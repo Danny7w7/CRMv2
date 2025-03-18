@@ -1,0 +1,234 @@
+{% extends "dashboard/index.html" %}
+{% load static %}
+{% block head %}
+    <title>Customer Performance Report</title>
+	<!--plugins-->
+	<link href="{% static 'assets/plugins/simplebar/css/simplebar.css' %}" rel="stylesheet" />
+	<link href="{% static 'assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css' %}" rel="stylesheet" />
+	<link href="{% static 'assets/plugins/metismenu/css/metisMenu.min.css' %}" rel="stylesheet" />
+	<link href="{% static 'assets/plugins/datatable/css/dataTables.bootstrap5.min.css' %}" rel="stylesheet" />
+	<!-- loader-->
+	<link href="{% static 'assets/css/pace.min.css' %}" rel="stylesheet" />
+	<script src="{% static 'assets/js/pace.min.js' %}"></script>
+	<!-- Bootstrap CSS -->
+	<link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet">
+	<link href="{% static 'assets/css/bootstrap-extended.css' %}" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&amp;display=swap" rel="stylesheet">
+	<link href="{% static 'assets/css/app.css' %}" rel="stylesheet">
+	<link href="{% static 'assets/css/icons.css' %}" rel="stylesheet">
+	<!-- Theme Style CSS -->
+	<link rel="stylesheet" href="{% static 'assets/css/dark-theme.css' %}" />
+	<link rel="stylesheet" href="{% static 'assets/css/semi-dark.css' %}" />
+	<link rel="stylesheet" href="{% static 'assets/css/header-colors.css' %}" />
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .report {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        .section {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #eef;
+            border-left: 5px solid #007bff;
+            border-radius: 5px;
+        }
+        .section h3 {
+            margin: 0 0 5px 0;
+            color: #007bff;
+        }
+        ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .note {
+            padding: 10px;
+            border-left: 5px solid;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+
+        .performance-perfect {
+            background: #e0f7fa;
+            border-left-color: #00acc1;
+            color: #006064;
+        }
+
+        .performance-excellent {
+            background: #d4edda;
+            border-left-color: #28a745;
+            color: #155724;
+        }
+
+        .performance-regular {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+            color: #856404;
+        }
+
+        .performance-low {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+            color: #721c24;
+        }
+
+
+    </style>
+{% endblock %}
+{% block page_content %}
+<h6 class="mb-0 text-uppercase">Customer Service Performance Report</h6>
+<hr/>
+<div class="card">
+    <div class="card-header">
+        <form method="POST" class="row">
+            {% csrf_token %}
+            <div class="col-md-3">
+                <label for="start_date">Start date:</label>
+                <input type="date" name="start_date" id="start_date" class="form-control" value="{{ start_date|date:'Y-m-d'|default:'' }}">
+            </div>
+            <div class="col-md-3">
+                <label for="end_date">End date:</label>
+                <input type="date" name="end_date" id="end_date" class="form-control" value="{{ end_date|date:'Y-m-d'|default:'' }}">
+            </div>
+            <div class="col-md-4 align-self-end mt-2">
+                <button type="submit" class="btn btn-primary">Filter</button>
+                <a href="{% url 'customerPerformance' %}" class="btn btn-secondary">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="card">
+    <div class="report">
+        <h2>📊 Customer Service Report</h2>
+
+        <div class="section">
+            <h3>Profiled Clients Total</h3>
+            <p><strong>{{totalObamacare}}</strong></p>
+        </div>
+
+        <div class="section">
+            <h3>📌 Enrollment</h3>
+            <ul>
+                <li><strong>Enrolled:</strong> {{totalEnroled}} ({{percentageEnroled}}%)</li>
+                <li><strong>Not Enrolled:</strong> {{totalNoEnroled}} ({{percentageNoEnroled}}%)</li>
+                <li><strong>Other Party:</strong> {{totalOtherParty}} ({{percentageOtherParty}}%)</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>📌 CMS Activation</h3>
+            <ul>
+                <li><strong>Active in CMS:</strong> {{enroledActiveCms}} of  {{totalEnroled}} ({{percentageEnroledActiveCms}}%)</li>
+                <li><strong>Not Active on Carrier:</strong> {{totalEnroledNoActiveCms}} of  {{totalEnroled}} ({{percentageNoActiveCms}}%)</li>
+                <li><strong>Active vs Profiled:</strong> {{totalActiveCms}} of  {{totalObamacare}} ({{percentageTotalActiveCms}}%)</li>
+                <li><strong>ctive on Carrier vs Profiled:</strong> {{totalNoActiveCms}} of  {{totalObamacare}} ({{percentageTotalNoActiveCms}}%)</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>📌 Other information</h3>
+            <ul>
+                <li><strong>Uploaded Docs:</strong> {{documentsTotal}}</li>
+                <li><strong>Medical Appointments:</strong> {{appointmentsTotal}}</li>
+                <li><strong>Total number of confirmed payments:</strong> {{paymentsTotal}}</li>
+            </ul>
+        </div>
+
+        {% if groupGoal == 1 %}
+        <div class="note performance-excellent">
+            ✅ <strong>Nota:</strong> Congratulations! The team has achieved exceptional performance with over 90% enrollment and activation in CMS. Let's continue to maintain this level of efficiency and quality service.
+        </div>
+        {% elif groupGoal == 2 %}
+        <div class="note performance-regular">
+            ⚠️ <strong>Nota:</strong> The team has met the minimum established goal, but there are opportunities for improvement. It is recommended to analyze possible process optimizations to increase efficiency.
+        </div>
+        {% else %}
+        <div class="note performance-low">
+            ❌ <strong>Nota:</strong> The team has not met the established goal. It is recommended to review the enrollment and activation strategies, as well as to evaluate the performance of the Customer Service department in order to take corrective actions.
+        </div>
+        {% endif %}
+    </div>
+</div>
+<div class="row">
+    {% for name, details in agentPerformance.items %}
+    <div class="col-6 mb-3">
+        <div class="report">
+            <h2>📊 {{name}}'s PERFORMANCE</h2>
+
+            <div class="section">
+                <h3>📌 Enrolment</h3>
+                <ul>
+                    <li><strong>Customers enrolled:</strong> {{details.totalEnroled}} ({{details.percentageEnroled}}%)</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h3>📌 Activation in CMS</h3>
+                <ul>
+                    <li><strong>Active CMS customers:</strong> {{details.enroledActiveCms}} de {{details.totalEnroled}} ({{details.percentageEnroledActiveCms}}%)</li>
+                    <li><strong>Customers not activated at Carrier:</strong> {{details.enroledNoActiveCms}} de {{details.totalEnroled}} ({{details.percentageEnroledNoActiveCms}}%)</li>
+                    <li><strong>Active clients in CMS with respect to total profiled:</strong> {{details.enroledActiveCms}} de {{totalObamacare}} ({{details.percentageTotalActiveCms}}%)</li>
+                    <li><strong>Customers not activated in Carrier compared to the total profiled:</strong> {{details.enroledNoActiveCms}} de {{totalObamacare}} ({{details.percentageTotalNoActiveCms}}%)</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h3>📌 Other information</h3>
+                <ul>
+                    <li><strong>Total number of documents uploaded:</strong> {{details.documents}}</li>
+                    <li><strong>Total number of medical appointments made:</strong> {{details.appointments}}</li>
+                    <li><strong>Total number of confirmed payments:</strong> {{details.payments}}</li>
+                </ul>
+            </div>
+
+            {% if details.personalGoal == 1 %}
+                <div class="note performance-perfect">
+                    🏆 <strong>Note:</strong> Impeccable performance. This agent has achieved <strong>100% effectiveness</strong>, demonstrating absolute mastery of his functions. It is recommended to recognize his performance and analyze his strategies in order to replicate them in the team. A true benchmark!
+                </div>
+            {% elif details.personalGoal == 2 %}
+                <div class="note performance-excellent">
+                    ✅ <strong>Note:</strong> Outstanding Performance. This agent has exceeded <strong>90% effectiveness</strong>, demonstrating a high level of commitment and efficiency. It is recommended to recognize his effort and take him as a reference for the team.
+                </div>
+            {% elif details.personalGoal == 3 %}
+                <div class="note performance-regular">
+                    ⚠️ <strong>Note:</strong> Acceptable performance, but with room for improvement. The agent has reached the minimum goal, although there are still opportunities to optimize performance. Follow-up is suggested to reinforce weak points.
+                </div>
+            {% else %}
+                <div class="note performance-low">
+                    ❌ <strong>Nota:</strong> Low performance, requires review. The agent has not reached <strong>80% effectiveness</strong>. It is necessary to analyze the causes and take corrective actions, either with training or adjustment of strategies.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+{% block end_js %}
+	<!-- Bootstrap JS -->
+	<script src="{% static "assets/js/bootstrap.bundle.min.js" %}"></script>
+
+	<!--plugins-->
+	<script src="{% static "assets/js/jquery.min.js" %}"></script>
+	<script src="{% static "assets/plugins/simplebar/js/simplebar.min.js" %}"></script>
+	<script src="{% static "assets/plugins/metismenu/js/metisMenu.min.js" %}"></script>
+	<script src="{% static "assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js" %}"></script>
+	<script src="{% static "assets/plugins/datatable/js/jquery.dataTables.min.js" %}"></script>
+	<script src="{% static "assets/plugins/datatable/js/dataTables.bootstrap5.min.js" %}"></script>
+
+	<!--app JS-->
+	<script src="{% static "assets/js/app.js" %}"></script>
+
+
+{% endblock %}
