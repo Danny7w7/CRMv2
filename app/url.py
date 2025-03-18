@@ -24,7 +24,7 @@ from .views.enterData import existClient, forms
 from .views.enterData import fetchs as fetchsEnterData
 from .views.reports import fecths as fetchsReports
 from .views.reports import table as tableReports
-from .views.reports import charts
+from .views.reports import charts, download
 from .views import users, dbExcel, quality, consents
 
 urlpatterns = [
@@ -110,35 +110,31 @@ urlpatterns = [
     path('viewIncomeLetter/<obamacare_id>/', consents.incomeLetter, name='incomeLetter'),
 
     path('averageCustomer', charts.averageCustomer, name='averageCustomer'),
-    path('customerTypification', views.customerTypification, name='customerTypification'),
+    path('customerTypification', tableReports.customerTypification, name='customerTypification'),
 
-    path('formAddObama/<client_id>', views.formAddObama, name='formAddObama'),
-    path('formAddSupp/<client_id>', views.formAddSupp, name='formAddSupp'),
-    path('formAddDepend/<client_id>', views.formAddDepend, name='formAddDepend'),
-    path('addDepend/', views.addDepend, name='addDepend'),
+    path('formAddObama/<client_id>', existClient.formAddObama, name='formAddObama'),
+    path('formAddSupp/<client_id>', forms.formAddSupp, name='formAddSupp'),
+    path('formAddDepend/<client_id>', forms.formAddDepend, name='formAddDepend'),
+    path('addDepend/', forms.addDepend, name='addDepend'),
     
-    path('detalle-agente/<agent_id>/', views.SaleModal, name='detalle_agente'),  
+    path('detalle-agente/<agent_id>/', fetchsReports.SaleModal, name='detalle_agente'),  
 
-    path('sale6Week/', views.sales6WeekReport, name='sale6Week'),  
-    path('chart6Week/', views.chart6Week, name='chart6Week'), 
+    path('sale6Week/', tableReports.sales6WeekReport, name='sale6Week'),  
+    path('chart6Week/', charts.chart6Week, name='chart6Week'), 
 
-    path('weekSalesWiew/',views.weekSalesWiew, name='weekSalesWiew'),
-    path('descargarPdf/<int:week_number>/', views.downloadPdf, name='downloadPdf'),
+    path('weekSalesWiew/',tableReports.weekSalesWiew, name='weekSalesWiew'),
+    path('descargarPdf/<int:week_number>/', download.downloadPdf, name='downloadPdf'),
 
-    path('formCreateClientMedicare/', views.formCreateClientMedicare, name='formCreateClientMedicare'),
-    path('consetMedicare/<client_id>/<language>/', views.consetMedicare, name='consetMedicare'),
-    path('clientMedicare/', views.clientMedicare, name='clientMedicare'),
-    path('editClientMedicare/<medicare_id>/', views.editClientMedicare, name='editClientMedicare'),
-    path('save-customer-observation-medicare/', views.saveCustomerObservationMedicare, name='saveCustomerObservationMedicare'),
-    path('desactiveMedicare/<medicare_id>/', views.desactiveMedicare, name='desactiveMedicare'),
-    path('validarCita/', views.validarCita, name='validarCita'),
+    path('formCreateClientMedicare/', forms.formCreateClientMedicare, name='formCreateClientMedicare'),
+    path('consetMedicare/<client_id>/<language>/', consents.consetMedicare, name='consetMedicare'),
+    path('clientMedicare/', table.clientMedicare, name='clientMedicare'),
+    path('editClientMedicare/<medicare_id>/', table.editClientMedicare, name='editClientMedicare'),
+    path('save-customer-observation-medicare/', table.saveCustomerObservationMedicare, name='saveCustomerObservationMedicare'),
+    path('desactiveMedicare/<medicare_id>/', table.desactiveMedicare, name='desactiveMedicare'),
+    path('validarCita/', table.validarCita, name='validarCita'),
 
-    path('reports/', views.reports, name='reports'),
-    path('downloadAccionRequired/', views.downloadAccionRequired, name='downloadAccionRequired'),
-    path('paymentClients/', views.paymentClients, name='paymentClients'),
+    path('reports/', tableReports.reports, name='reports'),
+    path('downloadAccionRequired/', download.downloadAccionRequired, name='downloadAccionRequired'),
+    path('paymentClients/', download.paymentClients, name='paymentClients'),
     
-    #Oneil, Sherpa and Carrier
-    path('uploadExcels/', views.uploadExcels, name='uploadExcels'),
-    path('processMappedHeadersPayments/', views.processMappedHeadersPayments, name='processMappedHeadersPayments'),
-    path('processMappedHeadersCarrier/', views.processMappedHeadersCarrier, name='processMappedHeadersCarrier'),
 ]
