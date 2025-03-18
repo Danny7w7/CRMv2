@@ -48,4 +48,4 @@ def motivationalPhrase(request):
     randomInt = random.randint(1,174)
     motivation = Motivation.objects.filter(id=randomInt).first()
     context = {'motivation':motivation}
-    return render (request, 'motivationalPhrase.html',context)
+    return render (request, 'auth/motivationalPhrase.html',context)

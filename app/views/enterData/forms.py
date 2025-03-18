@@ -49,9 +49,9 @@ def formCreateClient(request):
             # Responder con éxito y la URL de redirección
             return redirect('formCreatePlan', client.id)
         else:
-            return render(request, 'forms/formCreateClient.html', {'error_message': form.errors})
+            return render(request, 'newSale/formCreateClient.html', {'error_message': form.errors})
     else:
-        return render(request, 'forms/formCreateClient.html')
+        return render(request, 'newSale/formCreateClient.html')
 
 @login_required(login_url='/login') 
 def formCreateClientMedicare(request):
@@ -99,9 +99,9 @@ def formCreateClientMedicare(request):
         
             
         else:
-            return render(request, 'forms/formCreateClientMedicare.html', {'error_message': form.errors})
+            return render(request, 'newSale/formCreateClientMedicare.html', {'error_message': form.errors})
     else:
-        return render(request, 'forms/formCreateClientMedicare.html')
+        return render(request, 'newSale/formCreateClientMedicare.html')
 
 @login_required(login_url='/login') 
 def formCreatePlan(request, client_id):
@@ -291,4 +291,4 @@ def formCreateAlert(request):
             alert.save()
             return redirect('formCreateAlert')  # Cambia a tu página de éxito
 
-    return render(request, 'forms/formCreateAlert.html')
+    return render(request, 'newSale/formCreateAlert.html')

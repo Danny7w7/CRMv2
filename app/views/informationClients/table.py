@@ -43,7 +43,7 @@ def clientObamacare(request):
                     'obama_id', flat=True)).order_by('-created_at')      
 
 
-    return render(request, 'table/clientObamacare.html', {'obamacares':obamaCare})
+    return render(request, 'informationClient/clientObamacare.html', {'obamacares':obamaCare})
 
 @login_required(login_url='/login')
 def clientAccionRequired(request):
@@ -71,7 +71,7 @@ def clientAccionRequired(request):
                         date_completed__isnull=True ).values_list('obama_id', flat=True), is_active = True, agent_id = request.user.id ).order_by('-created_at')
 
 
-    return render(request, 'table/clientAccionRequired.html', {'obamacares':obamaCare})
+    return render(request, 'informationClient/clientAccionRequired.html', {'obamacares':obamaCare})
 
 @login_required(login_url='/login')
 def clientSupp(request):
@@ -96,24 +96,7 @@ def clientSupp(request):
             truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(agent = request.user.id, is_active = True).order_by('-created_at')
         suppPay = False
 
-    return render(request, 'table/clientSupp.html', {'supps':supp,'suppPay':suppPay})
-
-@login_required(login_url='/login')    
-def tableAlert(request):
-
-    roleAuditar = ['S', 'C',  'AU']
-    
-    if request.user.role in roleAuditar:
-        alert = ClientAlert.objects.select_related('agent').annotate(
-            truncated_contect=Substr('content', 1, 20)).filter(is_active = True)
-    elif request.user.role == 'Admin':
-        alert = ClientAlert.objects.select_related('agent').annotate(
-            truncated_contect=Substr('content', 1, 20))
-    elif request.user.role == 'A':
-        alert = ClientAlert.objects.select_related('agent').annotate(
-            truncated_contect=Substr('content', 1, 20)).filter(agent = request.user.id, is_active = True)
-    
-    return render(request, 'table/alert.html', {'alertC':alert})
+    return render(request, 'informationClient/clientSupp.html', {'supps':supp,'suppPay':suppPay})
 
 @login_required(login_url='/login')
 def clientMedicare(request):
@@ -131,4 +114,22 @@ def clientMedicare(request):
             truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(is_active = True, agent_id = request.user.id).order_by('-created_at')   
 
 
-    return render(request, 'table/clientMedicare.html', {'medicares':medicare})
+    return render(request, 'informationClient/clientMedicare.html', {'medicares':medicare})
+
+@login_required(login_url='/login')    
+def tableAlert(request):
+
+    roleAuditar = ['S', 'C',  'AU']
+    
+    if request.user.role in roleAuditar:
+        alert = ClientAlert.objects.select_related('agent').annotate(
+            truncated_contect=Substr('content', 1, 20)).filter(is_active = True)
+    elif request.user.role == 'Admin':
+        alert = ClientAlert.objects.select_related('agent').annotate(
+            truncated_contect=Substr('content', 1, 20))
+    elif request.user.role == 'A':
+        alert = ClientAlert.objects.select_related('agent').annotate(
+            truncated_contect=Substr('content', 1, 20)).filter(agent = request.user.id, is_active = True)
+    
+    return render(request, 'informationClient/alert.html', {'alertC':alert})
+

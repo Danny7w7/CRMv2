@@ -75,7 +75,7 @@ def sale(request):
         'end_date': end_date
     }
 
-    return render (request, 'table/sale.html', context)
+    return render (request, 'saleReports/sale.html', context)
 
 def saleObamaAgent(start_date=None, end_date=None):
     # Definir la consulta base para Supp, utilizando `select_related` para obtener el nombre completo del agente (User)
@@ -559,7 +559,7 @@ def customerPerformance(request):
             datetime.strptime(request.POST.get('end_date'), '%Y-%m-%d').replace(hour=23, minute=59, second=59, microsecond=999999)
         )
     else:
-        now = datetime.now()
+        now = datetime.datetime.now()
 
         # Primer día del mes actual
         start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
@@ -691,12 +691,12 @@ def customerPerformance(request):
         'totalAgentsPayments':totalAgentsPayments,
         'groupGoal':groupGoal
     }
-    return render(request, 'reports/customerPerformance.html', context)
+    return render(request, 'customerReports/customerPerformance.html', context)
 
 def table6Week():
 
     # Obtener la fecha actual
-    today = datetime.today()
+    today = datetime.datetime.today()
 
     # Calcular el domingo anterior (inicio de la semana actual)
     startOfCurrentWeek = today - timedelta(days=today.weekday() + 1)
@@ -829,14 +829,14 @@ def sales6WeekReport(request):
     }
 
     # Renderizar la plantilla con los datos
-    return render(request, 'table/sale6Week.html', context)
+    return render(request, 'saleReports/sale6Week.html', context)
 
 def weekSalesSummary(week_number):
     # Obtener el año actual
-    current_year = datetime.today().year
+    current_year = datetime.datetime.today().year
 
     # Calcular el lunes de la semana seleccionada
-    startOfWeek = datetime.fromisocalendar(current_year, week_number, 1)  # 1 = Lunes
+    startOfWeek = datetime.datetime.fromisocalendar(current_year, week_number, 1)  # 1 = Lunes
     # Calcular el sábado de la semana seleccionada
     endOfWeek = startOfWeek + timedelta(days=5)  # Lunes + 5 días = Sábado
 
@@ -952,14 +952,14 @@ def weekSalesWiew(request):
         resumen_semana, rango_fechas = weekSalesSummary(week_number)
 
         # Renderizar la plantilla con los resultados
-        return render(request, 'table/weekSalesWiew.html', {
+        return render(request, 'saleReports/weekSalesWiew.html', {
             'resumen_semana': resumen_semana,
             'rango_fechas': rango_fechas,
             'week_number': week_number
         })
 
     # Si no es POST, mostrar el formulario vacío
-    return render(request, 'table/weekSalesWiew.html')
+    return render(request, 'saleReports/weekSalesWiew.html')
 
 def reports(request):
 
@@ -987,7 +987,7 @@ def reports(request):
         'total_count' : total_count
         }
     
-    return render(request, 'table/reports.html', context)
+    return render(request, 'saleReports/reports.html', context)
 
 @login_required(login_url='/login')
 def customerTypification(request) :
@@ -1000,17 +1000,17 @@ def customerTypification(request) :
         startDatePost = request.POST['start_date']
         endDatePost = request.POST['end_date']
         startDate = timezone.make_aware(
-            datetime.strptime(startDatePost, '%Y-%m-%d').replace(hour=0, minute=0, second=0, microsecond=0)
+            datetime.datetime.strptime(startDatePost, '%Y-%m-%d').replace(hour=0, minute=0, second=0, microsecond=0)
         )
         endDate = timezone.make_aware(
-            datetime.strptime(endDatePost, '%Y-%m-%d').replace(hour=23, minute=59, second=59, microsecond=999999)
+            datetime.datetime.strptime(endDatePost, '%Y-%m-%d').replace(hour=23, minute=59, second=59, microsecond=999999)
         )
     else:
         startDate = timezone.make_aware(
-            datetime(now.year, now.month, 1, 0, 0, 0, 0)
+            datetime.datetime(now.year, now.month, 1, 0, 0, 0, 0)
         )
         endDate = timezone.make_aware(
-            datetime(now.year, now.month + 1, 1, 0, 0, 0, 0) - timezone.timedelta(microseconds=1)
+            datetime.datetime(now.year, now.month + 1, 1, 0, 0, 0, 0) - timezone.timedelta(microseconds=1)
         )
             
     agents = ObservationCustomer.objects.values('agent__username', 'agent__first_name', 'agent__last_name').distinct().filter(created_at__range=[startDate, endDate],is_active = True)
@@ -1048,4 +1048,4 @@ def customerTypification(request) :
     }   
     
     
-    return render(request, 'table/customerTypification.html', context)
+    return render(request, 'customerReports/customerTypification.html', context)

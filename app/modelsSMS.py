@@ -2,12 +2,15 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from storages.backends.s3boto3 import S3Boto3Storage
-from app.models import *
+from .models import *
 
 # Create your models here.
 
 class Numbers(models.Model):
-    phone_number = models.BigIntegerField()    
+    phone_number = models.BigIntegerField()   
+
+    class Meta:
+        db_table = 'sms_numbers' 
 
 class Contacts(models.Model):
     company = models.ForeignKey(Companies, on_delete=models.CASCADE)  # Relación con la compañía
@@ -24,7 +27,7 @@ class Contacts(models.Model):
         return f'{self.name} - {self.phone_number} ({self.company.company_name})'
 
     class Meta:
-        db_table = 'contacts'
+        db_table = 'sms_contacts'
 
 
 class SecretKey(models.Model):
@@ -32,7 +35,7 @@ class SecretKey(models.Model):
     secretKey = models.CharField(max_length=200)
 
     class Meta:
-        db_table = 'secretkey'
+        db_table = 'sms_secretkey'
 
 class Chat(models.Model):
     agent = models.ForeignKey(Users, on_delete=models.CASCADE)
@@ -49,7 +52,7 @@ class Chat(models.Model):
         return f'{self.agent.username} - {self.client.phone_number} ({self.company.company_name})'
     
     class Meta:
-        db_table = 'chat'
+        db_table = 'sms_chat'
 
 class Messages(models.Model):
     SENDER_TYPE_CHOICES = (
@@ -64,7 +67,7 @@ class Messages(models.Model):
     is_read = models.BooleanField(default=False)
 
     class Meta:
-        db_table = 'messages'
+        db_table = 'sms_messages'
 
 
 class FilesSMS(models.Model):
@@ -75,4 +78,4 @@ class FilesSMS(models.Model):
     message = models.OneToOneField(Messages, on_delete=models.CASCADE)
 
     class Meta:
-        db_table = 'filesSMS'
+        db_table = 'sms_files'

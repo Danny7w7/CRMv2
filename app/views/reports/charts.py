@@ -18,7 +18,7 @@ from app.models import *
 def chart6WeekSale():
 
     # Obtener la fecha actual
-    today = datetime.today()
+    today = datetime.datetime.today()
 
     # Calcular el domingo anterior (inicio de la semana actual)
     startOfCurrentWeek = today - timedelta(days=today.weekday() + 1)
@@ -98,7 +98,7 @@ def chart6Week(request):
     }
 
     # Renderizar la plantilla con los datos
-    return render(request, 'chart/chart6Week.html', context)
+    return render(request, 'graficsReports/chart6Week.html', context)
 
 @login_required(login_url='/login')
 def salesPerformance(request):
@@ -117,10 +117,10 @@ def salesPerformance(request):
         )
     else:
         startDate = timezone.make_aware(
-            datetime(now.year, now.month, 1, 0, 0, 0, 0)
+            datetime.datetime(now.year, now.month, 1, 0, 0, 0, 0)
         )
         endDate = timezone.make_aware(
-            datetime(now.year, now.month + 1, 1, 0, 0, 0, 0) - timezone.timedelta(microseconds=1)
+            datetime.datetime(now.year, now.month + 1, 1, 0, 0, 0, 0) - timezone.timedelta(microseconds=1)
         )
 
 
@@ -144,7 +144,7 @@ def salesPerformance(request):
     }
 
     # Renderizar la respuesta
-    return render(request, 'chart/averageSales.html', context)
+    return render(request, 'graficsReports/averageSales.html', context)
 
 def get_weekly_counts(user):
     # Obtener la fecha actual
@@ -334,4 +334,4 @@ def averageCustomer(request):
             'end_date': end_date
         }    
 
-    return render(request, 'chart/averageCustomer.html', context)
+    return render(request, 'graficsReports/averageCustomer.html', context)

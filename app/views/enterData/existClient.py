@@ -12,7 +12,7 @@ def select_client(request):
     if request.user.role == 'Admin': clients = Clients.objects.all()
     else: clients = Clients.objects.filter(is_active = True)
     
-    return render(request, 'agents/select_client.html', {'clients':clients})
+    return render(request, 'newSale/selectClient.html', {'clients':clients})
 
 def update_type_sales(request, client_id):
     if request.method == 'POST':

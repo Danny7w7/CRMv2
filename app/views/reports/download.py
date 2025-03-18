@@ -21,7 +21,7 @@ def downloadPdf(request, week_number):
     resumen_semana, rango_fechas = weekSalesSummary(week_number)
 
     # Renderizar la plantilla específica para el PDF
-    html_string = render_to_string('pdf/reportePdf.html', {
+    html_string = render_to_string('pdf/reportWekkly.html', {
         'resumen_semana': resumen_semana,
         'rango_fechas': rango_fechas,
         'week_number': week_number

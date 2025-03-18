@@ -1,6 +1,6 @@
 # Standard Python libraries
 import calendar
-import datetime
+from datetime import datetime
 import json
 
 # Django core libraries

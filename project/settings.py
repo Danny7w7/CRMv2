@@ -78,7 +78,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'app.utils.context_processors.alert_count',  # Asegúrate de que 'core' es la app correcta
+                # 'app.utils.context_processors.alert_count',  # Asegúrate de que 'core' es la app correcta #Estoy hay que repararlo
             ],
         },
     },

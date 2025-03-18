@@ -154,7 +154,7 @@ def typification(request):
             'agents' : agent
         })
 
-    return render(request, 'table/typification.html', {
+    return render(request, 'customerReports/typification.html', {
             'typification': typification,
             'start_date': start_date,
             'end_date': end_date,
