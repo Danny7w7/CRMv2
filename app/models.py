@@ -1,18 +1,17 @@
 from django.db import models
-
-# Create your models here.
-
 from django.contrib.auth.models import AbstractUser
-from django.db import models
 from django.utils import timezone
 from storages.backends.s3boto3 import S3Boto3Storage
+
+# Create your models here.
 
 class Companies(models.Model):
     owner = models.CharField(max_length=250)
     company_name = models.CharField(max_length=250)
     phone_company = models.BigIntegerField()
     company_email = models.EmailField()
-    is_active = models.BooleanField(default=True)  
+    is_active = models.BooleanField(default=True)
+    remaining_balance = models.DecimalField(max_digits=20, decimal_places=6)
 
     class Meta:
         db_table = 'companies'
@@ -36,6 +35,7 @@ class Users(AbstractUser):
         null=True,
         unique=False
     )
+    assigned_phone = models.ForeignKey('app.Numbers', on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey(Companies, on_delete=models.CASCADE)
     
     class Meta:
@@ -43,6 +43,14 @@ class Users(AbstractUser):
         
     def _str_(self):
         return self.username
+    
+    
+    def formatted_phone_number(self):
+        if self.assigned_phone and self.assigned_phone.phone_number:
+            phone_str = str(self.assigned_phone.phone_number)
+            formatted = f"+{phone_str[0]} ({phone_str[1:4]}) {phone_str[4:7]} {phone_str[7:]}"
+            return formatted
+        return None
 
 class Clients(models.Model):
     agent = models.ForeignKey(Users, on_delete=models.CASCADE)
@@ -405,6 +413,7 @@ class IncomeLetter(models.Model):
 
 class TemporaryToken(models.Model):
     client = models.ForeignKey(Clients, on_delete=models.CASCADE, null = True)
+    contact = models.ForeignKey('app.Contacts', on_delete=models.CASCADE, null = True)
     medicare = models.ForeignKey(Medicare, on_delete=models.CASCADE, null = True)
     token = models.TextField()  # Guardar el token firmado
     expiration = models.DateTimeField()

@@ -50,11 +50,11 @@ def sendMessage(request):
         to=f'+{request.POST['phoneNumber']}',
         text= request.POST['messageContent']
     )
-    client, created = createOrUpdateClient(request.POST['phoneNumber'], request.user.company)
+    contact, created = createOrUpdatecontact(request.POST['phoneNumber'], request.user.company)
     if request.user.role == 'Customer':
-        chat = createOrUpdateChat(client, request.user.company)
+        chat = createOrUpdateChat(contact, request.user.company)
     else:
-        chat = createOrUpdateChat(client, request.user.company, request.user)
+        chat = createOrUpdateChat(contact, request.user.company, request.user)
     saveMessageInDb('Agent', request.POST['messageContent'], chat, request.user)
     
     return JsonResponse({'message':'ok'})
@@ -64,74 +64,75 @@ def sendMessage(request):
 def sms(request, company_id):
     try:
         body = json.loads(request.body)
+        print(company_id)
         company = Companies.objects.get(id=company_id)
         
         # Imprimir el cuerpo completo
-        print("Cuerpo completo de la solicitud:")
-        print(json.dumps(body, indent=2))
+        # print("Cuerpo completo de la solicitud:")
+        # print(json.dumps(body, indent=2))
         
         # Acceder a datos específicos
         if 'data' in body and 'payload' in body['data']:
             payload = body['data']['payload']
             if body['data'].get('event_type') == 'message.received':
-                client, created = createOrUpdateClient(int(payload.get('from', {}).get('phone_number')), company)
-                chat = createOrUpdateChat(client, company)
+                contact, created = createOrUpdatecontact(int(payload.get('from', {}).get('phone_number')), company)
+                chat = createOrUpdateChat(contact, company)
                 message = saveMessageInDb('Client', payload.get('text'), chat)
                 
-                if not client.is_active:
-                    activateClient(client, payload.get('text'))
+                if not contact.is_active:
+                    activatecontact(contact, payload.get('text'))
 
-                if client.is_active:
-                    deactivateClient(client, payload.get('text'))
+                if contact.is_active:
+                    deactivatecontact(contact, payload.get('text'))
 
                 if payload.get('type') == 'MMS':
                     media = payload.get('media', [])
                     if media:
                         media_url = media[0].get('url')
                         fileUrl = save_image_from_url(message, media_url)
-                        SendMessageWebsocketChannel('MMS', payload, client, fileUrl)
+                        SendMessageWebsocketChannel('MMS', payload, contact, company.id, fileUrl)
                         if company.id != 1:
                             discountRemainingBalance(company, '0.027')
                         
                 else:
-                    SendMessageWebsocketChannel('SMS', payload, client)
+                    SendMessageWebsocketChannel('SMS', payload, contact, company.id)
                     if company.id != 1:
                         discountRemainingBalance(company, '0.025')
 
             return HttpResponse("Webhook recibido correctamente", status=200)
     except json.JSONDecodeError:
-        logger.debug("UwU:Error al decodificar JSON")
+        print("UwU:Error al decodificar JSON")
         return HttpResponse("Error en el formato JSON", status=400)
-    except Exception as e:
-        logger.debug(f"UwU:Error inesperado: {str(e)}")
-        return HttpResponse("Error interno del servidor", status=500)
+    # except Exception as e:
+    #     print(f"UwU:Error inesperado: {str(e)}")
+    #     return HttpResponse("Error interno del servidor", status=500)
 
-def SendMessageWebsocketChannel(typeMessage, payload, client, mediaUrl=None):
+def SendMessageWebsocketChannel(typeMessage, payload, contact, company_id, mediaUrl=None):
     # Enviar mensaje al canal de WebSocket
     channel_layer = get_channel_layer()
     # logger.debug('UwU:Intento enviar el mensaje al websocket')
     # logger.debug(f"Intentando enviar mensaje - Tipo: {typeMessage}")
-    # logger.debug(f"Cliente: {client.phone_number}")
+    # logger.debug(f"contacte: {contact.phone_number}")
     # logger.debug(f"Payload: {payload}")
     # logger.debug(f"MediaUrl: {mediaUrl}")
     if typeMessage == 'MMS':
         async_to_sync(channel_layer.group_send)(
-            f'chat_{client.phone_number}',  # Asegúrate de que este formato coincida con tu room_group_name
+            f"chat_{contact.phone_number}_company_{company_id}", # Asegúrate de que este formato coincida con tu room_group_name
             {
                 'type': typeMessage,
                 'message': mediaUrl,
-                'username': f"Cliente {client.phone_number}",  # O como quieras identificar al cliente
+                'username': f"contacte {contact.phone_number}",  # O como quieras identificar al contacte
                 'datetime': timezone.localtime(timezone.now()).strftime('%Y-%m-%d %H:%M:%S'),
                 'sender_id': True  # O cualquier identificador único que uses
             }
         )
     else:
         async_to_sync(channel_layer.group_send)(
-            f'chat_{client.phone_number}',  # Asegúrate de que este formato coincida con tu room_group_name
+            f"chat_{contact.phone_number}_company_{company_id}", # Asegúrate de que este formato coincida con tu room_group_name
             {
                 'type': 'chat_message',
                 'message': payload.get('text'),
-                'username': f"Cliente {client.phone_number}",  # O como quieras identificar al cliente
+                'username': f"contacte {contact.phone_number}",  # O como quieras identificar al contacte
                 'datetime': timezone.localtime(timezone.now()).strftime('%Y-%m-%d %H:%M:%S'),
                 'sender_id': True  # O cualquier identificador único que uses
             }
@@ -156,10 +157,10 @@ def saveMessageInDb(inboundOrOutbound, message_content, chat, sender=None):
     chat.save()
     return message
 
-def createOrUpdateChat(client, company, agent=None):
+def createOrUpdateChat(contact, company, agent=None):
     try:
-        # Intenta obtener un chat existente para el cliente en la empresa especificada
-        chat = Chat.objects.get(client_id=client.id, company_id=company.id)
+        # Intenta obtener un chat existente para el contacte en la empresa especificada
+        chat = Chat.objects.get(contact_id=contact.id, company_id=company.id)
 
         # Si se proporciona un nuevo agente, actualiza el chat
         if agent:
@@ -170,20 +171,20 @@ def createOrUpdateChat(client, company, agent=None):
         # Si el chat no existe, crea uno nuevo
         if not agent:
             # Define un agente por defecto si no se proporciona (opcional)
-            agent = Users.objects.get(id=29)  # ID de un agente genérico (En este caso sera el ID de Maria Carolina.)
+            agent = Users.objects.get(id=1)  # ID de un agente genérico (En este caso sera el ID de Maria Carolina.)
 
         chat = Chat(
             agent=agent,
-            client=client,
+            contact=contact,
             company=company  # Asocia el chat con la compañía
         )
         chat.save()
 
     return chat
 
-def createOrUpdateClient(phoneNumber, company, name=None):
-    # Intenta obtener o crear un cliente
-    client, created = Clients.objects.get_or_create(
+def createOrUpdatecontact(phoneNumber, company, name=None):
+    # Intenta obtener o crear un contact
+    contact, created = Contacts.objects.get_or_create(
         phone_number=phoneNumber,
         company=company,
         defaults={
@@ -192,46 +193,48 @@ def createOrUpdateClient(phoneNumber, company, name=None):
             }
     )
     if not created and name:
-        # Si el cliente ya existía y se proporcionó un nombre, actualizamos el nombre
-        client.name = name
-        client.save()
-        created = False  # El cliente no fue creado, solo actualizado
-    return client, created
+        # Si el contacte ya existía y se proporcionó un nombre, actualizamos el nombre
+        contact.name = name
+        contact.save()
+        created = False  # El contacte no fue creado, solo actualizado
+    return contact, created
 
-def deleteClient(request, id):
+def deleteContact(request, id):
     if request.user.is_superuser:
-        client = Clients.objects.get(id=id)
-        client.delete()
+        contact = Contacts.objects.get(id=id)
+        contact.delete()
     return redirect(index)
 
-def activateClient(client, message):
+def activatecontact(contact, message):
     # Limpiar el mensaje eliminando espacios al principio y al final, así como cualquier puntuación extra.
     cleaned_message = re.sub(r'[^a-zA-Z]+', '', message.strip()).upper()
 
     # Verificar si el mensaje es 'YES' o 'SI' o 'START'
     if cleaned_message == 'YES' or cleaned_message == 'SI' or cleaned_message == 'START':
-        client.is_active = True
-        client.save()
+        contact.is_active = True
+        contact.save()
 
-def deactivateClient(client, message):
+def deactivatecontact(contact, message):
     message_upper = message.upper()
     if message_upper == 'STOP':
-        client.is_active = False
-        client.save()
+        contact.is_active = False
+        contact.save()
 
 @login_required(login_url='/login')
 def index(request):
-    if request.user.is_staff:
-        chats = Chat.objects.select_related('client').filter(company=request.user.company).order_by('-last_message')
+    if request.user.is_superuser:
+        chats = Chat.objects.all()
+    elif request.user.is_staff:
+        chats = Chat.objects.select_related('contact').filter(company=request.user.company).order_by('-last_message')
     else:
-        chats = Chat.objects.select_related('client').filter(agent_id=request.user.id).order_by('-last_message')
+        chats = Chat.objects.select_related('contact').filter(agent_id=request.user.id).order_by('-last_message')
     chats = get_last_message_for_chats(chats)
 
     if request.method == 'POST':
         phoneNumber = request.POST.get('phoneNumber')
         name = request.POST.get('name', None)
-        client, created = createOrUpdateClient(phoneNumber, request.user.company, name)
-        chat = createOrUpdateChat(client, request.user.company, request.user)
+        contact, created = createOrUpdatecontact(phoneNumber, request.user.company, name)
+        chat = createOrUpdateChat(contact, request.user.company, request.user)
         if created:
             if request.POST.get('language') == 'english':
                 message = "Reply YES to receive updates and information about your policy from Lapeira & Associates LLC. Msg & data rates may apply. Up to 5 msgs/month. Reply STOP to opt-out at any time."
@@ -244,16 +247,16 @@ def index(request):
                 request.user.company,
                 message
             )
-        return redirect('chat', client.phone_number)
-    return render(request, 'sms/index.html', {'chats': chats})
+        return redirect('chatSms', contact.phone_number)
+    return render(request, 'sms/indexSms.html', {'chats': chats})
 
 @login_required(login_url='/login')
 def chat(request, phoneNumber):
     if request.method == 'POST':
         phoneNumber = request.POST.get('phoneNumber')
         name = request.POST.get('name', None)
-        client, created = createOrUpdateClient(phoneNumber, request.user.company, name)
-        chat = createOrUpdateChat(client, request.user.company, request.user)
+        contact, created = createOrUpdatecontact(phoneNumber, request.user.company, name)
+        chat = createOrUpdateChat(contact, request.user.company, request.user)
         if created:
             if request.POST.get('language') == 'english':
                 message = "Reply YES to receive updates and information about your policy from Lapeira & Associates LLC. Msg & data rates may apply. Up to 5 msgs/month. Reply STOP to opt-out at any time."
@@ -267,11 +270,11 @@ def chat(request, phoneNumber):
                 message
             )
             
-    client = Clients.objects.get(phone_number=phoneNumber, company=request.user.company)
-    chat = Chat.objects.get(client=client.id, company=request.user.company)
-    secretKey = SecretKey.objects.filter(client=client).filter()
+    contact = Contacts.objects.get(phone_number=phoneNumber, company=request.user.company)
+    chat = Chat.objects.get(contact=contact.id, company=request.user.company)
+    secretKey = SecretKey.objects.filter(contact=contact).filter()
     # Usamos select_related para optimizar las consultas
-    messages = Messages.objects.filter(chat=chat.id).select_related('files')
+    messages = Messages.objects.filter(chat=chat.id).select_related('filessms')
     
     # Creamos una lista para almacenar los mensajes con sus archivos
     messages_with_files = []
@@ -291,19 +294,20 @@ def chat(request, phoneNumber):
 
         # Intentamos obtener el archivo asociado
         try:
-            message_dict['file'] = message.files
+            message_dict['file'] = message.filessms
         except FilesSMS.DoesNotExist:
             pass
             
         messages_with_files.append(message_dict)
 
     if request.user.is_staff:
-        chats = Chat.objects.select_related('client').filter(company=request.user.company).order_by('-last_message')
+        chats = Chat.objects.select_related('contact').filter(company=request.user.company).order_by('-last_message')
     else:
-        chats = Chat.objects.select_related('client').filter(agent_id=request.user.id).order_by('-last_message')
+        chats = Chat.objects.select_related('contact').filter(agent_id=request.user.id).order_by('-last_message')
     chats = get_last_message_for_chats(chats)
     context = {
-        'client': client,
+        "chat_url": f"/chatSms/{contact.phone_number}/",
+        'contact': contact,
         'chats': chats,
         'messages': messages_with_files,
         'secretKey':secretKey
@@ -312,50 +316,50 @@ def chat(request, phoneNumber):
 
 def sendIndividualsSms(from_number, to_number, user, company, message_context):
     telnyx.api_key = settings.TELNYX_API_KEY
-    telnyx.Message.create(
+    print(telnyx.Message.create(
         from_=f"+{from_number}", # Your Telnyx number
         to=f'+{to_number}',
         text= message_context
-    )
-    client, created = createOrUpdateClient(to_number, company)
-    chat = createOrUpdateChat(client, company)
+    ))
+    contact, created = createOrUpdatecontact(to_number, company)
+    chat = createOrUpdateChat(contact, company)
     saveMessageInDb('Agent', message_context, chat, user)
     if company.id != 1: #No descuenta el saldo a Lapeira
         discountRemainingBalance(company, '0.035')
     
     return True
 
-def sendSecretKey(request, client_id):
-    client = Clients.objects.get(id=client_id)
-    secretKey = SecretKey.objects.get(client=client)
-    chat = Chat.objects.get(client=client)
+def sendSecretKey(request, contact_id):
+    contact = Contacts.objects.get(id=contact_id)
+    secretKey = SecretKey.objects.get(contact=contact)
+    chat = Chat.objects.get(contact=contact)
 
     telnyx.api_key = settings.TELNYX_API_KEY
     telnyx.Message.create(
         from_=f"+{request.user.assigned_phone.phone_number}", # Your Telnyx number
-        to=f'+{client.phone_number}',
-        text=generate_temporary_url(request, client, secretKey.secretKey)
+        to=f'+{contact.phone_number}',
+        text=generate_temporary_url(request, contact, secretKey.secretKey)
     )
     saveMessageInDb('Agent', 'Link to secret key sent', chat, request.user)
-    return redirect('chat', client.phone_number)
+    return redirect('chatSms', contact.phone_number)
 
 def sendCreateSecretKey(request, id):
-    client = Clients.objects.get(id=id)
-    chat = Chat.objects.get(client=client)
+    contact = Contacts.objects.get(id=id)
+    chat = Chat.objects.get(contact=contact)
     
     telnyx.api_key = settings.TELNYX_API_KEY
     telnyx.Message.create(
         from_=f"+{request.user.assigned_phone.phone_number}", # Your Telnyx number
-        to=f'+{client.phone_number}',
-        text= generate_temporary_url(request, client)
+        to=f'+{contact.phone_number}',
+        text= generate_temporary_url(request, contact)
     )
 
     saveMessageInDb('Agent', 'Secret key creation link sent', chat, request.user)
-    return redirect('chat', client.phone_number)
+    return redirect('chatSms', contact.phone_number)
 
 def createSecretKey(request):
     result = validate_temporary_url(request)
-    is_valid, note, *client = result
+    is_valid, note, *contact = result
 
     #Aqui valido si es valido el token, si no que retorne el mensaje de error
     if not is_valid:
@@ -364,11 +368,11 @@ def createSecretKey(request):
     if request.method == 'POST':
         secret_key_request = request.POST['secret_key']
 
-        # Verifica si existe un SecretKey para el cliente
-        secret_key = SecretKey.objects.filter(client=client[0].id).first()
+        # Verifica si existe un SecretKey para el contacte
+        secret_key = SecretKey.objects.filter(contact=contact[0].id).first()
         if not secret_key:
             secret_key = SecretKey()
-            secret_key.client = client[0]
+            secret_key.contact = contact[0]
         secret_key.secretKey = secret_key_request
         secret_key.save()
 
@@ -387,7 +391,7 @@ def createSecretKey(request):
 
 @login_required(login_url='/login')
 def chat_messages(request, phone_number):
-    chat = Chat.objects.get(client__phone_number=phone_number, agent=request.user)
+    chat = Chat.objects.get(contact__phone_number=phone_number, agent=request.user)
     messages = Messages.objects.filter(chat=chat).order_by('created_at')
     return JsonResponse([{
         'message': msg.message_content,
@@ -505,7 +509,7 @@ def get_last_message_for_chats(chats):
         unread_count = Messages.objects.filter(
             chat=chat,
             is_read=False,
-            sender_type='Client'  # Solo mensajes del cliente
+            sender_type='contact'  # Solo mensajes del contacte
         ).count()
         
         # Si existe último mensaje, agregar atributos personalizados
@@ -531,7 +535,7 @@ def get_last_message_for_chats(chats):
     return chats
 
 # Vista para generar el enlace temporal
-def generate_temporary_url(request, client, secret_key=None):
+def generate_temporary_url(request, contact, secret_key=None):
     signer = Signer()
 
     # Define una fecha de expiración (por ejemplo, 1 hora desde ahora)
@@ -539,8 +543,8 @@ def generate_temporary_url(request, client, secret_key=None):
 
     # Crear el token con la fecha de expiración usando JSON
     data = {
-        'client_id': client.id,
-        'phone_number': client.phone_number,
+        'contact_id': contact.id,
+        'phone_number': contact.phone_number,
         'expiration': expiration_time.isoformat(),
     }
     if secret_key:
@@ -550,7 +554,7 @@ def generate_temporary_url(request, client, secret_key=None):
 
     # Guardar la URL temporal en la base de datos
     TemporaryToken.objects.create(
-        client=client,
+        contact=contact,
         token=token,
         expiration=expiration_time
     )
@@ -576,10 +580,10 @@ def validate_temporary_url(request):
         signed_data = force_str(urlsafe_base64_decode(token))
         data = json.loads(signer.unsign(signed_data))
 
-        client_id = data.get('client_id')
+        contact_id = data.get('contact_id')
         expiration_time = timezone.datetime.fromisoformat(data['expiration'])
         # Verificar si el token está activo y no ha expirado
-        temp_url = TemporaryToken.objects.get(token=token, client_id=client_id)
+        temp_url = TemporaryToken.objects.get(token=token, contact_id=contact_id)
 
         if not temp_url.is_active:
             return False, 'Enlace desactivado. Link deactivated.'
@@ -588,9 +592,9 @@ def validate_temporary_url(request):
             return False, 'Enlace ha expirado. Link expired.'
 
         # Procesar si la URL es válida
-        client = temp_url.client
+        contact = temp_url.contact
         
-        return True, token, client
+        return True, token, contact
     
     except (BadSignature, ValueError, KeyError):
         return False, 'Token inválido o alterado. Invalid token.'

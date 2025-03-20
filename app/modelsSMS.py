@@ -31,7 +31,7 @@ class Contacts(models.Model):
 
 
 class SecretKey(models.Model):
-    client = models.OneToOneField(Clients, on_delete=models.CASCADE)
+    contact = models.OneToOneField(Contacts, on_delete=models.CASCADE)
     secretKey = models.CharField(max_length=200)
 
     class Meta:
@@ -39,17 +39,17 @@ class SecretKey(models.Model):
 
 class Chat(models.Model):
     agent = models.ForeignKey(Users, on_delete=models.CASCADE)
-    client = models.ForeignKey(Clients, on_delete=models.CASCADE)
+    contact = models.ForeignKey(Contacts, on_delete=models.CASCADE)
     company = models.ForeignKey(Companies, on_delete=models.CASCADE)  # Nueva relación
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     last_message = models.DateTimeField(null=True)
 
     class Meta:
-        unique_together = ('client', 'company')  # Restringe a un solo chat por cliente y compañía
+        unique_together = ('contact', 'company')  # Restringe a un solo chat por cliente y compañía
 
     def __str__(self):
-        return f'{self.agent.username} - {self.client.phone_number} ({self.company.company_name})'
+        return f'{self.agent.username} - {self.contact.phone_number} ({self.company.company_name})'
     
     class Meta:
         db_table = 'sms_chat'

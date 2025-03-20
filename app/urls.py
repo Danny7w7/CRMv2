@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.urls import path
 
-from .views import auth, index, tv, utils
+from .views import auth, index, tv
 from .views.informationClients import table, toggles, modals, edits
 from .views.informationClients import fetchs as fetchInformations
 from .views.enterData import existClient, forms
@@ -26,6 +26,8 @@ from .views.reports import table as tableReports
 from .views.reports import charts, download
 from .views.users import users, companies
 from .views import dbExcel, quality, consents
+
+from .views import sms
 
 urlpatterns = [
     #<---------------------------Auth--------------------------->
@@ -96,6 +98,19 @@ urlpatterns = [
     path('alert/<company_id>/', table.tableAlert, name='alert'),
     path('toggleAlert/<alertClient_id>/', toggles.toggleAlert, name='toggleAlert'),
     path('editAlert/<alertClient_id>/', edits.editAlert, name='editAlert'),
+
+
+    #<---------------------------SMS--------------------------->
+    path('smsBlue/', sms.index, name='smsBlue'),
+    path('chatSms/<phoneNumber>/', sms.chat, name='chatSms'),
+    path('sendMessage/', sms.sendMessage, name='sendMessage'),
+    path('deleteChat/<id>/', sms.deleteContact, name='deleteContact'),
+
+    path('sms/<int:company_id>/', sms.sms, name='sms'),
+
+    path('createSecretKey/<id>/', sms.sendCreateSecretKey, name='sendCreateSecretKey'),
+    path('sendSecretKey/<contact_id>/', sms.sendSecretKey, name='sendSecretKey'),
+    path('secret-key/', sms.createSecretKey, name='url_temporal'),
 
 
     #<---------------------------Sales Reports--------------------------->
