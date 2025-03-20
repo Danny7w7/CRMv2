@@ -42,6 +42,7 @@ def fetchAca(request, client_id):
         aca_plan, created = ObamaCare.objects.update_or_create(
             client=client,
             agent=request.user,
+            company = client.company,
             defaults={
                 'taxes': request.POST.get('taxes'),
                 'agent_usa': request.POST.get('agent_usa'),
@@ -120,7 +121,7 @@ def fetchSupp(request, client_id):
                 Supp.objects.filter(id=supp_id).update(
                     effective_date=sup_data.get('effectiveDateSupp'),
                     agent_usa=sup_data.get('agent_usa'),
-                    company=sup_data.get('carrierSuple'),
+                    carrier=sup_data.get('carrierSuple'),
                     premium=sup_data.get('premiumSupp'),
                     policy_type=sup_data.get('policyTypeSupp'),
                     preventive=sup_data.get('preventiveSupp'),
@@ -133,10 +134,11 @@ def fetchSupp(request, client_id):
                 new_supp = Supp.objects.create(
                     client=client,
                     status='REGISTERED',
+                    company = client.company,
                     agent=request.user,
                     effective_date=sup_data.get('effectiveDateSupp'),
                     agent_usa=sup_data.get('agent_usa'),
-                    company=sup_data.get('carrierSuple'),
+                    carrier=sup_data.get('carrierSuple'),
                     premium=sup_data.get('premiumSupp'),
                     policy_type=sup_data.get('policyTypeSupp'),
                     preventive=sup_data.get('preventiveSupp'),

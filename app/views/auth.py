@@ -15,7 +15,7 @@ from .index import index
 
 def login_(request):
     if request.user.is_authenticated:
-        return redirect(index)
+        return redirect(index, request.user.company)
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
@@ -41,11 +41,15 @@ def logout_(request):
     else:
         # Cierre de sesión manual tradicional
         logout(request)
-        return redirect(index)
+        return redirect(login_)
     
 @login_required(login_url='/login')
 def motivationalPhrase(request):
     randomInt = random.randint(1,174)
     motivation = Motivation.objects.filter(id=randomInt).first()
-    context = {'motivation':motivation}
+    user = Users.objects.select_related('company').filter(id = request.user.id).first()
+    context = {
+        'motivation':motivation,
+        'user':user
+        }
     return render (request, 'auth/motivationalPhrase.html',context)

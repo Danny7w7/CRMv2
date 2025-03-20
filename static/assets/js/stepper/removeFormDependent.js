@@ -2,6 +2,9 @@ function removeDependent(button) {
     // Obtener el contenedor del dependiente (div padre)
     const dependentDiv = button.closest('.dependentClassList');
     const dependentId = dependentDiv.querySelector('[name="dependentId"]').value;
+    const company = dependentDiv.querySelector('[name="company"]').value;
+    console.log("Dependent ID:", dependentId); // Depuración
+    console.log("company ID:", company); // Depuración
 
     // Confirmar antes de eliminar
     if (dependentId && confirm("Are you sure you want to delete this dependent?")) {
@@ -10,7 +13,7 @@ function removeDependent(button) {
         formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
 
         // Realizar la solicitud fetch para eliminar el registro
-        fetch(`/formCreatePlan/deleteDependent/${dependentId}/`, {
+        fetch(`/formCreatePlan/${company}/deleteDependent/${dependentId}/`, {
             method: 'POST',
             body: formData
         })

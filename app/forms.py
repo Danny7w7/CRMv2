@@ -6,14 +6,13 @@ class ClientForm(forms.ModelForm):
     class Meta:
         model = Clients
         fields = '__all__'
-        exclude = ['agent','date_birth','social_security','old']
+        exclude = ['agent','date_birth','social_security','company','created_at']
 
 class ClientMedicareForm(forms.ModelForm):
     class Meta:
         model = Medicare
         fields = '__all__'
         exclude = ['agent','date_birth','social_security','old','dateMedicare','status','status_color']
-
 
 class ObamaForm(forms.ModelForm):
     class Meta:
@@ -45,25 +44,6 @@ class ClientAlertForm(forms.ModelForm):
         fields = '__all__'
         exclude = ['agent']
 
-
-class ReporteSeleccionForm(forms.Form):
-    TIPOS_DE_REPORTE = (
-        ('clientes_por_agente', 'Clientes por Agente'),
-        ('clientes_activos', 'Clientes Activos e Inactivos'),
-        ('clientes_por_estado', 'Clientes por Estado'),
-        ('planes_obamacare', 'Planes de ObamaCare por Cliente'),
-        ('dependientes_cliente', 'Dependientes por Cliente'),
-        ('subsidios_por_agente', 'Subsidios por Agente'),
-        ('clientes_por_migracion', 'Clientes por Estado de Migración'),
-        ('clientes_por_fecha_nacimiento', 'Clientes por Fecha de Nacimiento'),
-        ('clientes_por_tipo_venta', 'Clientes por Tipo de Venta'),
-        ('clientes_con_docs_requeridos', 'Clientes con Documentos Requeridos'),
-        ('cobertura_efectiva', 'Fecha de Cobertura Efectiva de ObamaCare'),
-        # Agregar más opciones de reportes según se necesite
-    )
-
-    tipo_reporte = forms.ChoiceField(choices=TIPOS_DE_REPORTE, required=True)
-
 class ExcelUploadForm(forms.Form):
     file = forms.FileField(label="Subir archivo Excel", 
         widget=forms.FileInput(attrs={
@@ -90,7 +70,6 @@ class ControlQualityForm(forms.ModelForm):
             return datetime.strptime(date_input, '%m/%d/%Y').date()
         except ValueError:
             raise forms.ValidationError('Formato de fecha inválido. Use MM/DD/YYYY.')
-
 
 class ControlCallForm(forms.ModelForm):
     class Meta:

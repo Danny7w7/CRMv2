@@ -38,7 +38,7 @@
 									{% elif request.user.role == 'TV' %}
 										<a href="{% url "weeklyLiveViewTV" %}" class="btn btn-primary btn-lg px-md-5 radius-30">Go Home</a>
 									{% else %}
-										<a href="{% url "index" %}" class="btn btn-primary btn-lg px-md-5 radius-30">Go Home</a>
+										<a href="{% url 'index' user.company.id %}" class="btn btn-primary btn-lg px-md-5 radius-30">Go Home</a>
 									{% endif %}
 									<a href="{% url "logout" %}" class="btn btn-outline-dark btn-lg ms-3 px-md-5 radius-30">Exit</a>
 								</div>

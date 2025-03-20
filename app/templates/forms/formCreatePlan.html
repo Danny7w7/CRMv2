@@ -19,7 +19,7 @@
 	<!-- loader-->
 	<link href="{% static "assets/css/pace.min.css" %}" rel="stylesheet" />
 	<script src="{% static "assets/js/pace.min.js" %}"></script>
-
+	
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 
 	<!-- Bootstrap CSS -->
@@ -85,6 +85,7 @@
 				<form onSubmit="return false" method="POST">
 					<input type="hidden" id="type_sales" name="type_sales" value="{{ client.type_sales }}">
 					<input type="hidden" id="id" name="id" value="{{ client.id }}">
+					<input type="hidden" id="company" name="company" value="{{ company.id }}">
 					{% if client.type_sales == 'ACA'  or client.type_sales == 'ACA/SUPLEMENTARIO' %}
 					<!-- Stepper Aca -->
 						<div id="test-l-1" role="tabpanel" class="bs-stepper-pane" aria-labelledby="stepper1trigger1">
@@ -129,7 +130,7 @@
 								</div>
 								<div class="col-12 col-lg-6">
 									<label for="subsidy" class="form-label">Subsidy</label>
-									<input type="number" class="form-control" id="subsidy" step="0.01" value="{{aca_plan_data.subsidy}}" name="subsidy">
+									<input type="text" class="form-control" id="subsidy" step="0.01" value="{{aca_plan_data.subsidy}}" name="subsidy">
 								</div>								
 								<div class="col-12 col-lg-6">
 									<label for="carrierObama" class="form-label">Carrier</label>
@@ -176,7 +177,7 @@
 								</div>
 								<div class="col-12 col-lg-4">
 									<label for="premium" class="form-label">Premium</label>
-									<input type="number" class="form-control" id="premium" step="0.00" value="{{aca_plan_data.premium}}"  name="premium" required >
+									<input type="text" class="form-control" id="premium" step="0.01" value="{{aca_plan_data.premium}}"  name="premium" required >
 								</div>
 								<div class="col-12 col-lg-12">
 									<label for="observationObama" class="form-label">Observation</label>
@@ -185,7 +186,7 @@
 								<input type="hidden" id="client_id" value="{{client.id}}">
 								<div class="col-12">
 									<div class="d-flex align-items-center gap-3">
-										<a class="btn btn-outline-secondary px-4" href="{% url 'formEditClient' client.id %}"><i class='bx bx-left-arrow-alt me-2'></i>Previous	</a>										
+										<a class="btn btn-outline-secondary px-4" href="{% url 'formEditClient' company.id client.id %}"><i class='bx bx-left-arrow-alt me-2'></i>Previous	</a>										
 										<button class="btn btn-primary px-4" id='buttonSendObama'>Next<i class='bx bx-right-arrow-alt ms-2'></i></button>
 									</div>
 								</div>
@@ -242,17 +243,17 @@
 																<label for="carrierSuple" class="form-label">Carrier</label>
 																<select class="form-select" id="carrierSuple"  aria-label="Default select example" name="carrierSuple">
 																	<option disabled selected value=""></option>
-																	<option value="AFLAC" {% if supp_plan.company == 'AFLAC' %}selected{% endif %}> AFLAC</option>                             
-																	<option value="AETNA" {% if supp_plan.company == 'AETNA' %}selected{% endif %}> AETNA </option>
-																	<option value="ALLSTATE HEALTH SOLUTIONS" {% if supp_plan.company == 'ALLSTATE HEALTH SOLUTIONS' %}selected{% endif %}> ALLSTATE HEALTH SOLUTIONS </option>  
-																	<option value="COMBINED" {% if supp_plan.company == 'COMBINED' %}selected{% endif %}> COMBINED </option>
-																	<option value="CIGNA" {% if supp_plan.company == 'CIGNA' %}selected{% endif %}> CIGNA </option>    
-																	<option value="MANHATTAN LIFE" {% if supp_plan.company == 'MANHATTAN LIFE' %}selected{% endif %}> MANHATTAN LIFE </option>
-																	<option value="METLIFE" {% if supp_plan.company == 'METLIFE' %}selected{% endif %}> METLIFE </option>
-																	<option value="OSCAR" {% if supp_plan.company == 'OSCAR' %}selected{% endif %}> OSCAR</option> 
-																	<option value="PIVOT" {% if supp_plan.company == 'PIVOT' %}selected{% endif %}>PIVOT</option>  
-																	<option value="SUREBRIDGE" {% if supp_plan.company == 'SUREBRIDGE' %}selected{% endif %}> SUREBRIDGE </option>    
-																	<option value="UNITED" {% if supp_plan.company == 'UNITED' %}selected{% endif %}> UNITED </option>    
+																	<option value="AFLAC" {% if supp_plan.carrier == 'AFLAC' %}selected{% endif %}> AFLAC</option>                             
+																	<option value="AETNA" {% if supp_plan.carrier == 'AETNA' %}selected{% endif %}> AETNA </option>
+																	<option value="ALLSTATE HEALTH SOLUTIONS" {% if supp_plan.carrier == 'ALLSTATE HEALTH SOLUTIONS' %}selected{% endif %}> ALLSTATE HEALTH SOLUTIONS </option>  
+																	<option value="COMBINED" {% if supp_plan.carrier == 'COMBINED' %}selected{% endif %}> COMBINED </option>
+																	<option value="CIGNA" {% if supp_plan.carrier == 'CIGNA' %}selected{% endif %}> CIGNA </option>    
+																	<option value="MANHATTAN LIFE" {% if supp_plan.carrier == 'MANHATTAN LIFE' %}selected{% endif %}> MANHATTAN LIFE </option>
+																	<option value="METLIFE" {% if supp_plan.carrier == 'METLIFE' %}selected{% endif %}> METLIFE </option>
+																	<option value="OSCAR" {% if supp_plan.carrier == 'OSCAR' %}selected{% endif %}> OSCAR</option> 
+																	<option value="PIVOT" {% if supp_plan.carrier == 'PIVOT' %}selected{% endif %}>PIVOT</option>  
+																	<option value="SUREBRIDGE" {% if supp_plan.carrier == 'SUREBRIDGE' %}selected{% endif %}> SUREBRIDGE </option>    
+																	<option value="UNITED" {% if supp_plan.carrier == 'UNITED' %}selected{% endif %}> UNITED </option>    
 																</select>
 															</div>
 															<div class="col-12 col-lg-6">
@@ -446,7 +447,7 @@
 							<div class="col-12 mt-4">
 								<div class="d-flex align-items-center gap-3">
 									{% if client.type_sales == 'SUPLEMENTARIO' %}
-										<a class="btn btn-outline-secondary px-4" href="{% url 'formEditClient' client.id %}"><i class='bx bx-left-arrow-alt me-2'></i>Previous	</a>	
+										<a class="btn btn-outline-secondary px-4" href="{% url 'formEditClient' company.id client.id %}"><i class='bx bx-left-arrow-alt me-2'></i>Previous	</a>	
 									{% else %}
 										<button class="btn btn-outline-secondary px-4" onclick="stepper1.previous()">Previous</button>
 									{% endif %}									
@@ -479,6 +480,7 @@
 												<div class="card-body">
 													<div class="row g-3">
 														<input type="hidden" name="dependentId" value="{{ dependent.id }}">
+														<input type="hidden" id="company" name="company" value="{{ company.id }}">
 														<div class="col-12 col-lg-6">
 															<label class="form-label">Name of Dependent</label>
 															<input type="text" class="form-control" name="nameDependent" value="{{ dependent.name }}">
@@ -685,17 +687,22 @@
 	<script>
 		var client_id = '{{ client.id }}'
 		let type_sales = '{{ client.type_sales }}'
+		var company = '{{company.id}}'
 	</script>
 
-	<script src="{% static 'assets/js/validationFormCreatePlan.js' %}"></script>
-	<script src="{% static 'assets/js/repeater.js' %}"></script>
-	<script src="{% static 'assets/js/removeFormDependent.js' %}"></script>
-	<script src="{% static 'assets/js/validationForm.js' %}"></script>
-
-
+	<script src="{% static 'assets/js/stepper/formCreatePlan.js' %}"></script>
+	<script src="{% static 'assets/js/stepper/repeater.js' %}"></script>
+	<script src="{% static 'assets/js/stepper/removeFormDependent.js' %}"></script>
+	<script src="{% static 'assets/js/validations/validationForm.js' %}"></script>
 
 	<!-- Incluir JS de Choices.js -->
 	<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+
+
+
+
+	
 
 
 {% endblock %}

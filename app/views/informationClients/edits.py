@@ -13,22 +13,19 @@ from django.shortcuts import get_object_or_404, redirect, render
 # Application-specific imports
 from app.models import *
 from ...forms import *
+from ..decoratorsCompany import company_ownership_required
 
 @login_required(login_url='/login') 
-def formEditClient(request, client_id):
+#@company_ownership_required
+def formEditClient(request, company_id, client_id):
     
     client = get_object_or_404(Clients, id=client_id)        
 
     if request.method == 'POST':
 
         date_births = request.POST.get('date_birth')
-        fecha_obj = datetime.strptime(date_births, '%m/%d/%Y').date()
+        fecha_obj = datetime.datetime.strptime(date_births, '%m/%d/%Y').date()
         fecha_formateada = fecha_obj.strftime('%Y-%m-%d')
-
-        # Obtener la fecha actual
-        hoy = datetime.today().date()
-        # Calcular la edad
-        edad = hoy.year - fecha_obj.year - ((hoy.month, hoy.day) < (fecha_obj.month, fecha_obj.day))
 
         social = request.POST.get('social_security')
 
@@ -41,15 +38,20 @@ def formEditClient(request, client_id):
             client.is_active = 1
             client.date_birth = fecha_formateada
             client.social_security = formatSocial
-            client.old = edad
             
             client.save()
-            return redirect('formCreatePlan', client.id) 
+            return redirect('formCreatePlan', company_id ,client.id) 
         
     # Si el método es GET, mostrar el formulario con los datos del cliente
     form = ClientForm(instance=client)
 
-    return render(request, 'forms/formEditClient.html', {'form': form, 'client': client})
+    context = {
+        'form': form, 
+        'client': client,
+        'company_id': company_id
+    }
+
+    return render(request, 'edit/formEditClient.html', context)
 
 def editAlert(request, alertClient_id):
 

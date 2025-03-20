@@ -38,6 +38,7 @@ function saveAcaPlan() {
     formData.append('doc_migration', document.getElementById('doc_migration').value)
     formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value)
     formData.append('premium', document.getElementById('premium').value) 
+    formData.append('company', document.getElementById('company').value) 
 
     var acaPlanId = document.getElementById('acaPlanId').value;
     var acaPlan = document.getElementById('acaPlan').value;
@@ -91,6 +92,7 @@ function saveSupplementaryPlan() {
       const deducibleSupp = plan.querySelector('[name="deducibleSupp"]').value;
       const observationSuple = plan.querySelector('[name="observationSuple"]').value;
       const suppIdField = plan.querySelector('[name="suppId"]'); 
+      const company = plan.querySelector('[name="company"]'); 
 
       
       let suppId = suppIdField ? suppIdField.value : '';
@@ -123,6 +125,7 @@ function saveSupplementaryPlan() {
           formData.append(`supplementary_plan_data[${index}][coverageSupp]`, coverageSupp);
           formData.append(`supplementary_plan_data[${index}][deducibleSupp]`, deducibleSupp);
           formData.append(`supplementary_plan_data[${index}][observationSuple]`, observationSuple);
+          formData.append(`supplementary_plan_data[${index}][company]`, company); 
       }
   });
 
@@ -273,7 +276,8 @@ function saveDependents() {
 
           // Botón 1: Redirigir a la página de inicio
           document.getElementById('buttonHome').addEventListener('click', () => {
-            window.location.href = '/';
+            
+            window.location.href = `/index/${company}/`;
           });
 
           // Botón 2: Redirigir a los detalles

@@ -68,13 +68,13 @@
 							<div class="menu-title">Dashboard</div>
 						</a>
 						<ul>						
-							<li> <a href="{% url "index" %}"><i class='bx bx-radio-circle'></i>Home</a>
+							<li> <a href="{% url 'index' user.company.id %}"><i class='bx bx-radio-circle'></i>Home</a>
 							</li>
 							{% if request.user.role == 'Admin' or request.user.role == 'S' or request.user.role == 'TV' %}
 								{% if toggle %}
-									<li> <a href="{% url "monthLiveView" %}"><i class='bx bx-radio-circle'></i>View TV</a></li>
+									<li> <a href="{% url 'monthLiveView' user.company.id %}"><i class='bx bx-radio-circle'></i>View TV</a></li>
 								{% else %}
-									<li> <a href="{% url "weeklyLiveView" %}"><i class='bx bx-radio-circle'></i>View TV</a></li>
+									<li> <a href="{% url 'weeklyLiveView' user.company.id %}"><i class='bx bx-radio-circle'></i>View TV</a></li>
 								{% endif %}
 							{% endif %}
 						</ul>
@@ -86,13 +86,13 @@
 							<div class="menu-title">New Sale</div>
 						</a>
 						<ul>
-							<li> <a href="{% url "formCreateClient" %}"><i class='bx bx-radio-circle'></i>New Client</a>
+							<li> <a href="{% url 'formCreateClient' user.company.id %}"><i class='bx bx-radio-circle'></i>New Client</a>
 							</li>
-							<li> <a href="{% url "formCreateClientMedicare" %}"><i class='bx bx-radio-circle'></i>New Client Medicare</a>
+							<li> <a href="{% url 'formCreateClientMedicare' user.company.id %}"><i class='bx bx-radio-circle'></i>New Client Medicare</a>
 							</li>
-							<li> <a href="{% url "select_client" %}"><i class='bx bx-radio-circle'></i>Existing Client</a>
+							<li> <a href="{% url 'select_client' user.company.id %}"><i class='bx bx-radio-circle'></i>Existing Client</a>
 							</li>
-							<li> <a href="{% url "formCreateAlert" %}"><i class='bx bx-radio-circle'></i>Create Alert</a>
+							<li> <a href="{% url 'formCreateAlert' user.company.id %}"><i class='bx bx-radio-circle'></i>Create Alert</a>
 							</li>
 						</ul>
 					</li>
@@ -103,15 +103,15 @@
 							<div class="menu-title">Information Client</div>
 						</a>
 						<ul>
-							<li> <a href="{% url "clientObamacare" %}"><i class='bx bx-radio-circle'></i>Clients Obama</a>
+							<li> <a href="{% url 'clientObamacare' user.company.id %}"><i class='bx bx-radio-circle'></i>Clients Obama</a>
 							</li>
-							<li> <a href="{% url "clientAccionRequired" %}"><i class='bx bx-radio-circle'></i>Clients Accion Required </a>
+							<li> <a href="{% url 'clientAccionRequired' user.company.id %}"><i class='bx bx-radio-circle'></i>Clients Accion Required </a>
 							</li>
-							<li> <a href="{% url "clientSupp" %}"><i class='bx bx-radio-circle'></i>Clients Supp</a>
+							<li> <a href="{% url 'clientSupp' user.company.id %}"><i class='bx bx-radio-circle'></i>Clients Supp</a>
 							</li>
-							<li> <a href="{% url "clientMedicare" %}"><i class='bx bx-radio-circle'></i>Clients Medicare</a>
+							<li> <a href="{% url 'clientMedicare' user.company.id %}"><i class='bx bx-radio-circle'></i>Clients Medicare</a>
 							</li>
-							<li> <a href="{% url "alert" %}"><i class='bx bx-radio-circle'></i>Alert</a>
+							<li> <a href="{% url 'alert' user.company.id %}"><i class='bx bx-radio-circle'></i>Alert</a>
 							</li>
 						</ul>
 					</li>
@@ -123,13 +123,13 @@
 							<div class="menu-title">Sales Reports</div>
 						</a>
 						<ul>
-							<li> <a href="{% url 'sale' %}"><i class='bx bx-radio-circle'></i>Sale</a>
+							<li> <a href="{% url 'sale' user.company.id %}"><i class='bx bx-radio-circle'></i>Sale</a>
 							</li>
-							<li> <a href="{% url 'sale6Week' %}"><i class='bx bx-radio-circle'></i>Sales for the last 6 weeks</a>
+							<li> <a href="{% url 'sale6Week' user.company.id %}"><i class='bx bx-radio-circle'></i>Sales for the last 6 weeks</a>
 							</li>
-							<li> <a href="{% url 'weekSalesWiew' %}"><i class='bx bx-radio-circle'></i>Sales Week</a>
+							<li> <a href="{% url 'weekSalesWiew' user.company.id %}"><i class='bx bx-radio-circle'></i>Sales Week</a>
 							</li>
-							<li> <a href="{% url 'reports' %}"><i class='bx bx-radio-circle'></i>Report Payment / Action Required</a>
+							<li> <a href="{% url 'reports' user.company.id %}"><i class='bx bx-radio-circle'></i>Report Payment / Action Required</a>
 							</li>
 						</ul>
 					</li>
@@ -139,11 +139,11 @@
 							<div class="menu-title">Customer Reports</div>
 						</a>
 						<ul>
-							<li> <a href="{% url 'customerPerformance' %}"><i class='bx bx-radio-circle'></i>Customer performance</a>
+							<li> <a href="{% url 'customerPerformance' user.company.id %}"><i class='bx bx-radio-circle'></i>Customer performance</a>
 							</li>
-							<li> <a href="{% url 'typification' %}"><i class='bx bx-radio-circle'></i>Typification</a>
+							<li> <a href="{% url 'typification' user.company.id %}"><i class='bx bx-radio-circle'></i>Typification</a>
 							</li>
-							<li> <a href="{% url 'customerTypification' %}"><i class='bx bx-radio-circle'></i>Typification customer</a>
+							<li> <a href="{% url 'customerTypification' user.company.id %}"><i class='bx bx-radio-circle'></i>Typification customer</a>
 							</li>
 						</ul>
 					</li>
@@ -154,11 +154,11 @@
 							<div class="menu-title">Graphical reports</div>
 						</a>
 						<ul>
-							<li> <a href="{% url 'averageCustomer' %}"><i class='bx bx-radio-circle'></i>Effective Calls</a>
+							<li> <a href="{% url 'averageCustomer' user.company.id %}"><i class='bx bx-radio-circle'></i>Effective Calls</a>
 							</li>
-							<li> <a href="{% url 'salesPerformance' %}"><i class='bx bx-radio-circle'></i>Sales Performance</a>
+							<li> <a href="{% url 'salesPerformance' user.company.id %}"><i class='bx bx-radio-circle'></i>Sales Performance</a>
 							</li>
-							<li> <a href="{% url 'chart6Week' %}"><i class='bx bx-radio-circle'></i>Sale 6 Week</a>
+							<li> <a href="{% url 'chart6Week' user.company.id %}"><i class='bx bx-radio-circle'></i>Sale 6 Week</a>
 							</li>
 						</ul>
 					</li>
@@ -171,11 +171,11 @@
 							<div class="menu-title">Quality</div>
 						</a>
 						<ul>
-							<li> <a href="{% url 'formCreateControl' %}"><i class='bx bx-radio-circle'></i>Add Quality</a>
+							<li> <a href="{% url 'formCreateControl' user.company.id %}"><i class='bx bx-radio-circle'></i>Add Quality</a>
 							</li>
-							<li> <a href="{% url 'control' %}"><i class='bx bx-radio-circle'></i>View quality</a>
+							<li> <a href="{% url 'control' user.company.id %}"><i class='bx bx-radio-circle'></i>View quality</a>
 							</li>
-							<li> <a href="{% url 'createQuality' %}"><i class='bx bx-radio-circle'></i>Generate pdf</a>
+							<li> <a href="{% url 'createQuality' user.company.id %}"><i class='bx bx-radio-circle'></i>Generate pdf</a>
 							</li>
 						</ul>
 					</li>
@@ -189,11 +189,11 @@
 						</a>
 						<ul>
 							{% if request.user.role == 'Admin'  %}
-								<li> <a href="{% url "upload_excel" %}"><i class='bx bx-radio-circle'></i>Add Excel</a>
+								<li> <a href="{% url 'upload_excel' user.company.id %}"><i class='bx bx-radio-circle'></i>Add Excel</a>
 								</li>
-								<li> <a href="{% url "manage_agent_assignments" %}"><i class='bx bx-radio-circle'></i>Assign BD to agents</a>
+								<li> <a href="{% url 'manage_agent_assignments' user.company.id %}"><i class='bx bx-radio-circle'></i>Assign BD to agents</a>
 								</li>
-								<li> <a href="{% url "reportBd" %}"><i class='bx bx-radio-circle'></i>Report BD</a>
+								<li> <a href="{% url 'reportBd' user.company.id %}"><i class='bx bx-radio-circle'></i>Report BD</a>
 								</li>
 							{% endif %}
 							<li> <a href="{% url "bd" %}"><i class='bx bx-radio-circle'></i>View BD</a>
@@ -203,7 +203,7 @@
 					{% if request.user.role == 'Admin'  %}
 					<li class="menu-label">User</li>
 					<li>
-						<li> <a href="{% url "formCreateUser" %}"><i class='bx bx-radio-circle'></i>View User</a>
+						<li> <a href="{% url 'formCreateUser' user.company.id %}"><i class='bx bx-radio-circle'></i>View User</a>
 						</li>
 					</li>
 					{% endif %}					
@@ -213,7 +213,7 @@
 					<li class="menu-label">Information Client</li>
 					<li>
 						<li> 
-							<a href="{% url "clientObamacare" %}"><i class='bx bx-radio-circle'></i>Clients Obama</a>
+							<a href="{% url 'clientObamacare' user.company.id %}"><i class='bx bx-radio-circle'></i>Clients Obama</a>
 						</li>
 					</li>
 			{% endif %}
@@ -279,7 +279,7 @@
 											<p>No expired alerts</p>  <!-- Si no hay alertas vencidas -->
 										{% endif %}
 									</div>
-									<a href="{% url 'alert' %}">
+									<a href="{% url 'alert' user.company.id %}">
 										<div class="text-center msg-footer">
 											<button class="btn btn-primary w-100">View All Notifications</button>
 										</div>

@@ -1,7 +1,7 @@
 {% extends "dashboard/index.html" %}
 {% load static %}
 {% block head %}
-    <title>Creation User</title>
+    <title>Creation companies</title>
 	<!--plugins-->
 	<link href="{% static "assets/plugins/simplebar/css/simplebar.css" %}" rel="stylesheet" />
 	<link href="{% static "assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" %}" rel="stylesheet" />
@@ -22,54 +22,31 @@
 	<link rel="stylesheet" href="{% static "assets/css/header-colors.css" %}" />
 {% endblock %}
 {% block page_content %}
-<h6 class="mb-0 text-uppercase">CREATION OF USER</h6>
+<h6 class="mb-0 text-uppercase">CREATION OF COMPANY</h6>
 <hr/>
 <div class="row">
 	<div class="col-xl-10 mx-auto">
 		<div class="card">
 			<div class="card-header px-4 py-3">
-				<h5 class="mb-0">User information</h5>
+				<h5 class="mb-0">Company information</h5>
 			</div>
 			<div class="card-body p-4">
-				<form class="row g-3 needs-validation" method="POST" >
+				<form id="formCreateCompanies" class="row g-3 needs-validation" method="POST" >
 					<div class="col-md-4">
-						<label for="first_name" class="form-label">First Name</label>
-						<input type="text" class="form-control" id="first_name" name="first_name"required>
+						<label for="owner" class="form-label">Owner Name</label>
+						<input type="text" class="form-control" id="owner" name="owner"required>
 					</div>
 					<div class="col-md-4">
-						<label for="last_name" class="form-label">Last Name</label>
-						<input type="text" class="form-control" id="last_name" name="last_name"required>
+						<label for="name" class="form-label">Name Full Company</label>
+						<input type="text" class="form-control" id="name" name="name"required>
 					</div>
 					<div class="col-md-4">
-						<label for="username" class="form-label">Username</label>
-						<input type="text" class="form-control" id="username" name="username"required>
+						<label for="phone" class="form-label">Phone</label>
+						<input type="number" class="form-control" id="phone" name="phone"required>
 					</div>
 					<div class="col-md-4">
-						<label for="password" class="form-label">Password</label>
-						<input type="password" class="form-control" id="password" name="password" required>
-					</div>
-					<div class="col-md-4">
-						<label for="role" class="form-label">Role</label>						
-						<select id="inputState" class="form-select" id="role" name="role" required >	
-							{% for value, label in roles %}
-							<option value="{{ value }}" {% if user.role == value %}selected{% endif %}>{{ label }}</option>
-							{% endfor %}					
-							<option disabled selected value="">Please select</option>								
-						</select>
-					</div>
-					<div class="col-md-4">
-						<label for="role" class="form-label">Company </label>
-						{% if request.user.is_superuser %}
-							<select id="inputState" class="form-select" id="company" name="company" required >								
-								<option disabled selected value="">Please select</option>							
-								{% for companies in companies %}
-									<option value="{{companies.id}}" >{{ companies.company_name }}</option>
-								{% endfor %}
-							</select>
-						{% else %}
-							<input hidden type="text" class="form-control" id="company" name="company" value="{{ companies.id }}" >
-							<input readonly type="text" class="form-control" id="company" name="company" value="{{ companies.company_name }}" > 			
-						{% endif %}
+						<label for="email" class="form-label">Email </label>
+						<input type="email" class="form-control" id="email" name="email" required>
 					</div>
 					<div class="col-md-12">
 						<div class="d-md-flex d-grid align-items-center gap-3">
@@ -88,25 +65,23 @@
 					<table id="tableUser" class="table table-striped table-bordered">
 						<thead>
 							<tr>
-								<th>Name User</th>
-								<th>Username</th>
-								<th>Role</th>
+								<th>Name Owner</th>
+								<th>Company</th>
 								<th>Active</th>
 								<th>Option</th>
 							</tr>
 						</thead>
 						<tbody>
-							{% for user in users %}
+							{% for companie in companies %}
 							<tr>
-								<td>{{user.first_name}} {{user.last_name}}</td>
-								<td>{{user.username}}</td>
-								<td>{{user.role}}</td>
-								<td>{{user.is_active}}</td>
+								<td>{{companie.owner}} {{user.last_name}}</td>
+								<td>{{companie.company_name}}</td>
+								<td>{{companie.is_active}}</td>
 								<td>
 									<div class="d-flex order-actions">
-										<a href="{% url 'editUser' user.company.id user.id %}" class=""><i class='bx bxs-edit'></i></a>
+										<a href="{% url 'editCompanies' companie.id %}" class=""><i class='bx bxs-edit'></i></a>
 										{% if request.user.is_superuser %}
-										<a href="{% url 'toggleUser' user.id %}" class="ms-3"><i class='bx bxs-trash'></i></a>
+										<a href="{% url 'toggleUser' companie.id %}" class="ms-3"><i class='bx bxs-trash'></i></a>
 										{% endif %}
 									</div>
 								</td> 
@@ -119,6 +94,12 @@
 		</div>
 	</div>
 </div>
+<div id="alert-data"
+     data-type="{{ type }}"
+     data-message="{{ msg|safe }}"
+     style="display: none;">
+</div>
+
 {% endblock %}
 {% block end_js %}
 	<!-- Bootstrap JS -->
@@ -135,24 +116,8 @@
 
 	<!--app JS-->
 	<script src="{% static "assets/js/app.js" %}"></script>
-	<script> $(document).ready(function() {$('#tableUser').DataTable();} );	</script>
-	
-	{% if type == 'error' %}
-	<script>
-		Swal.fire({
-			icon: "error",
-			title: "Oops...",
-			text: "{{msg|safe}}",
-		});
-	</script>
-	{% elif type == 'good' %}
-	<script>
-		Swal.fire({
-			title: "Good job!",
-			text: "User successfully saved!",
-			icon: "success"
-		  });
-	</script>
-	{% endif %}
+
+    <!--JS-->
+	<script src="{% static "assets/js/validations/validationCompanies.js" %}"></script>
 
 {% endblock %}

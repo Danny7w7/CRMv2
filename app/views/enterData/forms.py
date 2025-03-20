@@ -13,23 +13,33 @@ from django.shortcuts import get_object_or_404, redirect, render
 from app.forms import *
 from app.models import *
 
+from ..decoratorsCompany import company_ownership_required
 
 # Vista para crear cliente
 @login_required(login_url='/login') 
-def formCreateClient(request):
+@company_ownership_required
+def formCreateClient(request, company_id):
+
+    user = Users.objects.select_related('company').filter(company = company_id).first()
+    if company_id == '1':
+        company = Companies.objects.filter(is_active = True)
+    else:
+        company = None
+
+    context = {
+        'user' : user,
+        'company' : company
+    }
+
     if request.method == 'POST':
 
         date_births = request.POST.get('date_birth')
-        fecha_obj = datetime.strptime(date_births, '%m/%d/%Y').date()
+        fecha_obj = datetime.datetime.strptime(date_births, '%m/%d/%Y').date()
         fecha_formateada = fecha_obj.strftime('%Y-%m-%d')
-
-        # Obtener la fecha actual
-        hoy = datetime.today().date()
-        # Calcular la edad
-        edad = hoy.year - fecha_obj.year - ((hoy.month, hoy.day) < (fecha_obj.month, fecha_obj.day))
+        companies = request.POST.get('companies')
+        companiesInstance = Companies.objects.filter(id = companies).first()
 
         social = request.POST.get('social_security')
-
         if social: formatSocial = social.replace('-','')
         else: formatSocial = None
 
@@ -38,20 +48,20 @@ def formCreateClient(request):
             client = form.save(commit=False)
             client.agent = request.user
             client.is_active = 1
-            client.old = edad
             client.date_birth = fecha_formateada
             client.social_security = formatSocial
+            client.company = companiesInstance
             client.save()
 
             if client.type_sales in ['ACA', 'ACA/SUPLEMENTARIO']:
                 contact = ContactClient.objects.create(client=client,agent=request.user)
             
             # Responder con éxito y la URL de redirección
-            return redirect('formCreatePlan', client.id)
+            return redirect('formCreatePlan', company_id ,client.id)
         else:
             return render(request, 'newSale/formCreateClient.html', {'error_message': form.errors})
     else:
-        return render(request, 'newSale/formCreateClient.html')
+        return render(request, 'newSale/formCreateClient.html',context)
 
 @login_required(login_url='/login') 
 def formCreateClientMedicare(request):
@@ -104,8 +114,9 @@ def formCreateClientMedicare(request):
         return render(request, 'newSale/formCreateClientMedicare.html')
 
 @login_required(login_url='/login') 
-def formCreatePlan(request, client_id):
+def formCreatePlan(request, company_id ,client_id):
     client = get_object_or_404(Clients, id=client_id)
+    company = Companies.objects.filter(id = company_id).first()
 
     type_sale = request.GET.get('type_sale')
     aca_plan = ObamaCare.objects.filter(client=client).first()
@@ -119,7 +130,8 @@ def formCreatePlan(request, client_id):
         'aca_plan_data': aca_plan,
         'supplementary_plan_data': supplementary_plan,
         'dependents': dependents,
-        'type_sale':type_sale
+        'type_sale':type_sale,
+        'company': company
     })
 
 @login_required(login_url='/login')

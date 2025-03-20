@@ -9,10 +9,18 @@ from django.shortcuts import get_object_or_404, redirect, render
 # Application-specific imports
 from app.models import *
 
-@login_required(login_url='/login') 
-def formCreateUser(request):
+from ..decoratorsCompany import company_ownership_required
 
-    users = Users.objects.all()
+@company_ownership_required
+@login_required(login_url='/login') 
+def formCreateUser(request, company_id):
+
+    if request.user.is_superuser:
+        users = Users.objects.exclude(is_superuser = True)
+        companies = Companies.objects.filter(is_active = True)
+    else:
+        users = Users.objects.filter(company = company_id, is_active = True).exclude(is_superuser = True)
+        companies = Companies.objects.filter(id = company_id, is_active = True).first()
 
     roles = Users.ROLES_CHOICES  # Obtén las opciones dinámicamente desde el modelo
 
@@ -22,6 +30,7 @@ def formCreateUser(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         role = request.POST.get('role')
+        company = request.POST.get('company')
         
         try:
             # Validar si el username ya existe
@@ -34,35 +43,43 @@ def formCreateUser(request):
                 password=make_password(password),  # Encriptar la contraseña
                 last_name=last_name,
                 first_name=first_name,
-                role=role
+                role=role,
+                company = companies
             )
 
             context = {
                 'msg':f'Usuario {user.username} creado con éxito.',
                 'users':users,
                 'type':'good',
-                'roles': roles
+                'roles': roles,
+                'companies' : companies
             }
 
             return render(request, 'forms/formCreateUser.html', context)
 
         except Exception as e:
             return HttpResponse(str(e))
+        
+    context = {
+            'users':users,
+            'roles': roles,
+            'companies' : companies
+        }
             
-    return render(request, 'forms/formCreateUser.html',{'users':users,'roles': roles})
+    return render(request, 'forms/formCreateUser.html', context)
 
 @login_required(login_url='/login') 
-def editUser(request, user_id):
+@company_ownership_required
+def editUser(request, company_id, user_id):
     # Obtener el usuario a editar o devolver un 404 si no existe
-    user = get_object_or_404(Users, id=user_id)
+    user = Users.objects.select_related('company').filter(id=user_id).exclude(is_superuser=True).first()
+
 
     if request.method == 'POST':
         # Recuperar los datos del formulario
         first_name = request.POST.get('first_name', user.first_name)
         last_name = request.POST.get('last_name', user.last_name)
-        email = request.POST.get('email', user.email)
         username = request.POST.get('username', user.username)
-        password = request.POST.get('password', None)
         role = request.POST.get('role', user.role)
         is_active = request.POST.get('is_active', user.is_active)
 
@@ -73,14 +90,9 @@ def editUser(request, user_id):
         # Actualizar los datos del usuario
         user.first_name = first_name
         user.last_name = last_name
-        user.email = email
         user.username = username
         user.role = role
         user.is_active = is_active
-
-        # Actualizar la contraseña si se proporciona una nueva
-        if password:
-            user.password = make_password(password)
 
         # Guardar los cambios
         user.save()

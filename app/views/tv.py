@@ -16,14 +16,18 @@ from django.shortcuts import render
 from app.models import *
 
 @login_required(login_url='/login')
-def weeklyLiveView(request):
+def weeklyLiveView(request, company_id):
+
+    companie = Users.objects.select_related('company').filter(company = company_id).first()
+
     context = {
-        'weeklySales': getSalesForWeekly(),
+        'weeklySales': getSalesForWeekly(company_id),
+        'companie' : companie
     }
     if request.user.role == 'TV': return render(request, 'dashboard/weeklyLiveViewTV.html', context)
     else: return render(request, 'dashboard/weeklyLiveView.html', context)
 
-def getSalesForWeekly():
+def getSalesForWeekly(company_id):
     # Obtener la fecha de hoy y calcular el inicio de la semana (asumiendo que empieza el lunes)
     today = timezone.now()
     startOfWeek = today - timedelta(days=today.weekday())
@@ -52,8 +56,14 @@ def getSalesForWeekly():
     # Contamos cuántos registros de ObamaCare tiene cada usuario por día
     userRole = ['A', 'C', 'S']
 
+    #validation de lo que se va a mostrar por company o si es super user    
+    if company_id == '1':
+        filterCompany = ObamaCare.objects.filter(is_active = True)
+    else:
+        filterCompany = ObamaCare.objects.filter(company = company_id, is_active = True)
+
     # Filtrar por la semana actual
-    obamaCounts = ObamaCare.objects.values('agent', 'created_at') \
+    obamaCounts = filterCompany.values('agent', 'created_at') \
         .filter(
             agent__role__in=userRole,
             is_active=True,
@@ -61,7 +71,7 @@ def getSalesForWeekly():
         ) \
         .annotate(obamaCount=Count('id'))
         
-    obamaActiveCounts = ObamaCare.objects.values('agent', 'created_at')\
+    obamaActiveCounts = filterCompany.values('agent', 'created_at')\
         .filter(
             agent__role__in=userRole, 
             is_active=True, 
@@ -84,8 +94,14 @@ def getSalesForWeekly():
             day = daysOfWeek[dayOfWeek]
             userCounts[obamaActive['agent']][day]['obamaActive'] += obamaActive['obamaProfilingCount']
 
+    #validation de lo que se va a mostrar por company o si es super user    
+    if company_id == '1':
+        filterCompanySupp = Supp.objects.filter(is_active = True)
+    else:
+        filterCompanySupp = Supp.objects.filter(company = company_id, is_active = True)
+
     # Contamos cuántos registros de Supp tiene cada usuario por día
-    suppCounts = Supp.objects.values('agent', 'created_at') \
+    suppCounts = filterCompanySupp.values('agent', 'created_at') \
         .filter(
             agent__role__in=userRole,
             is_active=True,
@@ -93,7 +109,7 @@ def getSalesForWeekly():
         ) \
         .annotate(suppCount=Count('id'))
 
-    suppActiveCounts = Supp.objects.values('agent', 'created_at') \
+    suppActiveCounts = filterCompanySupp.values('agent', 'created_at') \
         .filter(
             agent__role__in=userRole,
             is_active=True,
@@ -118,8 +134,14 @@ def getSalesForWeekly():
 
     excludedUsernames = ['Calidad01', 'mariluz', 'MariaCaTi'] #Excluimos a gente que no debe aparecer en la vista
 
+    #validation de lo que se va a mostrar por company o si es super user    
+    if company_id == '1':
+        filterCompanyUser = Users.objects.filter(role__in=userRole, is_active=True)
+    else:
+        filterCompanyUser = Users.objects.filter(role__in=userRole, is_active=True, company = company_id)
+
     # Aseguramos que todos los usuarios estén en el diccionario, incluso si no tienen registros
-    for user in Users.objects.filter(role__in=userRole, is_active=True).exclude(username__in=excludedUsernames):
+    for user in filterCompanyUser.exclude(username__in=excludedUsernames):
         if user.id not in userCounts:
             userCounts[user.id] = {
                 'lunes': {'obama': 0, 'obamaActive': 0 , 'supp': 0, 'suppActive':0},
@@ -138,9 +160,9 @@ def getSalesForWeekly():
 
     return finalCounts
 
-def getSalesForMonth():
+def getSalesForMonth(company_id):
     # Obtener las fechas de inicio y fin del mes actual
-    today = datetime.today()
+    today = datetime.datetime.today()
     startDate = today.replace(day=1)  # Primer día del mes actual
     _, lastDay = calendar.monthrange(today.year, today.month)
     endDate = today.replace(day=lastDay)  # Último día del mes actual
@@ -179,8 +201,12 @@ def getSalesForMonth():
     }
     
     # Filtrar todas las ventas realizadas en el mes actual
-    obamaSales = ObamaCare.objects.filter(created_at__range=[startDate, endDate])
-    suppSales = Supp.objects.filter(created_at__range=[startDate, endDate])
+    if company_id == '1':
+        obamaSales = ObamaCare.objects.filter(created_at__range=[startDate, endDate])
+        suppSales = Supp.objects.filter(created_at__range=[startDate, endDate])
+    else:
+        obamaSales = ObamaCare.objects.filter(created_at__range=[startDate, endDate], company = company_id)
+        suppSales = Supp.objects.filter(created_at__range=[startDate, endDate], company = company_id)
     
     # Iterar sobre las ventas de Obamacare y organizarlas por semanas
     for sale in obamaSales:
@@ -203,8 +229,12 @@ def getSalesForMonth():
                 pass
 
     # Agregar el conteo de pólizas activas por agente para Obamacare y Supp
-    activeObamaPolicies = ObamaCare.objects.filter(status='Active')
-    activeSuppPolicies = Supp.objects.filter(status='Active')
+    if company_id == '1':
+        activeObamaPolicies = ObamaCare.objects.filter(status='Active')
+        activeSuppPolicies = Supp.objects.filter(status='Active')
+    else:
+        activeObamaPolicies = ObamaCare.objects.filter(status='Active',company = company_id)
+        activeSuppPolicies = Supp.objects.filter(status='Active',company = company_id)
     
     for policy in activeObamaPolicies:
         agentName = policy.agent.username
@@ -232,12 +262,17 @@ def getSalesForMonth():
     
     return finalSummary, weekRanges
 
-def monthLiveView(request):
-    monthSales, weekRanges = getSalesForMonth()
+def monthLiveView(request, company_id):
+
+    companie = Users.objects.select_related('company').filter(company = company_id).first()
+
+    monthSales, weekRanges = getSalesForMonth(company_id)
+    
     context = {
         'monthSales': monthSales,
         'weekRanges': weekRanges,
-        'toggle': True
+        'toggle': True,
+        'companie':companie
     }
     
     if request.user.role == 'TV': return render(request, 'dashboard/monthLiveViewTV.html', context)

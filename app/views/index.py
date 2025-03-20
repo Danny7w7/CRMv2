@@ -12,8 +12,15 @@ from django.shortcuts import render
 # Application-specific imports
 from app.models import *
 
+from django.shortcuts import render
+from .decoratorsCompany import company_ownership_required
+
 @login_required(login_url='/login') 
-def index(request):
+@company_ownership_required
+def index(request, company_id):
+
+    user = Users.objects.select_related('company').filter(id = request.user.id).first()
+
     obama = countSalesObama(request)
     supp = countSalesSupp(request)
     chartOne = chartSaleIndex(request)
@@ -28,7 +35,8 @@ def index(request):
         'supp':supp,
         'chartOne':chartOne_json,
         'tableStatusObama':tableStatusAca,
-        'tableStatusSup':tableStatusSup
+        'tableStatusSup':tableStatusSup,
+        'user' : user
     }      
 
     return render(request, 'dashboard/index.html', context)

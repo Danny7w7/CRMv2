@@ -47,7 +47,7 @@ def fetchPaymentsMonth(request):
             return JsonResponse({'success': False, 'message': 'Invalid JSON'}, status=400)
     return JsonResponse({'success': False, 'message': 'Método no permitido'}, status=405)
 
-def delete_dependent(request, dependent_id):
+def delete_dependent(request, company_id ,dependent_id):
     if request.method == 'POST':
         try:
             # Buscar y eliminar el dependiente por ID
