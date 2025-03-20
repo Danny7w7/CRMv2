@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from app.models import *
 
 @login_required(login_url='/login') 
-def fromCreateCompanies(request):
+def formCreateCompanies(request):
 
     companies = Companies.objects.all()
 
@@ -20,10 +20,7 @@ def fromCreateCompanies(request):
         phone = request.POST.get('phone')
         email = request.POST.get('email')
         
-        try:     
-
-            companies = Companies.objects.all()
-            
+        try:
             companie = Companies.objects.create(
                 owner=owner,
                 company_name=name, 
@@ -31,22 +28,24 @@ def fromCreateCompanies(request):
                 company_email=email
             )
 
+            companies = Companies.objects.all()
+
             context = {
                 'msg':f'Companies {companie.owner} creado con éxito.',
                 'companies':companies,
                 'type':'good'
             }
 
-            return render(request, 'forms/fromCreateCompanies.html', context)
+            return render(request, 'forms/formCreateCompanies.html', context)
 
         except Exception as e:
             return HttpResponse(str(e))
     
     context = {
-        'companies' : companies
+        'companies':companies
     }
             
-    return render(request, 'forms/fromCreateCompanies.html', context)
+    return render(request, 'forms/formCreateCompanies.html', context)
 
 @login_required(login_url='/login') 
 def editCompanies(request, companies_id):
@@ -73,7 +72,7 @@ def editCompanies(request, companies_id):
         company.save()
 
         # Redirigir a otra vista o mostrar un mensaje de éxito
-        return redirect('fromCreateCompanies')  
+        return redirect('formCreateCompanies')  
 
     # Renderizar el formulario con los datos actuales del usuario
     context = {'company': company}
@@ -89,4 +88,4 @@ def toggleCompanies(request, companies_id):
     company.save()  # Guardar los cambios en la base de datos
     
     # Redirigir de nuevo a la página actual con un parámetro de éxito
-    return redirect('fromCreateCompanies')
+    return redirect('formCreateCompanies')

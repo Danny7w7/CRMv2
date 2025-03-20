@@ -37,6 +37,9 @@ def formCreateUser(request, company_id):
             if Users.objects.filter(username=username).exists():
                 return render(request, 'forms/formCreateUser.html', {'msg':f'El nombre de usuario "{username}" ya está en uso.','users':users, 'type':'error'})
             
+            # Obtener la instancia/objeto Company
+            company = companies.filter(id=company).first()
+
             # Crear el usuario si no existe el username
             user = Users.objects.create(
                 username=username,
@@ -44,7 +47,7 @@ def formCreateUser(request, company_id):
                 last_name=last_name,
                 first_name=first_name,
                 role=role,
-                company = companies
+                company = company
             )
 
             context = {
