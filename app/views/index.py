@@ -12,8 +12,18 @@ from django.shortcuts import render
 # Application-specific imports
 from app.models import *
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .decoratorsCompany import company_ownership_required
+
+@login_required(login_url='/login') 
+def index_redirect(request):
+    # Aquí puedes obtener la compañía del usuario autenticado si aplica
+    if request.user.is_authenticated:
+       company_id = request.user.company
+    else:
+        company_id = None 
+    
+    return redirect('index', company_id)  # Usa un ID válido
 
 @login_required(login_url='/login') 
 @company_ownership_required

@@ -58,7 +58,7 @@ def delete_dependent(request, company_id ,dependent_id):
             return JsonResponse({'success': False, 'error': 'Dependent not found'})
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
-def delete_supp(request, supp_id):
+def delete_supp(request, company_id ,supp_id):
     if request.method == 'POST':
         try:
             # Buscar y eliminar el dependiente por ID

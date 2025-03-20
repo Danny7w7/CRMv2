@@ -69,7 +69,7 @@
         function openNewTab() {
             var newPage = window.open("{{ new_page_url }}", "_blank");
             if (newPage) {
-                window.location.href = "{% url 'index' %}";
+                window.location.href = "{% url 'index' company.id %}";
             } else {
                 document.getElementById("manualRedirect").style.display = "block";
                 document.getElementById("autoMessage").style.display = "none";

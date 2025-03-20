@@ -4,13 +4,18 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 # Application-specific imports
 from app.models import *
+from ..decoratorsCompany import company_ownership_required
 
 
 @login_required(login_url='/login') 
-def select_client(request):
+@company_ownership_required
+def select_client(request, company_id):
 
-    if request.user.role == 'Admin': clients = Clients.objects.all()
-    else: clients = Clients.objects.filter(is_active = True)
+    if request.user.is_superuser: 
+        clients = Clients.objects.all()
+    elif request.user.role == 'Admin': 
+        clients = Clients.objects.filter(company = company_id)
+    else: clients = Clients.objects.filter(is_active = True, company = company_id)
     
     return render(request, 'newSale/selectClient.html', {'clients':clients})
 

@@ -64,24 +64,45 @@ def formCreateClient(request, company_id):
         return render(request, 'newSale/formCreateClient.html',context)
 
 @login_required(login_url='/login') 
-def formCreateClientMedicare(request):
+@company_ownership_required
+def formCreateClientMedicare(request, company_id):
+
+    user = Users.objects.select_related('company').filter(company = company_id).first()
+
+    if company_id == '1':
+        company = Companies.objects.filter(is_active = True)
+    else:
+        company = None
+
+    context = {
+        'user' : user,
+        'company' : company
+    }
+
     if request.method == 'POST':
 
         date_births = request.POST.get('date_birth')
         language = request.POST.get('language')
-        fecha_obj = datetime.strptime(date_births, '%m/%d/%Y').date()
+        fecha_obj = datetime.datetime.strptime(date_births, '%m/%d/%Y').date()
         fecha_formateada = fecha_obj.strftime('%Y-%m-%d')
+
+        #companie
+        companies = request.POST.get('companies')
+        companiesInstance = Companies.objects.filter(id = companies).first()
+
+        #reseteo de campos
+        nameAutorized = request.POST.get('nameAutorized')
+        relationship = request.POST.get('relationship')
+
+        if nameAutorized == '': nameAutorized = 'N/A'
+        if relationship == 'no_valid': relationship = 'N/A'
+
 
         date_medicare = request.POST.get('dateMedicare')
         # Convertir a objeto datetime
-        fecha_medicare = datetime.strptime(date_medicare, '%m/%d/%Y %H')
+        fecha_medicare = datetime.datetime.strptime(date_medicare, '%m/%d/%Y %H')
         # Asegurar compatibilidad con zona horaria
         fecha_formateada_medicare = make_aware(fecha_medicare)
-
-        # Obtener la fecha actual
-        hoy = datetime.today().date()
-        # Calcular la edad
-        edad = hoy.year - fecha_obj.year - ((hoy.month, hoy.day) < (fecha_obj.month, fecha_obj.day))
 
         social = request.POST.get('social_security')
 
@@ -93,27 +114,35 @@ def formCreateClientMedicare(request):
             client = form.save(commit=False)
             client.agent = request.user
             client.is_active = 1
-            client.old = edad
+            client.company = companiesInstance
             client.date_birth = fecha_formateada
             client.dateMedicare = fecha_formateada_medicare
             client.social_security = formatSocial
+            client.relationship = relationship
+            client.nameAutorized = nameAutorized
             client.save()
 
             contact = OptionMedicare.objects.create(client=client,agent=request.user)
             
             # Redirección a la nueva página en otra pestaña
             new_page_url = reverse('consetMedicare', args=[client.id, language])
+
+            context = {
+                'new_page_url': new_page_url,
+                'company' : companiesInstance
+            }
             
             # Redirección de la página actual al index
-            return render(request, 'redirect_template.html', {'new_page_url': new_page_url})
+            return render(request, 'consent/redirectMedicare.html', context)
         
             
         else:
             return render(request, 'newSale/formCreateClientMedicare.html', {'error_message': form.errors})
     else:
-        return render(request, 'newSale/formCreateClientMedicare.html')
+        return render(request, 'newSale/formCreateClientMedicare.html', context)
 
 @login_required(login_url='/login') 
+@company_ownership_required
 def formCreatePlan(request, company_id ,client_id):
     client = get_object_or_404(Clients, id=client_id)
     company = Companies.objects.filter(id = company_id).first()
@@ -135,6 +164,7 @@ def formCreatePlan(request, company_id ,client_id):
     })
 
 @login_required(login_url='/login')
+@company_ownership_required
 def formAddObama(request,client_id):
 
     client = Clients.objects.get(id=client_id)
@@ -154,6 +184,7 @@ def formAddObama(request,client_id):
     return render(request, 'forms/formAddObama.html')
 
 @login_required(login_url='/login')
+@company_ownership_required
 def formAddSupp(request,client_id):
 
     client = Clients.objects.get(id=client_id)    
@@ -181,6 +212,7 @@ def formAddSupp(request,client_id):
     return render(request, 'forms/formAddSupp.html')
 
 @login_required(login_url='/login')
+@company_ownership_required
 def formAddDepend(request, client_id):
     lista = []
     lista2 = []

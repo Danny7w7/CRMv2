@@ -38,12 +38,30 @@
 <!--end breadcrumb-->
 <div class="card">
 	<div class="card-body">
-		<h5 class="mb-1">Add Client Medicare</h5>
-		<p class="mb-4">Information about the client</p>
-		<hr/>
-		<div id="editor">
-			<form id="formCreateClientMedicare" method="POST">
-			{% csrf_token %}
+		<form id="formCreateClientMedicare" method="POST">			
+			<div class="d-flex justify-content-between align-items-start flex-wrap">
+				<div>
+					<h5 class="mb-1">Add Client Medicare</h5>
+					<p class="mb-4">Information about the client</p>
+				</div>
+				<div style="min-width: 300px;">
+					<label for="agent_usa" class="form-label font-weight-bold">Company:</label>
+					{% if company %}
+						<select class="form-select" id="companies" aria-label="Default select example" name="companies">
+							<option value="no_valid" disabled selected>Please Select</option>
+							{% for item in company %}
+								<option value="item.id">{{item.company_name}}</option>
+							{% endfor %}
+						</select>
+					{% else %}
+						<p> <strong> {{user.company.company_name}} </strong> </p>
+						<input hidden type="text" class="form-control" name="companies" id="companies" value="{{user.company.id}}" >	
+					{% endif %}
+				</div>
+			</div>
+			<hr/>
+			<div id="editor">
+				{% csrf_token %}
 				<div id="test-l-1" role="tabpanel" class="bs-stepper-pane" aria-labelledby="stepper1trigger1">
 					<div class="row g-3">
 						<div class="col-12 col-lg-4">
@@ -135,9 +153,8 @@
 						</div>
 						<div class="col-12 col-lg-2">
 							<label for="relationship" class="form-label">Relationship</label>
-							<select class="form-select" id="relationship"  name="relationship" required>
+							<select class="form-select" id="relationship"  name="relationship" >
 								<option value="no_valid" disabled selected>Please Select</option>
-								<option value="N/A">N/A</option>
 								<option value="Daughter/Son">Daughter/Son</option>
 								<option value="Legal Guardian">Legal Guardian</option>
 							</select>
@@ -159,8 +176,8 @@
 					</div><!---end row-->
 				
 				</div>
-			</form>
-		</div>
+			</div>
+		</form>
 	</div>
 </div>
 
@@ -178,7 +195,7 @@
 	
 	<!--app JS-->
 	<script src="{% static "assets/js/app.js" %}"></script>
-	<script src="{% static "assets/js/validationFormCreateClientMedicare.js" %}"></script>
+	<script src="{% static "assets/js/validations/FormCreateClientMedicare.js" %}"></script>
 
 	<!-- Agregar la librería de Flatpickr -->
 	<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>

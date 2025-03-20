@@ -35,6 +35,7 @@ urlpatterns = [
 
 
     #<---------------------------DashBoard--------------------------->
+    path('', index.index_redirect, name='home'),  # Nueva ruta sin parámetros
     path('index/<company_id>/', index.index, name='index'), #Home
     path('weeklyLiveView/<company_id>/',tv.weeklyLiveView,name='weeklyLiveView'), # Vista Semanal TV con Sidebard
     path('monthLiveView/<company_id>/',tv.monthLiveView,name='monthLiveView'), # Vista Mensual TV con Sidebard
@@ -53,7 +54,7 @@ urlpatterns = [
     path('fetchSupp/<client_id>/', fetchsEnterData.fetchSupp, name='fetchSupp'),
     path('fetchDependent/<client_id>/', fetchsEnterData.fetchDependent, name='fetchDependent'),
     path('formCreatePlan/<company_id>/deleteDependent/<int:dependent_id>/', fetchInformations.delete_dependent, name='delete_dependent'),
-    path('formCreatePlan/deleteSupp/<int:supp_id>/', fetchInformations.delete_supp, name='delete_supp'),
+    path('formCreatePlan/<company_id>/deleteSupp/<int:supp_id>/', fetchInformations.delete_supp, name='delete_supp'),
 
     path('formCreateClientMedicare/<company_id>/', forms.formCreateClientMedicare, name='formCreateClientMedicare'), # Formulario para crear clientes Medicare
 
