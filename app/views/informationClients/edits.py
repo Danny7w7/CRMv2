@@ -16,7 +16,7 @@ from ...forms import *
 from ..decoratorsCompany import company_ownership_required
 
 @login_required(login_url='/login') 
-#@company_ownership_required
+@company_ownership_required
 def formEditClient(request, company_id, client_id):
     
     client = get_object_or_404(Clients, id=client_id)        
@@ -214,7 +214,8 @@ def editClient(request,client_id):
     return client
 
 @login_required(login_url='/login')
-def editClientObama(request, obamacare_id, way):
+@company_ownership_required
+def editObama(request, company_id ,obamacare_id, way):
     obamacare = ObamaCare.objects.select_related('agent', 'client').filter(id=obamacare_id).first()
     dependents = Dependents.objects.select_related('obamacare').filter(obamacare=obamacare)
     letterCard = LettersCard.objects.filter(obama = obamacare_id).first()
@@ -505,10 +506,11 @@ def editClientObama(request, obamacare_id, way):
         'monthsPaid':monthsPaid,
         'accionRequired': accionRequired,
         'way': way,
-        'description' : description
+        'description' : description,
+        'company_id' : company_id
     }
 
-    return render(request, 'edit/editClientObama.html', context)
+    return render(request, 'edit/editObama.html', context)
 
 def usernameCarrier(request, obamacare):
 

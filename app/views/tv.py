@@ -14,8 +14,10 @@ from django.shortcuts import render
 
 # Application-specific imports
 from app.models import *
+from .decoratorsCompany import company_ownership_required
 
 @login_required(login_url='/login')
+@company_ownership_required
 def weeklyLiveView(request, company_id):
 
     companie = Users.objects.select_related('company').filter(company = company_id).first()
@@ -262,6 +264,8 @@ def getSalesForMonth(company_id):
     
     return finalSummary, weekRanges
 
+@login_required(login_url='/login')
+@company_ownership_required
 def monthLiveView(request, company_id):
 
     companie = Users.objects.select_related('company').filter(company = company_id).first()

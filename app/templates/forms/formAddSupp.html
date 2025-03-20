@@ -47,7 +47,7 @@
 				<div class="row g-3">	
 					<div class="col-12 col-lg-6">
 						<label for="agent_usa" class="form-label font-weight-bold">Agente USA</label>
-						<select class="form-select" id="agent_usa" aria-label="Default select example" name="agent_usa">
+						<select class="form-select" id="agent_usa" aria-label="Default select example" name="agent_usa" required>
 							<option disabled selected value=""></option>
 							<option value="GINA PAOLA LAPEIRA - NPN 19944280">GINA PAOLA LAPEIRA - NPN 19944280</option>
 							<option value="LUIS EDUARDO LAPEIRA - NPN 20556081">LUIS EDUARDO LAPEIRA - NPN 20556081</option>
@@ -63,11 +63,11 @@
 					</div>
 					<div class="col-12 col-lg-6">
 						<label for="effective_date" class="form-label">Effective Date</label>
-						<input type="text" class="form-control" id="effective_date" name="effective_date" >	
+						<input type="text" class="form-control" id="effective_date" name="effective_date" required>	
 					</div>
 					<div class="col-12 col-lg-6">
-						<label for="company" class="form-label">Carrier</label>
-						<select class="form-select" id="company" aria-label="Default select example" name="company">
+						<label for="carrier" class="form-label">Carrier</label>
+						<select class="form-select" id="carrier" aria-label="Default select example" name="carrier" required>
 							<option disabled selected value=""></option>
 							<option value="AFLAC"> AFLAC</option>                             
 							<option value="AETNA"> AETNA </option>
@@ -84,11 +84,11 @@
 					</div>
 					<div class="col-12 col-lg-6">
 						<label for="premium" class="form-label">Premium</label>
-						<input type="number" class="form-control" id="premium" step="0.01" name="premium" >
+						<input type="number" class="form-control" id="premium" step="0.01" name="premium" required >
 					</div>
 					<div class="col-12 col-lg-6">
 						<label for="policy_type" class="form-label">Policy Type</label>
-						<select class="form-select" id="policy_type" name="policy_type" aria-label="Default select example">
+						<select class="form-select" id="policy_type" name="policy_type" aria-label="Default select example" required>
 							<option disabled selected value=""></option>
 							<option value="ACCIDENT">ACCIDENT</option>
 							<option value="HOSPITALIZATION">HOSPITALIZATION</option>
@@ -103,7 +103,7 @@
 					</div>
 					<div class="col-12 col-lg-6">
 						<label for="preventive" class="form-label">Preventive</label>
-						<select class="form-select" id="preventive" name="preventive" aria-label="Default select example">
+						<select class="form-select" id="preventive" name="preventive" aria-label="Default select example" required>
 							<option disabled selected value=""></option>
 							<option value="N/A">N/A </option>
 							<option value="60">60% </option>
@@ -113,7 +113,7 @@
 					</div>
 					<div class="col-12 col-lg-6">
 						<label for="coverage" class="form-label">Coverage</label>
-						<select class="form-select" id="coverage" name="coverage" aria-label="Default select example">
+						<select class="form-select" id="coverage" name="coverage" aria-label="Default select example" required>
 							<option disabled selected value=""></option>
 							<option value="N/A">N/A </option>
 							<option value="0">0</option>
@@ -133,7 +133,7 @@
 					</div>
 					<div class="col-12 col-lg-6">
 						<label for="deducible" class="form-label">Deducible</label>
-						<select class="form-select" id="deducible" name="deducible" aria-label="Default select example">
+						<select class="form-select" id="deducible" name="deducible" aria-label="Default select example" required>
 							<option disabled selected value=""></option>
 							<option value="N/A">N/A </option>
 							<option value="100">100</option>

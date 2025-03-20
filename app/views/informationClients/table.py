@@ -6,24 +6,23 @@ from django.shortcuts import render
 
 # Application-specific imports
 from app.models import *
+from ..decoratorsCompany import company_ownership_required
 
 @login_required(login_url='/login')
-def clientObamacare(request):
+@company_ownership_required
+def clientObamacare(request, company_id):
     
-
-    borja = 'BORJA G CANTON HERRERA - NPN 20673324'
-    daniel = 'DANIEL SANTIAGO LAPEIRA ACEVEDO - NPN 19904958'
-    luis = 'LUIS EDUARDO LAPEIRA - NPN 20556081'
-    gina = 'GINA PAOLA LAPEIRA - NPN 19944280'
-    evelyn = 'EVELYN BEATRIZ HERRERA - NPN 20671818'
-    danieska = 'DANIESKA LOPEZ SEQUEIRA - NPN 20134539'
-    rodrigo = 'RODRIGO G CANTON - NPN 20670005'
     zohira = 'ZOHIRA RAQUEL DUARTE AGUILAR - NPN 19582295'
     vladimir = 'VLADIMIR DE LA HOZ FONTALVO - NPN 19915005'
-    
-    if request.user.role == 'Admin':       
+
+    if request.user.is_superuser:
         obamaCare = ObamaCare.objects.select_related('agent','client').annotate(
             truncated_agent_usa=Substr('agent_usa', 1, 8)).exclude(
+                id__in=CustomerRedFlag.objects.filter(date_completed__isnull=True).values_list(
+                    'obama_id', flat=True)).order_by('-created_at')       
+    elif request.user.role == 'Admin':       
+        obamaCare = ObamaCare.objects.select_related('agent','client').annotate(
+            truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(company = company_id).exclude(
                 id__in=CustomerRedFlag.objects.filter(date_completed__isnull=True).values_list(
                     'obama_id', flat=True)).order_by('-created_at')    
     elif request.user.username == 'zohiraDuarte':
@@ -38,12 +37,16 @@ def clientObamacare(request):
                     'obama_id', flat=True)).order_by('-created_at')
     else:
         obamaCare = ObamaCare.objects.select_related('agent', 'client').annotate(
-            truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(is_active = True).exclude(
+            truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(is_active = True, company = company_id).exclude(
                 id__in=CustomerRedFlag.objects.filter(date_completed__isnull=True).values_list(
-                    'obama_id', flat=True)).order_by('-created_at')      
+                    'obama_id', flat=True)).order_by('-created_at')  
 
+    context = {
+        'obamacares': obamaCare,
+        'company_id' : company_id
+    }    
 
-    return render(request, 'informationClient/clientObamacare.html', {'obamacares':obamaCare})
+    return render(request, 'informationClient/clientObamacare.html', context)
 
 @login_required(login_url='/login')
 def clientAccionRequired(request):

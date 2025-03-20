@@ -295,6 +295,7 @@ class ClientAlert(models.Model):
     datetime = models.DateField()
     content = models.TextField()
     is_active = models.BooleanField(default=True)  
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'clientAlert'

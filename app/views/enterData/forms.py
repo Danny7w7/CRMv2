@@ -165,11 +165,14 @@ def formCreatePlan(request, company_id ,client_id):
 
 @login_required(login_url='/login')
 @company_ownership_required
-def formAddObama(request,client_id):
+def formAddObama(request, company_id, client_id):
 
     client = Clients.objects.get(id=client_id)
 
     if request.method == 'POST':
+
+        company_id = Companies.objects.filter(id = company_id)
+
         formObama = ObamaForm(request.POST)
         if formObama.is_valid():
             obama = formObama.save(commit=False)
@@ -177,6 +180,7 @@ def formAddObama(request,client_id):
             obama.client = client
             obama.status_color = 1
             obama.is_active = True
+            obama.company = company_id
             obama.save()
 
             return redirect('select_client')  # Cambia a tu página de éxito            
@@ -185,15 +189,17 @@ def formAddObama(request,client_id):
 
 @login_required(login_url='/login')
 @company_ownership_required
-def formAddSupp(request,client_id):
+def formAddSupp(request,company_id,client_id):
 
     client = Clients.objects.get(id=client_id)    
 
     if request.method == 'POST':
 
+        company_id = Companies.objects.filter(id = company_id).first()
+
         observation = request.POST.get('observation')
         effective_dates = request.POST.get('effective_date')
-        fecha_obj = datetime.strptime(effective_dates, '%m/%d/%Y')
+        fecha_obj = datetime.datetime.strptime(effective_dates, '%m/%d/%Y')
         fecha_formateada = fecha_obj.strftime('%Y-%m-%d')
 
         formSupp = SuppForm(request.POST)
@@ -206,14 +212,15 @@ def formAddSupp(request,client_id):
             supp.effective_date = fecha_formateada
             supp.observation = observation
             supp.status = 'REGISTERED'
+            supp.company = company_id
             supp.save()
-            return redirect('select_client')  # Cambia a tu página de éxito           
+            return redirect('select_client', company_id.id)  # Cambia a tu página de éxito           
         
     return render(request, 'forms/formAddSupp.html')
 
 @login_required(login_url='/login')
 @company_ownership_required
-def formAddDepend(request, client_id):
+def formAddDepend(request, company_id ,client_id):
     lista = []
     lista2 = []
     dependents = Dependents.objects.filter(client_id=client_id)
@@ -324,15 +331,18 @@ def addDepend(request):
     return redirect('select_client')    
 
 @login_required(login_url='/login') 
-def formCreateAlert(request):
+def formCreateAlert(request, company_id):
+
 
     if request.method == 'POST':
+        company_id = Companies.objects.filter(id = company_id).first()
         formClient = ClientAlertForm(request.POST)
         if formClient.is_valid():
             alert = formClient.save(commit=False)
             alert.agent = request.user
             alert.is_active = True
+            alert.company = company_id
             alert.save()
-            return redirect('formCreateAlert')  # Cambia a tu página de éxito
+            return redirect('formCreateAlert', company_id.id)  # Cambia a tu página de éxito
 
     return render(request, 'newSale/formCreateAlert.html')

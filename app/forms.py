@@ -18,13 +18,13 @@ class ObamaForm(forms.ModelForm):
     class Meta:
         model = ObamaCare
         fields = '__all__'
-        exclude = ['client','agent','is_active','profiling','profiling_date','ffm','required_bearing','date_bearing','status','npm','date_effective_coverage','date_effective_coverage_end','password_carrier','username_carrier','policyNumber','status_color','observation']
+        exclude = ['client','agent','is_active','profiling','profiling_date','ffm','required_bearing','date_bearing','status','npm','date_effective_coverage','date_effective_coverage_end','password_carrier','username_carrier','policyNumber','status_color','observation','company']
 
 class SuppForm(forms.ModelForm):
     class Meta:
         model = Supp
         fields = '__all__'
-        exclude = ['client','agent','is_active','status','date_effective_coverage','date_effective_coverage_end','payment_type','status_color','policyNumber','observation','effective_date','dependents']
+        exclude = ['client','agent','is_active','status','date_effective_coverage','date_effective_coverage_end','payment_type','status_color','policyNumber','observation','effective_date','dependents','company']
 
 class DepentForm(forms.ModelForm):
     class Meta:
@@ -42,7 +42,7 @@ class ClientAlertForm(forms.ModelForm):
     class Meta:
         model = ClientAlert
         fields = '__all__'
-        exclude = ['agent']
+        exclude = ['agent','company']
 
 class ExcelUploadForm(forms.Form):
     file = forms.FileField(label="Subir archivo Excel", 

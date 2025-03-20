@@ -61,10 +61,10 @@ urlpatterns = [
     path('formCreateClientMedicare/<company_id>/', forms.formCreateClientMedicare, name='formCreateClientMedicare'), # Formulario para crear clientes Medicare
 
     path('select_client/<company_id>/', existClient.select_client, name='select_client'), # Vista para seleccionar clientes existentes
-    path('update-type-sales/<int:client_id>/', existClient.update_type_sales, name='update_type_sales'), # Funcion intermedia que cambia el TypeSale del cliente
-    path('formAddObama/<client_id>', forms.formAddObama, name='formAddObama'),
-    path('formAddSupp/<client_id>', forms.formAddSupp, name='formAddSupp'),
-    path('formAddDepend/<client_id>', forms.formAddDepend, name='formAddDepend'),
+    path('update-type-sales/<int:company_id>/<int:client_id>/', existClient.update_type_sales, name='update_type_sales'), # Funcion intermedia que cambia el TypeSale del cliente
+    path('formAddObama/<company_id>/<client_id>/', forms.formAddObama, name='formAddObama'),
+    path('formAddSupp/<company_id>/<client_id>', forms.formAddSupp, name='formAddSupp'),
+    path('formAddDepend/<company_id>/<client_id>', forms.formAddDepend, name='formAddDepend'),
     path('addDepend/', forms.addDepend, name='addDepend'),
 
     path('formCreateAlert/<company_id>/', forms.formCreateAlert, name='formCreateAlert'), # Formulario para crear las Alertas
@@ -72,7 +72,7 @@ urlpatterns = [
     #<---------------------------Information Client--------------------------->
     path('clientObamacare/<company_id>/', table.clientObamacare, name='clientObamacare'),
     path('toggleObamaStatus/<obamacare_id>/', toggles.toggleObamaStatus, name='toggleObamaStatus'),
-    path('editClientObama/<int:obamacare_id>/<int:way>/', edits.editClientObama, name='editClientObama'),
+    path('editObama/<company_id>/<int:obamacare_id>/<int:way>/', edits.editObama, name='editObama'),
     path('saveCustomerObservationACA/', modals.saveCustomerObservationACA, name='saveCustomerObservationACA'),
     path('saveDocumentClient/<int:obamacare_id>/<int:way>/', modals.saveDocumentClient, name='saveDocumentClient'),
     path('saveAppointment/<int:obamacare_id>/', modals.saveAppointment, name='saveAppointment'),

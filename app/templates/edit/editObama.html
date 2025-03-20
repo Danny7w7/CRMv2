@@ -555,7 +555,7 @@
 								<button type="submit" name="action" value="save_obamacare" id="enviar" class="btn btn-primary px-4"  >Submit</button>
 								<button type="submit" name="action" id="enviar2" value="save_observation_agent" class="btn btn-primary px-4" style="display: none;">Submits</button>
 								{% if way == 1 %}
-									<a href="{% url 'clientObamacare' %}" class="btn btn-light px-4">Back</a>								
+									<a href="{% url 'clientObamacare' company_id %}" class="btn btn-light px-4">Back</a>								
 								{% elif way == 2 %}
 									<a href="{% url 'clientAccionRequired' %}" class="btn btn-light px-4">Back</a>
 								{% endif %}
