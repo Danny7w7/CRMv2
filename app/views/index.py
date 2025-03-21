@@ -19,7 +19,7 @@ from .decoratorsCompany import company_ownership_required
 def index_redirect(request):
     # Aquí puedes obtener la compañía del usuario autenticado si aplica
     if request.user.is_authenticated:
-       company_id = request.user.company
+       company_id = request.user.company.id
     else:
         company_id = None 
     
