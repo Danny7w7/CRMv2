@@ -15,7 +15,14 @@ from django.shortcuts import render
 # Application-specific imports
 from app.models import *
 
-def chart6WeekSale():
+from ..decoratorsCompany import *
+
+@company_ownership_required_sinURL
+def chart6WeekSale(request):
+
+    company_id = request.company_id  # Obtener company_id desde request
+    # Definir el filtro de compañía (será un diccionario vacío si es superusuario)
+    company_filter = {'company': company_id} if not request.user.is_superuser else {}
 
     # Obtener la fecha actual
     today = datetime.datetime.today()
@@ -41,9 +48,11 @@ def chart6WeekSale():
         weekRange = f"{weekStart.strftime('%d/%m')} - {weekEnd.strftime('%d/%m')}"
         weekRanges.append(weekRange)
 
+    company_filter = {'company': company_id} if not request.user.is_superuser else {}
+
     # Obtener los datos de pólizas activas para las últimas 6 semanas
-    activeObamaPolicies = ObamaCare.objects.filter(status='Active', created_at__range=[startDate, endOfCurrentWeek],is_active = True)
-    activeSuppPolicies = Supp.objects.filter(status='Active', created_at__range=[startDate, endOfCurrentWeek], is_active= True)
+    activeObamaPolicies = ObamaCare.objects.filter(status='Active', created_at__range=[startDate, endOfCurrentWeek],is_active = True,  **company_filter)
+    activeSuppPolicies = Supp.objects.filter(status='Active', created_at__range=[startDate, endOfCurrentWeek], is_active= True,  **company_filter)
 
     # Inicializar diccionario de ventas para las últimas 6 semanas
     excludedUsernames = ['Calidad01', 'mariluz', 'MariaCaTi','StephanieMkt','CarmenR']  # Excluimos a gente que no debe aparecer en la vista
@@ -87,10 +96,11 @@ def chart6WeekSale():
     return chart_data
 
 @login_required(login_url='/login')
+@company_ownership_required_sinURL
 def chart6Week(request):
 
     # Obtener los datos para la gráfica
-    chart_data = chart6WeekSale()
+    chart_data = chart6WeekSale(request)
 
     # Pasar los datos a la plantilla
     context = {
@@ -101,7 +111,13 @@ def chart6Week(request):
     return render(request, 'graficsReports/chart6Week.html', context)
 
 @login_required(login_url='/login')
+@company_ownership_required_sinURL
 def salesPerformance(request):
+
+    company_id = request.company_id  # Obtener company_id desde request
+    # Definir el filtro de compañía (será un diccionario vacío si es superusuario)
+    company_filter = {'company': company_id} if not request.user.is_superuser else {}
+
     # Obtener la fecha actual
     now = timezone.now()
 
@@ -124,16 +140,16 @@ def salesPerformance(request):
         )
 
 
-    salesData = get_agent_sales(startDate, endDate)
+    salesData = get_agent_sales(request, startDate, endDate)
 
     # Preparar datos para la gráfica con nombres completos
     agents = list(salesData.keys())
     obamacareSales = [salesData[agent]['obamas'] for agent in agents]
     suppSales = [salesData[agent]['supp'] for agent in agents]
 
-    users = Users.objects.all()
-    for user in users:
-        print(f'{user.username} {get_weekly_counts(user)}')
+    #users = Users.objects.filter(** company_filter)
+    #for user in users:
+        #print(f'{user.username} {get_weekly_counts(request, user)}')
 
     context = {
         'agents': agents,
@@ -146,7 +162,13 @@ def salesPerformance(request):
     # Renderizar la respuesta
     return render(request, 'graficsReports/averageSales.html', context)
 
-def get_weekly_counts(user):
+@company_ownership_required_sinURL
+def get_weekly_counts(request, user):
+
+    company_id = request.company_id  # Obtener company_id desde request
+    # Definir el filtro de compañía (será un diccionario vacío si es superusuario)
+    company_filter = {'company': company_id} if not request.user.is_superuser else {}
+
     # Obtener la fecha actual
     noww = timezone.now()
 
@@ -182,7 +204,7 @@ def get_weekly_counts(user):
     }
     
     # Conteo de ObamaCare
-    obamacare_counts = ObamaCare.objects.filter(agent=user, created_at__range=(first_day_of_month, last_day_of_month))
+    obamacare_counts = ObamaCare.objects.filter(agent=user, created_at__range=(first_day_of_month, last_day_of_month), ** company_filter)
     for obamacare in obamacare_counts:
         if week1_start <= obamacare.created_at < week2_start:
             result["week1obama"] += 1
@@ -194,7 +216,7 @@ def get_weekly_counts(user):
             result["week4obama"] += 1
     
     # Conteo de Supp
-    supp_counts = Supp.objects.filter(agent=user, created_at__range=(first_day_of_month, last_day_of_month))
+    supp_counts = Supp.objects.filter(agent=user, created_at__range=(first_day_of_month, last_day_of_month), **company_filter)
     for supp in supp_counts:
         if week1_start <= supp.created_at < week2_start:
             result["week1supp"] += 1
@@ -207,7 +229,8 @@ def get_weekly_counts(user):
     
     return result
 
-def get_agent_sales(start_date, end_date):
+@company_ownership_required_sinURL
+def get_agent_sales(request, start_date, end_date):
     """
     Obtiene el conteo de ObamaCare y Supp vendidos por cada agente en un rango de fechas.
     
@@ -219,10 +242,15 @@ def get_agent_sales(start_date, end_date):
         dict: Un diccionario con el conteo de ventas por agente (nombre completo).
     """
 
+    company_id = request.company_id  # Obtener company_id desde request
+    # Definir el filtro de compañía (será un diccionario vacío si es superusuario)
+    company_filter = {'company': company_id} if not request.user.is_superuser else {}
+
+
     userExcludes = ['CarmenR', 'MariaCaTi']
 
     # Obtener todos los agentes activos con roles 'A' y 'C'
-    allAgents = Users.objects.filter(is_active=True, role__in=['A', 'C']).exclude(username__in=userExcludes).values('username', 'first_name', 'last_name')
+    allAgents = Users.objects.filter(is_active=True, role__in=['A', 'C'], **company_filter).exclude(username__in=userExcludes).values('username', 'first_name', 'last_name')
 
     # Crear un diccionario para mapear username a nombre completo
     agentNameMap = {agent['username']: f"{agent['first_name']} {agent['last_name']}".strip() for agent in allAgents}
@@ -230,12 +258,12 @@ def get_agent_sales(start_date, end_date):
     # Obtener todos los agentes que tienen ventas
     obamaCareAgents = set(ObamaCare.objects.filter(
         created_at__range=[start_date, end_date],
-        is_active=True
+        is_active=True, **company_filter
     ).values_list('agent__username', flat=True))
 
     suppAgents = set(Supp.objects.filter(
         created_at__range=[start_date, end_date],
-        is_active=True
+        is_active=True, **company_filter
     ).values_list('agent__username', flat=True))
 
     # Unir todos los agentes que tienen ventas con los agentes filtrados inicialmente
@@ -246,13 +274,13 @@ def get_agent_sales(start_date, end_date):
     # Obtener el conteo de ObamaCare dentro del rango de fechas
     obamaCareCount = ObamaCare.objects.filter(
         created_at__range=[start_date, end_date],
-        is_active=True
+        is_active=True, **company_filter
     ).values('agent__username').annotate(obama_count=Count('id'))
 
     # Obtener el conteo de Supp dentro del rango de fechas
     suppCount = Supp.objects.filter(
         created_at__range=[start_date, end_date],
-        is_active=True
+        is_active=True, **company_filter
     ).values('agent__username').annotate(supp_count=Count('id'))
 
     # Diccionario para almacenar los resultados con nombres completos
@@ -268,7 +296,7 @@ def get_agent_sales(start_date, end_date):
         username = entry['agent__username']
         if username not in agentNameMap:
             # Si el agente no está en agentNameMap, obtener su nombre completo directamente
-            agent = Users.objects.filter(username=username).values('first_name', 'last_name').first()
+            agent = Users.objects.filter(username=username, **company_filter).values('first_name', 'last_name').first()
             if agent:
                 fullName = f"{agent['first_name']} {agent['last_name']}".strip()
             else:
@@ -285,7 +313,7 @@ def get_agent_sales(start_date, end_date):
         username = entry['agent__username']
         if username not in agentNameMap:
             # Si el agente no está en agentNameMap, obtener su nombre completo directamente
-            agent = Users.objects.filter(username=username).values('first_name', 'last_name').first()
+            agent = Users.objects.filter(username=username, **company_filter).values('first_name', 'last_name').first()
             if agent:
                 fullName = f"{agent['first_name']} {agent['last_name']}".strip()
             else:
@@ -300,10 +328,15 @@ def get_agent_sales(start_date, end_date):
     return agentSales
 
 @login_required(login_url='/login')
+@company_ownership_required_sinURL
 def averageCustomer(request):
 
+    company_id = request.company_id  # Obtener company_id desde request
+    # Definir el filtro de compañía (será un diccionario vacío si es superusuario)
+    company_filter = {'client__company': company_id} if not request.user.is_superuser else {}
+
     data = list(ObservationCustomer.objects.filter(
-        typification__icontains="EFFECTIVE MANAGEMENT"
+        typification__icontains="EFFECTIVE MANAGEMENT", **company_filter
     ).values('agent__first_name', 'agent__last_name').annotate(total_llamadas=Count('id')).order_by('-total_llamadas'))
 
     context = {
@@ -325,7 +358,7 @@ def averageCustomer(request):
         )
 
         data = list(ObservationCustomer.objects.filter(created_at__range=[start_date_new, end_date_new],
-            typification__icontains="EFFECTIVE MANAGEMENT" ).values('agent__first_name', 'agent__last_name')
+            typification__icontains="EFFECTIVE MANAGEMENT", **company_filter ).values('agent__first_name', 'agent__last_name')
             .annotate(total_llamadas=Count('id')).order_by('-total_llamadas'))
 
         context = {

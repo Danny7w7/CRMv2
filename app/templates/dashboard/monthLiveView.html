@@ -53,9 +53,9 @@
                     </table>
                 </div>
                 {% if toggle %}
-                <a class="btn btn-outline-primary" href="{% url 'weeklyLiveView' companie.company.id %}">View Daily</a>
+                <a class="btn btn-outline-primary" href="{% url 'weeklyLiveView' %}">View Daily</a>
                 {% else %}
-                <a class="btn btn-outline-primary" href="{% url 'monthLiveView' companie.company.id %}">View Month</a>
+                <a class="btn btn-outline-primary" href="{% url 'monthLiveView' %}">View Month</a>
                 {% endif %}
             </div>
         </div>
@@ -94,6 +94,6 @@
 	<script src="{% static 'assets/js/chart/viewTv.js'%}"></script>
 
     <script>
-        startRedirectTimer("{% url 'weeklyLiveView' companie.company.id %}");
+        startRedirectTimer("{% url 'weeklyLiveView'  %}");
     </script>
 {% endblock %}

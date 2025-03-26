@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (password) {
                 try {
-                    const response = await fetch('/blockSocialSecurity/', {
+                    const response = await fetch('/blockSocialSecurityMedicare/', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch('/blockSocialSecurity/', {
+            const response = await fetch('/blockSocialSecurityMedicare/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',

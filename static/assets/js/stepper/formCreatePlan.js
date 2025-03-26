@@ -277,7 +277,7 @@ function saveDependents() {
           // Botón 1: Redirigir a la página de inicio
           document.getElementById('buttonHome').addEventListener('click', () => {
             
-            window.location.href = `/index/${company}/`;
+            window.location.href = `/`;
           });
 
           // Botón 2: Redirigir a los detalles

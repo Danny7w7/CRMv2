@@ -15,6 +15,7 @@ from weasyprint.text.fonts import FontConfiguration  # Agregar aquí
 # Application-specific imports
 from app.models import *
 from .table import weekSalesSummary
+from ..decoratorsCompany import *
 
 def downloadPdf(request, week_number):
     # Obtener el resumen de la semana seleccionada
@@ -40,7 +41,12 @@ def downloadPdf(request, week_number):
     return response
 
 @login_required(login_url='/login')
+@company_ownership_required_sinURL
 def downloadAccionRequired(request):
+
+    company_id = request.company_id  # Obtener company_id desde request
+    # Definir el filtro de compañía (será un diccionario vacío si es superusuario)
+    company_filter = Q(obama__company=company_id) if not request.user.is_superuser else Q()
 
     accionRequired = request.POST.get("accionRequired")
     start_date = request.POST.get("start_date")
@@ -65,7 +71,7 @@ def downloadAccionRequired(request):
 
     # Obtener las Acciones requeridas que correspondan a los filtros aplicados
     actionRequireds = CustomerRedFlag.objects.select_related("obama__client", "agent_create","agent_completed").filter(
-        pending_filter & completed_filter & date_filter
+        pending_filter & completed_filter & date_filter & company_filter
     )
 
 
@@ -100,11 +106,16 @@ def downloadAccionRequired(request):
     return response 
 
 @login_required(login_url='/login')
+@company_ownership_required_sinURL
 def paymentClients(request):
+
+    company_id = request.company_id  # Obtener company_id desde request
+    # Definir el filtro de compañía (será un diccionario vacío si es superusuario)
+    company_filter = {'company': company_id} if not request.user.is_superuser else {}
 
     months = request.POST.getlist("months")  # Capturar lista de meses seleccionados
     # Obtener pagos que correspondan a los meses seleccionados
-    clients = Payments.objects.select_related("obamaCare").filter(month__in=months)
+    clients = Payments.objects.select_related("obamaCare").filter(month__in=months,  **company_filter)
 
     # ✅ Crear un nuevo archivo Excel
     wb = openpyxl.Workbook()

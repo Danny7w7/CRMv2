@@ -13,12 +13,11 @@ from django.shortcuts import get_object_or_404, redirect, render
 # Application-specific imports
 from app.models import *
 from ...forms import *
-from ..decoratorsCompany import company_ownership_required
 from ..sms import get_last_message_for_chats
+from ..decoratorsCompany import *
 
 @login_required(login_url='/login') 
-@company_ownership_required
-def formEditClient(request, company_id, client_id):
+def formEditClient(request, client_id):
     
     client = get_object_or_404(Clients, id=client_id)        
 
@@ -41,22 +40,23 @@ def formEditClient(request, company_id, client_id):
             client.social_security = formatSocial
             
             client.save()
-            return redirect('formCreatePlan', company_id ,client.id) 
+            return redirect('formCreatePlan', client.id) 
         
     # Si el método es GET, mostrar el formulario con los datos del cliente
     form = ClientForm(instance=client)
 
     context = {
         'form': form, 
-        'client': client,
-        'company_id': company_id
+        'client': client
     }
 
     return render(request, 'edit/formEditClient.html', context)
 
+@login_required(login_url='/login') 
+@company_ownership_required(model_name="ClientAlert", id_field="alertClient_id")
 def editAlert(request, alertClient_id):
 
-    alert = ClientAlert.objects.select_related('agent').filter(id=alertClient_id).first()
+    alert = ClientAlert.objects.select_related('agent').get(id=alertClient_id)  # Ya validado en el decorador
 
     if request.method == 'POST':
 
@@ -76,37 +76,29 @@ def editAlert(request, alertClient_id):
     return render(request, 'edit/editAlert.html', {'editAlert':alert} )
 
 @login_required(login_url='/login')
+@company_ownership_required(model_name="Medicare", id_field="medicare_id") 
 def editClientMedicare(request, medicare_id):
-    
-    medicare = Medicare.objects.select_related('agent').filter(id=medicare_id).first()
 
-    if medicare and medicare:
-        social_number = medicare.social_security  # Campo real del modelo
-        # Asegurarse de que social_number no sea None antes de formatear
-        if social_number:
-            formatted_social = f"xxx-xx-{social_number[-4:]}"  # Obtener el formato deseado
-        else:
-            formatted_social = "N/A"  # Valor predeterminado si no hay número disponible
+    # Buscar el cliente
+    medicare = get_object_or_404(Medicare.objects.select_related('agent'), id=medicare_id)
+
+    
+    social_number = medicare.social_security  # Campo real del modelo
+    # Asegurarse de que social_number no sea None antes de formatear
+    if social_number:
+        formatted_social = f"xxx-xx-{social_number[-4:]}"  # Obtener el formato deseado
     else:
-        formatted_social = "N/A"
-        social_number = None
+        formatted_social = "N/A"  # Valor predeterminado si no hay número disponible
 
     obsCus = ObservationCustomerMedicare.objects.select_related('agent').filter(medicare=medicare.id)
     list_drow = DropDownList.objects.filter(profiling_supp__isnull=False)
 
-    if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        action = request.POST.get('action')
-        if action == 'validate_key':
-            provided_key = request.POST.get('key')
-            correct_key = 'Sseguros22@'  # Cambia por tu lógica segura
-
-            if provided_key == correct_key and social_number:
-                return JsonResponse({'status': 'success', 'social': social_number})
-            else:
-                return JsonResponse({'status': 'error', 'message': 'Clave incorrecta o no hay número disponible'})
-    
-
     consent = Consents.objects.filter(medicare = medicare_id )
+
+    #calculo de edad
+    hoy = timezone.now().date()
+    old = hoy.year - medicare.date_birth.year - ((hoy.month, hoy.day) < (medicare.date_birth.month, medicare.date_birth.day))
+   
 
     if request.method == 'POST':
         action = request.POST.get('action')
@@ -121,7 +113,7 @@ def editClientMedicare(request, medicare_id):
         fecha_str = request.POST.get('date_birth')  # Formato MM/DD/YYYY
         # Conversión solo si los valores no son nulos o vacíos
         if fecha_str not in [None, '']:
-            dateNew = datetime.strptime(fecha_str, '%m/%d/%Y').date()
+            dateNew = datetime.datetime.strptime(fecha_str, '%m/%d/%Y').date()
         else:
             dateNew = None
         
@@ -161,6 +153,7 @@ def editClientMedicare(request, medicare_id):
         'consent': consent,
         'obsCustomer': obsCus,
         'list_drow': list_drow,
+        'old' : old
 
     }
 
@@ -171,14 +164,14 @@ def editClient(request,client_id):
     # Campos de Client
     client_fields = [
         'agent_usa', 'first_name', 'last_name', 'phone_number', 'email', 'address', 'zipcode',
-        'city', 'state', 'county', 'sex', 'old', 'migration_status', 'apply'
+        'city', 'state', 'county', 'sex', 'migration_status', 'apply'
     ]
     
     #formateo de fecha para guardalar como se debe en BD ya que la obtengo USA
     fecha_str = request.POST.get('date_birth')  # Formato MM/DD/YYYY
     # Conversión solo si los valores no son nulos o vacíos
     if fecha_str not in [None, '']:
-        dateNew = datetime.strptime(fecha_str, '%m/%d/%Y').date()
+        dateNew = datetime.datetime.strptime(fecha_str, '%m/%d/%Y').date()
     else:
         dateNew = None
     
@@ -206,7 +199,6 @@ def editClient(request,client_id):
         state=cleaned_client_data['state'],
         county=cleaned_client_data['county'],
         sex=cleaned_client_data['sex'],
-        old=cleaned_client_data['old'],
         date_birth=dateNew,
         apply=cleaned_client_data['apply'],
         migration_status=cleaned_client_data['migration_status']
@@ -215,15 +207,18 @@ def editClient(request,client_id):
     return client
 
 @login_required(login_url='/login')
-@company_ownership_required
-def editObama(request, company_id, obamacare_id, way):
+@company_ownership_required(model_name="ObamaCare", id_field="obamacare_id")
+def editObama(request ,obamacare_id, way):
+
+    company_id = request.user.company.id
+
     obamacare = ObamaCare.objects.select_related('agent', 'client').filter(id=obamacare_id).first()
     dependents = Dependents.objects.select_related('obamacare').filter(obamacare=obamacare)
     letterCard = LettersCard.objects.filter(obama = obamacare_id).first()
     apppointment = AppointmentClient.objects.select_related('obama','agent_create').filter(obama = obamacare_id)
     userCarrier = UserCarrier.objects.filter(obama = obamacare_id).first()
-    accionRequired = CustomerRedFlag.objects.filter(obama = obamacare)
-
+    accionRequired = CustomerRedFlag.objects.filter(obama = obamacare)    
+        
     if letterCard and letterCard.letters and letterCard.card: 
         newLetterCard = True
     else: 
@@ -269,28 +264,18 @@ def editObama(request, company_id, obamacare_id, way):
 
     percentage = int(c/6*100)
 
-    if obamacare and obamacare.client:
-        social_number = obamacare.client.social_security  # Campo real del modelo
-        # Asegurarse de que social_number no sea None antes de formatear
-        if social_number:
-            formatted_social = f"xxx-xx-{social_number[-4:]}"  # Obtener el formato deseado
-        else:
-            formatted_social = "N/A"  # Valor predeterminado si no hay número disponible
+
+    social_number = obamacare.client.social_security  # Campo real del modelo
+    # Asegurarse de que social_number no sea None antes de formatear
+    if social_number:
+        formatted_social = f"xxx-xx-{social_number[-4:]}"  # Obtener el formato deseado
     else:
-        formatted_social = "N/A"
-        social_number = None
+        formatted_social = "N/A"  # Valor predeterminado si no hay número disponible
 
-    if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        action = request.POST.get('action')
-        if action == 'validate_key':
-            provided_key = request.POST.get('key')
-            correct_key = 'Sseguros22@'  # Cambia por tu lógica segura
-
-            if provided_key == correct_key and social_number:
-                return JsonResponse({'status': 'success', 'social': social_number})
-            else:
-                return JsonResponse({'status': 'error', 'message': 'Clave incorrecta o no hay número disponible'})
-    
+    #calculo de edad
+    hoy = timezone.now().date()
+    old = hoy.year - obamacare.client.date_birth.year - ((hoy.month, hoy.day) < (obamacare.client.date_birth.month, obamacare.client.date_birth.day))
+   
     obsObama = ObservationAgent.objects.filter(id_obamaCare=obamacare_id)  
     users = Users.objects.filter(role='C')
     list_drow = DropDownList.objects.filter(profiling_obama__isnull=False)
@@ -334,17 +319,17 @@ def editObama(request, company_id, obamacare_id, way):
 
             # Conversión solo si los valores no son nulos o vacíos
             if date_bearing not in [None, '']:
-                date_bearing_new = datetime.strptime(date_bearing, '%m/%d/%Y').date()
+                date_bearing_new = datetime.datetime.strptime(date_bearing, '%m/%d/%Y').date()
             else:
                 date_bearing_new = None
 
             if date_effective_coverage not in [None, '']:
-                date_effective_coverage_new = datetime.strptime(date_effective_coverage, '%m/%d/%Y').date()
+                date_effective_coverage_new = datetime.datetime.strptime(date_effective_coverage, '%m/%d/%Y').date()
             else:
                 date_effective_coverage_new = None
 
             if date_effective_coverage_end not in [None, '']:
-                date_effective_coverage_end_new = datetime.strptime(date_effective_coverage_end, '%m/%d/%Y').date()
+                date_effective_coverage_end_new = datetime.datetime.strptime(date_effective_coverage_end, '%m/%d/%Y').date()
             else:
                 date_effective_coverage_end_new = None
 
@@ -515,7 +500,7 @@ def editObama(request, company_id, obamacare_id, way):
         'accionRequired': accionRequired,
         'way': way,
         'description' : description,
-        'company_id' : company_id,
+        'old' : old,
         #SMS Blue
         'contact':contact,
         'chat':chat,
@@ -549,9 +534,8 @@ def usernameCarrier(request, obamacare):
             agent_create=request.user,
             username_carrier=username_carrier,
             password_carrier = password_carrier,
-            dateUserCarrier=date )
-        
-        
+            dateUserCarrier=date 
+            )      
 
         else:
 
@@ -560,11 +544,12 @@ def usernameCarrier(request, obamacare):
             agent_create=request.user,
             username_carrier=username_carrier,
             password_carrier = password_carrier,
-            dateUserCarrier=date  )
-
+            dateUserCarrier=date  
+            )
 
 @login_required(login_url='/login')
-def editClientSupp(request, supp_id):
+@company_ownership_required(model_name="Supp", id_field="supp_id")
+def editSupp(request, supp_id):
 
     supp = Supp.objects.select_related('client','agent').filter(id=supp_id).first()
     obsSupp = ObservationAgent.objects.filter(id_supp=supp_id)
@@ -578,35 +563,25 @@ def editClientSupp(request, supp_id):
     dependents = supp_instance.dependents.all()
     
     action = request.POST.get('action')
-
-    if supp and supp.client:
-        social_number = supp.client.social_security  # Campo real del modelo
-        # Asegurarse de que social_number no sea None antes de formatear
-        if social_number:
-            formatted_social = f"xxx-xx-{social_number[-4:]}"  # Obtener el formato deseado
-        else:
-            formatted_social = "N/A"  # Valor predeterminado si no hay número disponible
+  
+    social_number = supp.client.social_security  # Campo real del modelo
+    # Asegurarse de que social_number no sea None antes de formatear
+    if social_number:
+        formatted_social = f"xxx-xx-{social_number[-4:]}"  # Obtener el formato deseado
     else:
-        formatted_social = "N/A"
-        social_number = None
+        formatted_social = "N/A"  # Valor predeterminado si no hay número disponible
 
-    if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        action = request.POST.get('action')
-        if action == 'validate_key':
-            provided_key = request.POST.get('key')
-            correct_key = 'Sseguros22@'  # Cambia por tu lógica segura
+    #calculo de edad
+    hoy = timezone.now().date()
+    old = hoy.year - supp.client.date_birth.year - ((hoy.month, hoy.day) < (supp.client.date_birth.month, supp.client.date_birth.day)) 
 
-            if provided_key == correct_key and social_number:
-                return JsonResponse({'status': 'success', 'social': social_number})
-            else:
-                return JsonResponse({'status': 'error', 'message': 'Clave incorrecta o no hay número disponible'})
 
     if request.method == 'POST':
 
         if action == 'save_supp':
 
             editClient(request, supp.client.id)
-            dependents= editDepentsSupp(request, supp_id)
+            dependents = editDepentsSupp(request, supp_id)
 
             #formateo de fecha para guardalar como se debe en BD ya que la obtengo USA
             date_effective_coverage = request.POST.get('date_effective_coverage')  # Formato MM/DD/YYYY
@@ -616,17 +591,17 @@ def editClientSupp(request, supp_id):
 
             # Si la fecha no viene vacia la convertimos y si viene vacia la colocamos null
             if date_effective_coverage not in [None, '']:
-                date_effective_coverage_new = datetime.strptime(date_effective_coverage, '%m/%d/%Y').date()
+                date_effective_coverage_new = datetime.datetime.strptime(date_effective_coverage, '%m/%d/%Y').date()
             else:
                 date_effective_coverage_new = None
 
             if date_effective_coverage_end not in [None, '']:
-                date_effective_coverage_end_new = datetime.strptime(date_effective_coverage_end, '%m/%d/%Y').date()
+                date_effective_coverage_end_new = datetime.datetime.strptime(date_effective_coverage_end, '%m/%d/%Y').date()
             else:
                 date_effective_coverage_end_new = None
 
             if effectiveDateSupp not in [None, '']:
-                effectiveDateSupp_new = datetime.strptime(effectiveDateSupp, '%m/%d/%Y').date()
+                effectiveDateSupp_new = datetime.datetime.strptime(effectiveDateSupp, '%m/%d/%Y').date()
             else:
                 effectiveDateSupp_new = None
             
@@ -665,7 +640,7 @@ def editClientSupp(request, supp_id):
             Supp.objects.filter(id=supp_id).update(
                 effective_date=effectiveDateSupp_new,
                 agent_usa=cleaned_supp_data['agent_usa'],
-                company=cleaned_supp_data['carrierSuple'],
+                carrier=cleaned_supp_data['carrierSuple'],
                 premium=cleaned_supp_data['premiumSupp'],
                 preventive=cleaned_supp_data['preventiveSupp'],
                 coverage=cleaned_supp_data['coverageSupp'],
@@ -679,7 +654,7 @@ def editClientSupp(request, supp_id):
                 observation=cleaned_supp_data['observationSuple']
             )
 
-            return redirect('clientSupp')  
+            return redirect('clientSupp' )  
               
         elif action == 'save_supp_agent':
 
@@ -710,10 +685,11 @@ def editClientSupp(request, supp_id):
         'dependents': dependents,
         'obsSuppText': '\n'.join([obs.content for obs in obsSupp]),
         'obsCustomer': obsCus,
-        'list_drow': list_drow
+        'list_drow': list_drow,
+        'old' : old
     }
     
-    return render(request, 'edit/editClientSupp.html', context)
+    return render(request, 'edit/editSupp.html', context)
 
 def editDepentsObama(request, obamacare_id):
     # Obtener todos los dependientes asociados al ObamaCare
@@ -769,7 +745,7 @@ def editDepentsSupp(request, supp_id):
         for dependent in dependents:
 
             date_birth = request.POST.get(f'dateBirthDependent_{dependent.id}')
-            dateNew = datetime.strptime(date_birth, '%m/%d/%Y').date()
+            dateNew = datetime.datetime.strptime(date_birth, '%m/%d/%Y').date()
 
             # Aquí obtenemos los datos enviados a través del formulario para cada dependiente
             dependent_id = request.POST.get(f'dependentId_{dependent.id}')  # Cambiar a 'dependentId_{dependent.id}'

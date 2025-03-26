@@ -3,74 +3,44 @@
 {% block head %}
     <title>Upload BD</title>
 	<!--plugins-->
-	<link href="{% static 'assets/plugins/simplebar/css/simplebar.css' %}" rel="stylesheet" />
-	<link href="{% static 'assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css' %}" rel="stylesheet" />
-	<link href="{% static 'assets/plugins/metismenu/css/metisMenu.min.css' %}" rel="stylesheet" />
-	<link href="{% static 'assets/plugins/datatable/css/dataTables.bootstrap5.min.css' %}" rel="stylesheet" />
+	<link href="{% static "assets/plugins/simplebar/css/simplebar.css" %}" rel="stylesheet" />
+	<link href="{% static "assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" %}" rel="stylesheet" />
+	<link href="{% static "assets/plugins/metismenu/css/metisMenu.min.css" %}" rel="stylesheet" />
+	<link href="{% static "assets/plugins/datatable/css/dataTables.bootstrap5.min.css" %}" rel="stylesheet" />
 	<!-- loader-->
-	<link href="{% static 'assets/css/pace.min.css' %}" rel="stylesheet" />
-	<script src="{% static 'assets/js/pace.min.js' %}"></script>
+	<link href="{% static "assets/css/pace.min.css" %}" rel="stylesheet" />
+	<script src="{% static "assets/js/pace.min.js" %}"></script>
 	<!-- Bootstrap CSS -->
-	<link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet">
-	<link href="{% static 'assets/css/bootstrap-extended.css' %}" rel="stylesheet">
+	<link href="{% static "assets/css/bootstrap.min.css" %}" rel="stylesheet">
+	<link href="{% static "assets/css/bootstrap-extended.css" %}" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&amp;display=swap" rel="stylesheet">
-	<link href="{% static 'assets/css/app.css' %}" rel="stylesheet">
-	<link href="{% static 'assets/css/icons.css' %}" rel="stylesheet">
+	<link href="{% static "assets/css/app.css" %}" rel="stylesheet">
+	<link href="{% static "assets/css/icons.css" %}" rel="stylesheet">
 	<!-- Theme Style CSS -->
-	<link rel="stylesheet" href="{% static 'assets/css/dark-theme.css' %}"/>
-	<link rel="stylesheet" href="{% static 'assets/css/semi-dark.css' %}"/>
-	<link rel="stylesheet" href="{% static 'assets/css/header-colors.css' %}"/>
+	<link rel="stylesheet" href="{% static "assets/css/dark-theme.css" %}" />
+	<link rel="stylesheet" href="{% static "assets/css/semi-dark.css" %}" />
+	<link rel="stylesheet" href="{% static "assets/css/header-colors.css" %}" />
 {% endblock %}
 {% block page_content %}
 <h6 class="mb-0 text-uppercase">upload excel</h6>
 <hr/>
 <div class="row">
-	<div class="col-2">
-		<div class="d-grid gap-2">
-			<button type="button" name="" id="" class="btn btn-primary">Button</button>
-		</div>
-	</div>
-	<div class="col-2">
-		<div class="d-grid gap-2">
-			<button type="button" name="" id="" class="btn btn-primary">Button</button>
-		</div>
-	</div>
-	<div class="col-2">
-		<div class="d-grid gap-2">
-			<button type="button" name="" id="" class="btn btn-primary">Button</button>
-		</div>
-	</div>
-	<div class="col-2">
-		<div class="d-grid gap-2">
-			<button type="button" name="" id="" class="btn btn-primary">Button</button>
-		</div>
-	</div>
-	<div class="col-2">
-		<div class="d-grid gap-2">
-			<button type="button" name="" id="" class="btn btn-primary">Button</button>
-		</div>
-	</div>
-	<div class="col-2">
-		<div class="d-grid gap-2">
-			<button type="button" name="" id="" class="btn btn-primary">Button</button>
-		</div>
-	</div>
 	<div class="col-xl-10 mx-auto">
 		<div class="card">
 			<div class="card-body p-4">
-					<form method="POST" class='row' enctype="multipart/form-data">
+					<form method="POST"  enctype="multipart/form-data">
 						{% csrf_token %}
 						
 						{{ form.as_p }}
 
 						<div class="col-md-6" >
 							<label for="file_name" class="form-label">Nombre del Archivo:</label>
-							<input type="text" name="file_name" class="form-control" id="file_name" required><br>
+							<input type="text" name="file_name" class="form-control" id="file_name" required>
 						</div>
 
 						<div class="col-md-6" >
 							<label for="description" class="form-label">Descripción del Archivo:</label>
-							<input type="text" name="description" class="form-control" id="description"><br>
+							<input type="text" class="form-control" name="description" id="description"><br>
 						</div>			
 
 						<button class="btn btn-primary px-4" type="submit">Subir Archivo</button>

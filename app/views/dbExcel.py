@@ -18,9 +18,15 @@ from django.shortcuts import redirect, render
 # Application-specific imports
 from app.models import *
 from ..forms import *
+from .decoratorsCompany import * 
 
-@login_required(login_url='/login')   
-def upload_excel(request):
+@login_required(login_url='/login') 
+@company_ownership_required_sinURL    
+def uploadExcel(request):
+
+    company_id = request.company_id  # Obtener company_id desde request
+    company = Companies.objects.filter(id = company_id).first()
+
     headers = []  # Cabeceras del archivo Excel
     model_fields = [field.name for field in BdExcel._meta.fields if field.name not in ['id', 'agent_id', 'excel_metadata']]
 
@@ -30,47 +36,60 @@ def upload_excel(request):
         description = request.POST.get('description')
 
         if form.is_valid() and file_name:
-            excel_file = request.FILES['file']
+            excel_file = request.FILES['file']            
 
             try:
+                #print("📂 Intentando leer el archivo con Pandas...")
                 # Leer el archivo Excel para extraer las cabeceras
                 df = pd.read_excel(excel_file, engine='openpyxl')
                 headers = list(df.columns)  # Extraer las cabeceras del archivo
+                #print("📋 Cabeceras detectadas:", headers)
 
                 # Convertir valores a tipos compatibles con JSON
                 df = df.applymap(
                     lambda x: x.isoformat() if isinstance(x, pd.Timestamp) else x
                 )
 
+                #print("📂 Creando registro en ExcelFileMetadata...")
                 # Crear un registro en ExcelFileMetadata
-                excel_metadata = ExcelFileMetadata.objects.create(
-                    file_name=file_name,
-                    description=description,
-                    uploaded_at=datetime.now()
-                )
+                try:
+                    excel_metadata = ExcelFileMetadata.objects.create(
+                        file_name=file_name,
+                        description=description,
+                        uploaded_at=datetime.datetime.now(),
+                        company = company
+                    )
+                    #print("✅ Registro creado con ID:", excel_metadata.id)
+                except Exception as e:
+                    print("❌ Error al crear el registro en ExcelFileMetadata:", str(e))
+
+                #print("📂 Registro creado en ExcelFileMetadata con ID:", excel_metadata.id)  # ✅ Verificar si se guardó el registro
 
                 # Guardar el DataFrame en la sesión para usarlo después
                 request.session['uploaded_data'] = df.to_dict(orient='list')  # Convertir a diccionario serializable
                 request.session['uploaded_headers'] = headers
                 request.session['metadata_id'] = excel_metadata.id  # Guardar ID del archivo para usarlo luego
 
+                #print("💾 Datos guardados en sesión correctamente.")
+
             except Exception as e:
-                return render(request, 'excel/upload_excel.html', {
+                return render(request, 'addExcelsDB/uploadExcel.html', {
                     'form': form,
                     'error': f"Error al procesar el archivo: {str(e)}"
                 })
 
             # Renderizar la página de mapeo
-            return render(request, 'excel/map_headers.html', {
+            return render(request, 'addExcelsDB/mapHeaders.html', {
                 'headers': headers,
                 'model_fields': model_fields
+                
             })
     else:
         form = ExcelUploadForm()
 
-    return render(request, 'excel/upload_excel.html', {'form': form})
+    return render(request, 'addExcelsDB/uploadExcel.html', {'form': form})
 
-def process_and_save(request):
+def processAndSave(request):
     if request.method == 'POST':
         # Obtener el mapeo entre los campos del modelo y las cabeceras del archivo
         mapping = {}
@@ -83,7 +102,7 @@ def process_and_save(request):
         # Recuperar la ruta del archivo desde la sesión
         uploaded_file_path = request.session.get('uploaded_file_path')
         if not uploaded_file_path or not os.path.exists(uploaded_file_path):
-            return render(request, 'excel/upload_excel.html', {'error': 'No se encontró el archivo Excel. Por favor, súbelo nuevamente.'})
+            return render(request, 'addExcelsDB/uploadExcel.html', {'error': 'No se encontró el archivo Excel. Por favor, súbelo nuevamente.'})
 
         try:
             # Leer el archivo Excel desde la ruta temporal
@@ -98,7 +117,7 @@ def process_and_save(request):
                 BdExcel.objects.create(**data)
 
         except Exception as e:
-            return render(request, 'excel/upload_excel.html', {
+            return render(request, 'addExcelsDB/uploadExcel.html', {
                 'error': f"Error al procesar el archivo: {str(e)}"
             })
 
@@ -108,9 +127,9 @@ def process_and_save(request):
 
         return render(request, 'excel/header_processed.html', {'mapping': mapping, 'success': True})
     else:
-        return render(request, 'excel/upload_excel.html', {'form': ExcelUploadForm()})
+        return render(request, 'addExcelsDB/uploadExcel.html', {'form': ExcelUploadForm()})
 
-def save_data(request):
+def saveData(request):
     if request.method == 'POST':
         # Obtener el mapeo entre los campos del modelo y las cabeceras del archivo
         mapping = {}
@@ -125,7 +144,7 @@ def save_data(request):
         uploaded_data = request.session.get('uploaded_data')
         metadata_id = request.session.get('metadata_id')
         if not uploaded_data or not metadata_id:
-            return render(request, 'excel/upload_excel.html', {'error': 'No se encontraron datos para procesar.'})
+            return render(request, 'addExcelsDB/uploadExcel.html', {'error': 'No se encontraron datos para procesar.'})
 
         # Recuperar el registro de ExcelFileMetadata
         excel_metadata = ExcelFileMetadata.objects.get(id=metadata_id)
@@ -175,7 +194,7 @@ def save_data(request):
 
         # Si hay errores, mostrarlos al usuario
         if errors:
-            return render(request, 'excel/map_headers.html', {
+            return render(request, 'addExcelsDB/mapHeaders.html', {
                 'headers': request.session['uploaded_headers'],
                 'model_fields': [field.name for field in BdExcel._meta.fields if field.name not in ('id','agent_id' ,'excel_metadata')],
                 'errors': errors
@@ -190,12 +209,18 @@ def save_data(request):
         request.session.pop('uploaded_headers', None)
         request.session.pop('metadata_id', None)
 
-        return render(request, 'excel/success.html', {'message': 'Datos guardados exitosamente.'})
+        return render(request, 'addExcelsDB/success.html', {'message': 'Datos guardados exitosamente.'})
     else:
-        return redirect('excel/upload_excel')
+        return redirect('addExcelsDB/uploadExcel')
 
-@login_required(login_url='/login')   
-def manage_agent_assignments(request):
+@login_required(login_url='/login') 
+@company_ownership_required_sinURL  
+def manageAgentAssignments(request):
+
+    company_id = request.company_id  # Obtener company_id desde request    
+    # Definir el filtro de compañía (será un diccionario vacío si es superusuario)
+    company_filter = {'company': company_id} if not request.user.is_superuser else {}
+
     if request.method == 'POST':
         # Obtener el archivo seleccionado y los agentes
         file_id = request.POST.get('file_name')
@@ -203,37 +228,37 @@ def manage_agent_assignments(request):
         action = request.POST.get('action')  # Determinar si es asignar o quitar
 
         if not file_id:
-            return render(request, 'excel/manage_agent_assignments.html', {
-                'files': ExcelFileMetadata.objects.all(),
-                'users': Users.objects.filter(role='A',is_active=True),
+            return render(request, 'addExcelsDB/manageAgentAssignments.html', {
+                'files': ExcelFileMetadata.objects.filter(**company_filter),
+                'users': Users.objects.filter(role='A',is_active=True, **company_filter),
                 'error': 'Debes seleccionar un archivo.'
             })
 
         # Recuperar el archivo seleccionado
         try:
-            file = ExcelFileMetadata.objects.get(id=file_id)
+            file = ExcelFileMetadata.objects.filter(id=file_id, **company_filter).first()
         except ExcelFileMetadata.DoesNotExist:
-            return render(request, 'excel/manage_agent_assignments.html', {
-                'files': ExcelFileMetadata.objects.all(),
-                'users': Users.objects.filter(role='A',is_active=True),
+            return render(request, 'addExcelsDB/manageAgentAssignments.html', {
+                'files': ExcelFileMetadata.objects.filter(**company_filter),
+                'users': Users.objects.filter(role='A',is_active=True, **company_filter),
                 'error': 'El archivo seleccionado no es válido.'
             })
 
         # Validar que se seleccionen usuarios
         if not user_ids:
-            return render(request, 'excel/manage_agent_assignments.html', {
-                'files': ExcelFileMetadata.objects.all(),
-                'users': Users.objects.filter(role='A',is_active=True),
+            return render(request, 'addExcelsDB/manageAgentAssignments.html', {
+                'files': ExcelFileMetadata.objects.filter(**company_filter),
+                'users': Users.objects.filter(role='A',is_active=True, **company_filter),
                 'error': 'Debes seleccionar al menos un usuario.'
             })
 
         if action == 'assign':
             # Asignar registros equitativamente a los agentes seleccionados
-            users = Users.objects.filter(id__in=user_ids, role='A')
+            users = Users.objects.filter(id__in=user_ids, role='A', **company_filter)
             if not users.exists():
-                return render(request, 'excel/manage_agent_assignments.html', {
-                    'files': ExcelFileMetadata.objects.all(),
-                    'users': Users.objects.filter(role='A',is_active=True),
+                return render(request, 'addExcelsDB/manageAgentAssignments.html', {
+                    'files': ExcelFileMetadata.objects.filter(**company_filter),
+                    'users': Users.objects.filter(role='A',is_active=True, **company_filter),
                     'error': 'Los usuarios seleccionados no son válidos.'
                 })
 
@@ -247,9 +272,9 @@ def manage_agent_assignments(request):
                 record.agent_id = user_ids[i % user_count]
                 record.save()
 
-            return render(request, 'excel/manage_agent_assignments.html', {
-                'files': ExcelFileMetadata.objects.all(),
-                'users': Users.objects.filter(role='A',is_active=True),
+            return render(request, 'addExcelsDB/manageAgentAssignments.html', {
+                'files': ExcelFileMetadata.objects.filter(** company_filter),
+                'users': Users.objects.filter(role='A',is_active=True, **company_filter),
                 'success': f'Registros de {file.file_name} distribuidos exitosamente entre los usuarios seleccionados.'
             })
 
@@ -257,26 +282,31 @@ def manage_agent_assignments(request):
             # Quitar asignaciones de los usuarios seleccionados
             BdExcel.objects.filter(excel_metadata=file, agent_id__in=user_ids).update(agent_id=None)
 
-            return render(request, 'excel/manage_agent_assignments.html', {
-                'files': ExcelFileMetadata.objects.all(),
-                'users': Users.objects.filter(role='A',is_active=True),
+            return render(request, 'addExcelsDB/manageAgentAssignments.html', {
+                'files': ExcelFileMetadata.objects.filter(** company_filter),
+                'users': Users.objects.filter(role='A',is_active=True, **company_filter),
                 'success': f'Asignaciones eliminadas para los agentes seleccionados del archivo {file.file_name}.'
             })
 
         else:
-            return render(request, 'excel/manage_agent_assignments.html', {
-                'files': ExcelFileMetadata.objects.all(),
-                'users': Users.objects.filter(role='A',is_active=True),
+            return render(request, 'addExcelsDB/manageAgentAssignments.html', {
+                'files': ExcelFileMetadata.objects.filter(**company_filter),
+                'users': Users.objects.filter(role='A',is_active=True, **company_filter),
                 'error': 'Acción no válida.'
             })
 
-    return render(request, 'excel/manage_agent_assignments.html', {
-        'files': ExcelFileMetadata.objects.all(),
-        'users': Users.objects.filter(role='A',is_active=True)
+    return render(request, 'addExcelsDB/manageAgentAssignments.html', {
+        'files': ExcelFileMetadata.objects.filter(**company_filter),
+        'users': Users.objects.filter(role='A',is_active=True, **company_filter)
     })
 
 @login_required(login_url='/login')
+@company_ownership_required_sinURL  
 def commentDB(request):
+
+    company_id = request.company_id  # Obtener company_id desde request    
+    # Definir el filtro de compañía (será un diccionario vacío si es superusuario)
+    company_filter = {'excel_metadata__company': company_id} if not request.user.is_superuser else {}
 
     roleAuditar = ['S', 'Admin']
 
@@ -286,9 +316,9 @@ def commentDB(request):
 
     # Filtra los registros dependiendo del rol del usuario
     if request.user.role in roleAuditar:
-        bd = BdExcel.objects.all()
+        bd = BdExcel.objects.filter(**company_filter)
     else:
-        bd = BdExcel.objects.filter(agent_id=request.user.id, is_sold = False)
+        bd = BdExcel.objects.filter(agent_id=request.user.id, is_sold = False, **company_filter)
 
     # Si es una solicitud POST, procesamos la observación
     if request.method == 'POST':
@@ -334,11 +364,17 @@ def commentDB(request):
         'comenntAgent':comenntAgent
     }
 
-    return render(request, 'table/bd.html', context)
+    return render(request, 'addExcelsDB/bd.html', context)
 
 @login_required(login_url='/login')
+@company_ownership_required_sinURL  
 def reportBd(request):
-    BD = ExcelFileMetadata.objects.all()
+        
+    company_id = request.company_id  # Obtener company_id desde request    
+    # Definir el filtro de compañía (será un diccionario vacío si es superusuario)
+    company_filter = {'company': company_id} if not request.user.is_superuser else {}
+
+    BD = ExcelFileMetadata.objects.filter(**company_filter)
 
     if request.method == "POST":
         action = request.POST.get("action")  # Identificar qué formulario se está enviando
@@ -347,7 +383,7 @@ def reportBd(request):
             # Procesar formulario de listar
             filterBd = request.POST.get("bd")
             if not filterBd:
-                return render(request, 'table/reportBd.html', {'BDS': BD, 'error': 'Please select a BD'})
+                return render(request, 'addExcelsDB/reportBd.html', {'BDS': BD, 'error': 'Please select a BD'})
 
             filterBd = int(filterBd)
             nameBd = ExcelFileMetadata.objects.filter(id=filterBd).first()
@@ -379,19 +415,19 @@ def reportBd(request):
                 'filterBd': filterBd,  # Pasamos el BD seleccionado al contexto
             }
 
-            return render(request, 'table/reportBd.html', context)
+            return render(request, 'addExcelsDB/reportBd.html', context)
 
         elif action == "download":
             # Procesar formulario de descargar
             filterBd = request.POST.get("filterBd")  # Recibimos el BD ya seleccionado
             content_label = request.POST.get("content_label")
             if not filterBd or not content_label:
-                return render(request, 'table/reportBd.html', {'BDS': BD, 'error': 'Please select a category'})
+                return render(request, 'addExcelsDB/reportBd.html', {'BDS': BD, 'error': 'Please select a category'})
 
             # Llamar a la función de descarga
             return downloadBdExcelByCategory(int(filterBd), content_label)
 
-    return render(request, 'table/reportBd.html', {'BDS': BD})
+    return render(request, 'addExcelsDB/reportBd.html', {'BDS': BD})
 
 def downloadBdExcelByCategory(filterBd, content_label):
     if content_label == "PENDING":

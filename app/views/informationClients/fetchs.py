@@ -18,6 +18,70 @@ from app.models import *
 from ...forms import *
 
 @csrf_exempt
+def blockSocialSecurity(request):
+    if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        action = request.POST.get('action')
+        client_id = request.POST.get('client_id')
+
+        try:
+            client = Clients.objects.get(id=client_id)
+        except Clients.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Cliente no encontrado.'})
+
+        if action == 'validate_key':
+            provided_key = request.POST.get('key')
+            correct_key = 'Sseguros22@'  # 🔹 Cambia esto por una validación más segura
+
+            if provided_key == correct_key:
+                return JsonResponse({'status': 'success', 'social': client.social_security})
+            else:
+                return JsonResponse({'status': 'error', 'message': 'Clave incorrecta o no hay número disponible.'})
+
+        elif action == 'save_social':
+            new_social = request.POST.get('new_social')
+
+            if not new_social or len(new_social) != 9 or not new_social.isdigit():
+                return JsonResponse({'status': 'error', 'message': 'Número de seguro social inválido.'})
+
+            client.social_security = new_social
+            client.save()
+            return JsonResponse({'status': 'success', 'message': 'Número de seguro social guardado correctamente.'})
+
+    return JsonResponse({'status': 'error', 'message': 'Solicitud no válida.'}, status=400)
+
+@csrf_exempt
+def blockSocialSecurityMedicare(request):
+    if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        action = request.POST.get('action')
+        client_id = request.POST.get('client_id')
+
+        try:
+            client = Medicare.objects.get(id=client_id)
+        except Medicare.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Cliente no encontrado.'})
+
+        if action == 'validate_key':
+            provided_key = request.POST.get('key')
+            correct_key = 'Sseguros22@'  # 🔹 Cambia esto por una validación más segura
+
+            if provided_key == correct_key:
+                return JsonResponse({'status': 'success', 'social': client.social_security})
+            else:
+                return JsonResponse({'status': 'error', 'message': 'Clave incorrecta o no hay número disponible.'})
+
+        elif action == 'save_social':
+            new_social = request.POST.get('new_social')
+
+            if not new_social or len(new_social) != 9 or not new_social.isdigit():
+                return JsonResponse({'status': 'error', 'message': 'Número de seguro social inválido.'})
+
+            client.social_security = new_social
+            client.save()
+            return JsonResponse({'status': 'success', 'message': 'Número de seguro social guardado correctamente.'})
+
+    return JsonResponse({'status': 'error', 'message': 'Solicitud no válida.'}, status=400)
+
+@csrf_exempt
 def fetchPaymentsMonth(request):
     form = PaymentsForm(request.POST)
     if request.method == 'POST':
@@ -47,7 +111,7 @@ def fetchPaymentsMonth(request):
             return JsonResponse({'success': False, 'message': 'Invalid JSON'}, status=400)
     return JsonResponse({'success': False, 'message': 'Método no permitido'}, status=405)
 
-def delete_dependent(request, company_id ,dependent_id):
+def delete_dependent(request, dependent_id):
     if request.method == 'POST':
         try:
             # Buscar y eliminar el dependiente por ID
@@ -58,7 +122,7 @@ def delete_dependent(request, company_id ,dependent_id):
             return JsonResponse({'success': False, 'error': 'Dependent not found'})
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
-def delete_supp(request, company_id ,supp_id):
+def delete_supp(request ,supp_id):
     if request.method == 'POST':
         try:
             # Buscar y eliminar el dependiente por ID
@@ -91,7 +155,7 @@ def fetchActionRequired(request):
         app_name = re.sub(r'[^a-zA-Z0-9_.-]', '_', app_name)
 
         # Construir la URL absoluta
-        url_relativa = reverse('editClientObama', args=[obama.id, 1])
+        url_relativa = reverse('editObama', args=[obama.company.id,obama.id, 1])
         url_absoluta = request.build_absolute_uri(url_relativa)
 
         group_name = f'product_alerts_{app_name}'

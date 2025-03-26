@@ -68,46 +68,15 @@
 					</div>
 					<div class="col-12 col-lg-4">
 						<label for="city" class="form-label">City</label>
-						<input type="text" class="form-control" name ="city" id="city" value="{{supps.client.city}}" required>
+						<input type="text" class="form-control" name ="city" id="city" value="{{supps.client.city}}" required readonly>
 					</div>
 					<div class="col-12 col-lg-2">
 						<label for="state" class="form-label font-weight-bold">State</label>
-						<select id="inputState" class="form-select" id="state" name="state" required >
-							<option value="" disabled selected>Please Select</option>
-							<option value="AL" {% if supps.client.state == "AL" %}selected{% endif %} > AL </option>
-							<option value="AR" {% if supps.client.state == "AR" %}selected{% endif %} > AR </option>
-							<option value="AZ" {% if supps.client.state == "AZ" %}selected{% endif %} > AZ </option>
-							<option value="CA" {% if supps.client.state == "CA" %}selected{% endif %} > CA </option>
-							<option value="DE" {% if supps.client.state == "DE" %}selected{% endif %} > DE </option>
-							<option value="FL" {% if supps.client.state == "FL" %}selected{% endif %} > FL </option>
-							<option value="GA" {% if supps.client.state == "GA" %}selected{% endif %} > GA </option>
-							<option value="IL" {% if supps.client.state == "IL" %}selected{% endif %} > IL </option>
-							<option value="IA" {% if supps.client.state == "IA" %}selected{% endif %} > IA </option>
-							<option value="KS" {% if supps.client.state == "KS" %}selected{% endif %} > KS </option>
-							<option value="KY" {% if supps.client.state == "KY" %}selected{% endif %} > KY </option>
-							<option Value="MI" {% if supps.client.state == "MI" %}selected{% endif %} > MI </option>                            
-							<option value="MS" {% if supps.client.state == "MS" %}selected{% endif %} > MS </option>
-							<option Value="MO" {% if supps.client.state == "MO" %}selected{% endif %} > MO </option>
-							<option value="NJ" {% if supps.client.state == "NJ" %}selected{% endif %} > NJ </option>
-							<option value="NC" {% if supps.client.state == "NC" %}selected{% endif %} > NC </option>
-							<option value="ND" {% if supps.client.state == "ND" %}selected{% endif %} > ND </option>
-							<option value="NE" {% if supps.client.state == "NE" %}selected{% endif %} > NE </option>
-							<option value="OH" {% if supps.client.state == "OH" %}selected{% endif %} > OH </option>
-							<option value="OK" {% if supps.client.state == "OK" %}selected{% endif %} > OK </option>
-							<option value="SC" {% if supps.client.state == "SC" %}selected{% endif %} > SC </option>
-							<option value="TN" {% if supps.client.state == "TN" %}selected{% endif %} > TN </option>
-							<option value="TX" {% if supps.client.state == "TX" %}selected{% endif %} > TX </option>
-							<option value="UT" {% if supps.client.state == "UT" %}selected{% endif %} > UT </option>
-							<option value="VA" {% if supps.client.state == "VA" %}selected{% endif %} > VA </option>
-							<option value="WI" {% if supps.client.state == "WI" %}selected{% endif %} > WI </option>
-							<option value="LA" {% if supps.client.state == "LA" %}selected{% endif %} > LA </option>
-							<option value="IN" {% if supps.client.state == "IN" %}selected{% endif %} > IN </option>
-							<option value="OR" {% if supps.client.state == "OR" %}selected{% endif %} > OR </option>
-						</select>
+						<input type="text" class="form-control" name ="state" id="state" value="{{supps.client.state}}" readonly required>
 					</div>
 					<div class="col-12 col-lg-4">
 						<label for="county" class="form-label">County</label>
-						<input type="text" class="form-control" name ="county" id="county"  value="{{supps.client.county}}" required>
+						<input type="text" class="form-control" name ="county" id="county"  value="{{supps.client.county}}" readonly required>
 					</div>
 					<div class="col-12 col-lg-2">
 						<label for="sex" class="form-label">Sex</label>
@@ -119,7 +88,7 @@
 					</div>
 					<div class="col-12 col-lg-2">
 						<label for="old" class="form-label">Age</label>
-						<input type="number" nim="1" class="form-control" name ="old" id="old" placeholder="Old" value="{{supps.client.old}}" required>
+						<input type="number" nim="1" class="form-control" name ="old" id="old" value="{{old}}" readonly>
 					</div>
 					<div class="col-12 col-lg-3">
 						<label for="date_birth" class="form-label">Date Birth</label>
@@ -167,14 +136,20 @@
 							<option value = False {% if supps.client.apply == False %}selected{% endif %} >NO</option>
 						</select>
 					</div>
-					<div class="col-12 col-lg-4">
-						<label for="date_effective_coverage_end" class="form-label">Social Security</label>
-						<input type="text" class="form-control" name="social_security" id="social_security" value="{{formatted_social}}" disabled >
-					</div>  
-					<div class="col-12 col-lg-1">
-						<br>							
-						<button id="show-full-social" type="button" class="btn btn-secondary mt-2 "><i class="lni lni-eye"></i></button>
-						<button hidden type="button" id="block-social" class="btn btn-secondary mt-2">Bloquear Número</button>
+					<div class="col-12 col-lg-5">
+						<label for="social_security" class="form-label">Social Security</label>
+						<div class="input-group">
+							<input type="text" class="form-control" name="social_security" id="social_security" value="{{formatted_social}}"  disabled data-client-id="{{ supps.client.id }}">
+							<button id="show-full-social" type="button" class="btn btn-secondary">
+								<i class="lni lni-eye"></i>
+							</button>
+							<button hidden type="button" id="save-social" class="btn btn-success">
+								<i class="lni lni-save"></i>
+							</button>
+							<button hidden type="button" id="block-social" class="btn btn-danger">
+								<i class="lni lni-lock"></i> 
+							</button>
+						</div>
 					</div>
                     <hr>
 					{% if dependents %}
@@ -263,17 +238,17 @@
 							<label for="carrierSuple" class="form-label">Carrier</label>
 							<select class="form-select" id="carrierSuple"  aria-label="Default select example" name="carrierSuple" required>
 								<option value="" disabled selected>Please Select</option>
-								<option value="AFLAC" {% if supps.company == 'AFLAC' %}selected{% endif %}> AFLAC</option>                             
-								<option value="AETNA" {% if supps.company == 'AETNA' %}selected{% endif %}> AETNA </option>
-								<option value="ALLSTATE HEALTH SOLUTIONS" {% if supps.company == 'ALLSTATE HEALTH SOLUTIONS' %}selected{% endif %}> ALLSTATE HEALTH SOLUTIONS </option>  
-								<option value="COMBINED" {% if supps.company == 'COMBINED' %}selected{% endif %}> COMBINED </option>
-								<option value="CIGNA" {% if supps.company == 'CIGNA' %}selected{% endif %}> CIGNA </option>    
-								<option value="MANHATTAN LIFE" {% if supps.company == 'MANHATTAN LIFE' %}selected{% endif %}> MANHATTAN LIFE </option>
-								<option value="METLIFE" {% if supps.company == 'METLIFE' %}selected{% endif %}> METLIFE </option>
-								<option value="OSCAR" {% if supps.company == 'OSCAR' %}selected{% endif %}> OSCAR</option> 
-								<option value="PIVOT" {% if supps.company|default:'' == 'PIVOT' %}selected{% endif %}>PIVOT</option>  
-								<option value="SUREBRIDGE" {% if supps.company == 'SUREBRIDGE' %}selected{% endif %}> SUREBRIDGE </option>    
-								<option value="UNITED" {% if supps.company == 'UNITED' %}selected{% endif %}> UNITED </option>    
+								<option value="AFLAC" {% if supps.carrier == 'AFLAC' %}selected{% endif %}> AFLAC</option>                             
+								<option value="AETNA" {% if supps.carrier == 'AETNA' %}selected{% endif %}> AETNA </option>
+								<option value="ALLSTATE HEALTH SOLUTIONS" {% if supps.carrier == 'ALLSTATE HEALTH SOLUTIONS' %}selected{% endif %}> ALLSTATE HEALTH SOLUTIONS </option>  
+								<option value="COMBINED" {% if supps.carrier == 'COMBINED' %}selected{% endif %}> COMBINED </option>
+								<option value="CIGNA" {% if supps.carrier == 'CIGNA' %}selected{% endif %}> CIGNA </option>    
+								<option value="MANHATTAN LIFE" {% if supps.carrier == 'MANHATTAN LIFE' %}selected{% endif %}> MANHATTAN LIFE </option>
+								<option value="METLIFE" {% if supps.carrier == 'METLIFE' %}selected{% endif %}> METLIFE </option>
+								<option value="OSCAR" {% if supps.carrier == 'OSCAR' %}selected{% endif %}> OSCAR</option> 
+								<option value="PIVOT" {% if supps.carrier|default:'' == 'PIVOT' %}selected{% endif %}>PIVOT</option>  
+								<option value="SUREBRIDGE" {% if supps.carrier == 'SUREBRIDGE' %}selected{% endif %}> SUREBRIDGE </option>    
+								<option value="UNITED" {% if supps.carrier == 'UNITED' %}selected{% endif %}> UNITED </option>    
 								</select>
 						</div>
 						<div class="col-12 col-lg-3">
@@ -540,61 +515,11 @@
 
 	<!--app JS-->
 	<script src="{% static "assets/js/app.js" %}"></script>
-	<script src="{% static "assets/js/blockSocial.js" %}"></script>
-	{% if request.user.role == 'A' %}
-		<script>
-			document.addEventListener('DOMContentLoaded', function () {
-				var form = document.querySelector('form');
-				var formElements = form.querySelectorAll('input:not([type="hidden"]), select, textarea');
-		
-				// Deshabilitar todos los campos del formulario excepto los de tipo 'hidden'
-				formElements.forEach(function (element) {
-					if (element.id !== 'id_client') {  // Asegúrate de no deshabilitar 'id_client'
-						element.disabled = true;
-					}
-				});
-		
-				// Manejar el div y el input de 'obs_agent'
-				var divObsAgent = document.getElementById('obs_agent');
-				var inputObsAgent = document.querySelector('input#obs_agent');
-		
-				// Condición para habilitar y mostrar el campo (modificar según sea necesario)
-				var conditionMet = /* tu lógica aquí */ true; // Cambia esta lógica según lo que necesites
-		
-				if (conditionMet) {
-					if (divObsAgent) divObsAgent.style.display = 'block'; // Mostrar el div
-					if (inputObsAgent) inputObsAgent.disabled = false;    // Habilitar el input
-				} else {
-					if (divObsAgent) divObsAgent.style.display = 'none'; // Ocultar el div
-				}
-		
-				// Opcional: Ocultar botón submit
-				var submitButton = form.querySelector('button[id="enviar"]');
-				var submitButton2 = form.querySelector('button[id="enviar2"]');
-				if (submitButton && submitButton2) {
-					submitButton.style.display = 'none';     // Oculta el primer botón submit
-					submitButton2.style.display = 'inline';  // Muestra el segundo botón submit
-				}
-			});
-		</script>	
-	{% endif %} 
+	<script src="{% static "assets/js/validations/blockSocial.js" %}"></script>
+	<script src="{% static "assets/js/validations/validationZicode.js" %}"></script>
+	<script src="{% static "assets/js/validations/editSupp.js" %}"></script>
 
-	<script>
-		document.addEventListener('DOMContentLoaded', function() {
-			const selectElement = document.querySelector('#textoIngresados');
-			const choices = new Choices(selectElement, {
-				removeItemButton: true,  // Muestra el botón de eliminar las opciones seleccionadas
-				searchEnabled: true,     // Habilita la búsqueda en el menú desplegable
-				placeholderValue: 'Seleccione una opción...',
-				itemSelectText: '',      // Elimina el texto 'Selecciona un elemento'
-			});
-			//formateo de la fecha
-			flatpickr("#date_birth", {dateFormat: "m/d/Y", });
-			flatpickr("#effectiveDateSupp", {dateFormat: "m/d/Y",  }); 
-			flatpickr("[id^='dateBirthDependent']", {dateFormat: "m/d/Y",  }); 
-			flatpickr("#date_effective_coverage", {dateFormat: "m/d/Y",  }); 
-			flatpickr("#date_effective_coverage_end", {dateFormat: "m/d/Y",  }); 
-		});
-	</script>
+
+
 
 {% endblock %}

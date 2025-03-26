@@ -35,7 +35,6 @@ def saveCustomerObservationACA(request):
         
         # Convertir las observaciones a una cadena (por ejemplo, separada por comas o saltos de línea)
         typification_text = ", ".join(observations)  # Puedes usar "\n".join(observations) si prefieres saltos de línea
-
     
         plan = ObamaCare.objects.get(id=plan_id)
 
@@ -53,7 +52,7 @@ def saveCustomerObservationACA(request):
         else:
             messages.error(request, "El contenido de la observación no puede estar vacío.")
 
-        return redirect('editClientObama', plan.id, way)       
+        return redirect('editObama', plan.id, way)       
         
     else:
         return HttpResponse("Método no permitido.", status=405)
@@ -88,78 +87,11 @@ def saveCustomerObservationSupp(request):
         else:
             messages.error(request, "El contenido de la observación no puede estar vacío.")
 
-        return redirect('editClientSupp', plan.id)        
+        return redirect('editSupp', plan.id)        
         
     else:
         return HttpResponse("Método no permitido.", status=405)
 
-@login_required(login_url='/login') 
-def typification(request):
-        
-    start_date = request.POST.get('start_date')
-    end_date = request.POST.get('end_date')
-    agent = Users.objects.filter(role__in=['A', 'C'])
-    
-    # Consulta base
-    typification = ObservationCustomer.objects.select_related('agent', 'client').filter(is_active = True)
-
-    # Si no se proporcionan fechas, mostrar registros del mes actual   
-    # Obtener el primer día del mes actual con zona horaria
-    today = timezone.now()
-    first_day_of_month = today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    
-    # Obtener el último día del mes actual
-    if today.month == 12:
-        # Si es diciembre, el último día será el 31
-        last_day_of_month = today.replace(day=31, hour=23, minute=59, second=59, microsecond=999999)
-    else:
-        # Para otros meses, usar el día anterior al primer día del siguiente mes
-        last_day_of_month = (first_day_of_month.replace(month=first_day_of_month.month+1) - timezone.timedelta(seconds=1))
-    
-    typification = typification.filter(created_at__range=[first_day_of_month, last_day_of_month])
-
-    if request.method == 'POST':
-
-        # Obtener parámetros de fecha del request
-        start_date = request.POST.get('start_date')
-        end_date = request.POST.get('end_date')       
-        nameAgent = request.POST.get('agent')
-        nameTypification = request.POST.get('typification')
-
-        # Consulta base
-        typification = ObservationCustomer.objects.select_related('agent', 'client').filter(is_active = True)   
-        
-     
-        # Convertir fechas a objetos datetime con zona horaria
-        start_date = timezone.make_aware(
-            datetime.strptime(start_date, '%Y-%m-%d').replace(hour=0, minute=0, second=0, microsecond=0)
-        )
-        end_date = timezone.make_aware(
-            datetime.strptime(end_date, '%Y-%m-%d').replace(hour=23, minute=59, second=59, microsecond=999999)
-        )
-        
-        typification = typification.filter(
-            created_at__range=[start_date, end_date],
-            agent = nameAgent,
-            typification__contains = nameTypification
-        )
-
-        # Ordenar por fecha de creación descendente
-        typification = typification.order_by('-created_at')
-
-        return render(request, 'table/typification.html', {
-            'typification': typification,
-            'start_date': start_date,
-            'end_date': end_date,
-            'agents' : agent
-        })
-
-    return render(request, 'customerReports/typification.html', {
-            'typification': typification,
-            'start_date': start_date,
-            'end_date': end_date,
-            'agents' : agent
-        })
 
 @login_required(login_url='/login') 
 def saveCustomerObservationMedicare(request):
@@ -244,7 +176,7 @@ def saveDocumentClient(request, obamacare_id, way):
             )
 
         messages.success(request, "Archivos subidos correctamente.")
-        return JsonResponse({"success": True, "message": "Archivos subidos correctamente.", "redirect_url": f"/editClientObama/{obamacare_id}/{way}/"})
+        return JsonResponse({"success": True, "message": "Archivos subidos correctamente.", "redirect_url": f"/editObama/{obamacare_id}/{way}/"})
     
     return JsonResponse({"success": False, "message": "Método no permitido."}, status=405)
 
@@ -275,7 +207,7 @@ def saveAccionRequired(request):
     channel_layer = get_channel_layer()
 
     # Construir la URL absoluta
-    url_relativa = reverse('editClientObama', args=[obama.id, 2])
+    url_relativa = reverse('editObama', args=[obama.id, 2])
     url_absoluta = request.build_absolute_uri(url_relativa)
 
     async_to_sync(channel_layer.group_send)(
@@ -304,7 +236,7 @@ def saveAppointment(request, obamacare_id):
     way = request.POST.get('way')  
 
     # Conversión de date a la BD requerido
-    dateAppointmentNew = datetime.strptime(dateAppointment, '%m/%d/%Y').date()          
+    dateAppointmentNew = datetime.datetime.strptime(dateAppointment, '%m/%d/%Y').date()          
 
     AppointmentClient.objects.create(
         obama=obama,
@@ -314,5 +246,5 @@ def saveAppointment(request, obamacare_id):
         timeAppointment=timeAppointment,
     )
 
-    return redirect('editClientObama', obamacare_id, way)   
+    return redirect('editObama', obamacare_id, way)   
 

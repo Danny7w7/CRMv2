@@ -16,10 +16,13 @@ from django.utils.text import Truncator
 from app.models import *
 from ..utils import format_decimal
 from ..reports.charts import chart6WeekSale
+from ..decoratorsCompany import *
 
 @login_required(login_url='/login') 
+@company_ownership_required_sinURL
 def sale(request):
 
+    company_id = request.company_id  # Obtener company_id desde request
     start_date = None
     end_date = None
 
@@ -29,14 +32,14 @@ def sale(request):
         end_date = request.POST.get('end_date')
 
     # Llamar a la función que procesa los datos de ventas y obtiene la información agrupada
-    saleACA =  saleObamaAgent (start_date, end_date)
-    saleACAUsa = saleObamaAgentUsa(start_date, end_date)
-    saleSupp = saleSuppAgent(start_date, end_date)
-    saleSuppUsa = saleSuppAgentUsa(start_date, end_date)
-    sales_data, total_status_color_1_2_obama, total_status_color_3_obama, total_status_color_1_2_supp, total_status_color_3_supp, total_sales = salesBonusAgent(start_date, end_date)
+    saleACA =  saleObamaAgent (request, company_id, start_date, end_date)
+    saleACAUsa = saleObamaAgentUsa(request, company_id, start_date, end_date)
+    saleSupp = saleSuppAgent(request, company_id, start_date, end_date)
+    saleSuppUsa = saleSuppAgentUsa(request, company_id, start_date, end_date)
+    sales_data, total_status_color_1_2_obama, total_status_color_3_obama, total_status_color_1_2_supp, total_status_color_3_supp, total_sales = salesBonusAgent(request, company_id, start_date, end_date)
 
-    registered, proccessing, profiling, canceled, countRegistered,countProccsing,countProfiling,countCanceled = saleClientStatusObama(start_date, end_date)
-    registeredSupp, proccessingSupp, activeSupp, canceledSupp,countRegisteredSupp,countProccsingSupp,countActiveSupp,countCanceledSupp = saleClientStatusSupp(start_date, end_date)
+    registered, proccessing, profiling, canceled, countRegistered,countProccsing,countProfiling,countCanceled = saleClientStatusObama(request, company_id, start_date, end_date)
+    registeredSupp, proccessingSupp, activeSupp, canceledSupp,countRegisteredSupp,countProccsingSupp,countActiveSupp,countCanceledSupp = saleClientStatusSupp(request, company_id, start_date, end_date)
 
 
 
@@ -77,12 +80,21 @@ def sale(request):
 
     return render (request, 'saleReports/sale.html', context)
 
-def saleObamaAgent(start_date=None, end_date=None):
-    # Definir la consulta base para Supp, utilizando `select_related` para obtener el nombre completo del agente (User)
-    sales_query = ObamaCare.objects.select_related('agent').filter(is_active=True) \
-        .values('agent__username', 'agent__first_name', 'agent__last_name', 'status_color') \
-        .annotate(total_sales=Count('id')) \
-        .order_by('agent', 'status_color')
+def saleObamaAgent(request, company_id, start_date=None, end_date=None):
+
+    if request.user.is_superuser:
+        # Definir la consulta base para Supp, utilizando `select_related` para obtener el nombre completo del agente (User)
+        sales_query = ObamaCare.objects.select_related('agent').filter(is_active=True) \
+            .values('agent__username', 'agent__first_name', 'agent__last_name', 'status_color') \
+            .annotate(total_sales=Count('id')) \
+            .order_by('agent', 'status_color')
+    else:
+        # Definir la consulta base para Supp, utilizando `select_related` para obtener el nombre completo del agente (User)
+        sales_query = ObamaCare.objects.select_related('agent').filter(is_active=True, company = company_id) \
+            .values('agent__username', 'agent__first_name', 'agent__last_name', 'status_color') \
+            .annotate(total_sales=Count('id')) \
+            .order_by('agent', 'status_color')
+
 
     # Si no se proporcionan fechas, filtrar por el mes actual
     if not start_date and not end_date:
@@ -99,10 +111,10 @@ def saleObamaAgent(start_date=None, end_date=None):
     # Si se proporcionan fechas, filtrar por el rango de fechas
     elif start_date and end_date:
         start_date = timezone.make_aware(
-            datetime.strptime(start_date, '%Y-%m-%d').replace(hour=0, minute=0, second=0, microsecond=0)
+            datetime.datetime.strptime(start_date, '%Y-%m-%d').replace(hour=0, minute=0, second=0, microsecond=0)
         )
         end_date = timezone.make_aware(
-            datetime.strptime(end_date, '%Y-%m-%d').replace(hour=23, minute=59, second=59, microsecond=999999)
+            datetime.datetime.strptime(end_date, '%Y-%m-%d').replace(hour=23, minute=59, second=59, microsecond=999999)
         )
 
         sales_query = sales_query.filter(created_at__range=[start_date, end_date])
@@ -136,12 +148,19 @@ def saleObamaAgent(start_date=None, end_date=None):
 
     return agents_sales
 
-def saleObamaAgentUsa(start_date=None, end_date=None):
+def saleObamaAgentUsa(request, company_id, start_date=None, end_date=None):
 
-    # Definir la consulta base para Supp, utilizando `values` para obtener el nombre del agente (agent_usa)
-    sales_query = ObamaCare.objects.values('agent_usa', 'status_color').filter(is_active=True) \
-        .annotate(total_sales=Count('id')) \
-        .order_by('agent_usa', 'status_color')
+    if request.user.is_superuser:
+        # Definir la consulta base para Supp, utilizando `values` para obtener el nombre del agente (agent_usa)
+        sales_query = ObamaCare.objects.values('agent_usa', 'status_color').filter(is_active=True) \
+            .annotate(total_sales=Count('id')) \
+            .order_by('agent_usa', 'status_color')
+    else:
+        # Definir la consulta base para Supp, utilizando `values` para obtener el nombre del agente (agent_usa)
+        sales_query = ObamaCare.objects.values('agent_usa', 'status_color').filter(is_active=True, company = company_id) \
+            .annotate(total_sales=Count('id')) \
+            .order_by('agent_usa', 'status_color')
+
 
     # Si no se proporcionan fechas, filtrar por el mes actual
     if not start_date and not end_date:
@@ -196,12 +215,21 @@ def saleObamaAgentUsa(start_date=None, end_date=None):
 
     return agents_sales
 
-def saleSuppAgent(start_date=None, end_date=None):
-    # Definir la consulta base para Supp, utilizando `select_related` para obtener el nombre completo del agente (User)
-    sales_query = Supp.objects.select_related('agent').filter(is_active=True) \
-        .values('agent__username', 'agent__first_name', 'agent__last_name', 'status_color') \
-        .annotate(total_sales=Count('id')) \
-        .order_by('agent', 'status_color')
+def saleSuppAgent(request, company_id, start_date=None, end_date=None):
+
+    if request.user.is_superuser:
+        # Definir la consulta base para Supp, utilizando `select_related` para obtener el nombre completo del agente (User)
+        sales_query = Supp.objects.select_related('agent').filter(is_active=True) \
+            .values('agent__username', 'agent__first_name', 'agent__last_name', 'status_color') \
+            .annotate(total_sales=Count('id')) \
+            .order_by('agent', 'status_color')
+    else:
+        # Definir la consulta base para Supp, utilizando `select_related` para obtener el nombre completo del agente (User)
+        sales_query = Supp.objects.select_related('agent').filter(is_active=True, company = company_id) \
+            .values('agent__username', 'agent__first_name', 'agent__last_name', 'status_color') \
+            .annotate(total_sales=Count('id')) \
+            .order_by('agent', 'status_color')
+
 
     # Si no se proporcionan fechas, filtrar por el mes actual
     if not start_date and not end_date:
@@ -260,11 +288,19 @@ def saleSuppAgent(start_date=None, end_date=None):
 
     return agents_sales
 
-def saleSuppAgentUsa(start_date=None, end_date=None):
-    # Definir la consulta base para Supp, utilizando `values` para obtener el nombre del agente (agent_usa)
-    sales_query = Supp.objects.values('agent_usa', 'status_color').filter(is_active = True) \
-        .annotate(total_sales=Count('id')) \
-        .order_by('agent_usa', 'status_color')
+def saleSuppAgentUsa(request, company_id, start_date=None, end_date=None):
+
+    if request.user.is_superuser:
+        # Definir la consulta base para Supp, utilizando `values` para obtener el nombre del agente (agent_usa)
+        sales_query = Supp.objects.values('agent_usa', 'status_color').filter(is_active = True) \
+            .annotate(total_sales=Count('id')) \
+            .order_by('agent_usa', 'status_color')
+    else:
+        # Definir la consulta base para Supp, utilizando `values` para obtener el nombre del agente (agent_usa)
+        sales_query = Supp.objects.values('agent_usa', 'status_color').filter(is_active = True, company = company_id) \
+            .annotate(total_sales=Count('id')) \
+            .order_by('agent_usa', 'status_color')
+
 
     # Si no se proporcionan fechas, filtrar por el mes actual
     if not start_date and not end_date:
@@ -318,14 +354,17 @@ def saleSuppAgentUsa(start_date=None, end_date=None):
 
     return agents_sales
 
-def salesBonusAgent(start_date=None, end_date=None):
+def salesBonusAgent(request, company_id, start_date=None, end_date=None):
+
+    company_filter = {'company': company_id} if not request.user.is_superuser else {}
+
     # Consulta para Supp
-    sales_query_supp = Supp.objects.select_related('agent').filter(is_active=True) \
+    sales_query_supp = Supp.objects.select_related('agent').filter(is_active=True,  **company_filter) \
         .values('agent__id', 'agent__username', 'agent__first_name', 'agent__last_name', 'status_color') \
         .annotate(total_sales=Count('id'))
 
     # Consulta para ObamaCare
-    sales_query_obamacare = ObamaCare.objects.select_related('agent').filter(is_active = True) \
+    sales_query_obamacare = ObamaCare.objects.select_related('agent').filter(is_active = True,  **company_filter) \
         .values('agent__id', 'agent__username', 'agent__first_name', 'agent__last_name', 'status_color') \
         .annotate(total_sales=Count('id'))
 
@@ -431,23 +470,25 @@ def salesBonusAgent(start_date=None, end_date=None):
 
     return sales_data, total_status_color_1_2_obama, total_status_color_3_obama, total_status_color_1_2_supp, total_status_color_3_supp, total_sales
 
-def saleClientStatusObama(start_date=None, end_date=None):
+def saleClientStatusObama(request, company_id, start_date=None, end_date=None):
+
+    company_filter = {'company': company_id} if not request.user.is_superuser else {}
 
     # Consulta para Registered
     sales_query_registered = ObamaCare.objects.select_related('agent','client').annotate(
-        truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 1, is_active = True)
+        truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 1, is_active = True,  **company_filter)
     
     # Consulta para Proccessing
     sales_query_proccessing = ObamaCare.objects.select_related('agent','client').annotate(
-        truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 2, is_active = True ) 
+        truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 2, is_active = True,  **company_filter ) 
 
     # Consulta para Profiling
     sales_query_profiling = ObamaCare.objects.select_related('agent','client').annotate(
-        truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 3, is_active = True ) 
+        truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 3, is_active = True,  **company_filter ) 
     
     # Consulta para Canceled
     sales_query_canceled = ObamaCare.objects.select_related('agent','client').annotate(
-        truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 4, is_active = True )
+        truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 4, is_active = True,  **company_filter )
 
     # Si no se proporcionan fechas, filtrar por el mes actual
     if not start_date and not end_date:
@@ -486,24 +527,26 @@ def saleClientStatusObama(start_date=None, end_date=None):
     
     return sales_query_registered,sales_query_proccessing,sales_query_profiling,sales_query_canceled,countRegistered,countProccsing,countProfiling,countCanceled
 
-def saleClientStatusSupp(start_date=None, end_date=None):
+def saleClientStatusSupp(request, company_id, start_date=None, end_date=None):
+
+    company_filter = {'company': company_id} if not request.user.is_superuser else {}
 
     # Consulta para Registered
     registered_supp = Supp.objects.select_related('agent','client').annotate(
-        truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 1, is_active = True)
+        truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 1, is_active = True,  **company_filter)
     
     
     # Consulta para Proccessing
     proccessing_supp = Supp.objects.select_related('agent','client').annotate(
-        truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 2, is_active = True ) 
+        truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 2, is_active = True,  **company_filter ) 
 
     # Consulta para Active
     active_supp = Supp.objects.select_related('agent','client').annotate(
-        truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 3, is_active = True ) 
+        truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 3, is_active = True,  **company_filter ) 
     
     # Consulta para Canceled
     canceled_supp = Supp.objects.select_related('agent','client').annotate(
-        truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 4, is_active = True )
+        truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 4, is_active = True,  **company_filter )
 
     # Si no se proporcionan fechas, filtrar por el mes actual
     if not start_date and not end_date:
@@ -548,7 +591,12 @@ def saleClientStatusSupp(start_date=None, end_date=None):
     return registered_supp,proccessing_supp,active_supp,canceled_supp,countRegisteredSupp,countProccsingSupp,countActiveSupp,countCanceledSupp
 
 @login_required(login_url='/login') 
+@company_ownership_required_sinURL
 def customerPerformance(request):
+    company_id = request.company_id  # Obtener company_id desde request
+    # Definir el filtro de compañía (será un diccionario vacío si es superusuario)
+    company_filter = {'company': company_id} if not request.user.is_superuser else {}
+    company_filter2 = {'obama__company': company_id} if not request.user.is_superuser else {}
 
     if request.method == 'POST':
         # Convertir fechas a objetos datetime con zona horaria
@@ -568,7 +616,7 @@ def customerPerformance(request):
         next_month = now.replace(day=28) + timedelta(days=4)  # Garantiza que pasamos al siguiente mes
         end_date = next_month.replace(day=1, hour=23, minute=59, second=59, microsecond=999999) - timedelta(days=1)
 
-    obamacare = ObamaCare.objects.filter(created_at__range=(start_date, end_date), is_active=1)
+    obamacare = ObamaCare.objects.filter(created_at__range=(start_date, end_date), is_active=1, **company_filter)
     totalEnroled = obamacare.exclude(profiling='NO')
     totalNoEnroled = obamacare.filter(profiling='NO').count()
     totalOtherParty = obamacare.filter(status__in=('OTHER PARTY', 'OTHER AGENT')).count()
@@ -577,12 +625,12 @@ def customerPerformance(request):
     totalActiveCms = obamacare.filter(Q(status='ACTIVE') | Q(status='SELF-ENROLMENT')).count()
     totalNoActiveCms = obamacare.exclude(Q(status='ACTIVE') | Q(status='SELF-ENROLMENT')).count()
 
-    documents = DocumentObama.objects.select_related('agent_create').filter(created_at__range=(start_date, end_date))
-    appointments = AppointmentClient.objects.select_related('agent_create').filter(created_at__range=(start_date, end_date))
-    payments = Payments.objects.select_related('agent').filter(created_at__range=(start_date, end_date))
+    documents = DocumentObama.objects.select_related('agent_create').filter(created_at__range=(start_date, end_date), **company_filter2)
+    appointments = AppointmentClient.objects.select_related('agent_create').filter(created_at__range=(start_date, end_date), **company_filter2)
+    payments = Payments.objects.select_related('agent').filter(created_at__range=(start_date, end_date), **company_filter)
 
     # Obtener agentes Customer, excluyendo a Maria Tinoco y Carmen Rodriguez
-    agents = Users.objects.filter(role='C', is_active=1).exclude(username__in=('MariaCaTi', 'CarmenR'))
+    agents = Users.objects.filter(role='C', is_active=1, **company_filter).exclude(username__in=('MariaCaTi', 'CarmenR'))
     agent_performance = {}
 
     for agent in agents:
@@ -693,7 +741,7 @@ def customerPerformance(request):
     }
     return render(request, 'customerReports/customerPerformance.html', context)
 
-def table6Week():
+def table6Week(request, company_id):
 
     # Obtener la fecha actual
     today = datetime.datetime.today()
@@ -726,7 +774,17 @@ def table6Week():
     excludedUsernames = ['Calidad01', 'mariluz', 'MariaCaTi','StephanieMkt','CarmenR']  # Excluimos a gente que no debe aparecer en la vista
     userRoles = ['A', 'C', 'S']
 
-    users = Users.objects.filter(role__in=userRoles, is_active=True).exclude(username__in=excludedUsernames)
+    company_filter = {'company': company_id} if not request.user.is_superuser else {}
+
+    users = Users.objects.filter(role__in=userRoles, is_active=True,  **company_filter).exclude(username__in=excludedUsernames)
+
+    # Filtrar todas las ventas realizadas en las últimas 6 semanas
+    obamaSales = ObamaCare.objects.filter(created_at__range=[startDate, endOfCurrentWeek],  **company_filter)
+    suppSales = Supp.objects.filter(created_at__range=[startDate, endOfCurrentWeek],  **company_filter)
+        
+    # Agregar el conteo de pólizas activas para las últimas 6 semanas
+    activeObamaPolicies = ObamaCare.objects.filter(status='Active', created_at__range=[startDate, endOfCurrentWeek],is_active = True,  **company_filter)
+    activeSuppPolicies = Supp.objects.filter(status='Active', created_at__range=[startDate, endOfCurrentWeek], is_active = True,  **company_filter)
 
     salesSummary = {
         user.username: {
@@ -743,9 +801,7 @@ def table6Week():
         } for user in users
     }
 
-    # Filtrar todas las ventas realizadas en las últimas 6 semanas
-    obamaSales = ObamaCare.objects.filter(created_at__range=[startDate, endOfCurrentWeek])
-    suppSales = Supp.objects.filter(created_at__range=[startDate, endOfCurrentWeek])
+
 
     # Procesar las ventas de Obamacare y Supp para las últimas 6 semanas
     for sale in obamaSales:
@@ -774,9 +830,7 @@ def table6Week():
                     except KeyError:
                         pass
 
-    # Agregar el conteo de pólizas activas para las últimas 6 semanas
-    activeObamaPolicies = ObamaCare.objects.filter(status='Active', created_at__range=[startDate, endOfCurrentWeek],is_active = True)
-    activeSuppPolicies = Supp.objects.filter(status='Active', created_at__range=[startDate, endOfCurrentWeek], is_active = True)
+
 
     for policy in activeObamaPolicies:
         agentName = policy.agent.username
@@ -814,9 +868,13 @@ def table6Week():
     return finalSummary, weekRanges
 
 @login_required(login_url='/login')
+@company_ownership_required_sinURL
 def sales6WeekReport(request):
+
+    company_id = request.company_id  # Obtener company_id desde request
+
     # Obtener el resumen de ventas para las últimas 6 semanas
-    finalSummary, weekRanges = table6Week()
+    finalSummary, weekRanges = table6Week(request, company_id)
 
     # Obtener los datos para la gráfica
     chart_data = chart6WeekSale()
@@ -831,7 +889,7 @@ def sales6WeekReport(request):
     # Renderizar la plantilla con los datos
     return render(request, 'saleReports/sale6Week.html', context)
 
-def weekSalesSummary(week_number):
+def weekSalesSummary(request, week_number, company_id):
     # Obtener el año actual
     current_year = datetime.datetime.today().year
 
@@ -854,7 +912,17 @@ def weekSalesSummary(week_number):
     excludedUsernames = ['Calidad01', 'mariluz', 'MariaCaTi', 'StephanieMkt', 'CarmenR','admin','tv','zohiraDuarte', 'vladimirDeLaHoz']  # Excluimos a gente que no debe aparecer en la vista
     userRoles = ['A', 'C', 'S','SUPP']
 
-    users = Users.objects.exclude(username__in=excludedUsernames).filter(role__in=userRoles, is_active=True)
+    company_filter = {'company': company_id} if not request.user.is_superuser else {}
+
+    users = Users.objects.exclude(username__in=excludedUsernames).filter(role__in=userRoles, is_active=True,  **company_filter)
+
+    # Filtrar todas las ventas realizadas en la semana seleccionada
+    obamaSales = ObamaCare.objects.filter(created_at__range=[startOfWeek, endOfWeek],  **company_filter)
+    suppSales = Supp.objects.filter(created_at__range=[startOfWeek, endOfWeek],  **company_filter)
+
+    # Agregar el conteo de pólizas activas para la semana seleccionada
+    activeObamaPolicies = ObamaCare.objects.filter(status='Active', created_at__range=[startOfWeek, endOfWeek], is_active=True,  **company_filter)
+    activeSuppPolicies = Supp.objects.filter(status='Active', created_at__range=[startOfWeek, endOfWeek], is_active=True,  **company_filter)
 
     salesSummary = {
         user.username: {
@@ -868,9 +936,7 @@ def weekSalesSummary(week_number):
         } for user in users
     }
 
-    # Filtrar todas las ventas realizadas en la semana seleccionada
-    obamaSales = ObamaCare.objects.filter(created_at__range=[startOfWeek, endOfWeek])
-    suppSales = Supp.objects.filter(created_at__range=[startOfWeek, endOfWeek])
+  
 
     # Procesar las ventas de Obamacare para la semana seleccionada
     for sale in obamaSales:
@@ -906,9 +972,7 @@ def weekSalesSummary(week_number):
             }
             salesSummary[agentName]["clientes_supp"].append(cliente_info)
 
-    # Agregar el conteo de pólizas activas para la semana seleccionada
-    activeObamaPolicies = ObamaCare.objects.filter(status='Active', created_at__range=[startOfWeek, endOfWeek], is_active=True)
-    activeSuppPolicies = Supp.objects.filter(status='Active', created_at__range=[startOfWeek, endOfWeek], is_active=True)
+
 
     for policy in activeObamaPolicies:
         agentName = policy.agent.username
@@ -943,13 +1007,15 @@ def weekSalesSummary(week_number):
     return finalSummary, weekRange
 
 @login_required(login_url='/login')
+@company_ownership_required_sinURL
 def weekSalesWiew(request):
+    company_id = request.company_id  # Obtener company_id desde request
     if request.method == 'POST':
         # Obtener el número de la semana del formulario
         week_number = int(request.POST.get('week_number'))
 
         # Llamar a la función de lógica para obtener el resumen
-        resumen_semana, rango_fechas = weekSalesSummary(week_number)
+        resumen_semana, rango_fechas = weekSalesSummary(request, week_number,company_id)
 
         # Renderizar la plantilla con los resultados
         return render(request, 'saleReports/weekSalesWiew.html', {
@@ -961,22 +1027,29 @@ def weekSalesWiew(request):
     # Si no es POST, mostrar el formulario vacío
     return render(request, 'saleReports/weekSalesWiew.html')
 
+@login_required(login_url='/login')
+@company_ownership_required_sinURL
 def reports(request):
 
+    company_id = request.company_id  # Obtener company_id desde request
+    # Definir el filtro de compañía (será un diccionario vacío si es superusuario)
+    company_filter = {'company': company_id} if not request.user.is_superuser else {}
+    company_filter2 = {'obama__company': company_id} if not request.user.is_superuser else {}
+
     #Reports de Paymet!
-    payments = Payments.objects.values('month').annotate(total=Count('id')).order_by('month')
+    payments = Payments.objects.filter(**company_filter).values('month').annotate(total=Count('id')).order_by('month')
     # Calcular el total general de todos los meses
-    total_general = Payments.objects.aggregate(total=Count('id'))['total']
+    total_general = Payments.objects.filter(**company_filter).aggregate(total=Count('id'))['total']
 
     #Reports de Action Required
     # Cantidad de registros donde agent_completed es NULL
-    pending_count = CustomerRedFlag.objects.filter(agent_completed__isnull=True).count()
+    pending_count = CustomerRedFlag.objects.filter(agent_completed__isnull=True, **company_filter2).count()
 
     # Cantidad de registros donde agent_completed NO es NULL
-    completed_count = CustomerRedFlag.objects.filter(agent_completed__isnull=False).count()
+    completed_count = CustomerRedFlag.objects.filter(agent_completed__isnull=False, **company_filter2).count()
 
     # Total de registros en CustomerRedFlag
-    total_count = CustomerRedFlag.objects.count()
+    total_count = CustomerRedFlag.objects.filter(**company_filter2).count()
 
 
     context = {
@@ -990,7 +1063,12 @@ def reports(request):
     return render(request, 'saleReports/reports.html', context)
 
 @login_required(login_url='/login')
+@company_ownership_required_sinURL
 def customerTypification(request) :
+
+    company_id = request.company_id  # Obtener company_id desde request
+    # Definir el filtro de compañía (será un diccionario vacío si es superusuario)
+    company_filter = {'client__company': company_id} if not request.user.is_superuser else {}
 
     # Obtener la fecha actual
     now = timezone.now()
@@ -1013,7 +1091,7 @@ def customerTypification(request) :
             datetime.datetime(now.year, now.month + 1, 1, 0, 0, 0, 0) - timezone.timedelta(microseconds=1)
         )
             
-    agents = ObservationCustomer.objects.values('agent__username', 'agent__first_name', 'agent__last_name').distinct().filter(created_at__range=[startDate, endDate],is_active = True)
+    agents = ObservationCustomer.objects.values('agent__username', 'agent__first_name', 'agent__last_name').distinct().filter(created_at__range=[startDate, endDate],is_active = True, **company_filter)
     agent_data = []
 
     for agent in agents:
@@ -1024,7 +1102,7 @@ def customerTypification(request) :
             agent__username=username
         ).annotate(
             individual_types=F('typification')
-        ).values('individual_types').filter(is_active = True)
+        ).values('individual_types').filter(is_active = True, **company_filter)
         
         type_count = {}
         total = 0
@@ -1049,3 +1127,77 @@ def customerTypification(request) :
     
     
     return render(request, 'customerReports/customerTypification.html', context)
+
+@login_required(login_url='/login') 
+@company_ownership_required_sinURL
+def typification(request):
+
+    company_id = request.company_id  # Obtener company_id desde request
+    # Definir el filtro de compañía (será un diccionario vacío si es superusuario)
+    company_filter = {'company': company_id} if not request.user.is_superuser else {}
+    company_filter2 = {'client__company': company_id} if not request.user.is_superuser else {}
+        
+    start_date = request.POST.get('start_date')
+    end_date = request.POST.get('end_date')
+    agent = Users.objects.filter(role__in=['A', 'C'], **company_filter )
+    
+    # Consulta base
+    typification = ObservationCustomer.objects.select_related('agent', 'client').filter(is_active = True, **company_filter2)
+
+    # Si no se proporcionan fechas, mostrar registros del mes actual   
+    # Obtener el primer día del mes actual con zona horaria
+    today = timezone.now()
+    first_day_of_month = today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    
+    # Obtener el último día del mes actual
+    if today.month == 12:
+        # Si es diciembre, el último día será el 31
+        last_day_of_month = today.replace(day=31, hour=23, minute=59, second=59, microsecond=999999)
+    else:
+        # Para otros meses, usar el día anterior al primer día del siguiente mes
+        last_day_of_month = (first_day_of_month.replace(month=first_day_of_month.month+1) - timezone.timedelta(seconds=1))
+    
+    typification = typification.filter(created_at__range=[first_day_of_month, last_day_of_month])
+
+    if request.method == 'POST':
+
+        # Obtener parámetros de fecha del request
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')       
+        nameAgent = request.POST.get('agent')
+        nameTypification = request.POST.get('typification')
+
+        # Consulta base
+        typification = ObservationCustomer.objects.select_related('agent', 'client').filter(is_active = True, **company_filter2)   
+        
+     
+        # Convertir fechas a objetos datetime con zona horaria
+        start_date = timezone.make_aware(
+            datetime.strptime(start_date, '%Y-%m-%d').replace(hour=0, minute=0, second=0, microsecond=0)
+        )
+        end_date = timezone.make_aware(
+            datetime.strptime(end_date, '%Y-%m-%d').replace(hour=23, minute=59, second=59, microsecond=999999)
+        )
+        
+        typification = typification.filter(
+            created_at__range=[start_date, end_date],
+            agent = nameAgent,
+            typification__contains = nameTypification
+        )
+
+        # Ordenar por fecha de creación descendente
+        typification = typification.order_by('-created_at')
+
+        return render(request, 'table/typification.html', {
+            'typification': typification,
+            'start_date': start_date,
+            'end_date': end_date,
+            'agents' : agent
+        })
+
+    return render(request, 'customerReports/typification.html', {
+            'typification': typification,
+            'start_date': start_date,
+            'end_date': end_date,
+            'agents' : agent
+        })

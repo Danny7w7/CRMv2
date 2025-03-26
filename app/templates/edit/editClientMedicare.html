@@ -63,15 +63,15 @@
 						</div>
 						<div class="col-12 col-lg-2">
 							<label for="city" class="form-label">City</label>
-							<input type="text" class="form-control" name ="city" id="city" value="{{medicare.city}}" required>
+							<input type="text" class="form-control" name ="city" id="city" value="{{medicare.city}}" readonly required>
 						</div>
 						<div class="col-12 col-lg-2">
 							<label for="state" class="form-label font-weight-bold">State</label>
-							<input type="text" class="form-control" name ="state" id="state" value="{{medicare.state}}" required>							
+							<input type="text" class="form-control" name ="state" id="state" value="{{medicare.state}}" readonly required>							
 						</div>
 						<div class="col-12 col-lg-2">
 							<label for="county" class="form-label">County</label>
-							<input type="text" class="form-control" name ="county" id="county" value="{{medicare.county}}" required>
+							<input type="text" class="form-control" name ="county" id="county" value="{{medicare.county}}" readonly required>
 						</div>
 						<div class="col-12 col-lg-2">
 							<label for="sex" class="form-label">Sex</label>
@@ -83,21 +83,27 @@
 						</div>
 						<div class="col-12 col-lg-2">
 							<label for="old" class="form-label">Age</label>
-							<input type="number" nim="1" class="form-control" name ="old" id="old" placeholder="Old" value="{{medicare.old}}" disabled required>
+							<input type="number" nim="1" class="form-control" name ="old" id="old" placeholder="Old" value="{{old}}" disabled >
 						</div>
 						<div class="col-12 col-lg-3">
 							<label for="date_birth" class="form-label">Date Birth</label>
 							<input type="text" class="form-control" name="date_birth" id="date_birth" value="{{ medicare.date_birth|date:'m/d/Y' }}" required>
 						</div>
-						<div class="col-12 col-lg-2">
-							<label for="date_effective_coverage_end" class="form-label">Social Security</label>
-							<input type="text" class="form-control" name="social_security" id="social_security" value="{{formatted_social}}" disabled >
-						</div>  
-						<div class="col-12 col-lg-1">
-							<br>							
-							<button id="show-full-social" type="button" class="btn btn-secondary mt-2 "><i class="lni lni-eye"></i></button>
-							<button hidden type="button" id="block-social" class="btn btn-secondary mt-2">Bloquear Número</button>
-						</div>  
+						<div class="col-12 col-lg-3">
+							<label for="social_security" class="form-label">Social Security</label>
+							<div class="input-group">
+								<input type="text" class="form-control" name="social_security" id="social_security" value="{{formatted_social}}"  disabled data-client-id="{{ medicare.id }}">
+								<button id="show-full-social" type="button" class="btn btn-secondary">
+									<i class="lni lni-eye"></i>
+								</button>
+								<button hidden type="button" id="save-social" class="btn btn-success">
+									<i class="lni lni-save"></i>
+								</button>
+								<button hidden type="button" id="block-social" class="btn btn-danger">
+									<i class="lni lni-lock"></i> 
+								</button>
+							</div>
+						</div>
 						<div class="col-12 col-lg-6">
 							<label for="migration_status" class="form-label">Migration Status</label>
 							<select class="form-select" id="migration_status"  name="migration_status" required  >
@@ -123,13 +129,6 @@
 								<option {% if medicare.agent_usa == "GINA PAOLA LAPEIRA - NPN 19944280" %}selected{% endif %} value="GINA PAOLA LAPEIRA - NPN 19944280">GINA PAOLA LAPEIRA - NPN 19944280</option>
 								<option {% if medicare.agent_usa == "LUIS EDUARDO LAPEIRA - NPN 20556081" %}selected{% endif %} value="LUIS EDUARDO LAPEIRA - NPN 20556081">LUIS EDUARDO LAPEIRA - NPN 20556081</option>
 								<option {% if medicare.agent_usa == "DANIEL SANTIAGO LAPEIRA ACEVEDO - NPN 19904958" %}selected{% endif %} value="DANIEL SANTIAGO LAPEIRA ACEVEDO - NPN 19904958">DANIEL SANTIAGO LAPEIRA ACEVEDO - NPN 19904958</option>
-								<option {% if medicare.agent_usa == "ZOHIRA RAQUEL DUARTE AGUILAR - NPN 19582295" %}selected{% endif %} value="ZOHIRA RAQUEL DUARTE AGUILAR - NPN 19582295">ZOHIRA RAQUEL DUARTE AGUILAR - NPN 19582295</option>
-								<option {% if medicare.agent_usa == "DANIESKA LOPEZ SEQUEIRA - NPN 20134539" %}selected{% endif %} value="DANIESKA LOPEZ SEQUEIRA - NPN 20134539">DANIESKA LOPEZ SEQUEIRA - NPN 20134539</option>
-								<option {% if medicare.agent_usa == "VLADIMIR DE LA HOZ FONTALVO - NPN 19915005" %}selected{% endif %} value="VLADIMIR DE LA HOZ FONTALVO - NPN 19915005">VLADIMIR DE LA HOZ FONTALVO - NPN 19915005</option>
-								<option {% if medicare.agent_usa == "FRANK JOSE LOPEZ SEQUEIRA - NPN 21226603" %}selected{% endif %} value="FRANK JOSE LOPEZ SEQUEIRA - NPN 21226603">FRANK JOSE LOPEZ SEQUEIRA - NPN 21226603</option>
-								<option {% if medicare.agent_usa == "BORJA G CANTON HERRERA - NPN 20673324" %}selected{% endif %} >BORJA G CANTON HERRERA - NPN 20673324</option>
-								<option {% if medicare.agent_usa == "RODRIGO G CANTON - NPN 20670005" %}selected{% endif %} value="RODRIGO G CANTON - NPN 20670005">RODRIGO G CANTON - NPN 20670005</option>
-								<option {% if medicare.agent_usa == "EVELYN BEATRIZ HERRERA - NPN 20671818" %}selected{% endif %} value="EVELYN BEATRIZ HERRERA - NPN 20671818">EVELYN BEATRIZ HERRERA - NPN 20671818</option>
 							</select>
 						</div>
 						<div class="col-12 col-lg-6">
@@ -150,9 +149,9 @@
 							<div class="d-md-flex d-grid align-items-center gap-3">
 								<button type="submit" name="action" value="save_obamacare" id="enviar" class="btn btn-primary px-4"  >Submit</button>
 								<button type="submit" name="action" id="enviar2" value="save_observation_agent" class="btn btn-primary px-4" style="display: none;">Submits</button>
-								<a href="{% url 'clientObamacare' %}" class="btn btn-light px-4">Back</a>
+								<a href="{% url 'clientMedicare' %}" class="btn btn-light px-4">Back</a>
 								{% if request.user.role != 'A' %}
-									<a href="{% url 'clientObamacare' %}" class="btn btn-light px-4" data-bs-toggle="modal" data-bs-target="#verConsent">View Consent</a>
+									<a class="btn btn-light px-4" data-bs-toggle="modal" data-bs-target="#verConsent">View Consent</a>
 								{% endif %}
 							</div>
 						</div>
@@ -346,7 +345,8 @@
 
 	<!--app JS-->
 	<script src="{% static "assets/js/app.js" %}"></script>
-	<script src="{% static "assets/js/blockSocial.js" %}"></script>
+	<script src="{% static "assets/js/validations/blockSocialMedicare.js" %}"></script>
+	<script src="{% static "assets/js/validations/validationZicode.js" %}"></script>
 
 	
 	<script>

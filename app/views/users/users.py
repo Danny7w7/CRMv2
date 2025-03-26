@@ -9,9 +9,9 @@ from django.shortcuts import get_object_or_404, redirect, render
 # Application-specific imports
 from app.models import *
 
-from ..decoratorsCompany import company_ownership_required
+from ..decoratorsCompany import *
 
-@company_ownership_required
+@company_ownership_required_sinURL
 @login_required(login_url='/login') 
 def formCreateUser(request, company_id):
 
@@ -72,7 +72,7 @@ def formCreateUser(request, company_id):
     return render(request, 'forms/formCreateUser.html', context)
 
 @login_required(login_url='/login') 
-@company_ownership_required
+@company_ownership_required_sinURL
 def editUser(request, company_id, user_id):
     # Obtener el usuario a editar o devolver un 404 si no existe
     user = Users.objects.select_related('company').filter(id=user_id).exclude(is_superuser=True).first()

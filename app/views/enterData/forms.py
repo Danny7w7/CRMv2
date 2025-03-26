@@ -13,16 +13,20 @@ from django.shortcuts import get_object_or_404, redirect, render
 from app.forms import *
 from app.models import *
 
-from ..decoratorsCompany import company_ownership_required
 from ..sms import createOrUpdateChat
+from ..decoratorsCompany import *
 
 # Vista para crear cliente
 @login_required(login_url='/login') 
-@company_ownership_required
-def formCreateClient(request, company_id):
+@company_ownership_required_sinURL
+def formCreateClient(request):
+
+    company_id = request.company_id  # Obtener company_id desde request
+    print(company_id)
 
     user = Users.objects.select_related('company').filter(company = company_id).first()
-    if company_id == '1':
+
+    if company_id == 1:
         companies = Companies.objects.filter(is_active = True)
     else:
         companies = None
@@ -71,16 +75,17 @@ def formCreateClient(request, company_id):
             # De forma insofacta se le crea el contacto al cliente.
             
             # Responder con éxito y la URL de redirección
-            return redirect('formCreatePlan', company_id ,client.id)
+            return redirect('formCreatePlan' ,client.id)
         else:
             return render(request, 'newSale/formCreateClient.html', {'error_message': form.errors})
     else:
         return render(request, 'newSale/formCreateClient.html',context)
 
 @login_required(login_url='/login') 
-@company_ownership_required
-def formCreateClientMedicare(request, company_id):
+@company_ownership_required_sinURL
+def formCreateClientMedicare(request):
 
+    company_id = request.company_id  # Obtener company_id desde request
     user = Users.objects.select_related('company').filter(company = company_id).first()
 
     if company_id == '1':
@@ -98,7 +103,6 @@ def formCreateClientMedicare(request, company_id):
         date_births = request.POST.get('date_birth')
         language = request.POST.get('language')
         fecha_obj = datetime.datetime.strptime(date_births, '%m/%d/%Y').date()
-        fecha_formateada = fecha_obj.strftime('%Y-%m-%d')
 
         #companie
         companies = request.POST.get('companies')
@@ -129,7 +133,7 @@ def formCreateClientMedicare(request, company_id):
             client.agent = request.user
             client.is_active = 1
             client.company = companiesInstance
-            client.date_birth = fecha_formateada
+            client.date_birth = fecha_obj
             client.dateMedicare = fecha_formateada_medicare
             client.social_security = formatSocial
             client.relationship = relationship
@@ -156,9 +160,10 @@ def formCreateClientMedicare(request, company_id):
         return render(request, 'newSale/formCreateClientMedicare.html', context)
 
 @login_required(login_url='/login') 
-@company_ownership_required
-def formCreatePlan(request, company_id ,client_id):
+@company_ownership_required_sinURL
+def formCreatePlan(request ,client_id):
     client = get_object_or_404(Clients, id=client_id)
+    company_id = request.company_id  # Obtener company_id desde request
     company = Companies.objects.filter(id = company_id).first()
 
     type_sale = request.GET.get('type_sale')
@@ -178,14 +183,14 @@ def formCreatePlan(request, company_id ,client_id):
     })
 
 @login_required(login_url='/login')
-@company_ownership_required
-def formAddObama(request, company_id, client_id):
+@company_ownership_required_sinURL
+def formAddObama(request, client_id):
 
     client = Clients.objects.get(id=client_id)
 
     if request.method == 'POST':
-
-        company_id = Companies.objects.filter(id = company_id)
+        company_id = request.company_id  # Obtener company_id desde request
+        company_id = Companies.objects.filter(id = company_id).first()
 
         formObama = ObamaForm(request.POST)
         if formObama.is_valid():
@@ -202,13 +207,13 @@ def formAddObama(request, company_id, client_id):
     return render(request, 'forms/formAddObama.html')
 
 @login_required(login_url='/login')
-@company_ownership_required
-def formAddSupp(request,company_id,client_id):
+@company_ownership_required_sinURL
+def formAddSupp(request,client_id):
 
     client = Clients.objects.get(id=client_id)    
 
     if request.method == 'POST':
-
+        company_id = request.company_id  # Obtener company_id desde request
         company_id = Companies.objects.filter(id = company_id).first()
 
         observation = request.POST.get('observation')
@@ -228,13 +233,13 @@ def formAddSupp(request,company_id,client_id):
             supp.status = 'REGISTERED'
             supp.company = company_id
             supp.save()
-            return redirect('select_client', company_id.id)  # Cambia a tu página de éxito           
+            return redirect('select_client' )  # Cambia a tu página de éxito           
         
     return render(request, 'forms/formAddSupp.html')
 
 @login_required(login_url='/login')
-@company_ownership_required
-def formAddDepend(request, company_id ,client_id):
+@company_ownership_required_sinURL
+def formAddDepend(request ,client_id):
     lista = []
     lista2 = []
     dependents = Dependents.objects.filter(client_id=client_id)
@@ -309,7 +314,7 @@ def addDepend(request):
 
     # Conversión solo si los valores no son nulos o vacíos
     if dateBirthDependent not in [None, '']:
-        dateNew = datetime.strptime(dateBirthDependent, '%m/%d/%Y').date()
+        dateNew = datetime.datetime.strptime(dateBirthDependent, '%m/%d/%Y').date()
     else:
         dateNew = None
 
@@ -345,18 +350,19 @@ def addDepend(request):
     return redirect('select_client')    
 
 @login_required(login_url='/login') 
-def formCreateAlert(request, company_id):
-
+@company_ownership_required_sinURL
+def formCreateAlert(request):
 
     if request.method == 'POST':
-        company_id = Companies.objects.filter(id = company_id).first()
+        company_id = request.company_id  # Obtener company_id desde request
+        company  = Companies.objects.filter(id = company_id).first()
         formClient = ClientAlertForm(request.POST)
         if formClient.is_valid():
             alert = formClient.save(commit=False)
             alert.agent = request.user
             alert.is_active = True
-            alert.company = company_id
+            alert.company = company
             alert.save()
-            return redirect('formCreateAlert', company_id.id)  # Cambia a tu página de éxito
+            return redirect('formCreateAlert',)  # Cambia a tu página de éxito
 
     return render(request, 'newSale/formCreateAlert.html')

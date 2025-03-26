@@ -66,7 +66,7 @@
                                 {% if client.type_sales == "ACA" %}
                                     <!-- Solo mostrar ACA/SUPP si tiene ACA -->
                                     <li>
-                                        <form method="POST" action="{% url 'update_type_sales' company_id client.id %}">
+                                        <form method="POST" action="{% url 'update_type_sales' client.id %}">
                                             {% csrf_token %}
                                             <input type="hidden" name="type_sales" value="ACA/SUPLEMENTARIO">
                                             <button type="submit" class="dropdown-item">ADD SUPP</button>
@@ -74,7 +74,7 @@
                                         </form>
                                     </li> 
                                     <li>
-                                        <form method="POST" action="{% url 'update_type_sales' company_id client.id %}">
+                                        <form method="POST" action="{% url 'update_type_sales' client.id %}">
                                             {% csrf_token %}
                                             <input type="hidden" name="type_sales" value="ACA">
                                             <button type="submit" class="dropdown-item">ADD DEPENDENTS</button>
@@ -84,7 +84,7 @@
                                 {% elif client.type_sales == "SUPLEMENTARIO" %}
                                     <!-- Mostrar SUPP y ACA/SUPP si tiene SUPP -->
                                     <li>
-                                        <form method="POST" action="{% url 'update_type_sales' company_id client.id %}">
+                                        <form method="POST" action="{% url 'update_type_sales' client.id %}">
                                             {% csrf_token %}
                                             <input type="hidden" name="type_sales" value="ACA/SUPLEMENTARIO">
                                             <button type="submit" class="dropdown-item">ADD ACA</button>
@@ -92,7 +92,7 @@
                                         </form>
                                     </li>
                                     <li>
-                                        <form method="POST" action="{% url 'update_type_sales' company_id client.id %}">
+                                        <form method="POST" action="{% url 'update_type_sales' client.id %}">
                                             {% csrf_token %}
                                             <input type="hidden" name="type_sales" value="SUPLEMENTARIO">
                                             <button type="submit" class="dropdown-item">ADD. SUPP</button>
@@ -100,7 +100,7 @@
                                         </form>
                                     </li>
                                     <li>
-                                        <form method="POST" action="{% url 'update_type_sales' company_id client.id %}">
+                                        <form method="POST" action="{% url 'update_type_sales' client.id %}">
                                             {% csrf_token %}
                                             <input type="hidden" name="type_sales" value="SUPLEMENTARIO">
                                             <button type="submit" class="dropdown-item">ADD. DEPENDENTS</button>
@@ -110,7 +110,7 @@
                                 {% elif client.type_sales == "ACA/SUPLEMENTARIO" %}
                                     <!-- Solo mostrar ACA/SUPP si ya tiene ACA/SUPP -->
                                     <li>
-                                        <form method="POST" action="{% url 'update_type_sales' company_id client.id %}">
+                                        <form method="POST" action="{% url 'update_type_sales' client.id %}">
                                             {% csrf_token %}
                                             <input type="hidden" name="type_sales" value="ACA/SUPLEMENTARIO">
                                             <button type="submit" class="dropdown-item">ADD SUPP</button>
@@ -118,7 +118,7 @@
                                         </form>
                                     </li> 
                                     <li>
-                                        <form method="POST" action="{% url 'update_type_sales' company_id client.id %}">
+                                        <form method="POST" action="{% url 'update_type_sales' client.id %}">
                                             {% csrf_token %}
                                             <input type="hidden" name="type_sales" value="ACA">
                                             <button type="submit" class="dropdown-item">ADD DEPENDENTS</button>

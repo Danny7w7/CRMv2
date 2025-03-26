@@ -78,8 +78,11 @@
 						<th>Date</th>
 						<th>Type Police</th>
                         <th>Status</th>
-						{% if request.user.is_superuser %}
+						{% if request.user.role == 'Admin' %}
 							<th>Active</th>
+						{% endif  %}
+						{% if request.user.is_superuser  %}
+							<th>Company</th>
 						{% endif  %}
                         <th>Options</th>
                     </tr>
@@ -92,7 +95,7 @@
                         <td>{{supp.client.first_name}} {{supp.client.last_name}}</td>
                         <td>+ {{supp.client.phone_number}}</td>
 						<td>{{supp.created_at|date:"m-d-Y"}}</td>
-						<td>{{supp.policy_type}} / {{supp.company}}</td>
+						<td>{{supp.policy_type}} / {{supp.carrier}}</td>
 						<td>{% if supp.status_color == 1 or supp.status_color == None %}
 								<span class="badge rounded-pill bg-danger">{{supp.status}}</span>
 							{% elif supp.status_color == 2 %}
@@ -103,12 +106,15 @@
 								<span class="badge rounded-pill bg-danger">{{supp.status}}</span>
 							{% endif  %}
 						</td>
-						{% if request.user.is_superuser %}
+						{% if request.user.role == 'Admin' %}
 							<td> {{supp.is_active}} </td>
+						{% endif  %}
+						{% if request.user.is_superuser %}
+							<td> {{supp.company.owner}} </td>
 						{% endif  %}
                         <td>
 							<div class="d-flex order-actions">
-								<a href="{% url 'editClientSupp' supp.id %}" target="_blank" class=""><i class='bx bxs-edit'></i></a>
+								<a href="{% url 'editSupp' supp.id %}" target="_blank" class=""><i class='bx bxs-edit'></i></a>
 								{% if request.user.is_superuser %}
 								<a href="{% url 'toggleSuppStatus' supp.id %}" class="ms-3"><i class='bx bxs-trash'></i></a>
 								{% endif %}

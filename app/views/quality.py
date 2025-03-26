@@ -17,11 +17,18 @@ from weasyprint import HTML
 from app.models import *
 from ..forms import *
 
-@login_required(login_url='/login')   
+from .decoratorsCompany import * 
+
+@login_required(login_url='/login') 
+@company_ownership_required_sinURL  
 def formCreateControl(request):
 
+    company_id = request.company_id  # Obtener company_id desde request
+    # Definir el filtro de compañía (será un diccionario vacío si es superusuario)
+    company_filter = {'company': company_id} if not request.user.is_staff else {}
+
     userRole = [ 'A' , 'C', 'SUPP']
-    users = Users.objects.filter(role__in = userRole)
+    users = Users.objects.filter(role__in = userRole, **company_filter )
 
     if request.method == 'POST':
 
@@ -59,26 +66,37 @@ def formCreateControl(request):
 
     context = {'users':users}
 
-    return render(request, 'forms/formCreateControl.html', context)
+    return render(request, 'quality/formCreateControl.html', context)
 
 @login_required(login_url='/login')   
+@company_ownership_required_sinURL  
 def tableControl(request):
 
-    quality = ControlQuality.objects.select_related('agent','agent_create').filter(is_active = True)
-    call = ControlCall.objects.select_related('agent','agent_create').filter(is_active = True)
+    company_id = request.company_id  # Obtener company_id desde request
+    # Definir el filtro de compañía (será un diccionario vacío si es superusuario)
+    company_filter = {'agent__company': company_id} if not request.user.is_staff else {}
+
+    quality = ControlQuality.objects.select_related('agent','agent_create').filter(is_active = True, **company_filter)
+    call = ControlCall.objects.select_related('agent','agent_create').filter(is_active = True, **company_filter)
 
     context = {
         'quality' : quality,
         'call' : call
     }
 
-    return render(request, 'table/control.html', context)
+    return render(request, 'quality/control.html', context)
 
-@login_required(login_url='/login')   
+@login_required(login_url='/login')  
+@company_ownership_required_sinURL  
 def createQuality(request):
 
+    company_id = request.company_id  # Obtener company_id desde request
+    # Definir el filtro de compañía (será un diccionario vacío si es superusuario)
+    company_filter = {'company': company_id} if not request.user.is_staff else {}    
+    company_filter_agent = {'agent__company': company_id} if not request.user.is_staff else {} 
+
     userRole = [ 'A' , 'C']
-    agents = Users.objects.filter(is_active = True, role__in=userRole )
+    agents = Users.objects.filter(is_active = True, role__in=userRole, **company_filter )
 
     if request.method == 'POST':
 
@@ -86,11 +104,11 @@ def createQuality(request):
         end_date = request.POST.get('end_date')
         agent = request.POST.get('agent')
 
-        consultQuality = ControlQuality.objects.filter(date__range=(start_date, end_date), agent = agent)
-        agentReport = ControlQuality.objects.select_related('agent').filter(agent = agent).first
-        date = datetime.now()
+        consultQuality = ControlQuality.objects.filter(date__range=(start_date, end_date), agent = agent, **company_filter_agent)
+        agentReport = ControlQuality.objects.select_related('agent').filter(agent = agent, **company_filter_agent).first()
+        date = datetime.datetime.now()
 
-        callAll = ControlCall.objects.filter(date__range=(start_date, end_date), agent = agent)
+        callAll = ControlCall.objects.filter(date__range=(start_date, end_date), agent = agent, **company_filter_agent)
         # Sumar los valores de daily, answered y mins
         totals = callAll.aggregate(
             total_daily=Sum('daily'),
@@ -111,7 +129,7 @@ def createQuality(request):
         'agents' : agents
     }
 
-    return render (request,'pdf/createQuality.html', context)
+    return render (request,'quality/createQuality.html', context)
 
 def generatePdfQuality(request, consultQuality,agentReport,start_date,end_date,date,total_daily, total_answered, total_mins):
 
@@ -127,7 +145,7 @@ def generatePdfQuality(request, consultQuality,agentReport,start_date,end_date,d
     }
 
     # Renderiza la plantilla HTML a un string
-    html_content = render_to_string('pdf/template.html', context)
+    html_content = render_to_string('pdf/reportQuality.html', context)
 
     # Genera el PDF
     pdf_file = HTML(string=html_content).write_pdf()

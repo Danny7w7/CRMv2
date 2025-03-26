@@ -4,12 +4,14 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 # Application-specific imports
 from app.models import *
-from ..decoratorsCompany import company_ownership_required
+from ..decoratorsCompany import *
 
 
 @login_required(login_url='/login') 
-@company_ownership_required
-def select_client(request, company_id):
+@company_ownership_required_sinURL
+def select_client(request):
+
+    company_id = request.company_id  # Obtener company_id desde request
 
     if request.user.is_superuser: 
         clients = Clients.objects.all()
@@ -24,17 +26,19 @@ def select_client(request, company_id):
     
     return render(request, 'newSale/selectClient.html', context)
 
-def update_type_sales(request, company_id ,client_id):
-    if request.method == 'POST':
-        type_sales = request.POST.get('type_sales')
-        route = request.POST.get('route')
-        if type_sales:
-            client = get_object_or_404(Clients, id=client_id)
-            client.type_sales = type_sales
-            client.save()
-            # Redirige a la URL previa con el ID del cliente
-            if route == 'ACA': return redirect('formAddObama', company_id ,client_id)
-            elif route == 'SUPP': return redirect('formAddSupp', company_id ,client_id)
-            elif route == 'DEPEND': return redirect('formAddDepend', company_id ,client_id)
-            else: return redirect('select_client')
+
+@company_ownership_required_sinURL
+def update_type_sales(request ,client_id):
+    company_id = request.company_id  # Obtener company_id desde request
+    type_sales = request.POST.get('type_sales')
+    route = request.POST.get('route')
+    if type_sales:
+        client = get_object_or_404(Clients, id=client_id)
+        client.type_sales = type_sales
+        client.save()
+        # Redirige a la URL previa con el ID del cliente
+        if route == 'ACA': return redirect('formAddObama', client_id)
+        elif route == 'SUPP': return redirect('formAddSupp', client_id)
+        elif route == 'DEPEND': return redirect('formAddDepend', client_id)
+        else: return redirect('select_client')
 

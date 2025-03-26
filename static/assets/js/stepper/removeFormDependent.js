@@ -2,7 +2,6 @@ function removeDependent(button) {
     // Obtener el contenedor del dependiente (div padre)
     const dependentDiv = button.closest('.dependentClassList');
     const dependentId = dependentDiv.querySelector('[name="dependentId"]').value;
-    const company = dependentDiv.querySelector('[name="company"]').value;
  
 
     // Confirmar antes de eliminar
@@ -12,7 +11,7 @@ function removeDependent(button) {
         formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
 
         // Realizar la solicitud fetch para eliminar el registro
-        fetch(`/formCreatePlan/${company}/deleteDependent/${dependentId}/`, {
+        fetch(`/formCreatePlan/deleteDependent/${dependentId}/`, {
             method: 'POST',
             body: formData
         })
@@ -41,7 +40,6 @@ function removeSupp(button) {
     // Obtener el contenedor del dependiente (div padre)
     const suppDiv = button.closest('.supplementaryClassList');
     const suppId = suppDiv.querySelector('[name="suppId"]').value;
-    const company = suppDiv.querySelector('[name="company"]').value;
 
     // Confirmar antes de eliminar
     if (suppId && confirm("Are you sure you want to delete this SUPPLEMENTARY?")) {
@@ -50,7 +48,7 @@ function removeSupp(button) {
         formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
 
         // Realizar la solicitud fetch para eliminar el registro
-        fetch(`/formCreatePlan/${company}/deleteSupp/${suppId}/`, {
+        fetch(`/formCreatePlan/deleteSupp/${suppId}/`, {
             method: 'POST',
             body: formData
         })

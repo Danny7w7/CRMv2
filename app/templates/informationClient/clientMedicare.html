@@ -36,9 +36,10 @@
                         <th>Phone Numbers</th>
 						<th>Date</th>
 						{% if request.user.role == 'Admin' %}
-							<th>
-								Active
-							</th>
+							<th>Active</th>
+						{% endif %}
+						{% if request.user.is_superuser %}
+							<th>Company</th>
 						{% endif %}
                         <th>Options</th>
                     </tr>
@@ -52,9 +53,10 @@
                         <td>+ {{item.phone_number}}</td>
 						<td>{{item.created_at|date:"m-d-Y"}}</td>
 						{% if request.user.role == 'Admin' %}
-							<td>
-								{{item.is_active}}
-							</td>
+							<td>{{item.is_active}}</td>
+						{% endif  %}
+						{% if request.user.is_superuser %}
+							<td>{{item.company.owner}}</td>
 						{% endif  %}
                         <td>
 							<div class="d-flex order-actions">

@@ -37,9 +37,10 @@
 						<th>Date</th>
                         <th>Status</th>
 						{% if request.user.role == 'Admin' %}
-							<th>
-								Active
-							</th>
+							<th>Active</th>
+						{% endif %}
+						{% if request.user.is_superuser %}
+							<th>Company</th>
 						{% endif %}
                         <th>Options</th>
                     </tr>
@@ -67,10 +68,11 @@
 							{% endif  %}
 						</td>
 						{% if request.user.role == 'Admin' %}
-							<td>
-								{{obamacare.is_active}}
-							</td>
+							<td> {{obamacare.is_active}} </td>
 						{% endif  %}
+						{% if request.user.is_superuser %}
+							<td> {{obamacare.company.owner}} </td>
+						{% endif %}
                         <td>
 							<div class="d-flex order-actions">
 								<!-- Botón principal del dropdown -->
@@ -92,7 +94,7 @@
 										</form>
 									</li>
 								</ul>
-								<a href="{% url 'editObama' company_id obamacare.id 1 %}" class="ms-3"><i class='bx bxs-edit'></i></a>					
+								<a href="{% url 'editObama' obamacare.id 1 %}" class="ms-3"><i class='bx bxs-edit'></i></a>					
 								{% if request.user.is_superuser %}
 								<a href="{% url 'toggleObamaStatus' obamacare.id %}" class="ms-3">
 									<i class="bx bxs-trash"></i>

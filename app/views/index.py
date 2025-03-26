@@ -13,23 +13,13 @@ from django.shortcuts import render
 from app.models import *
 
 from django.shortcuts import render, redirect
-from .decoratorsCompany import company_ownership_required
+from .decoratorsCompany import *
 
 @login_required(login_url='/login') 
-def index_redirect(request):
-    # Aquí puedes obtener la compañía del usuario autenticado si aplica
-    if request.user.is_authenticated:
-       company_id = request.user.company.id
-    else:
-        company_id = None 
-    
-    return redirect('index', company_id)  # Usa un ID válido
+@company_ownership_required_sinURL
+def index(request):
 
-@login_required(login_url='/login') 
-@company_ownership_required
-def index(request, company_id):
-
-    user = Users.objects.select_related('company').filter(id = request.user.id).first()
+    company_id = request.company_id  # Obtener company_id desde request
 
     if request.user.is_superuser:  # Nota: Es is_superuser, no is_super_user
         obama = countSalesObama(request, company_id)
@@ -53,8 +43,7 @@ def index(request, company_id):
         'supp':supp,
         'chartOne':chartOne_json,
         'tableStatusObama':tableStatusAca,
-        'tableStatusSup':tableStatusSup,
-        'user' : user
+        'tableStatusSup':tableStatusSup
     }      
 
     return render(request, 'dashboard/index.html', context)

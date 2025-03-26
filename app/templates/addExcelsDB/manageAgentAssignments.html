@@ -20,6 +20,11 @@
 	<link rel="stylesheet" href="{% static "assets/css/dark-theme.css" %}" />
 	<link rel="stylesheet" href="{% static "assets/css/semi-dark.css" %}" />
 	<link rel="stylesheet" href="{% static "assets/css/header-colors.css" %}" />
+
+	<!-- jQuery (requerido para Select2) -->
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 {% endblock %}
 {% block page_content %}
 <h6 class="mb-0 text-uppercase">BD Assignment</h6>
@@ -81,10 +86,19 @@
 	<script src="{% static "assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js" %}"></script>
 	<script src="{% static "assets/plugins/datatable/js/jquery.dataTables.min.js" %}"></script>
 	<script src="{% static "assets/plugins/datatable/js/dataTables.bootstrap5.min.js" %}"></script>
-
+	<!-- Select2 JS -->
+	<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 	<!--app JS-->
 	<script src="{% static "assets/js/app.js" %}"></script>
 
+	<script>
+        $(document).ready(function() {
+            $('#users').select2({
+                placeholder: "Seleccione una opción",
+                allowClear: true
+            });
+        });
+    </script>
 	<style>
 			table {
 				width: 100%;

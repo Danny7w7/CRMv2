@@ -14,17 +14,16 @@ from django.shortcuts import render
 
 # Application-specific imports
 from app.models import *
-from .decoratorsCompany import company_ownership_required
+from .decoratorsCompany import *
 
 @login_required(login_url='/login')
-@company_ownership_required
-def weeklyLiveView(request, company_id):
+@company_ownership_required_sinURL
+def weeklyLiveView(request):
 
-    companie = Users.objects.select_related('company').filter(company = company_id).first()
+    company_id = request.company_id  # Obtener company_id desde request
 
     context = {
-        'weeklySales': getSalesForWeekly(company_id),
-        'companie' : companie
+        'weeklySales': getSalesForWeekly(company_id)
     }
     if request.user.role == 'TV': return render(request, 'dashboard/weeklyLiveViewTV.html', context)
     else: return render(request, 'dashboard/weeklyLiveView.html', context)
@@ -265,18 +264,17 @@ def getSalesForMonth(company_id):
     return finalSummary, weekRanges
 
 @login_required(login_url='/login')
-@company_ownership_required
-def monthLiveView(request, company_id):
+@company_ownership_required_sinURL
+def monthLiveView(request):
 
-    companie = Users.objects.select_related('company').filter(company = company_id).first()
+    company_id = request.company_id  # Obtener company_id desde request
 
     monthSales, weekRanges = getSalesForMonth(company_id)
     
     context = {
         'monthSales': monthSales,
         'weekRanges': weekRanges,
-        'toggle': True,
-        'companie':companie
+        'toggle': True
     }
     
     if request.user.role == 'TV': return render(request, 'dashboard/monthLiveViewTV.html', context)
