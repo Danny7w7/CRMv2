@@ -249,7 +249,7 @@
 						
 							
 							<li class="nav-item dark-mode d-none d-sm-flex">
-								<a class="nav-link dark-mode-icon" href="javascript:;"><i class='bx bx-moon'></i>
+								<a id='dark-mode' class="nav-link dark-mode-icon" href="javascript:;"><i class='bx bx-moon'></i>
 								</a>
 							</li>
 
@@ -538,7 +538,6 @@
 		<!--start overlay-->
 		<div class="overlay toggle-icon"></div>
 		<!--end overlay-->
-		<!--Start Back To Top Button--> <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
 		<!--End Back To Top Button-->
 		<footer class="page-footer">
 			<p class="mb-0">Copyright © {% now "Y" %}. All rights reserved to Lapeira & Associates.</p>
@@ -550,7 +549,7 @@
 
 	
 	<script src="{% static 'assets/js/sessionTimeout.js' %}"></script>
-	<script src="{% static "assets/js/websocketAlert.js" %}"></script>
+	<script src="{% static "assets/js/alerts/websocketAlert.js" %}"></script>
 
 	<!--end switcher-->
 	{% block end_js %}

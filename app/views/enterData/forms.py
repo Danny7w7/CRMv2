@@ -14,6 +14,7 @@ from app.forms import *
 from app.models import *
 
 from ..decoratorsCompany import company_ownership_required
+from ..sms import createOrUpdateChat
 
 # Vista para crear cliente
 @login_required(login_url='/login') 
@@ -22,22 +23,21 @@ def formCreateClient(request, company_id):
 
     user = Users.objects.select_related('company').filter(company = company_id).first()
     if company_id == '1':
-        company = Companies.objects.filter(is_active = True)
+        companies = Companies.objects.filter(is_active = True)
     else:
-        company = None
+        companies = None
 
     context = {
         'user' : user,
-        'company' : company
+        'companies' : companies
     }
 
     if request.method == 'POST':
 
         date_births = request.POST.get('date_birth')
         fecha_obj = datetime.datetime.strptime(date_births, '%m/%d/%Y').date()
-        fecha_formateada = fecha_obj.strftime('%Y-%m-%d')
-        companies = request.POST.get('companies')
-        companiesInstance = Companies.objects.filter(id = companies).first()
+        company = request.POST.get('company')
+        companyInstance = Companies.objects.filter(id = company).first()
 
         social = request.POST.get('social_security')
         if social: formatSocial = social.replace('-','')
@@ -48,13 +48,27 @@ def formCreateClient(request, company_id):
             client = form.save(commit=False)
             client.agent = request.user
             client.is_active = 1
-            client.date_birth = fecha_formateada
+            client.date_birth = fecha_obj
             client.social_security = formatSocial
-            client.company = companiesInstance
+            client.company = companyInstance
             client.save()
 
             if client.type_sales in ['ACA', 'ACA/SUPLEMENTARIO']:
-                contact = ContactClient.objects.create(client=client,agent=request.user)
+                contactClient = ContactClient.objects.create(client=client,agent=request.user)
+
+            contact = Contacts.objects.filter(phone_number=client.phone_number).first()
+            if not contact:
+                contact = Contacts()
+                contact.company = companyInstance
+                contact.name = f'{client.first_name} {client.last_name}'
+                contact.phone_number = client.phone_number
+                contact.is_active = False
+                contact.save()
+
+            createOrUpdateChat(contact, companyInstance, request.user)
+
+
+            # De forma insofacta se le crea el contacto al cliente.
             
             # Responder con éxito y la URL de redirección
             return redirect('formCreatePlan', company_id ,client.id)

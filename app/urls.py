@@ -112,6 +112,8 @@ urlpatterns = [
     path('sendSecretKey/<contact_id>/', sms.sendSecretKey, name='sendSecretKey'),
     path('secret-key/', sms.createSecretKey, name='url_temporal'),
 
+    path('readAllMessages/<chat_id>/<company_id>/', sms.readAllMessages, name='readAllMessages'),
+
 
     #<---------------------------Sales Reports--------------------------->
     path('sale/<company_id>/', tableReports.sale, name='sale'),

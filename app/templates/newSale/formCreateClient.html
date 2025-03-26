@@ -8,8 +8,6 @@
 	<!-- Required meta tags -->
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<!--favicon-->
-	<link rel="icon" href="{% static "assets/images/favicon-32x32.png" %}" type="image/png" />
 	<!--plugins-->
 	<link href="{% static "assets/plugins/simplebar/css/simplebar.css" %}" rel="stylesheet" />
 	<link href="{% static "assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" %}" rel="stylesheet" />
@@ -45,12 +43,12 @@
 					<p class="mb-4">Information about the client</p>
 				</div>
 				<div style="min-width: 300px;">
-					<label for="agent_usa" class="form-label font-weight-bold">Company:</label>
-					{% if company %}
-						<select class="form-select" id="companies" aria-label="Default select example" name="companies">
+					<label for="agent_usa" class="form-label font-weight-bold">Companies:</label>
+					{% if companies %}
+						<select class="form-select" id="companies" aria-label="Default select example" name="company">
 							<option value="no_valid" disabled selected>Please Select</option>
-							{% for item in company %}
-								<option value="item.id">{{item.company_name}}</option>
+							{% for company in companies %}
+								<option value="{{company.id}}">{{company.company_name}}</option>
 							{% endfor %}
 						</select>
 					{% else %}
@@ -193,7 +191,7 @@
 	
 	<!--app JS-->
 	<script src="{% static "assets/js/app.js" %}"></script>
-	<script src="{% static "assets/js/validationFormCreateClient.js" %}"></script>
+	<script src="{% static "assets/js/validations/validationFormCreateClient.js" %}"></script>
 	<script src="{% static "assets/js/validations/validationZicode.js" %}"></script>
 
 	<!-- Agregar la librería de Flatpickr -->

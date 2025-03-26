@@ -20,12 +20,16 @@
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 	
 	<!-- Theme Style CSS -->
-	<link rel="stylesheet" href="{% static "assets/css/dark-theme.css" %}" />
-	<link rel="stylesheet" href="{% static "assets/css/semi-dark.css" %}" />
-	<link rel="stylesheet" href="{% static "assets/css/header-colors.css" %}" />
+	<link rel="stylesheet" href="{% static 'assets/css/dark-theme.css' %}"/>
+	<link rel="stylesheet" href="{% static 'assets/css/semi-dark.css' %}"/>
+	<link rel="stylesheet" href="{% static 'assets/css/header-colors.css' %}"/>
 
 	<!-- Choise Style CSS -->
-	<link rel="stylesheet" href="{% static "assets/css/choiseFromEdit.css" %}" />
+	<link rel="stylesheet" href="{% static 'assets/css/choiseFromEdit.css' %}" />
+
+	<!-- Custom styles -->
+	<link rel="stylesheet" href="{% static 'assets/css/floatingSms.css' %}">
+
 {% endblock %}
 {% block page_content %}
 <h6 class="mb-0 text-uppercase">Client supplemental</h6>

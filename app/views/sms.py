@@ -11,7 +11,6 @@ import pandas as pd
 # Django utilities
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.hashers import make_password
 from django.core.files.base import ContentFile
 from django.core.signing import BadSignature, Signer
 from django.http import HttpResponse, JsonResponse
@@ -98,6 +97,7 @@ def sms(request, company_id):
                     SendMessageWebsocketChannel('SMS', payload, contact, company.id)
                     if company.id != 1:
                         discountRemainingBalance(company, '0.025')
+                sendAlertToAgent(request, chat, contact)
 
             return HttpResponse("Webhook recibido correctamente", status=200)
     except json.JSONDecodeError:
@@ -106,6 +106,43 @@ def sms(request, company_id):
     # except Exception as e:
     #     print(f"UwU:Error inesperado: {str(e)}")
     #     return HttpResponse("Error interno del servidor", status=500)
+
+def sendAlertToAgent(request, chat, contact):
+    #Obtener al agente asociado
+    agent = Users.objects.get(id=chat.agent_id)
+
+    #Aqui inicia el websocket
+    app_name = request.get_host()  # Obtener el host (ej. "127.0.0.1:8000" o "miapp.com")
+
+    # Reemplazar ":" y otros caracteres inválidos con "_" para hacer un nombre válido
+    app_name = re.sub(r'[^a-zA-Z0-9_.-]', '_', app_name)
+
+    group_name = f'product_alerts_{app_name}'
+
+    channel_layer = get_channel_layer()
+    
+    # 'event_type': event_type,
+    # 'icon': icon,
+    # 'title': title,
+    # 'message': message,
+    # 'absoluteUrl': absoluteUrl,
+    # 'agent': agent # Enviar extra_info al frontend
+    async_to_sync(channel_layer.group_send)(
+        group_name,
+        {
+            'type': 'send_alert',
+            'event_type': 'newMessage',
+            'icon': 'info',
+            'title': 'New Message',
+            'message': f'{contact.name} sent a message.',
+            'buttonMessage': 'Go to chat with Client',
+            'absoluteUrl': f'/chatSms/{contact.phone_number}/',
+            'agent': {
+                'id': agent.id,
+                'username': agent.username
+            }
+        }
+    )
 
 def SendMessageWebsocketChannel(typeMessage, payload, contact, company_id, mediaUrl=None):
     # Enviar mensaje al canal de WebSocket
@@ -272,7 +309,7 @@ def chat(request, phoneNumber):
             
     contact = Contacts.objects.get(phone_number=phoneNumber, company=request.user.company)
     chat = Chat.objects.get(contact=contact.id, company=request.user.company)
-    secretKey = SecretKey.objects.filter(contact=contact).filter()
+    secretKey = SecretKey.objects.filter(contact=contact).first()
     # Usamos select_related para optimizar las consultas
     messages = Messages.objects.filter(chat=chat.id).select_related('filessms')
     
@@ -288,9 +325,6 @@ def chat(request, phoneNumber):
             'is_read': message.is_read,
             'file': None
         }
-        
-        message.is_read = True
-        message.save()
 
         # Intentamos obtener el archivo asociado
         try:
@@ -299,6 +333,7 @@ def chat(request, phoneNumber):
             pass
             
         messages_with_files.append(message_dict)
+    messages.update(is_read=True)
 
     if request.user.is_staff:
         chats = Chat.objects.select_related('contact').filter(company=request.user.company).order_by('-last_message')
@@ -343,19 +378,20 @@ def sendSecretKey(request, contact_id):
     saveMessageInDb('Agent', 'Link to secret key sent', chat, request.user)
     return redirect('chatSms', contact.phone_number)
 
+@csrf_exempt
 def sendCreateSecretKey(request, id):
     contact = Contacts.objects.get(id=id)
     chat = Chat.objects.get(contact=contact)
     
+    print(generate_temporary_url(request, contact))
     telnyx.api_key = settings.TELNYX_API_KEY
     telnyx.Message.create(
         from_=f"+{request.user.assigned_phone.phone_number}", # Your Telnyx number
         to=f'+{contact.phone_number}',
         text= generate_temporary_url(request, contact)
     )
-
     saveMessageInDb('Agent', 'Secret key creation link sent', chat, request.user)
-    return redirect('chatSms', contact.phone_number)
+    return JsonResponse('message', 'ok', status=200)
 
 def createSecretKey(request):
     result = validate_temporary_url(request)
@@ -431,7 +467,15 @@ def create_stripe_checkout_session(company_id):
         raise Exception(f"Stripe error: {str(e)}")
     except Exception as e:
         raise Exception(f"Unexpected error: {str(e)}")
-                                             
+
+@csrf_exempt
+def readAllMessages(request, chat_id, company_id):
+    contact = Contacts.objects.get(phone_number=chat_id, company_id=company_id)
+    chat = Chat.objects.get(contact_id=contact.id)
+    messages = Messages.objects.filter(chat=chat.id).select_related('filessms')
+    messages.update(is_read=True)
+    return JsonResponse({'message':'ok'})
+
 @csrf_exempt
 def stripe_webhook(request):
     payload = request.body
@@ -509,8 +553,9 @@ def get_last_message_for_chats(chats):
         unread_count = Messages.objects.filter(
             chat=chat,
             is_read=False,
-            sender_type='contact'  # Solo mensajes del contacte
+            sender_type='Client'  # Solo mensajes del contacte
         ).count()
+        print(unread_count)
         
         # Si existe último mensaje, agregar atributos personalizados
         if last_message:

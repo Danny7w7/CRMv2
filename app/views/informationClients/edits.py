@@ -14,6 +14,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from app.models import *
 from ...forms import *
 from ..decoratorsCompany import company_ownership_required
+from ..sms import get_last_message_for_chats
 
 @login_required(login_url='/login') 
 @company_ownership_required
@@ -215,7 +216,7 @@ def editClient(request,client_id):
 
 @login_required(login_url='/login')
 @company_ownership_required
-def editObama(request, company_id ,obamacare_id, way):
+def editObama(request, company_id, obamacare_id, way):
     obamacare = ObamaCare.objects.select_related('agent', 'client').filter(id=obamacare_id).first()
     dependents = Dependents.objects.select_related('obamacare').filter(obamacare=obamacare)
     letterCard = LettersCard.objects.filter(obama = obamacare_id).first()
@@ -484,6 +485,13 @@ def editObama(request, company_id ,obamacare_id, way):
         
     obamacare.subsidy = f"{float(obamacare.subsidy):.2f}"
     obamacare.premium = f"{float(obamacare.premium):.2f}"
+
+    # Obtener los mensajes de texto del Cliente.
+    contact = Contacts.objects.filter(phone_number=obamacare.client.phone_number, company_id=company_id).first()
+    chats = Chat.objects.filter(contact=contact)
+    messages = Messages.objects.filter(chat_id=chats[0].id)
+    secretKey = SecretKey.objects.filter(contact_id=contact.id).first()
+    chat = get_last_message_for_chats(chats)[0]
     
     context = {
         'obamacare': obamacare,
@@ -507,7 +515,12 @@ def editObama(request, company_id ,obamacare_id, way):
         'accionRequired': accionRequired,
         'way': way,
         'description' : description,
-        'company_id' : company_id
+        'company_id' : company_id,
+        #SMS Blue
+        'contact':contact,
+        'chat':chat,
+        'messages':messages,
+        'secretKey':secretKey
     }
 
     return render(request, 'edit/editObama.html', context)

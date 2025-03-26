@@ -2,8 +2,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const userRole = document.body.getAttribute("data-user-role");
     const user = document.body.getAttribute("data-username");
 
-    console.log('*****')
-    console.log(user)
 
     if (!userRole) return;
 
@@ -22,25 +20,25 @@ document.addEventListener("DOMContentLoaded", function () {
                 confirmButtonText: "Aceptar",
                 timer: 5000
             });
-
         }
 
-        if ( userRole === "A" || userRole === "Admin" && data.event_type === 'new_accion_required' ) {
+        if ( userRole === "A" || userRole === "Admin" && data.event_type === 'newMessage' && !window.location.href.includes("chatSms")) {
 
             if (user == data.agent.username || userRole === "Admin" ) {
-                
                 Swal.fire({
-                    title: "Action Required!",
+                    title: data.title,
                     text: data.message,
-                    icon: "warning",
+                    icon: data.icon,
+                    imageWidth: 400,
+                    imageHeight: 200,
                     showCancelButton: "OK",
                     confirmButtonColor: "#19e207",
                     cancelButtonColor: "#ea0907",
-                    confirmButtonText: "Go to customer with required action.", // Cambiamos el texto del botón
+                    confirmButtonText: data.buttonMessage, // Cambiamos el texto del botón
                     cancelButtonText:"Ignore"
                 }).then((result) => {
                     if (result.isConfirmed) {
-                    window.open(data.extra_info, '_blank'); // Abre la URL en una nueva pestaña
+                        window.open(data.absoluteUrl, '_blank'); // Abre la URL en una nueva pestaña
                     }
                 });        
 

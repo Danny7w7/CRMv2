@@ -1,4 +1,5 @@
 import json
+import re
 from channels.generic.websocket import AsyncWebsocketConsumer
 import logging
 
@@ -92,4 +93,74 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'datetime': datetime,
             'is_sms': isinstance(sender_id, str),
             'media_url': message  # Incluimos la URL del medio en el mensaje
+        }))
+   
+class ProductAlertConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        #asi estaba antes
+        #self.group_name = 'product_alerts'
+        #await self.channel_layer.group_add(self.group_name, self.channel_name)
+        #await self.accept()
+
+        # Obtener la dirección del host del WebSocket
+        raw_host = self.scope["headers"]
+        host = None
+        for header in raw_host:
+            if header[0] == b'host':
+                host = header[1].decode("utf-8")
+                break
+
+        if not host:
+            host = "default"
+
+        # Limpiar el host para que sea un nombre de grupo válido
+        safe_host = re.sub(r'[^a-zA-Z0-9_.-]', '_', host)
+        self.group_name = f'product_alerts_{safe_host}'
+
+        print(f"Conectando WebSocket al grupo: {self.group_name}")
+
+        # Unirse al grupo
+        await self.channel_layer.group_add(
+            self.group_name,
+            self.channel_name
+        )
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(self.group_name, self.channel_name)
+
+    async def receive(self, text_data):
+        data = json.loads(text_data)
+        event_type = data.get('event_type', 'general')  # Tipo de evento
+        message = data.get('message', '')
+
+
+       # Enviar el mensaje a todos los clientes conectados con el event_type
+        await self.channel_layer.group_send(
+            self.group_name,
+            {
+                'type': 'send_alert',
+                'event_type': event_type,
+                'message': message,
+                'agent': data.get('agent', '')
+            }
+        )
+
+    async def send_alert(self, event):
+        event_type = event.get('event_type', 'general')
+        icon = event['icon']
+        title = event['title']
+        message = event['message']
+        buttonMessage = event['buttonMessage']
+        absoluteUrl = event.get('absoluteUrl', '')
+        agent = event.get('agent', '')
+
+        await self.send(text_data=json.dumps({
+            'event_type': event_type,
+            'icon': icon,
+            'title': title,
+            'message': message,
+            'buttonMessage': buttonMessage,
+            'absoluteUrl': absoluteUrl,
+            'agent': agent # Enviar extra_info al frontend
         }))

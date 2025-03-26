@@ -23,11 +23,18 @@ class Contacts(models.Model):
     class Meta:
         unique_together = ('company', 'phone_number')  # Restricción de unicidad por compañía y número de teléfono
 
-    def __str__(self):
-        return f'{self.name} - {self.phone_number} ({self.company.company_name})'
-
     class Meta:
         db_table = 'sms_contacts'
+
+    def __str__(self):
+        return f'{self.name} - {self.phone_number} ({self.company.company_name})'
+    
+    def formatted_phone_number(self):
+        if self.phone_number:
+            phone_str = str(self.phone_number)
+            formatted = f"+{phone_str[0]} ({phone_str[1:4]}) {phone_str[4:7]} {phone_str[7:]}"
+            return formatted
+        return None
 
 
 class SecretKey(models.Model):
