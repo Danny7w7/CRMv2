@@ -70,9 +70,81 @@
         .form-label {
             margin-bottom: 8px;
         }
+
+        /* Floating Container */
+
+        .floating-container {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        .copy-button {
+            background-color: #00ff08;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .copy-button:hover {
+            background-color: #48aa4d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .copy-button:active {
+            transform: translateY(0);
+        }
+
+        .success-message {
+            color: #00ff08;
+            margin-top: 10px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .input-verde-sombra {
+            border: 2px solid rgb(0, 255, 0);
+            color: rgb(0, 255, 0);
+            box-shadow: 0 0 8px rgb(22, 107, 1); /* Sombra negra alrededor del input */
+        }
+
+        .custom-link {
+            color: black;
+        }
+        .custom-link:hover {
+            color: red; /* Cambia el color al pasar el mouse */
+        }
     </style>
 </head>
 <body>
+
+    {% if temporalyURL %}
+        <!-- Div flotante -->
+        <div class="floating-container">
+            <button class="copy-button" onclick="copyCurrentURL()">
+                <i class="fas fa-link"></i>
+                Copy Link
+            </button>
+            <div class="success-message">¡Link copiado!</div>
+        </div>
+    {% endif %}
     
     <div class="container my-5">
         <h1 class="text-center mb-4">{% trans "Carta explicativa de los ingresos anuales" %}</h1>
@@ -230,6 +302,36 @@
             });
         });
     </script>
+
+    {% if temporalyURL %}
+        <script>
+            function copyCurrentURL() {
+                // Obtener la URL actual
+                const URL = '{{temporalyURL|safe}}';
+                
+                // Copiar al portapapeles
+                navigator.clipboard.writeText(URL).then(() => {
+                    // Mostrar mensaje de éxito
+                    const successMessage = document.querySelector('.success-message');
+                    successMessage.style.display = 'block';
+                    
+                    // Cambiar el texto del botón temporalmente
+                    const button = document.querySelector('.copy-button');
+                    const originalContent = button.innerHTML;
+                    button.innerHTML = '<i class="fas fa-check"></i> {% trans "Copiado!" %}';
+                    
+                    // Restaurar después de 2 segundos
+                    setTimeout(() => {
+                        successMessage.style.display = 'none';
+                        button.innerHTML = originalContent;
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Error al copiar:', err);
+                    alert('{% trans "No se pudo copiar el link. Por favor, inténtalo de nuevo." %}');
+                });
+            }
+        </script>
+    {% endif %}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

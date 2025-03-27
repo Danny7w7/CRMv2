@@ -47,7 +47,7 @@
                         <td>{{alertClient.datetime}}</td>
 						<td>{{alertClient.truncated_contect}}</td> 
 						{% if request.user.role == 'Admin' %} <td>{{alertClient.is_active}}</td> {% endif %}		
-						{% if request.user.is_superuser %} <td>{{alertClient.company.owner}}</td> {% endif %}				
+						{% if request.user.is_superuser %} <td>{{alertClient.company.company_name}}</td> {% endif %}				
 						<td>
 							<div class="d-flex order-actions">
 								<a href="{% url 'editAlert' alertClient.id %}" class=""><i class='bx bxs-edit'></i></a>

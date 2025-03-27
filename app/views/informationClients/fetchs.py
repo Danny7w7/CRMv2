@@ -165,9 +165,12 @@ def fetchActionRequired(request):
             group_name,
             {
                 'type': 'send_alert',
-                'event_type': 'action_completed',
+                'event_type': 'actionCompleted',
+                'icon': 'info',
+                'title': 'New Action Required completed',
+                'buttonMessage': 'Go to customer with the required action completed.',
                 'message': f'The required action ({customerRedFlag.description}) of the client {clients.first_name} {clients.last_name} has already been performed.',
-                'extra_info': url_absoluta
+                'absoluteUrl': url_absoluta
             }
         )
 

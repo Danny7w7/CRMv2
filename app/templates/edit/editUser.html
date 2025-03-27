@@ -28,7 +28,7 @@
     <div class="col-xl-10 mx-auto">
         <div class="card">
             <div class="card-body p-4">
-                <form class="row g-3 needs-validation" method="POST" Action="{% url 'editUser' users.company.id users.id %}">
+                <form class="row g-3 needs-validation" method="POST" Action="{% url 'editUser' users.id %}">
                     <h4>User Information</h4>					
 					<div class="col-md-4">
 						<label for="frist_name" class="form-label">Frist Name</label>
@@ -41,10 +41,6 @@
 					<div class="col-md-4">
 						<label for="username" class="form-label">User Name</label>
 						<input type="text" class="form-control" id="username" name="username"  value="{{users.username}}">
-					</div>
-					<div class="col-md-4">
-						<label for="company" class="form-label">Company</label>
-						<input readonly type="text" class="form-control" id="company" name="company"  value="{{users.company.company_name}}">
 					</div>
 					<div class="col-md-4">
 						<label for="role" class="form-label">Roll</label>
@@ -66,7 +62,7 @@
                     <div class="col-md-12">
                         <div class="d-md-flex d-grid align-items-center gap-3">
 							<button type="submit" class="btn btn-primary px-4"  >Submit</button>
-							<a href="{% url 'formCreateUser' user.company.id %}" class="btn btn-light px-4">Back</a>
+							<a href="{% url 'formCreateUser' %}" class="btn btn-light px-4">Back</a>
                         </div>
                     </div>
                     {% csrf_token %}	

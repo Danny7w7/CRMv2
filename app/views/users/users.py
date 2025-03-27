@@ -11,9 +11,11 @@ from app.models import *
 
 from ..decoratorsCompany import *
 
-@company_ownership_required_sinURL
 @login_required(login_url='/login') 
-def formCreateUser(request, company_id):
+@company_ownership_required_sinURL
+def formCreateUser(request):
+
+    company_id = request.company_id  # Obtener company_id desde request
 
     if request.user.is_superuser:
         users = Users.objects.exclude(is_superuser = True)
@@ -72,8 +74,8 @@ def formCreateUser(request, company_id):
     return render(request, 'forms/formCreateUser.html', context)
 
 @login_required(login_url='/login') 
-@company_ownership_required_sinURL
-def editUser(request, company_id, user_id):
+@company_ownership_required(model_name="Users", id_field="user_id")
+def editUser(request, user_id):
     # Obtener el usuario a editar o devolver un 404 si no existe
     user = Users.objects.select_related('company').filter(id=user_id).exclude(is_superuser=True).first()
 

@@ -218,7 +218,24 @@
 						<li> <a href="{% url 'formCreateUser'  %}"><i class='bx bx-radio-circle'></i>View User</a>
 						</li>
 					</li>
-					{% endif %}					
+					{% endif %}		
+					{% if request.user.is_superuser %}
+						<li class="menu-label">Company</li>
+						<li>
+							<a class="has-arrow" href="javascript:;">
+								<div class="parent-icon"> <i class="lni lni-apartment"></i> </div>
+								<div class="menu-title">Add Company</div>
+							</a>
+							<ul>
+								<li> <a href="{% url 'formCreateCompanies' %}"><i class='bx bx-radio-circle'></i>Add Company</a>
+								</li>
+								<li> <a href="{% url 'addPermisos' %}"><i class='bx bx-radio-circle'></i>Company permits</a>
+								</li>
+								<li> <a href="{% url 'reportBd' %}"><i class='bx bx-radio-circle'></i>Report BD</a>
+								</li>
+							</ul>
+						</li>
+					{% endif %}			
 				</ul>
 			{% else %}
 				<ul class="metismenu" id="menu">	

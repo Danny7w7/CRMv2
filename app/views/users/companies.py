@@ -1,5 +1,6 @@
 # Standard Python libraries
 from django.http import JsonResponse, HttpResponse
+from django.db.models import F
 
 # Django core libraries
 from django.contrib.auth.decorators import login_required
@@ -45,7 +46,7 @@ def formCreateCompanies(request):
         'companies':companies
     }
             
-    return render(request, 'forms/formCreateCompanies.html', context)
+    return render(request, 'companies/formCreateCompanies.html', context)
 
 @login_required(login_url='/login') 
 def editCompanies(request, companies_id):
@@ -76,12 +77,15 @@ def editCompanies(request, companies_id):
 
     # Renderizar el formulario con los datos actuales del usuario
     context = {'company': company}
-    return render(request, 'edit/editCompanies.html', context)
+    return render(request, ' companies/editCompanies.html', context)
 
 @login_required(login_url='/login') 
 def toggleCompanies(request, companies_id):
     # Obtener el cliente por su ID
-    company = get_object_or_404(company, id=companies_id)
+    company = get_object_or_404(Companies, id=companies_id)
+
+    users = Users.objects.filter(company=company)
+    users.update(is_active=F('is_active').invert())    
     
     # Cambiar el estado de is_active (True a False o viceversa)
     company.is_active = not company.is_active
@@ -89,3 +93,13 @@ def toggleCompanies(request, companies_id):
     
     # Redirigir de nuevo a la página actual con un parámetro de éxito
     return redirect('formCreateCompanies')
+
+@login_required(login_url='/login') 
+def addPermisos(request):
+
+    companies = Companies.objects.all()
+
+    context = {
+        'companies' : companies
+    }
+    return render(request, 'companies/addPermisos.html', context)

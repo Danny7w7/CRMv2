@@ -124,6 +124,17 @@ def consent(request, obamacare_id):
     return render(request, 'consent/consent1.html', context)
 
 def incomeLetter(request, obamacare_id):
+
+    obamacare = ObamaCare.objects.select_related('client').get(id=obamacare_id)
+    signed = IncomeLetter.objects.filter(obamacare = obamacare_id).first()
+
+    language = request.GET.get('lenguaje', 'es')  # Idioma predeterminado si no se pasa
+    activate(language)
+
+    temporalyURL = None
+    typeToken = True 
+
+
     # Validar si el usuario no está logueado y verificar el token
     if isinstance(request.user, AnonymousUser):
         typeToken = True #Aqui le indico si buscar el token temporal por el medicare o client_id
@@ -132,21 +143,19 @@ def incomeLetter(request, obamacare_id):
         if not is_valid_token:
             return HttpResponse(note)
     elif request.user.is_authenticated:
-        print('Usuario autenticado')
+        temporalyURL = f"{request.build_absolute_uri('/viewIncomeLetter/')}{obamacare_id}?token={generateTemporaryToken(obamacare.client , typeToken)}&lenguaje={language}"
+        #print('Usuario autenticado')
     else:
         # Si el usuario no está logueado y no hay token válido
         return HttpResponse('Acceso denegado. Por favor, inicie sesión o use un enlace válido.')
-    obamacare = ObamaCare.objects.select_related('client').get(id=obamacare_id)
-    signed = IncomeLetter.objects.filter(obamacare = obamacare_id).first()
 
-    language = request.GET.get('lenguaje', 'es')  # Idioma predeterminado si no se pasa
-    activate(language)
-    
   
     context = {
         'obamacare': obamacare,
         'signed' : signed,
+        'temporalyURL' : temporalyURL
     }
+
     if request.method == 'POST':
         objectClient = save_data_from_request(Clients, request.POST, ['agent'],obamacare.client)
         objectObamacare = save_data_from_request(ObamaCare, request.POST, ['signature'], obamacare)

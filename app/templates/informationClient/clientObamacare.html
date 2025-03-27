@@ -71,7 +71,7 @@
 							<td> {{obamacare.is_active}} </td>
 						{% endif  %}
 						{% if request.user.is_superuser %}
-							<td> {{obamacare.company.owner}} </td>
+							<td> {{obamacare.company.company_name}} </td>
 						{% endif %}
                         <td>
 							<div class="d-flex order-actions">
@@ -91,6 +91,18 @@
 										<form action="{% url 'viewConsent' obamacare.id %}" method="get" target="_blank">                                         <input type="hidden" name="lenguaje" value="en">
                                             <input type="hidden" name="lenguaje" value="es">
 											<button type="submit" class="dropdown-item">Spanish</button>
+										</form>
+									</li>
+									<li>
+										<form action="{% url 'incomeLetter' obamacare.id %}" method="get" target="_blank">
+                                            <input type="hidden" name="lenguaje" value="en">
+											<button type="submit" class="dropdown-item">I.L English</button>
+										</form>
+									</li>
+									<li>
+										<form action="{% url 'incomeLetter' obamacare.id %}" method="get" target="_blank">                                         <input type="hidden" name="lenguaje" value="en">
+                                            <input type="hidden" name="lenguaje" value="es">
+											<button type="submit" class="dropdown-item">I.L Spanish</button>
 										</form>
 									</li>
 								</ul>

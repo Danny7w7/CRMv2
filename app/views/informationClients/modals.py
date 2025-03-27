@@ -214,9 +214,12 @@ def saveAccionRequired(request):
         group_name,
         {
             'type': 'send_alert',
-            'event_type': 'new_accion_required',
+            'event_type': 'newAccionRequired',
+            'icon': 'warning',
+            'title': 'New Action Required',
+            'buttonMessage': 'Go to customer with required action.',
             'message': f'New action required for the customer: {obama.client.first_name} {obama.client.last_name}',
-            'extra_info': url_absoluta,
+            'absoluteUrl': url_absoluta,
             'agent': {
                 'id': obama.agent.id,
                 'username': obama.agent.username

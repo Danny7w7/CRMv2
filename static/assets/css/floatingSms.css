@@ -59,6 +59,7 @@
 .floating-chat-container.show {
     animation: fadeIn 0.3s ease-in-out;
     display: flex;
+    z-index: 1000;
 }
 
 .floating-chat-container.hide {

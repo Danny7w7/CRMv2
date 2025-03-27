@@ -175,5 +175,6 @@ urlpatterns = [
     path('formCreateCompanies/', companies.formCreateCompanies, name='formCreateCompanies'),
     path('editCompanies/<companies_id>', companies.editCompanies, name='editCompanies'),
     path('toggleCompanies/<companies_id>/', companies.toggleCompanies, name='toggleCompanies'),
+    path('addPermisos/', companies.addPermisos, name='addPermisos'),
     
 ]

@@ -11,12 +11,12 @@ document.addEventListener("DOMContentLoaded", function () {
     socket.onmessage = function (event) {
         const data = JSON.parse(event.data);
 
-        if (data.event_type === 'new_client' && !(userRole === "A" || userRole === "AU")) {
+        if (data.event_type === 'newClient' && !(userRole === "A" || userRole === "AU")) {
             
             Swal.fire({
-                title: "New Client!",
+                title: data.title,
                 text: data.message,
-                icon: "success",
+                icon: data.icon,
                 confirmButtonText: "Aceptar",
                 timer: 5000
             });
@@ -29,8 +29,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     title: data.title,
                     text: data.message,
                     icon: data.icon,
-                    imageWidth: 400,
-                    imageHeight: 200,
                     showCancelButton: "OK",
                     confirmButtonColor: "#19e207",
                     cancelButtonColor: "#ea0907",
@@ -45,16 +43,37 @@ document.addEventListener("DOMContentLoaded", function () {
             }          
         }
 
-        if (userRole === "S" || userRole === "C" || userRole === "Admin" && data.event_type === 'action_completed') {
+        if ( userRole === "A"  && data.event_type === 'newAccionRequired' ) {
+
+            if (user == data.agent.username  ) {
+                Swal.fire({
+                    title: data.title,
+                    text: data.message,
+                    icon: data.icon,
+                    showCancelButton: "OK",
+                    confirmButtonColor: "#19e207",
+                    cancelButtonColor: "#ea0907",
+                    confirmButtonText: data.buttonMessage, // Cambiamos el texto del botón
+                    cancelButtonText:"Ignore"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.open(data.absoluteUrl, '_blank'); // Abre la URL en una nueva pestaña
+                    }
+                });        
+
+            }          
+        }
+
+        if (userRole === "S" || userRole === "C" || userRole === "Admin" && data.event_type === 'actionCompleted') {
 
             Swal.fire({
-                title: "Action Required!",
+                title: data.title,
                 text: data.message,
-                icon: "warning",
-                showCancelButton: "OK",
+                icon: data.icon,                
+                showCancelButton: "OK",                
                 confirmButtonColor: "#19e207",
                 cancelButtonColor: "#ea0907",
-                confirmButtonText: "Go to customer with required action.", // Cambiamos el texto del botón
+                confirmButtonText: data.buttonMessage, // Cambiamos el texto del botón
                 cancelButtonText:"Ignore"
             }).then((result) => {
                 if (result.isConfirmed) {

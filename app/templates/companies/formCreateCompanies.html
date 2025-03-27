@@ -58,7 +58,7 @@
 			</div>
 		</div>
 		<hr>
-		<h3>Users</h3>
+		<h3>Comapnies</h3>
 		<div class="card">
 			<div class="card-body">
 				<div class="table-responsive">
@@ -81,7 +81,7 @@
 									<div class="d-flex order-actions">
 										<a href="{% url 'editCompanies' companie.id %}" class=""><i class='bx bxs-edit'></i></a>
 										{% if request.user.is_superuser %}
-										<a href="{% url 'toggleUser' companie.id %}" class="ms-3"><i class='bx bxs-trash'></i></a>
+										<a href="{% url 'toggleCompanies' companie.id %}" class="ms-3"><i class='bx bxs-trash'></i></a>
 										{% endif %}
 									</div>
 								</td> 

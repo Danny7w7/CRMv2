@@ -57,7 +57,7 @@
                         
                         {% if request.user.is_superuser %}
                             <td>{{client.is_active}}</td>
-                            <td>{{client.company.owner}}</td>
+                            <td>{{client.company.company_name}}</td>
                         {% endif %}
 
                         <td>

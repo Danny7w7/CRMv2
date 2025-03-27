@@ -82,7 +82,9 @@ def fetchAca(request, client_id):
             group_name,
             {
                 'type': 'send_alert',
-                'event_type': 'new_client',
+                'event_type': 'newClient',
+                'icon': 'success',
+                'title': 'New Client!',
                 'message': f'New product Obamacare added',
             }
         )
@@ -163,7 +165,9 @@ def fetchSupp(request, client_id):
                     group_name,
                     {
                         'type': 'send_alert',
-                        'event_type': 'new_client',
+                        'event_type': 'newClient',
+                        'icon': 'success',
+                        'title': 'New Client!',
                         'message': f'New product Supplemental added',
                     }
                 )

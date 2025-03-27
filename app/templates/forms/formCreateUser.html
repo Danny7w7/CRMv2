@@ -58,8 +58,8 @@
 						</select>
 					</div>
 					<div class="col-md-4">
-						<label for="role" class="form-label">Company </label>
 						{% if request.user.is_superuser %}
+							<label for="role" class="form-label">Company </label>
 							<select id="inputState" class="form-select" id="company" name="company" required >								
 								<option disabled selected value="">Please select</option>							
 								{% for companies in companies %}
@@ -67,8 +67,7 @@
 								{% endfor %}
 							</select>
 						{% else %}
-							<input hidden type="text" class="form-control" id="company" name="company" value="{{ companies.id }}" >
-							<input readonly type="text" class="form-control" id="company" name="company" value="{{ companies.company_name }}" > 			
+							<input hidden type="text" class="form-control" id="company" name="company" value="{{ companies.id }}" >		
 						{% endif %}
 					</div>
 					<div class="col-md-12">
@@ -104,7 +103,7 @@
 								<td>{{user.is_active}}</td>
 								<td>
 									<div class="d-flex order-actions">
-										<a href="{% url 'editUser' user.company.id user.id %}" class=""><i class='bx bxs-edit'></i></a>
+										<a href="{% url 'editUser' user.id %}" class=""><i class='bx bxs-edit'></i></a>
 										{% if request.user.is_superuser %}
 										<a href="{% url 'toggleUser' user.id %}" class="ms-3"><i class='bx bxs-trash'></i></a>
 										{% endif %}

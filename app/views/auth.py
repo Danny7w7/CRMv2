@@ -20,8 +20,11 @@ def login_(request):
         username = request.POST['username']
         password = request.POST['password']
 
+        companyUser = Users.objects.filter(username=username).first()
+        company = companyUser and Companies.objects.filter(id=companyUser.company, is_active=True).exists() or None
+
         user = authenticate(request, username=username, password=password)
-        if user is not None:
+        if user and company is not None:
             login(request, user)
             return redirect(motivationalPhrase)
         else:
