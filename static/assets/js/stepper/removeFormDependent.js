@@ -20,7 +20,6 @@ function removeDependent(button) {
             if (data.success) {
                 // Eliminar el div del dependiente del DOM si se eliminó correctamente en la BD
                 dependentDiv.remove();
-                console.log('Dependent deleted successfully');
             } else {
                 console.error('Error deleting dependent:', data.error);
                 alert('Error deleting dependent');
@@ -57,7 +56,6 @@ function removeSupp(button) {
             if (data.success) {
                 // Eliminar el div del dependiente del DOM si se eliminó correctamente en la BD
                 suppDiv.remove();
-                console.log('supp deleted successfully');
             } else {
                 console.error('Error deleting dependent:', data.error);
                 alert('Error deleting dependent');

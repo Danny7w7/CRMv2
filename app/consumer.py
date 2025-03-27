@@ -95,13 +95,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'media_url': message  # Incluimos la URL del medio en el mensaje
         }))
    
-class ProductAlertConsumer(AsyncWebsocketConsumer):
+class GenericAlertConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        #asi estaba antes
-        #self.group_name = 'product_alerts'
-        #await self.channel_layer.group_add(self.group_name, self.channel_name)
-        #await self.accept()
-
         # Obtener la dirección del host del WebSocket
         raw_host = self.scope["headers"]
         host = None
@@ -115,7 +110,7 @@ class ProductAlertConsumer(AsyncWebsocketConsumer):
 
         # Limpiar el host para que sea un nombre de grupo válido
         safe_host = re.sub(r'[^a-zA-Z0-9_.-]', '_', host)
-        self.group_name = f'product_alerts_{safe_host}'
+        self.group_name = f'genericAlert_{safe_host}'
 
         print(f"Conectando WebSocket al grupo: {self.group_name}")
 

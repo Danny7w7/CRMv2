@@ -7,6 +7,4 @@ buttons.forEach(button => {
 function changeInputValue(value) {
     document.getElementById('reportingType').value = value
     document.getElementById('buttonSubmit').disabled = false
-
-    console.log(document.getElementById('reportingType'))
 }

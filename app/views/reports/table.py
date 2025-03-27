@@ -281,10 +281,6 @@ def saleSuppAgent(request, company_id, start_date=None, end_date=None):
 
         agents_sales[agent_full_name]['total_sales'] += total_sales
 
-    # Imprimir el resultado para verificar los datos
-    #print("Sales Data for Supp:")
-    #for agent, data in agents_sales.items():
-    #    print(f"Agent: {agent}, Data: {data}")
 
     return agents_sales
 

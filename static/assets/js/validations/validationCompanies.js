@@ -1,6 +1,5 @@
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('***********************',window.jQuery);
 
     $('#tableUser').DataTable();
 

@@ -53,17 +53,14 @@ def company_ownership_required(model_name, id_field, company_field="company_id")
     def decorator(view_func):
         @wraps(view_func)
         def _wrapped_view(request, *args, **kwargs):
-            #print(f"🔎 kwargs en el decorador: {kwargs}")
 
             # Si el usuario es superusuario, permitir acceso total
             if request.user.is_superuser:
-                #print("✅ Usuario es superusuario, acceso permitido sin restricciones.")
                 return view_func(request, *args, **kwargs)
 
             # Obtener el ID dinámicamente desde kwargs
             obj_id = kwargs.get(id_field)
             if obj_id is None:
-                #print(f"❌ No se encontró el campo '{id_field}' en kwargs")
                 return render(request, "auth/404.html", {"message": "ID no encontrado."})
 
             # Obtener el modelo dinámicamente
@@ -71,7 +68,6 @@ def company_ownership_required(model_name, id_field, company_field="company_id")
                 Model = apps.get_model("app", model_name)  # 🔴 Cambia 'app' por el nombre real de tu app
                 obj = Model.objects.get(id=obj_id)
             except ObjectDoesNotExist:
-                #print(f"❌ {model_name} con ID {obj_id} no encontrado")
                 return render(request, "auth/404.html", {"message": "Registro no encontrado."})
 
             # Obtener la empresa del objeto
@@ -82,7 +78,6 @@ def company_ownership_required(model_name, id_field, company_field="company_id")
 
             # Verificar si el usuario pertenece a la misma compañía
             if obj_company_id != user_company_id:
-                #print(f"❌ Acceso denegado: Usuario compañía {user_company_id} != Objeto compañía {obj_company_id}")
                 return render(request, "auth/404.html", {"message": "No tienes permiso para acceder a este recurso."})
 
             return view_func(request, *args, **kwargs)

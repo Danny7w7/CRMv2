@@ -1,9 +1,9 @@
 # Standard Python libraries
 import base64
-import datetime
 import io
 import json
-from datetime import timedelta
+import re
+from datetime import timedelta, datetime
 
 # Django utilities
 from django.core.files.base import ContentFile
@@ -25,7 +25,7 @@ from weasyprint import HTML
 
 # Application-specific imports
 from app.models import *
-
+from ..alertWebsocket import websocketAlertGeneric
 
 def consetMedicare(request, client_id, language):
 
@@ -43,8 +43,8 @@ def consetMedicare(request, client_id, language):
         if not is_valid_token:
             return HttpResponse(note)
     elif request.user.is_authenticated:
+        # Usuario autenticado
         temporalyURL = f"{request.build_absolute_uri('/consetMedicare/')}{client_id}/{language}/?token={generateTemporaryToken(medicare, typeToken)}"
-        print('Usuario autenticado')
     else:
         # Si el usuario no está logueado y no hay token válido
         return HttpResponse('Acceso denegado. Por favor, inicie sesión o use un enlace válido.')
@@ -67,7 +67,7 @@ def consetMedicare(request, client_id, language):
     return render(request, 'consent/consetMedicare.html',context)
 
 def consent(request, obamacare_id):
-    obamacare = ObamaCare.objects.select_related('client').get(id=obamacare_id)
+    obamacare = ObamaCare.objects.select_related('client', 'agent').get(id=obamacare_id)
     temporalyURL = None
 
     typeToken = True
@@ -81,8 +81,8 @@ def consent(request, obamacare_id):
         if not is_valid_token:
             return HttpResponse(note)
     elif request.user.is_authenticated:
+        # Usuario autenticado
         temporalyURL = f"{request.build_absolute_uri('/viewConsent/')}{obamacare_id}?token={generateTemporaryToken(obamacare.client , typeToken)}&lenguaje={language}"
-        print('Usuario autenticado')
     else:
         # Si el usuario no está logueado y no hay token válido
         return HttpResponse('Acceso denegado. Por favor, inicie sesión o use un enlace válido.')
@@ -109,6 +109,20 @@ def consent(request, obamacare_id):
                 file=document,
                 client=obamacare.client)  # Crear una nueva instancia de Foto
             photo.save()  # Guardar el archivo en la base de datos
+        
+        websocketAlertGeneric(
+            request,
+            'send_alert',
+            'signedConsent',
+            'success',
+            'Signed consent',
+            f'The client {obamacare.client.first_name} {obamacare.client.last_name} successfully signed the consent form.',
+            'Go to client information',
+            f'/editObama/{obamacare.id}/{obamacare.company.id}',
+            obamacare.agent.id,
+            obamacare.agent.username
+        )
+        
         return generateConsentPdf(request, objectObamacare, dependents, supps, language)
 
     context = {
@@ -143,8 +157,8 @@ def incomeLetter(request, obamacare_id):
         if not is_valid_token:
             return HttpResponse(note)
     elif request.user.is_authenticated:
+        # Usuario autenticado
         temporalyURL = f"{request.build_absolute_uri('/viewIncomeLetter/')}{obamacare_id}?token={generateTemporaryToken(obamacare.client , typeToken)}&lenguaje={language}"
-        #print('Usuario autenticado')
     else:
         # Si el usuario no está logueado y no hay token válido
         return HttpResponse('Acceso denegado. Por favor, inicie sesión o use un enlace válido.')
@@ -159,6 +173,20 @@ def incomeLetter(request, obamacare_id):
     if request.method == 'POST':
         objectClient = save_data_from_request(Clients, request.POST, ['agent'],obamacare.client)
         objectObamacare = save_data_from_request(ObamaCare, request.POST, ['signature'], obamacare)
+
+        websocketAlertGeneric(
+            request,
+            'send_alert',
+            'signedIncomeLetter',
+            'success',
+            'Signed Income Letter',
+            f'The client {obamacare.client.first_name} {obamacare.client.last_name} successfully signed the Income Letter form.',
+            'Go to client information',
+            f'/editObama/{obamacare.id}/{obamacare.company.id}',
+            obamacare.agent.id,
+            obamacare.agent.username
+        )
+
         generateIncomeLetterPDF(request, objectObamacare, language)
         deactivateTemporaryToken(request)
         return render(request, 'consent/endView.html')   

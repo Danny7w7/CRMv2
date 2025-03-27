@@ -31,7 +31,6 @@ def SaleModal(request, agent_id):
 
     start_date = request.POST.get('start_date')  # Obtiene start_date desde la URL
     end_date = request.POST.get('end_date')      # Obtiene end_date desde la URL
-    print(start_date)
 
     if not start_date and not end_date:
         today = timezone.now()

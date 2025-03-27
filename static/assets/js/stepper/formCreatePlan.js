@@ -59,7 +59,6 @@ function saveAcaPlan() {
         stepper1.next();
         idAcaPlan = acaPlan
         if (idAcaPlan == 'ACA') {
-          //console.log(idAcaPlan);
           addTypesDependentACA();
         }       
         
@@ -137,10 +136,8 @@ function saveSupplementaryPlan() {
   .then(response => response.json())
   .then(data => {
       if (data.success) {
-          //console.log('IDs actualizados:', data.supp_ids);
           plans.forEach((plan, index) => {
             suppIdInputHidden = plan.querySelector('[name="suppId"]')
-            //console.log(suppIdInputHidden)
             if (suppIdInputHidden.value == ''){
               // si imput esta vacio se le coloca el id recivido del parte del bakend
               suppIdInputHidden.value = data.supp_ids[index]
@@ -165,12 +162,9 @@ function saveDependents() {
   formData.append('type_sales', 'DEPENDENTS');
   formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
 
-  //console.log('Formulario inicializado con CSRF:', document.querySelector('[name=csrfmiddlewaretoken]').value);  // Verificar CSRF
-
   // Recorrer todos los conjuntos de dependientes
   const dependents = document.querySelectorAll('.dependentClassList'); // Ajustado el selector aquí.
   dependents.forEach((dependent, index) => {
-    //console.log(`Procesando dependiente ${index + 1}...`); // Verificar el índice del dependiente procesado
 
     // Obtener los valores de cada conjunto de dependientes
     const kinship = dependent.querySelector('[name="kinship"]').value;
@@ -209,9 +203,6 @@ function saveDependents() {
         // Obtener los valores seleccionados
         typePolice = Array.from(typePoliceField.selectedOptions)
             .map(option => option.value);
-        
-        // Mostrar los valores seleccionados en 'typePolice'
-        //console.log('Valores seleccionados en typePolice:', typePolice);
     }
     
     if(typePoliceField.value.trim() === ''){
@@ -224,12 +215,8 @@ function saveDependents() {
     const dependentIdField = dependent.querySelector('[name="dependentId"]');
     let dependentId = dependentIdField ? dependentIdField.value : '';
 
-    // Mostrar el dependentId
-    //console.log('Dependent ID:', dependentId);
-
     // Validar si hay un nombre ingresado, para evitar enviar campos vacíos
     if (nameDependent.trim() !== '') {
-        //console.log('Enviando dependiente al formData:', index + 1);
 
         // Agregar cada dependiente al formData con un índice
         if (dependentId) {
@@ -245,13 +232,10 @@ function saveDependents() {
         // Si se han seleccionado opciones en 'typePolice', agregarlas
         if (typePolice.length > 0) {
           formData.append(`dependent[${index}][typePoliceDependents]`, typePolice);
-          //console.log('Agregando typePolice al formData:', typePolice);  // Verificar qué valores de 'typePolice' se agregan
         }
     }
     
   });
-
-  //console.log('FormData antes de la solicitud fetch:', formData);
 
   // Realizar la solicitud fetch
   fetch(`/fetchDependent/${client_id}/`, {
@@ -260,11 +244,8 @@ function saveDependents() {
   })
   .then(response => response.json())
   .then(data => {
-      //console.log('Respuesta del servidor:', data);  // Verificar la respuesta del servidor
 
       if (data.success) {
-          //console.log('IDs actualizados:', data.dependents_ids);
-          //console.log('Éxito:', data.success);
           
           // Actualizar la interfaz de usuario según sea necesario
           stepper1.next();
@@ -328,8 +309,6 @@ function addTypesDependent() {
     }
   });
   
-  // Verificar si idAcaPlan es "ACA" y agregar la opción "ACA" si es necesario
-  console.log(idAcaPlan);
   if (idAcaPlan === "ACA" || idAcaPlan === "ACA/SUPLEMENTARIO") {
     typePoliceSelects.forEach(typePoliceSelect => {
       // Verificar si la opción 'ACA' ya existe
@@ -361,7 +340,6 @@ function addTypesDependentACA() {
   const typePoliceSelects = document.querySelectorAll('select[name="typePoliceDependents[]"]');
 
   // Verificar si idAcaPlan es "ACA" y agregar la opción "ACA" si es necesario
-  console.log(idAcaPlan)
   if (idAcaPlan === "ACA") {
     typePoliceSelects.forEach(typePoliceSelect => {
       // Verificar si la opción 'ACA' ya existe

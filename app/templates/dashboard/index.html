@@ -42,7 +42,7 @@
 </head>
 
 
-<body data-user-role="{{ request.user.role }}" data-username="{{ request.user.username }}" >
+<body data-user-role="{{ request.user.role }}" data-username="{{ request.user.username }}">
 	<!--wrapper-->
 	<div class="wrapper">
 		<!--sidebar wrapper -->
@@ -117,7 +117,7 @@
 					</li>
 					<li class="menu-label">Applications</li>
 					<li {% if request.path == chat_url %}class='mm-active'{% endif %}>
-						<a class="has-arrow" href="javascript:;" aria-expanded="true">
+						<a class="has-arrow" href="javascript:;">
 							<div class="parent-icon"> <i class="fadeIn animated bx bx-line-chart"></i></div>
 							<div class="menu-title">Communications</div>
 						</a>

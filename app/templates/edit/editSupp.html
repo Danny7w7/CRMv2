@@ -493,18 +493,83 @@
         </div>
     </div>
 </div>
+<!-- Chat UI -->
+<div class="light-mode">
+	<button class="floating-chat-button flex-grow-1" onclick="toggleChat()">
+		<i class="lni lni-comments-alt"></i>
+		{% if chat.is_message_unread %}<span class="alert-count">{{ chat.unread_messages }}</span>{% endif %}
+	</button>
+    
+	<div class="floating-chat-container" id="chatContainer">
+		<div class="floating-chat-header">
+			<span class="client-name">{{contact.name}} <br>{{contact.formatted_phone_number}}</span>
+			<div class="chat-actions">
+				{% if secretKey %}
+				<button id="buttonSendSecretKey" class="tooltip-container"><span class="tooltip-text">Send Secret Key</span><i class="bx bx-key me-1"></i></button>
+				{% else %}
+				<button id="buttonCreateSecretKey" class="tooltip-container"><span class="tooltip-text">Create Secret Key</span><i class="bx bx-key me-1"></i></button>
+				{% endif %}
+			</div>
+		</div>
+		<div class="floating-chat-body" id="chat-content">
+			{% for message in messages %}
+			{%if message.sender_type == 'Client'%}
+				<div class="chat-content-leftside">
+					<div class="d-flex">
+						<svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+							stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user">
+							<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+							<circle cx="12" cy="7" r="4"></circle>
+						</svg>
+						<div class="flex-grow-1 ms-2">
+							<p class="mb-0 chat-time">{{obamacare.client.first_name}}, {{message.created_at|date:"g:i A"}}</p>
+							{% if message.file %}
+							<p class="chat-left-msg">
+								<img class="img-responsive" src="{{ message.file.file.url }}" alt="">
+							</p>
+							{% else %}
+							<p class="chat-left-msg" style="white-space: pre-wrap;">{{message.message_content}}</p>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+			{%elif message.sender_type == 'Agent'%}
+				<div class="chat-content-rightside">
+					<div class="d-flex ms-auto">
+						<div class="flex-grow-1 me-2">
+							<p class="mb-0 chat-time text-end">{{message.sender.username}}, {{ message.created_at|date:"m:H - d/m" }}</p>
+							{% if message.file %}
+							<p class="chat-left-msg">
+								<img class="img-responsive" src="{{ message.file.file.url }}" alt="">
+							</p>
+							{% else %}
+							<p class="chat-right-msg">{{message.message_content|linebreaksbr}}</p>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+			{% endif %}
+			{% endfor %}
+		</div>
+		<div class="floating-chat-footer">
+			<input type="text" id="messageContent" placeholder="Type a message...">
+			<button id="sendMessage">Send</button>
+		</div>
+	</div>
+</div>
+
 {% endblock %}
 {% block end_js %}
 	<!-- Bootstrap JS -->
-	<script src="{% static "assets/js/bootstrap.bundle.min.js" %}"></script>
+	<script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+
 	<!--plugins-->
-	<script src="{% static "assets/js/jquery.min.js" %}"></script>
-	<script src="{% static "assets/plugins/simplebar/js/simplebar.min.js" %}"></script>
-	<script src="{% static "assets/plugins/metismenu/js/metisMenu.min.js" %}"></script>
-	<script src="{% static "assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js" %}"></script>
-	<script src="{% static "assets/plugins/datatable/js/jquery.dataTables.min.js" %}"></script>
-	<script src="{% static "assets/plugins/datatable/js/dataTables.bootstrap5.min.js" %}"></script>
-	
+	<script src="{% static 'assets/js/jquery.min.js' %}"></script>
+	<script src="{% static 'assets/plugins/simplebar/js/simplebar.min.js' %}"></script>
+	<script src="{% static 'assets/plugins/metismenu/js/metisMenu.min.js' %}"></script>
+	<script src="{% static 'assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js' %}"></script>
+	<script src="{% static 'assets/plugins/datatable/js/jquery.dataTables.min.js' %}"></script>
+	<script src="{% static 'assets/plugins/datatable/js/dataTables.bootstrap5.min.js' %}"></script>
 
 	<!-- Agregar Flatpickr -->
 	<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -514,12 +579,20 @@
 	<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
 	<!--app JS-->
-	<script src="{% static "assets/js/app.js" %}"></script>
-	<script src="{% static "assets/js/validations/blockSocial.js" %}"></script>
-	<script src="{% static "assets/js/validations/validationZicode.js" %}"></script>
-	<script src="{% static "assets/js/validations/editSupp.js" %}"></script>
+	<script src="{% static 'assets/js/app.js' %}"></script>
+	<script src="{% static 'assets/js/validations/blockSocial.js' %}"></script>
+	<script src="{% static 'assets/js/validations/validationZicode.js' %}"></script>
+	<script src="{% static 'assets/js/validations/editSupp.js' %}"></script>
 
-
-
-
+	<!-- Scripts SMS's -->
+	<script>
+		var obamacare_id = '{{obamacare.id}}'
+		var company_id = '{{request.user.company.id}}'
+		var username = '{{request.user.username}}'
+		var contact_id = '{{contact.id}}'
+		var chat_id = '{{ contact.phone_number }}'
+		var chat_name = '{{ contact.name }}'
+		var	is_message_unread = '{{chat.is_message_unread}}'.toLowerCase() === "true";
+	</script>
+	<script src="{% static 'assets/js/sms/scripts.js' %}"></script>
 {% endblock %}

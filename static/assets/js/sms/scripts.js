@@ -47,7 +47,6 @@ function sendMessage() {
             message: message
         }));
         sendFirstMessage(message)
-        addMessage(message, 'Agent');
         inputMessage.value = ''; // Limpiar el input después de enviar
     } else {
         console.log('El mensaje está vacío');
@@ -195,25 +194,35 @@ async function sendFirstMessage(message) {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Server error ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
     .then(data => {
-        if (data.message == 'No money'){
-            Swal.fire({
-                title:  "<p style='color: red;'>Insufficient funding</p>",
+        if (data.message === 'No money') {
+            return Swal.fire({
+                title: "<p style='color: red;'>Insufficient funding</p>",
                 text: "Recharge your account, in case of error contact support.",
                 icon: "error"
-              }).then(() => {
+            }).then(() => {
                 window.location.reload();
             });
         }
-        console.log('Success:', data);
-
+        
+        addMessage(message, 'Agent');
         return data;
     })
     .catch((error) => {
         console.error('Error:', error);
+        Swal.fire({
+            title: "Error",
+            text: `An error occurred while sending the message. Please try again later.<br> Error: ${error.message}`,
+            icon: "error"
+        });
         throw error;
-    });
+    });    
 }
 
 // Obtener el formulario cuando el DOM esté cargado
@@ -240,17 +249,21 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    const buttonCreateSecretKey = document.getElementById('buttonCreateSecretKey')
-    console.log('Bro entra en esa verga vale')
-    const buttonSendSecretKey = document.getElementById('buttonSendSecretKey')
-
-    buttonCreateSecretKey.addEventListener('click', createSecretKey)
-    // buttonSendSecretKey.addEventListener('click', SendSecretKey)
+    const buttonCreateSecretKey = document.getElementById('buttonCreateSecretKey');
+    const buttonSendSecretKey = document.getElementById('buttonSendSecretKey');
+    
+    if (buttonCreateSecretKey) {
+        buttonCreateSecretKey.addEventListener('click', () => SecretKey('Create'));
+    }
+    
+    if (buttonSendSecretKey) {
+        buttonSendSecretKey.addEventListener('click', () => SecretKey('Send'));
+    }
 
 });
 
-function createSecretKey() {
-    fetch(`/createSecretKey/${contact_id}/`, {
+function SecretKey(type) {
+    fetch(`/${type.toLowerCase()}SecretKey/${contact_id}/`, {
         method: 'POST'
     })
     .then(response => {
@@ -260,7 +273,11 @@ function createSecretKey() {
         return response.json();
     })
     .then(() => {
-        addMessage('Secret key creation link sent', 'Agent', 'SMS');
+        if (type == 'Create'){
+            addMessage('Secret key creation link sent successfully', 'Agent', 'SMS');
+        }else{
+            addMessage('Secret key link successfully sent', 'Agent', 'SMS');
+        }
     })
     .catch((error) => {
         Swal.fire({
@@ -269,6 +286,10 @@ function createSecretKey() {
             icon: "error"
         });
     });
+}
+
+function SendSecretKey() {
+    
 }
 
 function validatePhoneNumber(phoneNumber) {

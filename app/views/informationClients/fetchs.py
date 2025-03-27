@@ -168,13 +168,11 @@ def fetchActionRequired(request):
                 'event_type': 'actionCompleted',
                 'icon': 'info',
                 'title': 'New Action Required completed',
-                'buttonMessage': 'Go to customer with the required action completed.',
                 'message': f'The required action ({customerRedFlag.description}) of the client {clients.first_name} {clients.last_name} has already been performed.',
+                'buttonMessage': 'Go to customer with the required action completed.',
                 'absoluteUrl': url_absoluta
             }
         )
-
-        print(f"POST recibido con id: {id_value}")
 
         return JsonResponse({'success': True, 'message': 'Acción POST procesada', 'id': id_value})
 

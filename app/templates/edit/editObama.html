@@ -174,17 +174,12 @@
 						</div>
 					</div>
 				</div>
-				
 			</div>
-
 			<hr>
-
 			<div class="progress">
 				<div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="{{percentage}}" aria-valuemin="0" aria-valuemax="100" style="width: {{percentage}}%">{{percentage}}%</div>
 			</div>
-
 	  	</div>
-	  
 	</div>
 </div>
 
@@ -1088,7 +1083,7 @@
     </div>
 </div>
 
-<!--  Chat UI -->
+<!-- Chat UI -->
 <div class="light-mode">
 	<button class="floating-chat-button flex-grow-1" onclick="toggleChat()">
 		<i class="lni lni-comments-alt"></i>
@@ -1100,7 +1095,7 @@
 			<span class="client-name">{{contact.name}} <br>{{contact.formatted_phone_number}}</span>
 			<div class="chat-actions">
 				{% if secretKey %}
-				<button id="buttonCreateSecretKey" class="tooltip-container"><span class="tooltip-text">Send Secret Key</span><i class="bx bx-key me-1"></i></button>
+				<button id="buttonSendSecretKey" class="tooltip-container"><span class="tooltip-text">Send Secret Key</span><i class="bx bx-key me-1"></i></button>
 				{% else %}
 				<button id="buttonCreateSecretKey" class="tooltip-container"><span class="tooltip-text">Create Secret Key</span><i class="bx bx-key me-1"></i></button>
 				{% endif %}
@@ -1173,15 +1168,15 @@
 	<!-- Incluir JS de Choices.js -->
 	<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
-	<script src="{% static "assets/plugins/bs-stepper/js/bs-stepper.min.js" %}"></script>
-	<script src="{% static "assets/plugins/bs-stepper/js/main.js" %}"></script>
+	<script src="{% static 'assets/plugins/bs-stepper/js/bs-stepper.min.js' %}"></script>
+	<script src="{% static 'assets/plugins/bs-stepper/js/main.js' %}"></script>
 
 
 	<!--app JS-->
-	<script src="{% static "assets/js/app.js" %}"></script>
-	<script src="{% static "assets/js/validations/blockSocial.js" %}"></script>
-	<script src="{% static "assets/js/validations/validationZicode.js" %}"></script>
-	<script src="{% static "assets/js/validations/saveDocumentObama.js" %}" defer></script>	
+	<script src="{% static 'assets/js/app.js' %}"></script>
+	<script src="{% static 'assets/js/validations/blockSocial.js' %}"></script>
+	<script src="{% static 'assets/js/validations/validationZicode.js' %}"></script>
+	<script src="{% static 'assets/js/validations/saveDocumentObama.js' %}" defer></script>	
 	<script src="{% static 'assets/js/payments/fetchPayments.js' %}"></script>
 	<script src="{% static 'assets/js/validations/editObama.js' %}"></script>
 
@@ -1189,9 +1184,9 @@
 	<script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
 	<script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.min.js"></script>
 
-	<script src="{% static "assets/js/saveDocumentObama.js" %}"></script>
+	<script src="{% static 'assets/js/saveDocumentObama.js' %}"></script>
 
-	<!-- Scripts Payments -->
+	<!-- Scripts SMS's -->
 	<script>
 		var obamacare_id = '{{obamacare.id}}'
 		var company_id = '{{request.user.company.id}}'
@@ -1200,10 +1195,7 @@
 		var chat_id = '{{ contact.phone_number }}'
 		var chat_name = '{{ contact.name }}'
 		var	is_message_unread = '{{chat.is_message_unread}}'.toLowerCase() === "true";
-		console.log(contact_id)
 	</script>
-
-	<!-- Scripts SMS's -->
 	<script src="{% static 'assets/js/sms/scripts.js' %}"></script>
 
 	<!-- Scripts Payments -->

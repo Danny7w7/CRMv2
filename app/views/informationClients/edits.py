@@ -12,6 +12,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 # Application-specific imports
 from app.models import *
+from app.modelsSMS import *
 from ...forms import *
 from ..sms import get_last_message_for_chats
 from ..decoratorsCompany import *
@@ -32,7 +33,6 @@ def formEditClient(request, client_id):
         if social: formatSocial = social.replace('-','')
         else: formatSocial = None
         form = ClientForm(request.POST, instance=client)
-        print(form.errors)
         if form.is_valid():
             client = form.save(commit=False)
             client.is_active = 1
@@ -551,6 +551,8 @@ def usernameCarrier(request, obamacare):
 @company_ownership_required(model_name="Supp", id_field="supp_id")
 def editSupp(request, supp_id):
 
+    company_id = request.user.company.id
+
     supp = Supp.objects.select_related('client','agent').filter(id=supp_id).first()
     obsSupp = ObservationAgent.objects.filter(id_supp=supp_id)
     obsCus = ObservationCustomer.objects.select_related('agent').filter(client_id=supp.client.id, type_police = 'SUPP')
@@ -678,6 +680,13 @@ def editSupp(request, supp_id):
             
     supp.premium = f"{float(supp.premium):.2f}"
 
+    # Obtener los mensajes de texto del Cliente.
+    contact = Contacts.objects.filter(phone_number=supp.client.phone_number, company_id=company_id).first()
+    chats = Chat.objects.filter(contact=contact)
+    messages = Messages.objects.filter(chat_id=chats[0].id)
+    secretKey = SecretKey.objects.filter(contact_id=contact.id).first()
+    chat = get_last_message_for_chats(chats)[0]
+
 
     context = {
         'supps': supp,
@@ -686,14 +695,19 @@ def editSupp(request, supp_id):
         'obsSuppText': '\n'.join([obs.content for obs in obsSupp]),
         'obsCustomer': obsCus,
         'list_drow': list_drow,
-        'old' : old
+        'old' : old,
+        #SMS Blue
+        'contact':contact,
+        'chat':chat,
+        'messages':messages,
+        'secretKey':secretKey
     }
     
     return render(request, 'edit/editSupp.html', context)
 
 def editDepentsObama(request, obamacare_id):
     # Obtener todos los dependientes asociados al ObamaCare
-    dependents = Dependents.objects.filter(obamacare=obamacare_id)    
+    dependents = Dependents.objects.filter(obamacare=obamacare_id)
 
     if request.method == "POST":
         for dependent in dependents:

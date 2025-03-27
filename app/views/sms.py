@@ -35,6 +35,7 @@ from channels.layers import get_channel_layer
 from app.modelsSMS import *
 from ..forms import *
 from .utils import *
+from ..alertWebsocket import websocketAlertGeneric
 
 # Create your views here.
 logger = logging.getLogger('django')
@@ -63,7 +64,6 @@ def sendMessage(request):
 def sms(request, company_id):
     try:
         body = json.loads(request.body)
-        print(company_id)
         company = Companies.objects.get(id=company_id)
         
         # Imprimir el cuerpo completo
@@ -101,47 +101,24 @@ def sms(request, company_id):
 
             return HttpResponse("Webhook recibido correctamente", status=200)
     except json.JSONDecodeError:
-        print("UwU:Error al decodificar JSON")
         return HttpResponse("Error en el formato JSON", status=400)
-    # except Exception as e:
-    #     print(f"UwU:Error inesperado: {str(e)}")
-    #     return HttpResponse("Error interno del servidor", status=500)
+    except Exception as e:
+        return HttpResponse(f"Error interno del servidor {str(e)}", status=500)
 
 def sendAlertToAgent(request, chat, contact):
     #Obtener al agente asociado
     agent = Users.objects.get(id=chat.agent_id)
-
-    #Aqui inicia el websocket
-    app_name = request.get_host()  # Obtener el host (ej. "127.0.0.1:8000" o "miapp.com")
-
-    # Reemplazar ":" y otros caracteres inválidos con "_" para hacer un nombre válido
-    app_name = re.sub(r'[^a-zA-Z0-9_.-]', '_', app_name)
-
-    group_name = f'product_alerts_{app_name}'
-
-    channel_layer = get_channel_layer()
-    
-    # 'event_type': event_type,
-    # 'icon': icon,
-    # 'title': title,
-    # 'message': message,
-    # 'absoluteUrl': absoluteUrl,
-    # 'agent': agent # Enviar extra_info al frontend
-    async_to_sync(channel_layer.group_send)(
-        group_name,
-        {
-            'type': 'send_alert',
-            'event_type': 'newMessage',
-            'icon': 'info',
-            'title': 'New Message',
-            'message': f'{contact.name} sent a message.',
-            'buttonMessage': 'Go to chat with Client',
-            'absoluteUrl': f'/chatSms/{contact.phone_number}/',
-            'agent': {
-                'id': agent.id,
-                'username': agent.username
-            }
-        }
+    websocketAlertGeneric(
+        request,
+        'send_alert',
+        'newMessage',
+        'info',
+        'New Message',
+        f'{contact.name} sent a message.',
+        'Go to chat with Client',
+        f'/chatSms/{contact.phone_number}/',
+        agent.id,
+        agent.username
     )
 
 def SendMessageWebsocketChannel(typeMessage, payload, contact, company_id, mediaUrl=None):
@@ -335,10 +312,13 @@ def chat(request, phoneNumber):
         messages_with_files.append(message_dict)
     messages.update(is_read=True)
 
-    if request.user.is_staff:
+    if request.user.is_superuser:
+        chats = Chat.objects.all()
+    elif request.user.is_staff:
         chats = Chat.objects.select_related('contact').filter(company=request.user.company).order_by('-last_message')
     else:
         chats = Chat.objects.select_related('contact').filter(agent_id=request.user.id).order_by('-last_message')
+        
     chats = get_last_message_for_chats(chats)
     context = {
         "chat_url": f"/chatSms/{contact.phone_number}/",
@@ -351,11 +331,11 @@ def chat(request, phoneNumber):
 
 def sendIndividualsSms(from_number, to_number, user, company, message_context):
     telnyx.api_key = settings.TELNYX_API_KEY
-    print(telnyx.Message.create(
+    telnyx.Message.create(
         from_=f"+{from_number}", # Your Telnyx number
         to=f'+{to_number}',
         text= message_context
-    ))
+    )
     contact, created = createOrUpdatecontact(to_number, company)
     chat = createOrUpdateChat(contact, company)
     saveMessageInDb('Agent', message_context, chat, user)
@@ -364,6 +344,7 @@ def sendIndividualsSms(from_number, to_number, user, company, message_context):
     
     return True
 
+@csrf_exempt
 def sendSecretKey(request, contact_id):
     contact = Contacts.objects.get(id=contact_id)
     secretKey = SecretKey.objects.get(contact=contact)
@@ -376,14 +357,13 @@ def sendSecretKey(request, contact_id):
         text=generate_temporary_url(request, contact, secretKey.secretKey)
     )
     saveMessageInDb('Agent', 'Link to secret key sent', chat, request.user)
-    return redirect('chatSms', contact.phone_number)
+    return JsonResponse({'message': 'ok'}, status=200)
 
 @csrf_exempt
 def sendCreateSecretKey(request, id):
     contact = Contacts.objects.get(id=id)
     chat = Chat.objects.get(contact=contact)
     
-    print(generate_temporary_url(request, contact))
     telnyx.api_key = settings.TELNYX_API_KEY
     telnyx.Message.create(
         from_=f"+{request.user.assigned_phone.phone_number}", # Your Telnyx number
@@ -391,7 +371,7 @@ def sendCreateSecretKey(request, id):
         text= generate_temporary_url(request, contact)
     )
     saveMessageInDb('Agent', 'Secret key creation link sent', chat, request.user)
-    return JsonResponse('message', 'ok', status=200)
+    return JsonResponse({'message': 'ok'}, status=200)
 
 def createSecretKey(request):
     result = validate_temporary_url(request)
@@ -406,13 +386,27 @@ def createSecretKey(request):
 
         # Verifica si existe un SecretKey para el contacte
         secret_key = SecretKey.objects.filter(contact=contact[0].id).first()
+        chat = Chat.objects.select_related('agent').get(contact_id=contact[0].id)
         if not secret_key:
             secret_key = SecretKey()
             secret_key.contact = contact[0]
         secret_key.secretKey = secret_key_request
         secret_key.save()
 
-        invalidate_temporary_url(request, note) #Aqui el note equivale al Token
+        websocketAlertGeneric(
+            request,
+            'send_alert',
+            'createSecretKey',
+            'success',
+            'Secret key successfully created.',
+            f'The client {contact[0].name} successfully created his secret key.',
+            'Go to chat with Client',
+            f'/chatSms/{contact[0].phone_number}/',
+            chat.agent.id,
+            chat.agent.username
+        )
+
+        # invalidate_temporary_url(request, note) #Aqui el note equivale al Token
         return render(request, 'secret_key/create_secret_key.html', {'secret_key':secret_key_request})
     
     token = request.GET.get('token')
@@ -555,7 +549,6 @@ def get_last_message_for_chats(chats):
             is_read=False,
             sender_type='Client'  # Solo mensajes del contacte
         ).count()
-        print(unread_count)
         
         # Si existe último mensaje, agregar atributos personalizados
         if last_message:
@@ -628,7 +621,7 @@ def validate_temporary_url(request):
         contact_id = data.get('contact_id')
         expiration_time = timezone.datetime.fromisoformat(data['expiration'])
         # Verificar si el token está activo y no ha expirado
-        temp_url = TemporaryToken.objects.get(token=token, contact_id=contact_id)
+        temp_url = TemporaryToken.objects.select_related('contact').get(token=token, contact_id=contact_id)
 
         if not temp_url.is_active:
             return False, 'Enlace desactivado. Link deactivated.'
@@ -650,7 +643,7 @@ def invalidate_temporary_url(request, token):
         temp_url.is_active = False
         temp_url.save()
     except TemporaryToken.DoesNotExist:
-        print("Esta URL temporal no existe chamo")
+        return "Esta URL temporal no existe"
 
 def comprobate_company(company):
     if company.id == 1: #No descuenta el saldo a Lapeira

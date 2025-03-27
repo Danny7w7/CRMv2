@@ -147,10 +147,6 @@ def salesPerformance(request):
     obamacareSales = [salesData[agent]['obamas'] for agent in agents]
     suppSales = [salesData[agent]['supp'] for agent in agents]
 
-    #users = Users.objects.filter(** company_filter)
-    #for user in users:
-        #print(f'{user.username} {get_weekly_counts(request, user)}')
-
     context = {
         'agents': agents,
         'obamacareSales': obamacareSales,

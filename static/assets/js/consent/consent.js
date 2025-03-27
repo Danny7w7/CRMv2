@@ -88,7 +88,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function validateSelects() {
     const idsSelectWithValidation = ['apply', 'work', 'migration_status', 'selectAgent']
-    console.log(idsSelectWithValidation)
     let isValid = true;
     const phoneNumber = document.getElementById('phone_number')
 
@@ -96,9 +95,7 @@ function validateSelects() {
     // Función para validar los Select
     for (let i = 0; i < idsSelectWithValidation.length; i++) {
         var idSelect = idsSelectWithValidation[i];
-        console.log(idSelect)
         var select = document.getElementById(idSelect);
-        console.log(select)
         if (select.value == 'no_valid') {
         isValid = false;
         select.focus(); // Hace foco en el select inválido

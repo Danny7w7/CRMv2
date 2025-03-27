@@ -39,18 +39,15 @@ def uploadExcel(request):
             excel_file = request.FILES['file']            
 
             try:
-                #print("📂 Intentando leer el archivo con Pandas...")
                 # Leer el archivo Excel para extraer las cabeceras
                 df = pd.read_excel(excel_file, engine='openpyxl')
                 headers = list(df.columns)  # Extraer las cabeceras del archivo
-                #print("📋 Cabeceras detectadas:", headers)
 
                 # Convertir valores a tipos compatibles con JSON
                 df = df.applymap(
                     lambda x: x.isoformat() if isinstance(x, pd.Timestamp) else x
                 )
 
-                #print("📂 Creando registro en ExcelFileMetadata...")
                 # Crear un registro en ExcelFileMetadata
                 try:
                     excel_metadata = ExcelFileMetadata.objects.create(
@@ -59,18 +56,14 @@ def uploadExcel(request):
                         uploaded_at=datetime.datetime.now(),
                         company = company
                     )
-                    #print("✅ Registro creado con ID:", excel_metadata.id)
                 except Exception as e:
                     print("❌ Error al crear el registro en ExcelFileMetadata:", str(e))
 
-                #print("📂 Registro creado en ExcelFileMetadata con ID:", excel_metadata.id)  # ✅ Verificar si se guardó el registro
 
                 # Guardar el DataFrame en la sesión para usarlo después
                 request.session['uploaded_data'] = df.to_dict(orient='list')  # Convertir a diccionario serializable
                 request.session['uploaded_headers'] = headers
                 request.session['metadata_id'] = excel_metadata.id  # Guardar ID del archivo para usarlo luego
-
-                #print("💾 Datos guardados en sesión correctamente.")
 
             except Exception as e:
                 return render(request, 'addExcelsDB/uploadExcel.html', {

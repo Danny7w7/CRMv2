@@ -21,7 +21,7 @@ def login_(request):
         password = request.POST['password']
 
         companyUser = Users.objects.filter(username=username).first()
-        company = companyUser and Companies.objects.filter(id=companyUser.company, is_active=True).exists() or None
+        company = companyUser and Companies.objects.filter(id=companyUser.company.id, is_active=True).exists() or None
 
         user = authenticate(request, username=username, password=password)
         if user and company is not None:

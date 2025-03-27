@@ -22,7 +22,6 @@ from ..decoratorsCompany import *
 def formCreateClient(request):
 
     company_id = request.company_id  # Obtener company_id desde request
-    print(company_id)
 
     user = Users.objects.select_related('company').filter(company = company_id).first()
 
@@ -288,7 +287,7 @@ def formAddDepend(request ,client_id):
                             supp_instance.dependents.add(dependent)
 
             except Exception as e:
-                print(f"Error processing dependent {dependent_id}: {e}")
+                return (f"Error processing dependent {dependent_id}: {e}")
 
         return redirect('select_client')
 

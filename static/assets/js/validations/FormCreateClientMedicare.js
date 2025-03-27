@@ -3,7 +3,6 @@ const idsSelectWithValidation = ['agent_usa', 'sex', 'migration_status','dateMed
 
 
 document.getElementById('formCreateClientMedicare').addEventListener('submit', function(event) {
-    console.log(idsSelectWithValidation)
     event.preventDefault(); // Previene el envío por defecto del formulario
     let isValid = true;
     const phoneNumber = document.getElementById('phone_number')
@@ -24,9 +23,7 @@ document.getElementById('formCreateClientMedicare').addEventListener('submit', f
     // Función para validar los Select
     for (let i = 0; i < idsSelectWithValidation.length; i++) {
         var idSelect = idsSelectWithValidation[i];
-        console.log(idSelect)
         var select = document.getElementById(idSelect);
-        console.log(select)
         if (select.value == 'no_valid') {
             isValid = false;
             select.focus(); // Hace foco en el select inválido
@@ -43,7 +40,6 @@ document.getElementById('formCreateClientMedicare').addEventListener('submit', f
         return;
     }
     phoneNumber.value = phoneNumberFormat
-    //console.log('Papi llego hasta aqui. lo mando mi loco')
     this.submit();
 });
 

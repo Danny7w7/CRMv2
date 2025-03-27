@@ -11,9 +11,6 @@ document.addEventListener("DOMContentLoaded", function() {
     // Obtener los datos JSON y convertirlos a un objeto
     const chartData = JSON.parse(chartDataElement.textContent);
 
-    // Verificar si los datos se han cargado correctamente
-    //console.log("chartData:", chartData);
-
     // Extraer los datos para el gráfico
     const usernames = chartData.map(item => item.username);
     const obamacareCounts = chartData.map(item => item.obamacare_count);

@@ -16,7 +16,6 @@ function listenAllCheckInput() {
         checkbox.removeEventListener('change', toogleActionRequired);
 
         checkbox.addEventListener('change', function(event) {  
-            console.log("Checkbox cambiado:", checkbox.value);          
             toogleActionRequired(checkbox);
         });
     });
@@ -36,9 +35,7 @@ function toggleUserStatus(checkbox) {
         })
         .then(response => response.json())  // Procesar la respuesta (si es JSON)
         .then(data => {
-            //console.log(data.success)
             if (data.success){
-                //console.log("User role:", data.role); // Debugging
                 if (data.success && data.role != "Admin") {
                     checkbox.disabled = true;
                 }
@@ -76,8 +73,6 @@ function toogleActionRequired(checkbox) {
     if (isRequestPending) return; // Evita enviar otra petición si ya hay una en curso
     isRequestPending = true;
 
-    console.log("Ejecutando toogleActionRequired con checkbox ID:", checkbox.value);
-
     const checkboxId = checkbox.value;
     const formData = new FormData();
     formData.append('id', checkboxId);
@@ -87,11 +82,9 @@ function toogleActionRequired(checkbox) {
         body: formData,
     })
     .then(response => {
-        console.log("Respuesta recibida del servidor");
         return response.json();
     })
     .then(data => {
-        console.log("Datos recibidos:", data);
         checkbox.disabled = true;
     })
     .catch(error => {
