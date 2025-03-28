@@ -91,5 +91,9 @@ class ControlCallForm(forms.ModelForm):
         except ValueError:
             raise forms.ValidationError('Formato de fecha inválido. Use MM/DD/YYYY.')
 
+class ServicesForm(forms.ModelForm):
+    class Meta:
+        model = Services
+        fields = '__all__'
 
     

@@ -873,7 +873,7 @@ def sales6WeekReport(request):
     finalSummary, weekRanges = table6Week(request, company_id)
 
     # Obtener los datos para la gráfica
-    chart_data = chart6WeekSale()
+    chart_data = chart6WeekSale(request)
 
     # Pasar los datos a la plantilla
     context = {

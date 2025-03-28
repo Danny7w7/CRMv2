@@ -151,11 +151,11 @@
 							<div class="menu-title">Customer Reports</div>
 						</a>
 						<ul>
-							<li> <a href="{% url 'customerPerformance' %}"><i class='bx bx-radio-circle'></i>Customer performance</a>
+							<li> <a href="{% url 'customerPerformance' %}"><i class='bx bx-radio-circle'></i>Customer Performance</a>
 							</li>
 							<li> <a href="{% url 'typification' %}"><i class='bx bx-radio-circle'></i>Typification</a>
 							</li>
-							<li> <a href="{% url 'customerTypification' %}"><i class='bx bx-radio-circle'></i>Typification customer</a>
+							<li> <a href="{% url 'customerTypification' %}"><i class='bx bx-radio-circle'></i>Typification Customer</a>
 							</li>
 						</ul>
 					</li>
@@ -163,7 +163,7 @@
 					<li>
 						<a class="has-arrow" href="javascript:;">
 							<div class="parent-icon"> <i class="fadeIn animated bx bx-line-chart"></i></div>
-							<div class="menu-title">Graphical reports</div>
+							<div class="menu-title">Graphical Reports</div>
 						</a>
 						<ul>
 							<li> <a href="{% url 'averageCustomer' %}"><i class='bx bx-radio-circle'></i>Effective Calls</a>
@@ -185,9 +185,9 @@
 						<ul>
 							<li> <a href="{% url 'formCreateControl' %}"><i class='bx bx-radio-circle'></i>Add Quality</a>
 							</li>
-							<li> <a href="{% url 'control' %}"><i class='bx bx-radio-circle'></i>View quality</a>
+							<li> <a href="{% url 'control' %}"><i class='bx bx-radio-circle'></i>View Quality</a>
 							</li>
-							<li> <a href="{% url 'createQuality' %}"><i class='bx bx-radio-circle'></i>Generate pdf</a>
+							<li> <a href="{% url 'createQuality' %}"><i class='bx bx-radio-circle'></i>Generate Pdf</a>
 							</li>
 						</ul>
 					</li>
@@ -203,7 +203,7 @@
 							{% if request.user.role == 'Admin'  %}
 								<li> <a href="{% url 'uploadExcel' %}"><i class='bx bx-radio-circle'></i>Add Excel</a>
 								</li>
-								<li> <a href="{% url 'manageAgentAssignments' %}"><i class='bx bx-radio-circle'></i>Assign BD to agents</a>
+								<li> <a href="{% url 'manageAgentAssignments' %}"><i class='bx bx-radio-circle'></i>Assign BD to Agents</a>
 								</li>
 								<li> <a href="{% url 'reportBd' %}"><i class='bx bx-radio-circle'></i>Report BD</a>
 								</li>
@@ -217,6 +217,8 @@
 					<li>
 						<li> <a href="{% url 'formCreateUser'  %}"><i class='bx bx-radio-circle'></i>View User</a>
 						</li>
+						<li> <a href="{% url 'adminSms'  %}"><i class='bx bx-radio-circle'></i>Admin SMS</a>
+						</li>
 					</li>
 					{% endif %}		
 					{% if request.user.is_superuser %}
@@ -224,14 +226,14 @@
 						<li>
 							<a class="has-arrow" href="javascript:;">
 								<div class="parent-icon"> <i class="lni lni-apartment"></i> </div>
-								<div class="menu-title">Add Company</div>
+								<div class="menu-title">All Company</div>
 							</a>
 							<ul>
 								<li> <a href="{% url 'formCreateCompanies' %}"><i class='bx bx-radio-circle'></i>Add Company</a>
 								</li>
-								<li> <a href="{% url 'addPermisos' %}"><i class='bx bx-radio-circle'></i>Company permits</a>
+								<li> <a href="{% url 'createServices' %}"><i class='bx bx-radio-circle'></i>Create Services</a>
 								</li>
-								<li> <a href="{% url 'reportBd' %}"><i class='bx bx-radio-circle'></i>Report BD</a>
+								<li> <a href="{% url 'addSubscription' %}"><i class='bx bx-radio-circle'></i>Add  Subscription</a>
 								</li>
 							</ul>
 						</li>

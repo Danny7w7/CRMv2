@@ -1,0 +1,120 @@
+{% extends "dashboard/index.html" %}
+{% load static %}
+{% block head %}
+    <title>Add of Subscription</title>
+	<!--plugins-->
+	<link href="{% static "assets/plugins/simplebar/css/simplebar.css" %}" rel="stylesheet" />
+	<link href="{% static "assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" %}" rel="stylesheet" />
+	<link href="{% static "assets/plugins/metismenu/css/metisMenu.min.css" %}" rel="stylesheet" />
+	<link href="{% static "assets/plugins/datatable/css/dataTables.bootstrap5.min.css" %}" rel="stylesheet" />
+	<!-- loader-->
+	<link href="{% static "assets/css/pace.min.css" %}" rel="stylesheet" />
+	<script src="{% static "assets/js/pace.min.js" %}"></script>
+	<!-- Bootstrap CSS -->
+	<link href="{% static "assets/css/bootstrap.min.css" %}" rel="stylesheet">
+	<link href="{% static "assets/css/bootstrap-extended.css" %}" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&amp;display=swap" rel="stylesheet">
+	<link href="{% static "assets/css/app.css" %}" rel="stylesheet">
+	<link href="{% static "assets/css/icons.css" %}" rel="stylesheet">
+	<!-- Theme Style CSS -->
+	<link rel="stylesheet" href="{% static "assets/css/dark-theme.css" %}" />
+	<link rel="stylesheet" href="{% static "assets/css/semi-dark.css" %}" />
+	<link rel="stylesheet" href="{% static "assets/css/header-colors.css" %}" />
+{% endblock %}
+{% block page_content %}
+<h6 class="mb-0 text-uppercase">ADD SUBSCRIPTION</h6>
+<hr/>
+<div class="row">
+    <div class="col-xl-10 mx-auto">
+        <div class="card">
+            <div class="card-header px-4 py-3">
+                <h5 class="mb-0">Add Subscription</h5>
+            </div>
+            <div class="card-body p-4">
+                <form id="formCreateCompanies" class="row g-3 needs-validation" method="POST">
+                    <div id="subscription-container">
+                        <div class="subscription-item row g-3">
+                            <div class="col-md-6">
+                                <label for="company" class="form-label">Company</label>
+                                <select class="form-control" name="company[]" required>
+                                    <option value="" disabled selected>Select Please</option>
+                                    {% for  item in company %}
+										<option value="{{item.id}}" >{{item.company_name}}</option>                      
+									{% endfor %}		
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="service" class="form-label">Service</label>
+                                <select class="form-control" name="service[]" required>
+                                    <option value="" disabled selected>Select Please</option>
+                                    {% for  item in service %}
+										<option value="{{item.id}}" >{{item.name}}</option>                      
+									{% endfor %}		
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="auto_renew" class="form-label">Auto Renew</label>
+                                <select class="form-control" name="auto_renew[]" required>
+                                    <option value="" disabled selected>Select Please</option>
+                                    <option value = True >YES</option>
+                                    <option value = False >NO</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="renewal_period" class="form-label">Renewal Period</label>
+                                <select class="form-control" name="renewal_period[]" required>
+                                    <option value="" disabled selected>Select Please</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="biweekly">Biweekly</option>
+                                    <option value="monthly">Monthly</option>
+                                    <option value="unique">Unique</option>
+                                </select>
+                            </div>
+                            <div class="col-md-12 text-end">
+                                <button type="button" class="btn btn-danger remove-subscription">Remove</button>
+                            </div>
+                        </div>
+                    </div>                   
+                    <div class="col-md-12">
+                        <div class="d-md-flex d-grid align-items-center gap-3">
+                            <button type="button" id="addSubscription" class="btn btn-success px-4">ADD</button>
+                            <button type="submit" class="btn btn-primary px-4">Submit</button>
+                        </div>
+                    </div>
+                    {% csrf_token %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="alert-data"
+     data-type="{{ type }}"
+     data-message="{{ msg|safe }}"
+     style="display: none;">
+</div>
+
+
+
+{% endblock %}
+{% block end_js %}
+	<!-- Bootstrap JS -->
+	<script src="{% static "assets/js/bootstrap.bundle.min.js" %}"></script>
+	<!--plugins-->
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script src="{% static "assets/js/jquery.min.js" %}"></script>
+	<script src="{% static "assets/plugins/simplebar/js/simplebar.min.js" %}"></script>
+	<script src="{% static "assets/plugins/metismenu/js/metisMenu.min.js" %}"></script>
+	<script src="{% static "assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js" %}"></script>
+	<script src="{% static "assets/plugins/datatable/js/jquery.dataTables.min.js" %}"></script>
+	<script src="{% static "assets/plugins/datatable/js/dataTables.bootstrap5.min.js" %}"></script>
+	
+
+	<!--app JS-->
+	<script src="{% static "assets/js/app.js" %}"></script>
+
+    <!--JS-->
+	<script src="{% static "assets/js/validations/validationCompanies.js" %}"></script>
+	<script src="{% static "assets/js/company/addSubscription.js" %}"></script>
+
+{% endblock %}

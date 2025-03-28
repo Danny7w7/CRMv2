@@ -227,7 +227,7 @@ def saveAccionRequired(request):
         }
     )
     
-    return redirect('editClientObama', obama.id, 1 )  
+    return redirect('editObama', obama.id, 1 )  
 
 @login_required(login_url='/login')
 def saveAppointment(request, obamacare_id):

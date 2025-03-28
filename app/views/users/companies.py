@@ -9,11 +9,12 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 # Application-specific imports
 from app.models import *
+from ...forms import ServicesForm
 
 @login_required(login_url='/login') 
 def formCreateCompanies(request):
 
-    companies = Companies.objects.all()
+    companies = Companies.objects.exclude(id = 1)
 
     if request.method == 'POST':
         owner = request.POST.get('owner').upper()
@@ -94,12 +95,51 @@ def toggleCompanies(request, companies_id):
     # Redirigir de nuevo a la página actual con un parámetro de éxito
     return redirect('formCreateCompanies')
 
+@login_required(login_url='/login')
+def createServices(request):
+        
+    if request.method == 'POST':
+
+        form = ServicesForm(request.POST)
+        if form.is_valid():
+            form.save()
+
+        return redirect('createServices')
+    
+    return render(request, 'companies/createServices.html')
+
+
 @login_required(login_url='/login') 
-def addPermisos(request):
+def addSubscription(request):
 
-    companies = Companies.objects.all()
+    company = Companies.objects.filter(is_active = True)
+    service = Services.objects.all()
 
+    if request.method == "POST":
+        company_ids = request.POST.getlist('company[]')
+        service_ids = request.POST.getlist('service[]')
+        auto_renew_list = request.POST.getlist('auto_renew[]')
+        renewal_periods = request.POST.getlist('renewal_period[]')
+
+        for company_id, service_id, auto_renew, renewal_period in zip(company_ids, service_ids, auto_renew_list, renewal_periods):
+            try:
+                company = Companies.objects.get(id=company_id)
+                service = Services.objects.get(id=service_id)
+
+                Subscriptions.objects.create(
+                    company=company,
+                    service=service,
+                    auto_renew=(auto_renew.lower() == 'true'),  # Convertir a booleano
+                    renewal_period=renewal_period
+                )
+            except (Companies.DoesNotExist, Services.DoesNotExist):
+                continue  # Si no encuentra la empresa o servicio, lo ignora
+
+        return redirect('addSubscription')  # Redirige a una página de éxito
+    
     context = {
-        'companies' : companies
+        'company' : company,
+        'service' : service
     }
-    return render(request, 'companies/addPermisos.html', context)
+
+    return render(request, 'companies/addSubscription.html' , context)

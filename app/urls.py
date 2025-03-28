@@ -115,6 +115,12 @@ urlpatterns = [
 
     path('readAllMessages/<chat_id>/<company_id>/', sms.readAllMessages, name='readAllMessages'),
 
+    path('webhook/', sms.stripe_webhook, name='stripe-webhook'),
+    path('payment/<str:type>/<int:company_id>/', sms.payment_type, name='payment'),
+
+
+    path('adminSms/', sms.adminSms, name='adminSms'),
+
 
     #<---------------------------Sales Reports--------------------------->
     path('sale/', tableReports.sale, name='sale'),
@@ -175,6 +181,7 @@ urlpatterns = [
     path('formCreateCompanies/', companies.formCreateCompanies, name='formCreateCompanies'),
     path('editCompanies/<companies_id>', companies.editCompanies, name='editCompanies'),
     path('toggleCompanies/<companies_id>/', companies.toggleCompanies, name='toggleCompanies'),
-    path('addPermisos/', companies.addPermisos, name='addPermisos'),
+    path('createServices/', companies.createServices, name='createServices'),
+    path('addSubscription/', companies.addSubscription, name='addSubscription'),
     
 ]

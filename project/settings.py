@@ -30,6 +30,7 @@ SECRET_KEY = 'django-insecure-wxwjr&9_la5a&fe9i@=fwe(gjze$wsz$lwac&=5mmy&557vyzg
 DEBUG = True
 
 # CSRF_TRUSTED_ORIGINS = ['https://blue.lapeira.com', 'https://www.blue.lapeira.com']
+#CSRF_TRUSTED_ORIGINS = ['https://171a-179-33-189-146.ngrok-free.app']
 ALLOWED_HOSTS = ['*']
 
 TELNYX_API_KEY = os.getenv('TELNYX_API_KEY')

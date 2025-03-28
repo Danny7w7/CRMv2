@@ -16,6 +16,59 @@ class Companies(models.Model):
     class Meta:
         db_table = 'companies'
 
+class Services(models.Model):
+    name = models.CharField(max_length=100)
+    cost = models.DecimalField(max_digits=10, decimal_places=4)
+    description = models.TextField()
+
+    def _str_(self):
+        return self.name
+    
+    def formatCost(self):
+        return "{:.2f}".format(self.cost)
+    
+    class Meta:
+        db_table = 'services'
+
+class Subscriptions(models.Model):
+    PERIOD_CHOICES = (
+        ('weekly', 'Weekly'),
+        ('biweekly', 'Biweekly'),
+        ('monthly', 'Monthly'),
+        ('unique', 'Unique'),
+    )
+
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE)
+    service = models.ForeignKey(Services, on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True) 
+    auto_renew = models.BooleanField(default=False)
+    renewal_period = models.CharField(max_length=10, choices=PERIOD_CHOICES, default='monthly')
+
+    def _str_(self):
+        return f'{self.company.name} - {self.service.name}'
+    
+    class Meta:
+        db_table = 'subscriptions'
+
+class Transactions(models.Model):
+    TRANSACTION_TYPES = (
+        ('recarga', 'Recarga'),
+        ('descuento', 'Descuento'),
+    )
+
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE)
+    type = models.CharField(max_length=10, choices=TRANSACTION_TYPES)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    remaining_balance = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now=True)
+
+    def _str_(self):
+        return f'{self.company.name} - {self.type} - {self.amount}'
+    
+    class Meta:
+        db_table = 'transactions'
+
 
 class Users(AbstractUser):
 

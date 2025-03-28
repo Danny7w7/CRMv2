@@ -1,7 +1,7 @@
 {% extends "dashboard/index.html" %}
 {% load static %}
 {% block head %}
-    <title>Creation companies</title>
+    <title>Creation of Services</title>
 	<!--plugins-->
 	<link href="{% static "assets/plugins/simplebar/css/simplebar.css" %}" rel="stylesheet" />
 	<link href="{% static "assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" %}" rel="stylesheet" />
@@ -22,31 +22,27 @@
 	<link rel="stylesheet" href="{% static "assets/css/header-colors.css" %}" />
 {% endblock %}
 {% block page_content %}
-<h6 class="mb-0 text-uppercase">CREATION OF COMPANY</h6>
+<h6 class="mb-0 text-uppercase">CREATION OF SERVICES</h6>
 <hr/>
 <div class="row">
 	<div class="col-xl-10 mx-auto">
 		<div class="card">
 			<div class="card-header px-4 py-3">
-				<h5 class="mb-0">Company information</h5>
+				<h5 class="mb-0">Create the Services</h5>
 			</div>
 			<div class="card-body p-4">
 				<form id="formCreateCompanies" class="row g-3 needs-validation" method="POST" >
-					<div class="col-md-4">
-						<label for="owner" class="form-label">Owner Name</label>
-						<input type="text" class="form-control" id="owner" name="owner"required>
-					</div>
-					<div class="col-md-4">
-						<label for="name" class="form-label">Name Full Company</label>
+					<div class="col-md-6">
+						<label for="name" class="form-label">Name</label>
 						<input type="text" class="form-control" id="name" name="name"required>
 					</div>
-					<div class="col-md-4">
-						<label for="phone" class="form-label">Phone</label>
-						<input type="number" class="form-control" id="phone" name="phone"required>
+					<div class="col-md-6">
+						<label for="cost" class="form-label">Cost</label>
+						<input type="number" class="form-control" id="cost" name="cost"required>
 					</div>
-					<div class="col-md-4">
-						<label for="email" class="form-label">Email </label>
-						<input type="email" class="form-control" id="email" name="email" required>
+					<div class="col-md-12">
+						<label for="description" class="form-label">Description</label>
+						<textarea class="form-control" id="description" name="description" cols="40" rows="10" style="resize: none"  required></textarea>
 					</div>
 					<div class="col-md-12">
 						<div class="d-md-flex d-grid align-items-center gap-3">
@@ -57,39 +53,6 @@
 				</form>
 			</div>
 		</div>
-		<hr>
-		<h3>Comapnies</h3>
-		<div class="card">
-			<div class="card-body">
-				<div class="table-responsive">
-					<table id="tableUser" class="table table-striped table-bordered">
-						<thead>
-							<tr>
-								<th>Name Owner</th>
-								<th>Company</th>
-								<th>Active</th>
-								<th>Option</th>
-							</tr>
-						</thead>
-						<tbody>
-							{% for companie in companies %}
-							<tr>
-								<td>{{companie.owner}}</td>
-								<td>{{companie.company_name}}</td>
-								<td>{{companie.is_active}}</td>
-								<td>
-									<div class="d-flex order-actions">
-										<a href="{% url 'editCompanies' companie.id %}" class=""><i class='bx bxs-edit'></i></a>
-										<a href="{% url 'toggleCompanies' companie.id %}" class="ms-3"><i class="fadeIn animated bx bx-sync"></i></a>					
-									</div>
-								</td> 
-							</tr>
-							{% endfor %}
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</div>
 	</div>
 </div>
 <div id="alert-data"
@@ -97,6 +60,8 @@
      data-message="{{ msg|safe }}"
      style="display: none;">
 </div>
+
+
 
 {% endblock %}
 {% block end_js %}
@@ -117,5 +82,6 @@
 
     <!--JS-->
 	<script src="{% static "assets/js/validations/validationCompanies.js" %}"></script>
+	<script src="{% static "assets/js/modals/modalCompany.js" %}"></script>
 
 {% endblock %}

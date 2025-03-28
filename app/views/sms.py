@@ -36,6 +36,7 @@ from app.modelsSMS import *
 from ..forms import *
 from .utils import *
 from ..alertWebsocket import websocketAlertGeneric
+from .decoratorsCompany import *
 
 # Create your views here.
 logger = logging.getLogger('django')
@@ -431,12 +432,12 @@ def chat_messages(request, phone_number):
 
 def payment_type(request, type, company_id):
     if type == 'Thank-You-Page':
-        return render(request, 'email_templates/thank_you_page.html')
+        return render(request, 'sms/thank_you_page.html')
     elif type == 'Payment-Error':
         context = {
             'retry_payment_url': create_stripe_checkout_session(company_id)
         }
-        return render(request, 'email_templates/payment_error.html', context)
+        return render(request, 'sms/payment_error.html', context)
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 def create_stripe_checkout_session(company_id):
@@ -712,17 +713,20 @@ def paymend_recording(company):
 def format_number(number):
     return Decimal(number) / Decimal(100)
 
-# Admin
-def admin(request):
-    if not request.user.is_staff:
-        return redirect('index')
-    # Obtener la fecha actual
-    now = datetime.now()
+#vista para pagos del usuario de la company
+@login_required(login_url='/login')
+@company_ownership_required_sinURL
+def adminSms(request):
+
+    company_id = request.company_id  # Obtener company_id desde request
+    company_filter = {'company': company_id} if not request.user.is_superuser else {}
+
+    now = datetime.datetime.now()
     seven_days_ago = now - timedelta(days=6)
 
     # Obtener usuarios de la compañia
-    company_users = Users.objects.filter(company=request.user.company)
-    company = Companies.objects.get(id=request.user.company.id)
+    company_users = Users.objects.filter(**company_filter)
+    company = Companies.objects.get(id=company_id)
 
     # Filtrar mensajes de los últimos 7 días y asociados a chats de usuarios
     messages = Messages.objects.filter(
@@ -747,4 +751,6 @@ def admin(request):
         "company":company,
         "message_count":messages.count()
     }
-    return render(request, 'admin/admin.html', context)
+
+    return render(request, 'sms/adminSms.html', context)
+

@@ -1,13 +1,19 @@
 # Standard Python libraries
+from datetime import timedelta
+import datetime
+import json
+import stripe 
 from django.http import JsonResponse, HttpResponse
 
 # Django core libraries
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
-from django.shortcuts import get_object_or_404, redirect, render 
+from django.shortcuts import get_object_or_404, redirect, render
 
+from django.conf import settings
 # Application-specific imports
 from app.models import *
+from app.modelsSMS import *
 
 from ..decoratorsCompany import *
 
@@ -120,3 +126,4 @@ def toggleUser(request, user_id):
     
     # Redirigir de nuevo a la página actual con un parámetro de éxito
     return redirect('formCreateUser')
+
