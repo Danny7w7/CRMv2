@@ -1,0 +1,2790 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-03-28 13:57-0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\app\templates\consent\consent1.html:156
+msgid "AGENTE EN REGISTRO"
+msgstr "PERSONAL INFORMATION"
+
+#: .\app\templates\consent\consent1.html:157
+msgid ""
+"AUTORIZACION DE ENTREGA INFORMACIÓN PARA ENROLAMIENTO EN EL MERCADO DE SALUD"
+msgstr "PLEASE VERIFY THAT YOUR INFORMATION IS ACCURATE AND CORRECT"
+
+#: .\app\templates\consent\consent1.html:162
+#: .\app\templates\consent\consent1.html:443
+#: .\app\templates\consent\templatePdfConsent.html:221
+msgid "Nombre del Aplicante"
+msgstr "Applicant Name"
+
+#: .\app\templates\consent\consent1.html:177
+#: .\app\templates\consent\consent1.html:447
+#: .\app\templates\consent\templatePdfConsent.html:225
+#: .\app\templates\consent\templatePdfConsentMedicare.html:235
+msgid "Teléfono"
+msgstr "Phone"
+
+#: .\app\templates\consent\consent1.html:179
+msgid "Número no válido. Debe ser un número de 10 o 11 dígitos."
+msgstr "Invalid number. Must be a 10 or 11 digit number."
+
+#: .\app\templates\consent\consent1.html:186
+msgid "Email no valido."
+msgstr "Invalid Email."
+
+#: .\app\templates\consent\consent1.html:194
+#: .\app\templates\consent\consent1.html:455
+msgid ""
+"Acepto a ser contactado por mi broker, mi carrier, y/o el mercado de salud "
+"vía:"
+msgstr ""
+"I accept to be contacted by my broker, my carrier, or the marketplace via:"
+
+#: .\app\templates\consent\consent1.html:199
+#: .\app\templates\consent\consetMedicare.html:171
+msgid "Telefono"
+msgstr "Phone"
+
+#: .\app\templates\consent\consent1.html:203
+msgid "Mensajes de Texto"
+msgstr "Text Message"
+
+#: .\app\templates\consent\consent1.html:225
+#: .\app\templates\consent\consent1.html:464
+msgid "Cobertura adicional:"
+msgstr "Additional coverage"
+
+#: .\app\templates\consent\consent1.html:244
+#: .\app\templates\consent\consent1.html:460
+#: .\app\templates\consent\templatePdfConsent.html:237
+#: .\app\templates\consent\templatePdfConsent.html:283
+msgid "Aplica"
+msgstr "Applies"
+
+#: .\app\templates\consent\consent1.html:247
+#: .\app\templates\consent\templatePdfConsent.html:362
+msgid "SI"
+msgstr "YES"
+
+#: .\app\templates\consent\consent1.html:248
+#: .\app\templates\consent\templatePdfConsent.html:362
+msgid "NO"
+msgstr "NO"
+
+#: .\app\templates\consent\consent1.html:258
+msgid ""
+"Aplicante (s) Adicional (es) (Nombre Completo, Fecha Nacimiento, Sexo, "
+"Status, Parentesco, Aplica)"
+msgstr ""
+"Additional Applicant(s) (Full Name, Date of Birth, Gender, Status, "
+"Relationship, Applicable)"
+
+#: .\app\templates\consent\consent1.html:270
+#: .\app\templates\consent\consent1.html:274
+#: .\app\templates\consent\consent1.html:487
+msgid "Direccion"
+msgstr "Address"
+
+#: .\app\templates\consent\consent1.html:278
+msgid "Apto"
+msgstr "Apt/Ste"
+
+#: .\app\templates\consent\consent1.html:282
+msgid "Ciudad"
+msgstr "City"
+
+#: .\app\templates\consent\consent1.html:286
+msgid "Estado"
+msgstr "State"
+
+#: .\app\templates\consent\consent1.html:298
+#: .\app\templates\consent\consent1.html:491
+msgid "Fecha de Nacimiento "
+msgstr "Date of Birth"
+
+#: .\app\templates\consent\consent1.html:302
+#: .\app\templates\consent\consent1.html:495
+msgid "Ingreso Anual Estimado "
+msgstr "Estimated Income"
+
+#: .\app\templates\consent\consent1.html:306
+#: .\app\templates\consent\consent1.html:499
+msgid "Tipo de Ingreso "
+msgstr "Type of Income"
+
+#: .\app\templates\consent\consent1.html:311
+msgid "Otro"
+msgstr "Other"
+
+#: .\app\templates\consent\consent1.html:322
+#: .\app\templates\consent\consent1.html:503
+#: .\app\templates\consent\templatePdfConsent.html:245
+msgid "Estatus de Inmigración "
+msgstr "Immigration Status"
+
+#: .\app\templates\consent\consent1.html:351
+#: .\app\templates\consent\consent1.html:511
+msgid "Agente Autorizado de Registro"
+msgstr "Authorized Agent of Record"
+
+#: .\app\templates\consent\consent1.html:365
+msgid "TELÉFONO"
+msgstr "PHONE"
+
+#: .\app\templates\consent\consent1.html:370
+#: .\app\templates\consent\consent1.html:515
+msgid "Agencia de Seguros"
+msgstr "Insurance Agency"
+
+#: .\app\templates\consent\consent1.html:378
+msgid "Cargar documento de inmigración, SSN, ID, foto selfie con ID en mano"
+msgstr "File Upload (front and back) SSN, ID, Selfie with ID"
+
+#: .\app\templates\consent\consent1.html:384
+msgid "Subir Archivo o Foto (Frente y Atrás)"
+msgstr "Upload File or Photo (Front and Back)"
+
+#: .\app\templates\consent\consent1.html:396
+#: .\app\templates\consent\consent1.html:519
+#: .\app\templates\consent\templatePdfConsent.html:301
+msgid "Mis Derechos como Paciente"
+msgstr "My Rights as a Patient"
+
+#: .\app\templates\consent\consent1.html:397
+#: .\app\templates\consent\consent1.html:419
+#: .\app\templates\consent\consent1.html:520
+#: .\app\templates\consent\consent1.html:541
+msgid "Yo, "
+msgstr "By signing this form, I, "
+
+#: .\app\templates\consent\consent1.html:397
+#: .\app\templates\consent\consent1.html:520
+msgid ", autorizo a "
+msgstr " give consent to "
+
+#: .\app\templates\consent\consent1.html:397
+#: .\app\templates\consent\consent1.html:520
+msgid ""
+" para servir como mi agente y broker de seguros de salud, es decir mi Agente "
+"de Registro, para mi y las personas en mi núcleo familiar, cuando aplica, "
+"para el propósito de enrolamiento en un Plan Médico Calificado ofrecido en "
+"el Mercado de Salud Federal."
+msgstr ""
+" to serve as the health insurance agent or broker, as my Agent of Record, "
+"for myself and my entire household if applicable, for purposes of enrollment "
+"in a Qualified Health Plan offered on the Federally Facilitated Marketplace."
+
+#: .\app\templates\consent\consent1.html:399
+#: .\app\templates\consent\consent1.html:522
+#: .\app\templates\consent\templatePdfConsent.html:307
+msgid "Al firmar esta forma, autorizo a "
+msgstr "By signing this form, I give my permission to "
+
+#: .\app\templates\consent\consent1.html:399
+#: .\app\templates\consent\consent1.html:522
+#: .\app\templates\consent\templatePdfConsent.html:307
+msgid ""
+", y su staff, a trabajar para mi y las personas en mi núcleo familiar, "
+"cuando aplica, en las siguientes funciones de apoyo de seguro y cualquier "
+"otra tarea administrativa necesaria para mantener mi solicitud y cobertura "
+"en buen estado, como sigue:"
+msgstr ""
+"and/or their staff to provide the following services on behalf of myself, "
+"and my entire household if applicable to keep my application and health "
+"coverage in good standing:  "
+
+#: .\app\templates\consent\consent1.html:401
+#: .\app\templates\consent\consent1.html:470
+#: .\app\templates\consent\consent1.html:524
+msgid ""
+"Realizar búsquedas de aplicaciones nuevas o actuales en el mercado de salud."
+msgstr "Search for a new or existing Marketplace application."
+
+#: .\app\templates\consent\consent1.html:402
+#: .\app\templates\consent\consent1.html:471
+#: .\app\templates\consent\consent1.html:525
+msgid ""
+"Completar una aplicación para búsqueda de eligibilidad y enrolamiento en el "
+"Mercado de Salud Federal, o en programas de gobierno tales como Medicaid y "
+"CHIP, en los sitios de Enrolamiento Directo del Mercado de Salud, o "
+"enrolamiento en programas del mercado de salud que ayudan a aplicar a "
+"crédito fiscales o enrolamiento de productos de seguros en planes a nivel "
+"estatal."
+msgstr ""
+"Completing an application for eligibility and enrollment in a marketplace "
+"Qualified Health Plan or government insurance affordability programs, such "
+"as Medicaid and CHIP, Marketplace Direct Enrollment Classic/Enhanced Direct "
+"Enrollment websites, or advance tax credits to help pay for Marketplace "
+"Premiums or enrollment in off-exchange insurance products as applicable."
+
+#: .\app\templates\consent\consent1.html:403
+#: .\app\templates\consent\consent1.html:472
+#: .\app\templates\consent\consent1.html:526
+msgid ""
+"Proveer mantenimiento de mi cuenta en el Mercado de Salud Federal, "
+"asistencia en enrolamiento, información sobre los beneficios de los planes, "
+"nuevos productos, beneficios de nuevos productos, y asesoría en los pagos de "
+"transacciones si es necesario."
+msgstr ""
+"Providing ongoing account maintenance, enrollment assistance, information on "
+"plan benefits, new products, the benefits of new products, and payment "
+"transactions as necessary"
+
+#: .\app\templates\consent\consent1.html:404
+#: .\app\templates\consent\consent1.html:473
+#: .\app\templates\consent\consent1.html:527
+msgid ""
+"Apoyar si es necesario en responder inquietudes del Mercado de Salud Federal "
+"en lo referente a mi aplicación."
+msgstr ""
+"Responding to inquiries from the Marketplace regarding my Marketplace "
+"application. "
+
+#: .\app\templates\consent\consent1.html:405
+msgid "Consentimiento de comunicación (Cumplimiento TCPA): Yo,"
+msgstr "Communication consent (TCPA Compliance): I,"
+
+#: .\app\templates\consent\consent1.html:405
+msgid ", doy mi consentimiento para recibir comunicaciones de"
+msgstr ", consent to receive communications from"
+
+#: .\app\templates\consent\consent1.html:405
+msgid ""
+"con respecto a opciones de seguro de salud, beneficios, productos de "
+"seguros, actualizaciones de pólizas, primas, solicitudes y asuntos "
+"relacionados a través de llamadas telefónicas, correos electrónicos, "
+"mensajes SMS y otras formas de comunicación para ayudarme o recordarme "
+"cualquier acción necesaria para mantener mi póliza en buen estado. Entiendo "
+"que dichas comunicaciones pueden involucrar el uso de sistemas automatizados "
+"o mensajes de voz pregrabados de"
+msgstr ""
+"regarding health insurance options, benefits, insurance products policy "
+"updates, premiums, applications, and related matters through phone calls, "
+"emails, SMS messages, and other forms of communication to assist me or "
+"remind me of any action necessary to keep my policy in good standing. I "
+"understand that such communications may involve the use of automated systems "
+"or with prerecorded voice messages from "
+
+#: .\app\templates\consent\consent1.html:405
+msgid ""
+"en el número proporcionado. Al proporcionar mi información de contacto con "
+"mi firma electrónica, cuando hago clic en el botón \"enviar\", acepto los "
+"Términos de Uso de"
+msgstr ""
+"at your provided number. By providing my contact information with my "
+"electronic signature, when I click the \"submit\" button, I agree to "
+
+#: .\app\templates\consent\consent1.html:405
+msgid " "
+msgstr "'s Terms of Use"
+
+#: .\app\templates\consent\consent1.html:405
+msgid ""
+"Este consentimiento incluye aceptar resolver cualquier reclamo de la Ley de "
+"Protección al Consumidor de Teléfonos mediante arbitraje. Esto aplica "
+"incluso si su número está en una lista de no llamar. Aceptar estas llamadas "
+"o textos no es un requisito para comprar bienes o servicios de nosotros. Al "
+"recibir un mensaje de texto, puede responder <span class=\"roboto-"
+"black\">SI</span> para recibir actualizaciones e información sobre su póliza "
+"de"
+msgstr ""
+"This consent includes agreeing to resolve any Telephone Consumer Protection "
+"Act claims by arbitration. This applies even if your number is on a do-not-"
+"call list. Agreeing to these calls r texts is not required to buy goods or "
+"services from us. When receiving a text message, you can reply <span "
+"class=\"roboto-black\">YES</span> to receive updates and information about "
+"your policy from "
+
+#: .\app\templates\consent\consent1.html:405
+msgid ""
+"También puede responder <span class=\"roboto-black\">AYUDA</span> para "
+"obtener ayuda. Pueden aplicarse tarifas de mensajes y datos. Hasta 5 "
+"mensajes/mes. Responda <span class=\"roboto-black\">ALTO</span> para "
+"cancelar en cualquier momento. Para obtener más información sobre nuestras "
+"Políticas de Privacidad, haga clic aquí:"
+msgstr ""
+"You can also reply <span class=\"roboto-black\">HELP</span> for help. Msg & "
+"data rates may apply. Up to 5 msgs/month. Reply <span class=\"roboto-"
+"black\">STOP</span> to opt-out at any time. For more information about our "
+"Privacy Policies click here: "
+
+#: .\app\templates\consent\consent1.html:405
+msgid ""
+"Para obtener más información sobre nuestros Términos de Uso, haga clic aquí:"
+msgstr "For more information about our Terms of Use click here: "
+
+#: .\app\templates\consent\consent1.html:408
+#: .\app\templates\consent\consent1.html:530
+msgid ""
+"Entiendo que mi Agente de Registro no utilizará o compartirá mi información "
+"de identificación personal (PII) para ningún propósito excepto los aquí "
+"listados en esta autorización. Entiendo que esta autorización será válida "
+"hasta que sea revocada por mi en cualquier momento. Para revocar esta "
+"autorización, debo hacerlo por escrito y enviarlo a la persona "
+"correspondiente a través del correo electrónico: client@lapeira.com."
+msgstr ""
+"I understand that my Agent of Record will not use or share my "
+"personallyidentifiable information (PII) for any purposes other than those "
+"listed above.Additionally, my Agent of Record will ensure that my PII is "
+"kept private andsafe when collecting, storing, and using my PII for the "
+"stated purposes above."
+
+#: .\app\templates\consent\consent1.html:409
+#: .\app\templates\consent\consent1.html:531
+msgid ""
+"Entiendo que la información que yo le suministre a mi Agente de Registro se "
+"va a utilizar ÚNICAMENTE para asistirme en verificar mi elegibilidad y mi "
+"aplicacion o enrolamiento en el mercado de salud federal (Marketplace). Esta "
+"aprobación incluye la búsqueda de una aplicacion activa utilizando la "
+"páginas web aprobadas para el enrolamiento clásico directo (DE) o el "
+"Enhanced Direct Enrollment (EDE). Así mismo, entiendo que no tengo que "
+"compatir otra informacion adicional excepto la que es requerida para mi "
+"enrolamiento o verificacion de eligibilidad en el mercado de salud federal "
+"(Marketplace)"
+msgstr ""
+"I understand that the information I provide to my Agent of Recordwill be "
+"used or disclosed ONLY to provide information or assist mewith or facilitate "
+"enrollment through a Federally-Facilitated Exchange,including to searching "
+"for a current application using an approvedClassic Direct Enrollment (DE) or "
+"Enhanced Direct Enrollment (EDE)website (Marketplace)."
+
+#: .\app\templates\consent\consent1.html:410
+#: .\app\templates\consent\consent1.html:532
+#: .\app\templates\consent\templatePdfConsent.html:323
+msgid "Reconocimiento de Información Correcta y No Falsificación"
+msgstr "Acknowledgment of Accurate Information and Non-Misrepresentation"
+
+#: .\app\templates\consent\consent1.html:411
+#: .\app\templates\consent\consent1.html:533
+#: .\app\templates\consent\templatePdfConsent.html:324
+msgid ""
+"Al firmar este formulario, afirmo y reconozco que he sido completamente "
+"informado y se me ha brindado una explicación clara sobre lo siguiente:"
+msgstr ""
+"By signing this form, I affirm and acknowledge that I have been "
+"fullyinformed and provided with a clear explanation regarding the following:"
+
+#: .\app\templates\consent\consent1.html:413
+#: .\app\templates\consent\consent1.html:535
+#: .\app\templates\consent\templatePdfConsent.html:326
+msgid ""
+"Los beneficios específicos incluidos en el plan de salud, incluyendo "
+"cualquier cobertura de seguro o beneficios asociados."
+msgstr ""
+"The specific benefits included in the healthcare plan, includingany "
+"insurance coverage or associated benefits;"
+
+#: .\app\templates\consent\consent1.html:414
+#: .\app\templates\consent\consent1.html:536
+#: .\app\templates\consent\templatePdfConsent.html:327
+msgid ""
+"Si el plan de salud en el que me estoy inscribiendo es considerado un plan "
+"de salud mayor o integral, o si es equivalente a dicha cobertura de seguro."
+msgstr ""
+"Whether the healthcare plan I am enrolling in is considered a major "
+"orcomprehensive medical insurance plan, or is equivalent to such insurance "
+"coverage;"
+
+#: .\app\templates\consent\consent1.html:415
+#: .\app\templates\consent\consent1.html:537
+#: .\app\templates\consent\templatePdfConsent.html:328
+msgid ""
+"Los costos verdaderos y precisos asociados con el plan de salud, incluyendo "
+"primas, deducibles y otras obligaciones financieras."
+msgstr ""
+"The true and accurate costs associated with the healthcare plan, including "
+"premiums, deductibles, and other financial obligations."
+
+#: .\app\templates\consent\consent1.html:417
+#: .\app\templates\consent\consent1.html:539
+msgid ""
+"Además, confirmo que no se me ha ofrecido ni prometido ningún tipo de "
+"ofertas gratuitas, recompensas en efectivo, reembolsos u otros incentivos "
+"relacionados con la inscripción en el plan de salud. Reconozco que no se me "
+"ha hecho ninguna afirmación o promesa sobre este tipo de incentivos durante "
+"el proceso de inscripción."
+msgstr ""
+"Furthermore, I confirm that I have not been offered or promised any free "
+"offers, cash rewards, rebates, or other incentives related to enrolling in "
+"the healthcare plan. I acknowledge that no such claims or promises have been "
+"made to me during the enrollment process."
+
+#: .\app\templates\consent\consent1.html:419
+#: .\app\templates\consent\consent1.html:541
+#: .\app\templates\consent\templatePdfConsent.html:337
+msgid ""
+", he revisado y confirmado que la información para mi aplicación en el "
+"mercado de salud es CORRECTA Y VERIDICA y estará disponible como es "
+"requerido por el Centro de Servicios de Medicare & Medicaid (CMS) para "
+"efectos de elegibilidad y enrolamiento."
+msgstr ""
+", REVIEWED AND CONFIRMED THAT MY APPLICATION INFORMATION IS CORRECT AND "
+"ACCURATE and I understand that my Agent of Record will maintain "
+"documentation as required by the Centers for Medicare & Medicaid Services "
+"(CMS) for eligibility and enrollment. I understand that a copy of this "
+"authorization will be available upon request from the Center for Medicare "
+"and Medicaid Services as required."
+
+#: .\app\templates\consent\consent1.html:420
+#: .\app\templates\consent\consent1.html:542
+msgid "Nombre del Agente en Registro: "
+msgstr "Name of Agent of Record [AOR]: "
+
+#: .\app\templates\consent\consent1.html:421
+#: .\app\templates\consent\consent1.html:543
+msgid "Nombre de la Agencia en Registro: "
+msgstr "Name of Agency of Record: "
+
+#: .\app\templates\consent\consent1.html:422
+#: .\app\templates\consent\consent1.html:544
+msgid "Teléfono de la Agencia: "
+msgstr "Agency Phone: "
+
+#: .\app\templates\consent\consent1.html:431
+#: .\app\templates\consent\incomeLetter.html:200
+msgid "Firma Aplicante o Representante Autorizado"
+msgstr "Applicant or Authorized Representative's Signature"
+
+#: .\app\templates\consent\consent1.html:431
+#: .\app\templates\consent\incomeLetter.html:204
+msgid "Firmado"
+msgstr "Signed"
+
+#: .\app\templates\consent\consent1.html:437
+#: .\app\templates\consent\consetMedicare.html:140
+msgid "Limpiar firma"
+msgstr "Clear Signature"
+
+#: .\app\templates\consent\consent1.html:468
+msgid "Breve Descripción"
+msgstr "Brief Description"
+
+#: .\app\templates\consent\consent1.html:474
+#: .\app\templates\consent\consent1.html:528
+msgid ""
+"Contactarme vía telefónica o por cualquier medio electrónico o escrito para "
+"ayudarme y asistirme en cualquier acción necesaria para mantener mi póliza "
+"en buen estado."
+msgstr ""
+"Contact me by phone or by any written means to assist me or remind me of any "
+"action necessary to keep my policy in good standing."
+
+#: .\app\templates\consent\consent1.html:479
+msgid "Detalle de Cobertura:"
+msgstr "Coverage Detail:"
+
+#: .\app\templates\consent\consent1.html:483
+msgid ""
+"Aplicante (s) Adicional (es) (Nombre Completo, Fecha Nacimiento, Sexo, "
+"Status, Parentesco)"
+msgstr ""
+"Additional Applicant(s) (Full Name, Date of Birth, Gender, Status, "
+"Relationship)"
+
+#: .\app\templates\consent\consent1.html:548
+msgid "Fecha y Hora de Firma: "
+msgstr "Date and Time of Signature:"
+
+#: .\app\templates\consent\consent1.html:552
+msgid "Autorización válida hasta: "
+msgstr "Authorization valid until:"
+
+#: .\app\templates\consent\consent1.html:561
+#: .\app\templates\consent\consetMedicare.html:203
+msgid "Enviar"
+msgstr "Send"
+
+#: .\app\templates\consent\consent1.html:564
+msgid "Revise su informacion"
+msgstr "Check your information"
+
+#: .\app\templates\consent\consent1.html:567
+msgid "Regresar a la forma"
+msgstr "Back to form"
+
+#: .\app\templates\consent\consent1.html:597
+#: .\app\templates\consent\consetMedicare.html:228
+#: .\app\templates\consent\incomeLetter.html:321
+msgid "Copiado!"
+msgstr "Copied!"
+
+#: .\app\templates\consent\consent1.html:606
+#: .\app\templates\consent\consetMedicare.html:237
+#: .\app\templates\consent\incomeLetter.html:330
+msgid "No se pudo copiar el link. Por favor, inténtalo de nuevo."
+msgstr "Could not copy the link. Please try again."
+
+#: .\app\templates\consent\consetMedicare.html:96
+#: .\app\templates\consent\templatePdfConsentMedicare.html:177
+msgid ""
+" Los Centros de Servicios de Medicare y Medicaid exigen que los agentes "
+"documenten el alcance de una cita de marketing antes de CUALQUIER reunión de "
+"ventas para garantizar la comprensión de lo que se discutirá entre el agente "
+"y el beneficiario de Medicare (o su representante autorizado). Toda la "
+"información provista en este formulario es confidencial y debe ser "
+"completada por cada beneficiario de Medicare o su representante autorizado. "
+"Los agentes deben tener licencia, contrato y certificación, cuando "
+"corresponda, para poder hablar de los productos que se enumeran a "
+"continuación. Favor marcar en las siguientes casillas lo que desea hablar "
+"durante la reunión con el Agente Licenciado."
+msgstr ""
+"The Centers for Medicare and Medicaid Services requires that agents document "
+"the scope of a marketing appointment prior to ANY sales to ensure "
+"understanding of what will be discussed between the agent and the Medicare "
+"beneficiary (or his/her authorized representative). All information provided "
+"on this form is confidential and must be completed by each Medicare "
+"beneficiary or his or her authorized representative. Agents must be "
+"licensed, contracted and certified, where applicable, in order to discuss "
+"the products listed below. Please check in the boxes below what you would "
+"like to discuss during the meeting with the Licensed Agent."
+
+#: .\app\templates\consent\consetMedicare.html:100
+msgid "Seleccione los planes a discutir"
+msgstr "Select the plans to discuss"
+
+#: .\app\templates\consent\consetMedicare.html:103
+msgid " Planes de Prescripción de Medicare Parte D "
+msgstr " Medicare Part D Prescription Plans "
+
+#: .\app\templates\consent\consetMedicare.html:107
+msgid " Planes de Medicare Advantage (Parte C) y Planes de Costo "
+msgstr " Medicare Advantage (Part C) Plans and Cost Plans "
+
+#: .\app\templates\consent\consetMedicare.html:111
+msgid " Productos Dental-Visión-Oescucha "
+msgstr " Dental-Vision-Listening Products "
+
+#: .\app\templates\consent\consetMedicare.html:115
+msgid " Productos de Complementarios de Hospitalización "
+msgstr " Hospital Complementary Products "
+
+#: .\app\templates\consent\consetMedicare.html:119
+msgid "Planes Suplementarios de Medicare (Medigap) "
+msgstr " Medicare Supplement Plans (Medigap) "
+
+#: .\app\templates\consent\consetMedicare.html:124
+#: .\app\templates\consent\templatePdfConsentMedicare.html:189
+msgid ""
+"Al enviar este formulario, acepta una reunión telefónica con un agente de "
+"seguros de salud con licencia de Lapeira & Associates LLC para analizar el "
+"tipo de productos que puso sus iniciales arriba. Tenga en cuenta que la "
+"persona que hablará sobre los productos es un agente con licencia empleado o "
+"contratado por un plan de Medicare. No trabajan directamente para el "
+"gobierno federal. Al proporcionar su información en el formulario anterior, "
+"usted acepta expresamente recibir información de Lapeira & Associates LLC a "
+"través de una llamada telefónica, correo electrónico y/o mensaje de texto/"
+"SMS (incluso mediante el uso de un sistema de marcación telefónica "
+"automática o voz artificial/pregrabada, SMS o MMS (mensajes de texto), "
+"incluso si su(s) número(s) de teléfono está(n) actualmente incluido(s) en "
+"alguna lista de No llamar estatal, federal o corporativa). Se pueden aplicar "
+"tarifas estándar de mensajes de texto y cargos por datos móviles. El agente "
+"de seguros de salud con licencia también puede recibir un pago en función de "
+"su inscripción en un plan. Su consentimiento en este formulario NO lo obliga "
+"a inscribirse en un plan, no afecta su inscripción actual ni lo inscribe en "
+"un plan de Medicare."
+msgstr ""
+"By submitting this form, you agree to a telephone meeting with a  licensed "
+"health insurance agent from Lapeira & Associates LLC to discuss the type of "
+"products you initialed above. Please note that the person who will discuss "
+"the products is a licensed agent employed or contracted with a Medicare "
+"plan. They do not work directly for the federal government. By providing "
+"your information on the form above, you expressly agree to receive "
+"information from Lapeira & Associates LLC by via phone call, email and/or "
+"text message/SMS (including through the use of an automated automatic or "
+"artificial/pre-recorded voice, SMS or MMS (text messaging), even if your "
+"telephone number(s) are currently included on any state, federal or "
+"corporate Do Not Call list). Standard standard text message rates and "
+"wireless data charges may apply. The licensed health insurance agent may "
+"also receive payment based on your enrollment in a plan. Your consent on "
+"this form does NOT obligate you to enroll in a plan, does not affect your "
+"current enrollment, and does not enroll you in a a Medicare plan."
+
+#: .\app\templates\consent\consetMedicare.html:129
+#: .\app\templates\consent\templatePdfConsentMedicare.html:197
+msgid "Nombre del Beneficiario"
+msgstr "Applicant Name"
+
+#: .\app\templates\consent\consetMedicare.html:134
+#: .\app\templates\consent\templatePdfConsentMedicare.html:202
+msgid "Firma del beneficiario o persona autorizada"
+msgstr "Applicant or Authorized Representative's Signature"
+
+#: .\app\templates\consent\consetMedicare.html:146
+#: .\app\templates\consent\templatePdfConsentMedicare.html:210
+msgid "Nombre de la persona Autorizada"
+msgstr "Name of Authorized Person"
+
+#: .\app\templates\consent\consetMedicare.html:151
+msgid "Su relacion con el beneficiario"
+msgstr "Your relationship to the Beneficiary"
+
+#: .\app\templates\consent\consetMedicare.html:156
+#: .\app\templates\consent\templatePdfConsentMedicare.html:220
+msgid "Nombre de Agente"
+msgstr "Applicant Name"
+
+#: .\app\templates\consent\consetMedicare.html:161
+#: .\app\templates\consent\templatePdfConsentMedicare.html:225
+msgid "Nombre de agencia"
+msgstr "Name of Agency of Record: "
+
+#: .\app\templates\consent\consetMedicare.html:166
+msgid "Dirección (Para encontrar opciones de planes de salud en su área) "
+msgstr "Home Address (To find a plan in your area) "
+
+#: .\app\templates\consent\consetMedicare.html:176
+#: .\app\templates\consent\templatePdfConsentMedicare.html:240
+msgid "Fecha de la cita (Medicare)"
+msgstr "Appointment Date (Medicare)"
+
+#: .\app\templates\consent\endView.html:7
+msgid "Gracias por su Inscripción"
+msgstr "Thank you for your Enrollment"
+
+#: .\app\templates\consent\endView.html:44
+msgid "Gracias!"
+msgstr "Thank you!"
+
+#: .\app\templates\consent\endView.html:45
+msgid "Su inscripción está en proceso"
+msgstr "Your Enrollment Application Process Will Start Now"
+
+#: .\app\templates\consent\endView.html:46
+msgid ""
+"Su información ha sido exitosamente recibida para iniciar su aplicación con "
+"el mercado de salud."
+msgstr ""
+"Your information has been successfully sent to initiate the enrollment "
+"application with the marketplace."
+
+#: .\app\templates\consent\endView.html:48
+msgid ""
+"En caso de ser necesario hacer una llamada en conferencia con el mercado de "
+"salud le estaremos comunicando."
+msgstr ""
+"If your case requires a 3-way call conference with the marketplace we will "
+"contact you again."
+
+#: .\app\templates\consent\endView.html:49
+msgid "El mercado de salud puede solicitar la misma o información adicional."
+msgstr ""
+"The marketplace may ask for additional information to verify your identity "
+"and process your enrollment."
+
+#: .\app\templates\consent\endView.html:50
+msgid ""
+"Sus documentos deben ser legibles para que su aplicación sea debidamente "
+"procesada."
+msgstr "All your documents must be clear and legible to enroll successfully."
+
+#: .\app\templates\consent\endView.html:51
+msgid ""
+"Usted recibirá mediante el método de contacto de su preferencia, los "
+"detalles de su póliza."
+msgstr ""
+"You will receive a message about the details of your policy via your "
+"preferred communication method."
+
+#: .\app\templates\consent\incomeLetter.html:150
+msgid "Carta explicativa de los ingresos anuales"
+msgstr "Letter explaining annual income"
+
+#: .\app\templates\consent\incomeLetter.html:154
+msgid "Nombre Completo:"
+msgstr "Name"
+
+#: .\app\templates\consent\incomeLetter.html:155
+msgid "NOMBRE"
+msgstr "NAME"
+
+#: .\app\templates\consent\incomeLetter.html:158
+msgid "Apellido:"
+msgstr "Last Name"
+
+#: .\app\templates\consent\incomeLetter.html:159
+msgid "APELLIDO"
+msgstr "LAST NAME"
+
+#: .\app\templates\consent\incomeLetter.html:163
+msgid "Fecha de Nacimiento del Aplicante Principal:"
+msgstr "Date of Birth"
+
+#: .\app\templates\consent\incomeLetter.html:168
+msgid "Mi hogar espera recibir:"
+msgstr "My home is waiting to receive:"
+
+#: .\app\templates\consent\incomeLetter.html:172
+msgid "Durante el año:"
+msgstr "During the year:"
+
+#: .\app\templates\consent\incomeLetter.html:177
+#: .\app\templates\consent\templatePdfIncomeLetter.html:144
+msgid "Cómo enviar por correo:"
+msgstr "How to send by mail: "
+
+#: .\app\templates\consent\incomeLetter.html:179
+msgid ""
+"Incluya la página de código de barras impresa que vino con su carta. Si no "
+"tiene un código de barras, incluya su nombre completo impreso y la "
+"identificación de la solicitud en cada página de su formulario. Su ID de "
+"solicitud está cerca de su dirección postal en la parte superior de su carta."
+msgstr ""
+"Include the printed barcode page that came with your letter. If you do not "
+"have a bar code, include your printed full name and application ID on each "
+"page of your form. Your application ID is near your mailing address at the "
+"top of your letter."
+
+#: .\app\templates\consent\incomeLetter.html:180
+#: .\app\templates\consent\templatePdfIncomeLetter.html:148
+msgid "Envíe el formulario a:"
+msgstr "Send the form to:"
+
+#: .\app\templates\consent\incomeLetter.html:182
+#: .\app\templates\consent\templatePdfIncomeLetter.html:150
+msgid "Mercado de Seguros Médicos"
+msgstr "Insurance Agency"
+
+#: .\app\templates\consent\incomeLetter.html:183
+msgid "Attn: Coverage Processing"
+msgstr "Attn: Coverage Processing"
+
+#: .\app\templates\consent\incomeLetter.html:184
+msgid "465 Industrial Blvd."
+msgstr "465 Industrial Blvd."
+
+#: .\app\templates\consent\incomeLetter.html:185
+msgid "London, KY 40750"
+msgstr "London, KY 40750"
+
+#: .\app\templates\consent\incomeLetter.html:189
+msgid "Nota:"
+msgstr "Note"
+
+#: .\app\templates\consent\incomeLetter.html:190
+#: .\app\templates\consent\templatePdfIncomeLetter.html:160
+msgid ""
+"El ingreso anual que informe debe coincidir con el ingreso que informó en su "
+"solicitud del Mercado u otra solicitud de seguro médico. Si no es así, "
+"actualice su solicitud del Mercado."
+msgstr ""
+"The annual income you report must match the income you reported on your "
+"Marketplace application or other health insurance application. If it does "
+"not, update your Marketplace application."
+
+#: .\app\templates\consent\incomeLetter.html:191
+msgid "Visite:"
+msgstr "Visit:"
+
+#: .\app\templates\consent\incomeLetter.html:191
+msgid "CuidadoDeSalud.gov/es/income-and-household-information/how-to-report/"
+msgstr "CuidadoDeSalud.gov/es/income-and-household-information/how-to-report/"
+
+#: .\app\templates\consent\incomeLetter.html:191
+#: .\app\templates\consent\templatePdfIncomeLetter.html:164
+msgid "o"
+msgstr "or"
+
+#: .\app\templates\consent\incomeLetter.html:191
+#: .\app\templates\consent\templatePdfIncomeLetter.html:164
+msgid "CuidadoDeSalud.gov/es/income-calculator"
+msgstr "CuidadoDeSalud.gov/es/income-calculator"
+
+#: .\app\templates\consent\incomeLetter.html:191
+#: .\app\templates\consent\templatePdfIncomeLetter.html:165
+msgid "si necesita ayuda para estimar su ingreso anual esperado."
+msgstr "if you need help estimating your expected annual income."
+
+#: .\app\templates\consent\incomeLetter.html:193
+msgid "Recuerde:"
+msgstr "Remember:"
+
+#: .\app\templates\consent\incomeLetter.html:194
+msgid ""
+"Es importante ingresar una estimación de ingresos precisa en su solicitud "
+"del Mercado. Si los ingresos que ingresó en su solicitud son menores que los "
+"ingresos que declara en sus impuestos al final del año, es posible que tenga "
+"que devolver parte o la totalidad de su crédito tributario de prima cuando "
+"presente su declaración de impuestos. Si su ingreso estimado cambia durante "
+"el año, actualice su solicitud del Mercado con esta información de inmediato."
+msgstr ""
+"It is important to enter an accurate income estimate in your Marketplace "
+"application. If the income you entered in your application is lower than the "
+"income you report on your taxes at the end of the year, you may have to "
+"repay some or all of your premium tax credit when you file your tax return. "
+"If your estimated income changes during the year, update your Marketplace "
+"application with this information immediately."
+
+#: .\app\templates\consent\templatePdfConsent.html:211
+msgid "INFORMACIÓN DE MIEMBRO APLICANTE"
+msgstr "APPLICANT MEMBER INFORMATION"
+
+#: .\app\templates\consent\templatePdfConsent.html:212
+#: .\app\templates\consent\templatePdfConsent.html:268
+msgid "PARA ENROLAMIENTO EN EL MERCADO DE SALUD"
+msgstr "PLEASE VERIFY THAT YOUR INFORMATION IS ACCURATE AND CORRECT"
+
+#: .\app\templates\consent\templatePdfConsent.html:233
+#: .\app\templates\consent\templatePdfIncomeLetter.html:129
+msgid "Fecha de Nacimiento"
+msgstr "Date of Birth"
+
+#: .\app\templates\consent\templatePdfConsent.html:241
+msgid "Dirección"
+msgstr "Address"
+
+#: .\app\templates\consent\templatePdfConsent.html:249
+msgid "Social Security"
+msgstr "Social Security"
+
+#: .\app\templates\consent\templatePdfConsent.html:253
+msgid "Tipo de Ingreso"
+msgstr "Type of Income"
+
+#: .\app\templates\consent\templatePdfConsent.html:257
+msgid "Ingreso Anual Estimado"
+msgstr "Estimated Income"
+
+#: .\app\templates\consent\templatePdfConsent.html:267
+msgid "INFORMACIÓN DE LOS DEPENDIENTES"
+msgstr "DEPENDENT INFORMATION"
+
+#: .\app\templates\consent\templatePdfConsent.html:275
+msgid "Dependientes"
+msgstr "Dependents"
+
+#: .\app\templates\consent\templatePdfConsent.html:278
+msgid "Nombre"
+msgstr "Name"
+
+#: .\app\templates\consent\templatePdfConsent.html:279
+msgid "Sexo"
+msgstr "Sex"
+
+#: .\app\templates\consent\templatePdfConsent.html:280
+msgid "Estatus de inmigración"
+msgstr "Immigration Status"
+
+#: .\app\templates\consent\templatePdfConsent.html:281
+msgid "Fecha de Cumpleaños"
+msgstr "Birthday Date"
+
+#: .\app\templates\consent\templatePdfConsent.html:282
+msgid "Parentesco"
+msgstr "Relationship"
+
+#: .\app\templates\consent\templatePdfConsent.html:304
+#: .\app\templates\consent\templatePdfConsent.html:337
+#: .\app\templates\consent\templatePdfConsent.html:354
+msgid "Yo,"
+msgstr "I, "
+
+#: .\app\templates\consent\templatePdfConsent.html:304
+msgid ", autorizo a"
+msgstr " give consent to "
+
+#: .\app\templates\consent\templatePdfConsent.html:304
+msgid "de"
+msgstr "the"
+
+#: .\app\templates\consent\templatePdfConsent.html:304
+msgid ""
+"para servir como mi agente y broker de seguros de salud, es decir mi Agente "
+"de Registro, para mi y las personas en mi núcleo familiar, cuando aplica, "
+"para el propósito de enrolamiento en un Plan Médico Calificado ofrecido en "
+"el Mercado de Salud Federal."
+msgstr ""
+" to serve as the health insurance agent or broker, as my Agent of Record, "
+"for myself and my entire household if applicable, for purposes of enrollment "
+"in a Qualified Health Plan offered on the Federally Facilitated Marketplace."
+
+#: .\app\templates\consent\templatePdfConsent.html:312
+msgid ""
+" Realizar búsquedas de aplicaciones nuevas o actuales en el mercado de salud."
+msgstr "Search for a new or existing Marketplace application."
+
+#: .\app\templates\consent\templatePdfConsent.html:313
+msgid ""
+" Completar una aplicación para búsqueda de eligibilidad y enrolamiento en el "
+"Mercado de Salud Federal, o en programas de gobierno tales como Medicaid y "
+"CHIP."
+msgstr ""
+" Completion of an application for eligibility search and enrollment in "
+"theFederal Health Care Marketplace, or in government programs such as "
+"Medicaid andCHIP."
+
+#: .\app\templates\consent\templatePdfConsent.html:314
+msgid ""
+" Proveer mantenimiento de mi cuenta en el Mercado de Salud Federal, "
+"asistencia en enrolamiento e información sobre los beneficios."
+msgstr ""
+"Providing ongoing account maintenance, enrollment assistance, information on "
+"plan benefits, new products, the benefits of new products, and payment "
+"transactions as necessary"
+
+#: .\app\templates\consent\templatePdfConsent.html:315
+msgid ""
+" Apoyar si es necesario en responder inquietudes del Mercado de Salud "
+"Federal."
+msgstr ""
+"Responding to inquiries from the Marketplace regarding my Marketplace "
+"application. "
+
+#: .\app\templates\consent\templatePdfConsent.html:316
+msgid "Consentimiento de comunicación (Cumplimiento de TCPA): Yo,"
+msgstr ""
+
+#: .\app\templates\consent\templatePdfConsent.html:317
+msgid "doy mi consentimiento para recibir comunicaciones de"
+msgstr ""
+
+#: .\app\templates\consent\templatePdfConsent.html:318
+msgid ""
+" sobre opciones de seguro médico, beneficios, productos de seguros, "
+"actualizaciones de pólizas, primas, solicitudes y asuntos relacionados a "
+"través de llamadas telefónicas, correos electrónicos, mensajes SMS y otras "
+"formas de comunicación para ayudarme o recordarme de cualquier acción "
+"necesaria para mantener mi póliza al día. Entiendo que dichas comunicaciones "
+"pueden implicar el uso de sistemas automatizados o mensajes de voz "
+"pregrabados de "
+msgstr ""
+
+#: .\app\templates\consent\templatePdfConsent.html:319
+msgid ""
+"al número proporcionado. Al proporcionar mi información de contacto con mi "
+"firma electrónica, cuando hago clic en el botón 'enviar', acepto los "
+"Términos de uso de"
+msgstr ""
+
+#: .\app\templates\consent\templatePdfConsent.html:320
+msgid ""
+" Este consentimiento incluye aceptar resolver cualquier reclamo de la Ley de "
+"Protección al Consumidor Telefónico mediante arbitraje. Esto se aplica "
+"incluso si su número está en una lista de no llamar. No es necesario aceptar "
+"estas llamadas o mensajes de texto para comprarnos bienes o servicios. "
+"Entiendo que en caso de recibir un mensaje de texto, puedo responder YES "
+"para recibir actualizaciones e information acerca de mi poliza de parte de . "
+"También entiendo que puedo responder HELP para recibir ayuda. Entiendo que "
+"msg & data rates pueden aplicar, que puedo recibir hasta 5 msgs/mes. "
+"Entiendo que puedo responder STOP para opt-out en cualquier momento. Para "
+"mayor informacion acerca las Politicas de Privacidad puedo darle click "
+"aquí:  <a  class=\"custom-link\" href=\"https://lapeirainsurance.com/privacy-"
+"policy/.\"><strong> Lapeira insurance Privacidad </strong></a> Para mayor "
+"informacion acerca los Términos de Uso puedo darle click aquí: <a  "
+"class=\"custom-link\" href=\"https://lapeirainsurance.com/terms-of-use/. "
+"\"><strong>Lapeira Insurance Terminos</strong> </a>"
+msgstr ""
+
+#: .\app\templates\consent\templatePdfConsent.html:330
+msgid ""
+"Además, confirmo que no se me ha ofrecido ni prometido ningún tipo de "
+"ofertas gratuitas, recompensas en efectivo, reembolsos u otros incentivos "
+"relacionados con la inscripción en el plan de salud. Reconozco que no se me "
+"ha hecho ninguna afirmación, promesa ni engaños sobre este tipo de "
+"incentivos durante el proceso de inscripción."
+msgstr ""
+"Furthermore, I confirm that I have not been offered or promised any free "
+"offers, cash rewards, rebates, or other incentives related to enrolling in "
+"the healthcare plan. I acknowledge that no such claims or promises have been "
+"made to me during the enrollment process."
+
+#: .\app\templates\consent\templatePdfConsent.html:334
+msgid ""
+" Entiendo que mi Agente de Registro no utilizará o compartirá mi información "
+"de identificación personal (PII) para ningún propósito excepto los aquí "
+"listados en esta autorización. Entiendo que esta autorización será válida "
+"hasta que sea revocada por mi en cualquier momento. Para revocar esta "
+"autorización, debo hacerlo por escrito y enviarlo a la persona "
+"correspondiente a través del correo electrónico: client@lapeira.com."
+msgstr ""
+"I understand that my Agent of Record will not use or share my "
+"personallyidentifiable information (PII) for any purposes other than those "
+"listed above.Additionally, my Agent of Record will ensure that my PII is "
+"kept private andsafe when collecting, storing, and using my PII for the "
+"stated purposes above."
+
+#: .\app\templates\consent\templatePdfConsent.html:340
+msgid ""
+" Entiendo que la información que yo le suministre a mi Agente de Registro se "
+"va a utilizar ÚNICAMENTE para asistirme en verificar mi elegibilidad y mi "
+"aplicacion o enrolamiento en el mercado de salud federal (Marketplace). Esta "
+"aprobación incluye la búsqueda de una aplicacion activa utilizando la "
+"páginas web aprobadas para el enrolamiento clásico directo (DE) o el "
+"Enhanced Direct Enrollment (EDE). Así mismo, entiendo que no tengo que "
+"compatir otra informacion adicional excepto la que es requerida para mi "
+"enrolamiento o verificacion de eligibilidad en el mercado de salud federal "
+"(Marketplace)."
+msgstr ""
+"I understand that the information I provide to my Agent of Recordwill be "
+"used or disclosed ONLY to provide information or assist mewith or facilitate "
+"enrollment through a Federally-Facilitated Exchange,including to searching "
+"for a current application using an approvedClassic Direct Enrollment (DE) or "
+"Enhanced Direct Enrollment (EDE)website (Marketplace)."
+
+#: .\app\templates\consent\templatePdfConsent.html:347
+msgid "Acepto ser contactado via: "
+msgstr ""
+"I accept to be contacted by my broker, my carrier or the marketplace via:"
+
+#: .\app\templates\consent\templatePdfConsent.html:352
+msgid "Información Adicional"
+msgstr "Additional Information"
+
+#: .\app\templates\consent\templatePdfConsent.html:354
+msgid ""
+", confirmo que la información para mi aplicación es correcta y válida según "
+"los requisitos del Mercado de Salud Federal."
+msgstr ""
+"I confirm that the information for my application is correct and valid "
+"according to the following informationthe requirements of the Federal Health "
+"Marketplace."
+
+#: .\app\templates\consent\templatePdfConsent.html:356
+msgid "Nombre del Aplicante:"
+msgstr "Applicant Name"
+
+#: .\app\templates\consent\templatePdfConsent.html:357
+msgid "Nombre Agente en Registro [AOR]:"
+msgstr "Name of Agent of Record [AOR]: "
+
+#: .\app\templates\consent\templatePdfConsent.html:358
+msgid "Nombre Agencia en Registro:"
+msgstr "Name of Agency of Record: "
+
+#: .\app\templates\consent\templatePdfConsent.html:359
+msgid "Teléfono Agencia:"
+msgstr "Agency Phone: "
+
+#: .\app\templates\consent\templatePdfConsent.html:362
+msgid "Necesita cobertura adicional?:"
+msgstr "Additional coverage"
+
+#: .\app\templates\consent\templatePdfConsent.html:364
+msgid "Coberturas adicionales solicitadas:"
+msgstr "Additional coverage"
+
+#: .\app\templates\consent\templatePdfConsent.html:374
+#: .\app\templates\consent\templatePdfIncomeLetter.html:170
+msgid "Firma"
+msgstr "Signed"
+
+#: .\app\templates\consent\templatePdfConsent.html:378
+#: .\app\templates\consent\templatePdfConsentMedicare.html:206
+msgid "Fecha y Hora de Firma:"
+msgstr "Date and Time of Signature:"
+
+#: .\app\templates\consent\templatePdfConsent.html:382
+msgid "Documentos Requeridos"
+msgstr "Required Documents"
+
+#: .\app\templates\consent\templatePdfConsent.html:385
+msgid "Documento de Inmigración"
+msgstr "Immigration Status"
+
+#: .\app\templates\consent\templatePdfConsent.html:388
+msgid "Foto selfie con ID"
+msgstr ""
+
+#: .\app\templates\consent\templatePdfConsent.html:394
+msgid "Validez de la Autorización"
+msgstr "Selfie photo with ID"
+
+#: .\app\templates\consent\templatePdfConsent.html:395
+msgid "Autorización válida hasta:"
+msgstr "Authorization valid until:"
+
+#: .\app\templates\consent\templatePdfConsent.html:399
+#: .\app\templates\consent\templatePdfConsentMedicare.html:291
+msgid "- SECURE PLUS INSURANCE LLC. Todos los derechos reservados."
+msgstr "Health Insurance Marketplace. All rights reserved."
+
+#: .\app\templates\consent\templatePdfConsentMedicare.html:183
+msgid "Los planes a discutir son los siguientes: "
+msgstr "The plans to be discussed are as follows: "
+
+#: .\app\templates\consent\templatePdfConsentMedicare.html:215
+msgid "Su relación con el beneficiario"
+msgstr "Your relationship to the Beneficiary"
+
+#: .\app\templates\consent\templatePdfConsentMedicare.html:230
+msgid "Dirección (Para encontrar opciones de planes de salud en su área)"
+msgstr "Home Address (To find a plan in your area) "
+
+#: .\app\templates\consent\templatePdfIncomeLetter.html:7
+#: .\app\templates\consent\templatePdfIncomeLetter.html:114
+msgid "Carta Explicativa de los Ingresos Anuales"
+msgstr "Annual Income Statement "
+
+#: .\app\templates\consent\templatePdfIncomeLetter.html:121
+msgid "Fecha de Hoy"
+msgstr "Date today"
+
+#: .\app\templates\consent\templatePdfIncomeLetter.html:125
+msgid "Nombre Completo"
+msgstr "Full Name"
+
+#: .\app\templates\consent\templatePdfIncomeLetter.html:133
+msgid "Ingreso Estimado"
+msgstr "Estimated Income"
+
+#: .\app\templates\consent\templatePdfIncomeLetter.html:137
+msgid "Año"
+msgstr "Year"
+
+#: .\app\templates\consent\templatePdfIncomeLetter.html:146
+msgid ""
+"Incluya la página de código de barras impresa que vino con su carta. Si no "
+"tiene un código barras, incluya su nombre completo impreso y la "
+"identificación de la solicitud en cada página de su formulario."
+msgstr ""
+"Include the printed barcode page that came with your letter. If you do not "
+"have a bar code, include your printed full name and application ID on each "
+"page of your form. Your application ID is near your mailing address at the "
+"top of your letter."
+
+#: .\app\templates\consent\templatePdfIncomeLetter.html:158
+msgid "Nota"
+msgstr "Note"
+
+#: .\app\templates\consent\templatePdfIncomeLetter.html:163
+msgid "Visite"
+msgstr "Visit:"
+
+#: .\app\templates\consent\templatePdfIncomeLetter.html:163
+msgid "CuidadoDeSalud.gov"
+msgstr "CuidadoDeSalud.gov/es/income-calculator"
+
+#: .\app\templates\consent\templatePdfIncomeLetter.html:172
+msgid "Firma:"
+msgstr "Signed"
+
+#: .\app\templates\consent\templatePdfIncomeLetter.html:178
+msgid "Mercado de Seguros Médicos. Todos los derechos reservados."
+msgstr "Health Insurance Marketplace. All rights reserved."
+
+#: .\app\templates\emailTemplates\payment_reminder.html:84
+msgid "Recordatorio de Saldo"
+msgstr "Balance Reminder"
+
+#: .\app\templates\emailTemplates\payment_reminder.html:86
+msgid "Estimado(a) "
+msgstr "Dear "
+
+#: .\app\templates\emailTemplates\payment_reminder.html:88
+#, python-format
+msgid ""
+"Esperamos que este mensaje le encuentre bien. Nos dirigimos a "
+"<strong>%(company)s</strong> para informarle sobre su saldo actual en "
+"nuestra plataforma de mensajes de texto."
+msgstr ""
+"We hope this message finds you well. We are reaching out to inform you about "
+"your current balance in our text messaging platform at <strong>%(company)s</"
+"strong>."
+
+#: .\app\templates\emailTemplates\payment_reminder.html:91
+msgid "🔔 Aviso Importante"
+msgstr "🔔 Important Notice"
+
+#: .\app\templates\emailTemplates\payment_reminder.html:92
+msgid "Su saldo actual es de: "
+msgstr "Your current balance is: "
+
+#: .\app\templates\emailTemplates\payment_reminder.html:95
+msgid ""
+"Para evitar cualquier interrupción en nuestros servicios, le recomendamos "
+"realizar una recarga antes de que su saldo se agote."
+msgstr ""
+"To avoid any interruption in our services, we recommend you recharge your "
+"balance before it runs out."
+
+#: .\app\templates\emailTemplates\payment_reminder.html:99
+msgid "Recargar Saldo Ahora"
+msgstr "Recharge Now"
+
+#: .\app\templates\emailTemplates\payment_reminder.html:103
+msgid ""
+"Si tiene alguna pregunta o necesita asistencia, no dude en <a "
+"href=\"#\">contactarnos</a>."
+msgstr ""
+"If you have any questions or need assistance, please feel free to <a "
+"href=\"#\">contact us</a>."
+
+#: .\app\templates\emailTemplates\payment_reminder.html:105
+msgid "Saludos cordiales,"
+msgstr "Best regards,"
+
+#: .\app\templates\emailTemplates\payment_reminder.html:106
+msgid "<strong>Lapeira & Associates LLC"
+msgstr "<strong>Lapeira & Associates LLC</strong>"
+
+#: .\app\templates\emailTemplates\payment_reminder.html:107
+msgid "El equipo de <strong>Soporte"
+msgstr "The <strong>Support</strong> team"
+
+#: .\app\templates\emailTemplates\payment_reminder.html:111
+msgid ""
+"\n"
+"            <p>Este es un correo automático, por favor no responda a este "
+"mensaje.</p>\n"
+"            <p>© 2024 Bluestream Marketing Colombia. Todos los derechos "
+"reservados.</p>\n"
+"            <p><a href=\"#\">Política de privacidad</a> | <a "
+"href=\"#\">Términos y condiciones</a></p>\n"
+"            "
+msgstr ""
+"\n"
+"            <p>This is an automated email, please do not reply to this "
+"message.</p>\n"
+"            <p>© 2024 Bluestream Marketing Colombia. All rights reserved.</"
+"p>\n"
+"            <p><a href=\"#\">Privacy Policy</a> | <a href=\"#\">Terms and "
+"Conditions</a></p>\n"
+"            "
+
+#: .\app\views\sms.py:686
+#, python-brace-format
+msgid "Tu saldo en SMS Blue es de {balance:.2f} USD. No te quedes sin servicio"
+msgstr ""
+"Your balance in SMS Blue is {balance:.2f} USD. Ensure continuous service"
+
+#: .\venv\Lib\site-packages\click\_termui_impl.py:518
+#, python-brace-format
+msgid "{editor}: Editing failed"
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\_termui_impl.py:522
+#, python-brace-format
+msgid "{editor}: Editing failed: {e}"
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\core.py:1120
+msgid "Aborted!"
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\core.py:1309
+#: .\venv\Lib\site-packages\click\decorators.py:559
+msgid "Show this message and exit."
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\core.py:1340
+#: .\venv\Lib\site-packages\click\core.py:1370
+#, python-brace-format
+msgid "(Deprecated) {text}"
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\core.py:1387
+msgid "Options"
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\core.py:1413
+#, python-brace-format
+msgid "Got unexpected extra argument ({args})"
+msgid_plural "Got unexpected extra arguments ({args})"
+msgstr[0] ""
+msgstr[1] ""
+
+#: .\venv\Lib\site-packages\click\core.py:1429
+msgid "DeprecationWarning: The command {name!r} is deprecated."
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\core.py:1636
+msgid "Commands"
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\core.py:1668
+msgid "Missing command."
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\core.py:1746
+msgid "No such command {name!r}."
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\core.py:2310
+msgid "Value must be an iterable."
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\core.py:2331
+#, python-brace-format
+msgid "Takes {nargs} values but 1 was given."
+msgid_plural "Takes {nargs} values but {len} were given."
+msgstr[0] ""
+msgstr[1] ""
+
+#: .\venv\Lib\site-packages\click\core.py:2778
+#, python-brace-format
+msgid "env var: {var}"
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\core.py:2808
+msgid "(dynamic)"
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\core.py:2821
+#, python-brace-format
+msgid "default: {default}"
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\core.py:2834
+msgid "required"
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\decorators.py:465
+#, python-format
+msgid "%(prog)s, version %(version)s"
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\decorators.py:528
+msgid "Show the version and exit."
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\exceptions.py:44
+#: .\venv\Lib\site-packages\click\exceptions.py:80
+#, python-brace-format
+msgid "Error: {message}"
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\exceptions.py:72
+#, python-brace-format
+msgid "Try '{command} {option}' for help."
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\exceptions.py:121
+#, python-brace-format
+msgid "Invalid value: {message}"
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\exceptions.py:123
+#, python-brace-format
+msgid "Invalid value for {param_hint}: {message}"
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\exceptions.py:179
+msgid "Missing argument"
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\exceptions.py:181
+msgid "Missing option"
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\exceptions.py:183
+msgid "Missing parameter"
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\exceptions.py:185
+#, python-brace-format
+msgid "Missing {param_type}"
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\exceptions.py:192
+#, python-brace-format
+msgid "Missing parameter: {param_name}"
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\exceptions.py:212
+#, python-brace-format
+msgid "No such option: {name}"
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\exceptions.py:224
+#, python-brace-format
+msgid "Did you mean {possibility}?"
+msgid_plural "(Possible options: {possibilities})"
+msgstr[0] ""
+msgstr[1] ""
+
+#: .\venv\Lib\site-packages\click\exceptions.py:262
+msgid "unknown error"
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\exceptions.py:269
+msgid "Could not open file {filename!r}: {message}"
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\formatting.py:156
+msgid "Usage:"
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\parser.py:231
+msgid "Argument {name!r} takes {nargs} values."
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\parser.py:413
+msgid "Option {name!r} does not take a value."
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\parser.py:474
+msgid "Option {name!r} requires an argument."
+msgid_plural "Option {name!r} requires {nargs} arguments."
+msgstr[0] ""
+msgstr[1] ""
+
+#: .\venv\Lib\site-packages\click\shell_completion.py:319
+msgid "Shell completion is not supported for Bash versions older than 4.4."
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\shell_completion.py:326
+msgid "Couldn't detect Bash version, shell completion is not supported."
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\termui.py:158
+msgid "Repeat for confirmation"
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\termui.py:174
+msgid "Error: The value you entered was invalid."
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\termui.py:176
+#, python-brace-format
+msgid "Error: {e.message}"
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\termui.py:187
+msgid "Error: The two entered values do not match."
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\termui.py:243
+msgid "Error: invalid input"
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\termui.py:773
+msgid "Press any key to continue..."
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\types.py:266
+#, python-brace-format
+msgid ""
+"Choose from:\n"
+"\t{choices}"
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\types.py:298
+msgid "{value!r} is not {choice}."
+msgid_plural "{value!r} is not one of {choices}."
+msgstr[0] ""
+msgstr[1] ""
+
+#: .\venv\Lib\site-packages\click\types.py:392
+msgid "{value!r} does not match the format {format}."
+msgid_plural "{value!r} does not match the formats {formats}."
+msgstr[0] ""
+msgstr[1] ""
+
+#: .\venv\Lib\site-packages\click\types.py:414
+msgid "{value!r} is not a valid {number_type}."
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\types.py:470
+#, python-brace-format
+msgid "{value} is not in the range {range}."
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\types.py:611
+msgid "{value!r} is not a valid boolean."
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\types.py:635
+msgid "{value!r} is not a valid UUID."
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\types.py:822
+msgid "file"
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\types.py:824
+msgid "directory"
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\types.py:826
+msgid "path"
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\types.py:877
+msgid "{name} {filename!r} does not exist."
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\types.py:886
+msgid "{name} {filename!r} is a file."
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\types.py:894
+#, python-brace-format
+msgid "{name} '{filename}' is a directory."
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\types.py:903
+msgid "{name} {filename!r} is not readable."
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\types.py:912
+msgid "{name} {filename!r} is not writable."
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\types.py:921
+msgid "{name} {filename!r} is not executable."
+msgstr ""
+
+#: .\venv\Lib\site-packages\click\types.py:988
+#, python-brace-format
+msgid "{len_type} values are required, but {len_value} was given."
+msgid_plural "{len_type} values are required, but {len_value} were given."
+msgstr[0] ""
+msgstr[1] ""
+
+#: .\venv\Lib\site-packages\django\contrib\messages\apps.py:16
+msgid "Messages"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\contrib\sitemaps\apps.py:8
+msgid "Site Maps"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\contrib\staticfiles\apps.py:9
+msgid "Static Files"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\contrib\syndication\apps.py:7
+msgid "Syndication"
+msgstr ""
+
+#. Translators: String used to replace omitted page numbers in elided page
+#. range generated by paginators, e.g. [1, 2, '…', 5, 6, 7, '…', 9, 10].
+#: .\venv\Lib\site-packages\django\core\paginator.py:30
+msgid "…"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\core\paginator.py:32
+msgid "That page number is not an integer"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\core\paginator.py:33
+msgid "That page number is less than 1"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\core\paginator.py:34
+msgid "That page contains no results"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\core\validators.py:22
+msgid "Enter a valid value."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\core\validators.py:70
+msgid "Enter a valid domain name."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\core\validators.py:155
+#: .\venv\Lib\site-packages\django\forms\fields.py:768
+msgid "Enter a valid URL."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\core\validators.py:216
+msgid "Enter a valid integer."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\core\validators.py:227
+msgid "Enter a valid email address."
+msgstr ""
+
+#. Translators: "letters" means latin letters: a-z and A-Z.
+#: .\venv\Lib\site-packages\django\core\validators.py:310
+msgid ""
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\core\validators.py:318
+msgid ""
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\core\validators.py:330
+#: .\venv\Lib\site-packages\django\core\validators.py:339
+#: .\venv\Lib\site-packages\django\core\validators.py:353
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2215
+#, python-format
+msgid "Enter a valid %(protocol)s address."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\core\validators.py:332
+msgid "IPv4"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\core\validators.py:341
+#: .\venv\Lib\site-packages\django\utils\ipv6.py:30
+msgid "IPv6"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\core\validators.py:355
+msgid "IPv4 or IPv6"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\core\validators.py:396
+msgid "Enter only digits separated by commas."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\core\validators.py:402
+#, python-format
+msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\core\validators.py:437
+#, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\core\validators.py:446
+#, python-format
+msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\core\validators.py:455
+#, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\core\validators.py:462
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\core\validators.py:494
+#, python-format
+msgid ""
+"Ensure this value has at least %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at least %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] ""
+msgstr[1] ""
+
+#: .\venv\Lib\site-packages\django\core\validators.py:512
+#, python-format
+msgid ""
+"Ensure this value has at most %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at most %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] ""
+msgstr[1] ""
+
+#: .\venv\Lib\site-packages\django\core\validators.py:535
+#: .\venv\Lib\site-packages\django\forms\fields.py:359
+#: .\venv\Lib\site-packages\django\forms\fields.py:398
+msgid "Enter a number."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\core\validators.py:537
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] ""
+msgstr[1] ""
+
+#: .\venv\Lib\site-packages\django\core\validators.py:542
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] ""
+msgstr[1] ""
+
+#: .\venv\Lib\site-packages\django\core\validators.py:547
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] ""
+msgstr[1] ""
+
+#: .\venv\Lib\site-packages\django\core\validators.py:618
+#, python-format
+msgid ""
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\core\validators.py:680
+msgid "Null characters are not allowed."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\base.py:1572
+#: .\venv\Lib\site-packages\django\forms\models.py:908
+msgid "and"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\base.py:1574
+#, python-format
+msgid "%(model_name)s with this %(field_labels)s already exists."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\constraints.py:22
+#, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:134
+#, python-format
+msgid "Value %(value)r is not a valid choice."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:135
+msgid "This field cannot be null."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:136
+msgid "This field cannot be blank."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:137
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr ""
+
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:141
+#, python-format
+msgid ""
+"%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:180
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1156
+#, python-format
+msgid "“%(value)s” value must be either True or False."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1157
+#, python-format
+msgid "“%(value)s” value must be either True, False, or None."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1159
+msgid "Boolean (Either True or False)"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1209
+#, python-format
+msgid "String (up to %(max_length)s)"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1211
+msgid "String (unlimited)"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1320
+msgid "Comma-separated integers"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1421
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
+"format."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1425
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1560
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
+"date."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1429
+msgid "Date (without time)"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1556
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1564
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"[TZ]) but it is an invalid date/time."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1569
+msgid "Date (with time)"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1696
+#, python-format
+msgid "“%(value)s” value must be a decimal number."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1698
+msgid "Decimal number"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1859
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1863
+msgid "Duration"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1915
+msgid "Email address"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:1940
+msgid "File path"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2018
+#, python-format
+msgid "“%(value)s” value must be a float."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2020
+msgid "Floating point number"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2060
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2062
+msgid "Integer"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2158
+msgid "Big (8 byte) integer"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2175
+msgid "Small integer"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2183
+msgid "IPv4 address"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2214
+msgid "IP address"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2305
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2306
+#, python-format
+msgid "“%(value)s” value must be either None, True or False."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2308
+msgid "Boolean (Either True, False or None)"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2359
+msgid "Positive big integer"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2374
+msgid "Positive integer"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2389
+msgid "Positive small integer"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2405
+#, python-format
+msgid "Slug (up to %(max_length)s)"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2441
+msgid "Text"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2521
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"format."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2525
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"invalid time."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2529
+msgid "Time"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2637
+msgid "URL"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2661
+msgid "Raw binary data"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2726
+#, python-format
+msgid "“%(value)s” is not a valid UUID."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\__init__.py:2728
+msgid "Universally unique identifier"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\files.py:244
+msgid "File"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\files.py:420
+msgid "Image"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\json.py:24
+msgid "A JSON object"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\json.py:26
+msgid "Value must be valid JSON."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\related.py:932
+#, python-format
+msgid "%(model)s instance with %(field)s %(value)r does not exist."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\related.py:934
+msgid "Foreign Key (type determined by related field)"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\related.py:1228
+msgid "One-to-one relationship"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\related.py:1285
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\related.py:1287
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\db\models\fields\related.py:1335
+msgid "Many-to-many relationship"
+msgstr ""
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the label
+#: .\venv\Lib\site-packages\django\forms\boundfield.py:185
+msgid ":?.!"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\fields.py:95
+msgid "This field is required."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\fields.py:308
+msgid "Enter a whole number."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\fields.py:479
+#: .\venv\Lib\site-packages\django\forms\fields.py:1260
+msgid "Enter a valid date."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\fields.py:502
+#: .\venv\Lib\site-packages\django\forms\fields.py:1261
+msgid "Enter a valid time."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\fields.py:529
+msgid "Enter a valid date/time."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\fields.py:563
+msgid "Enter a valid duration."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\fields.py:564
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\fields.py:633
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\fields.py:634
+msgid "No file was submitted."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\fields.py:635
+msgid "The submitted file is empty."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\fields.py:637
+#, python-format
+msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
+msgid_plural ""
+"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgstr[0] ""
+msgstr[1] ""
+
+#: .\venv\Lib\site-packages\django\forms\fields.py:642
+msgid "Please either submit a file or check the clear checkbox, not both."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\fields.py:710
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\fields.py:882
+#: .\venv\Lib\site-packages\django\forms\fields.py:968
+#: .\venv\Lib\site-packages\django\forms\models.py:1592
+#, python-format
+msgid "Select a valid choice. %(value)s is not one of the available choices."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\fields.py:970
+#: .\venv\Lib\site-packages\django\forms\fields.py:1089
+#: .\venv\Lib\site-packages\django\forms\models.py:1590
+msgid "Enter a list of values."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\fields.py:1090
+msgid "Enter a complete value."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\fields.py:1329
+msgid "Enter a valid UUID."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\fields.py:1359
+msgid "Enter a valid JSON."
+msgstr ""
+
+#. Translators: This is the default suffix added to form field labels
+#: .\venv\Lib\site-packages\django\forms\forms.py:94
+msgid ":"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\forms.py:230
+#, python-format
+msgid "(Hidden field %(name)s) %(error)s"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\formsets.py:61
+#, python-format
+msgid ""
+"ManagementForm data is missing or has been tampered with. Missing fields: "
+"%(field_names)s. You may need to file a bug report if the issue persists."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\formsets.py:65
+#, python-format
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] ""
+msgstr[1] ""
+
+#: .\venv\Lib\site-packages\django\forms\formsets.py:70
+#, python-format
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] ""
+msgstr[1] ""
+
+#: .\venv\Lib\site-packages\django\forms\formsets.py:484
+#: .\venv\Lib\site-packages\django\forms\formsets.py:491
+msgid "Order"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\formsets.py:499
+msgid "Delete"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\models.py:901
+#, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\models.py:906
+#, python-format
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\models.py:913
+#, python-format
+msgid ""
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\models.py:922
+msgid "Please correct the duplicate values below."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\models.py:1359
+msgid "The inline value did not match the parent instance."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\models.py:1450
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\models.py:1594
+#, python-format
+msgid "“%(pk)s” is not a valid value."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\utils.py:227
+#, python-format
+msgid ""
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
+"may be ambiguous or it may not exist."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\widgets.py:461
+msgid "Clear"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\widgets.py:462
+msgid "Currently"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\widgets.py:463
+msgid "Change"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\widgets.py:800
+msgid "Unknown"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\widgets.py:801
+msgid "Yes"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\forms\widgets.py:802
+msgid "No"
+msgstr ""
+
+#. Translators: Please do not add spaces around commas.
+#: .\venv\Lib\site-packages\django\template\defaultfilters.py:873
+msgid "yes,no,maybe"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\template\defaultfilters.py:903
+#: .\venv\Lib\site-packages\django\template\defaultfilters.py:920
+#, python-format
+msgid "%(size)d byte"
+msgid_plural "%(size)d bytes"
+msgstr[0] ""
+msgstr[1] ""
+
+#: .\venv\Lib\site-packages\django\template\defaultfilters.py:922
+#, python-format
+msgid "%s KB"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\template\defaultfilters.py:924
+#, python-format
+msgid "%s MB"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\template\defaultfilters.py:926
+#, python-format
+msgid "%s GB"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\template\defaultfilters.py:928
+#, python-format
+msgid "%s TB"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\template\defaultfilters.py:930
+#, python-format
+msgid "%s PB"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dateformat.py:74
+msgid "p.m."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dateformat.py:75
+msgid "a.m."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dateformat.py:80
+msgid "PM"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dateformat.py:81
+msgid "AM"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dateformat.py:153
+msgid "midnight"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dateformat.py:155
+msgid "noon"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:7
+msgid "Monday"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:8
+msgid "Tuesday"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:9
+msgid "Wednesday"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:10
+msgid "Thursday"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:11
+msgid "Friday"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:12
+msgid "Saturday"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:13
+msgid "Sunday"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:16
+msgid "Mon"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:17
+msgid "Tue"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:18
+msgid "Wed"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:19
+msgid "Thu"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:20
+msgid "Fri"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:21
+msgid "Sat"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:22
+msgid "Sun"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:25
+msgid "January"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:26
+msgid "February"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:27
+msgid "March"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:28
+msgid "April"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:29
+msgid "May"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:30
+msgid "June"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:31
+msgid "July"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:32
+msgid "August"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:33
+msgid "September"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:34
+msgid "October"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:35
+msgid "November"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:36
+msgid "December"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:39
+msgid "jan"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:40
+msgid "feb"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:41
+msgid "mar"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:42
+msgid "apr"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:43
+msgid "may"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:44
+msgid "jun"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:45
+msgid "jul"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:46
+msgid "aug"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:47
+msgid "sep"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:48
+msgid "oct"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:49
+msgid "nov"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:50
+msgid "dec"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:53
+msgctxt "abbrev. month"
+msgid "Jan."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:54
+msgctxt "abbrev. month"
+msgid "Feb."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:55
+msgctxt "abbrev. month"
+msgid "March"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:56
+msgctxt "abbrev. month"
+msgid "April"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:57
+msgctxt "abbrev. month"
+msgid "May"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:58
+msgctxt "abbrev. month"
+msgid "June"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:59
+msgctxt "abbrev. month"
+msgid "July"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:60
+msgctxt "abbrev. month"
+msgid "Aug."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:61
+msgctxt "abbrev. month"
+msgid "Sept."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:62
+msgctxt "abbrev. month"
+msgid "Oct."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:63
+msgctxt "abbrev. month"
+msgid "Nov."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:64
+msgctxt "abbrev. month"
+msgid "Dec."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:67
+msgctxt "alt. month"
+msgid "January"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:68
+msgctxt "alt. month"
+msgid "February"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:69
+msgctxt "alt. month"
+msgid "March"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:70
+msgctxt "alt. month"
+msgid "April"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:71
+msgctxt "alt. month"
+msgid "May"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:72
+msgctxt "alt. month"
+msgid "June"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:73
+msgctxt "alt. month"
+msgid "July"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:74
+msgctxt "alt. month"
+msgid "August"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:75
+msgctxt "alt. month"
+msgid "September"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:76
+msgctxt "alt. month"
+msgid "October"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:77
+msgctxt "alt. month"
+msgid "November"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\dates.py:78
+msgctxt "alt. month"
+msgid "December"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\ipv6.py:8
+msgid "This is not a valid IPv6 address."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\text.py:75
+#, python-format
+msgctxt "String to return when truncating text"
+msgid "%(truncated_text)s…"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\text.py:286
+msgid "or"
+msgstr ""
+
+#. Translators: This string is used as a separator between list elements
+#: .\venv\Lib\site-packages\django\utils\text.py:305
+#: .\venv\Lib\site-packages\django\utils\timesince.py:135
+msgid ", "
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\utils\timesince.py:8
+#, python-format
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] ""
+msgstr[1] ""
+
+#: .\venv\Lib\site-packages\django\utils\timesince.py:9
+#, python-format
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] ""
+msgstr[1] ""
+
+#: .\venv\Lib\site-packages\django\utils\timesince.py:10
+#, python-format
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] ""
+msgstr[1] ""
+
+#: .\venv\Lib\site-packages\django\utils\timesince.py:11
+#, python-format
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] ""
+msgstr[1] ""
+
+#: .\venv\Lib\site-packages\django\utils\timesince.py:12
+#, python-format
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] ""
+msgstr[1] ""
+
+#: .\venv\Lib\site-packages\django\utils\timesince.py:13
+#, python-format
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] ""
+msgstr[1] ""
+
+#: .\venv\Lib\site-packages\django\views\csrf.py:29
+msgid "Forbidden"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\csrf.py:30
+msgid "CSRF verification failed. Request aborted."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\csrf.py:34
+msgid ""
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your web browser, but none was sent. This header is "
+"required for security reasons, to ensure that your browser is not being "
+"hijacked by third parties."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\csrf.py:40
+msgid ""
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\csrf.py:45
+msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\csrf.py:54
+msgid ""
+"You are seeing this message because this site requires a CSRF cookie when "
+"submitting forms. This cookie is required for security reasons, to ensure "
+"that your browser is not being hijacked by third parties."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\csrf.py:60
+msgid ""
+"If you have configured your browser to disable cookies, please re-enable "
+"them, at least for this site, or for “same-origin” requests."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\csrf.py:66
+msgid "More information is available with DEBUG=True."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\generic\dates.py:44
+msgid "No year specified"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\generic\dates.py:64
+#: .\venv\Lib\site-packages\django\views\generic\dates.py:115
+#: .\venv\Lib\site-packages\django\views\generic\dates.py:214
+msgid "Date out of range"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\generic\dates.py:94
+msgid "No month specified"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\generic\dates.py:147
+msgid "No day specified"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\generic\dates.py:194
+msgid "No week specified"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\generic\dates.py:349
+#: .\venv\Lib\site-packages\django\views\generic\dates.py:380
+#, python-format
+msgid "No %(verbose_name_plural)s available"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\generic\dates.py:652
+#, python-format
+msgid ""
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\generic\dates.py:692
+#, python-format
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\generic\detail.py:56
+#, python-format
+msgid "No %(verbose_name)s found matching the query"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\generic\list.py:70
+msgid "Page is not “last”, nor can it be converted to an int."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\generic\list.py:77
+#, python-format
+msgid "Invalid page (%(page_number)s): %(message)s"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\generic\list.py:169
+#, python-format
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\static.py:49
+msgid "Directory indexes are not allowed here."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\static.py:51
+#, python-format
+msgid "“%(path)s” does not exist"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\static.py:68
+#: .\venv\Lib\site-packages\django\views\templates\directory_index.html:8
+#: .\venv\Lib\site-packages\django\views\templates\directory_index.html:11
+#, python-format
+msgid "Index of %(directory)s"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\templates\default_urlconf.html:7
+#: .\venv\Lib\site-packages\django\views\templates\default_urlconf.html:204
+msgid "The install worked successfully! Congratulations!"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\templates\default_urlconf.html:206
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\templates\default_urlconf.html:208
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\templates\default_urlconf.html:217
+msgid "Django Documentation"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\templates\default_urlconf.html:218
+msgid "Topics, references, &amp; how-to’s"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\templates\default_urlconf.html:226
+msgid "Tutorial: A Polling App"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\templates\default_urlconf.html:227
+msgid "Get started with Django"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\templates\default_urlconf.html:235
+msgid "Django Community"
+msgstr ""
+
+#: .\venv\Lib\site-packages\django\views\templates\default_urlconf.html:236
+msgid "Connect, get help, or contribute"
+msgstr ""
+
+#: .\venv\Lib\site-packages\kombu\transport\qpid.py:1311
+#, python-format
+msgid "Attempting to connect to qpid with SASL mechanism %s"
+msgstr ""
+
+#: .\venv\Lib\site-packages\kombu\transport\qpid.py:1316
+#, python-format
+msgid "Connected to qpid with SASL mechanism %s"
+msgstr ""
+
+#: .\venv\Lib\site-packages\kombu\transport\qpid.py:1334
+#, python-format
+msgid "Unable to connect to qpid with SASL mechanism %s"
+msgstr ""
+
+#: .\venv\Lib\site-packages\timezone_field\rest_framework.py:10
+msgid "A valid timezone is required."
+msgstr ""

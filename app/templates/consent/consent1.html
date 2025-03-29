@@ -255,9 +255,9 @@
             <div class="row mb-3">
                 <div class="col">
                     <div class="bg-morado p-3 rounded">
-                        <label class="form-label">{% blocktrans %}Aplicante (s) Adicional (es) (Nombre Completo, Fecha Nacimiento, Sexo, Status, Parentesco){% endblocktrans %}</label>
+                        <label class="form-label">{% blocktrans %}Aplicante (s) Adicional (es) (Nombre Completo, Fecha Nacimiento, Sexo, Status, Parentesco, Aplica){% endblocktrans %}</label>
                         <div class="mb-3">
-                            <textarea disabled class="form-control" name="applicants" id="inputApplicants" rows="5" >{% for dependent in dependents %}{{dependent.name}}, {{dependent.date_birth}}, {{dependent.sex}}, {{dependent.migration_status}}, {{dependent.kinship}}
+                            <textarea disabled class="form-control" name="applicants" id="inputApplicants" rows="5" >{% for dependent in dependents %}{{dependent.name}}, {{dependent.date_birth}}, {{dependent.sex}}, {{dependent.migration_status}}, {{dependent.kinship}}, {{dependent.apply}}
 {% endfor %}</textarea>
                         </div>
                     </div>

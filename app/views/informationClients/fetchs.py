@@ -9,13 +9,10 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
 
-# Third-party libraries
-from asgiref.sync import async_to_sync
-from channels.layers import get_channel_layer  
-
 # Application-specific imports
 from app.models import *
 from ...forms import *
+from ...alertWebsocket import websocketAlertGeneric
 
 @csrf_exempt
 def blockSocialSecurity(request):
@@ -148,30 +145,19 @@ def fetchActionRequired(request):
             date_completed=timezone.now().date(),
         )
 
-        #Aqui inicia el websocket
-        app_name = request.get_host()  # Obtener el host (ej. "127.0.0.1:8000" o "miapp.com")
-
-        # Reemplazar ":" y otros caracteres inválidos con "_" para hacer un nombre válido
-        app_name = re.sub(r'[^a-zA-Z0-9_.-]', '_', app_name)
-
         # Construir la URL absoluta
         url_relativa = reverse('editObama', args=[obama.company.id,obama.id, 1])
         url_absoluta = request.build_absolute_uri(url_relativa)
 
-        group_name = f'product_alerts_{app_name}'
-
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            group_name,
-            {
-                'type': 'send_alert',
-                'event_type': 'actionCompleted',
-                'icon': 'info',
-                'title': 'New Action Required completed',
-                'message': f'The required action ({customerRedFlag.description}) of the client {clients.first_name} {clients.last_name} has already been performed.',
-                'buttonMessage': 'Go to customer with the required action completed.',
-                'absoluteUrl': url_absoluta
-            }
+        websocketAlertGeneric(
+            request,
+            'send_alert',
+            'actionCompleted',
+            'info',
+            'New Action Required completed',
+            f'The required action ({customerRedFlag.description}) of the client {clients.first_name} {clients.last_name} has already been performed.',
+            'Go to customer with the required action completed.',
+            url_absoluta
         )
 
         return JsonResponse({'success': True, 'message': 'Acción POST procesada', 'id': id_value})

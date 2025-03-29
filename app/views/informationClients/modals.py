@@ -18,6 +18,7 @@ from channels.layers import get_channel_layer
 
 # Application-specific imports
 from app.models import *
+from ...alertWebsocket import websocketAlertGeneric
 
 
 @login_required(login_url='/login') 
@@ -196,35 +197,21 @@ def saveAccionRequired(request):
         clave = opcion.clave
     )
 
-    #Aqui inicia el websocket
-    app_name = request.get_host()  # Obtener el host (ej. "127.0.0.1:8000" o "miapp.com")
-
-    # Reemplazar ":" y otros caracteres inválidos con "_" para hacer un nombre válido
-    app_name = re.sub(r'[^a-zA-Z0-9_.-]', '_', app_name)
-
-    group_name = f'product_alerts_{app_name}'
-
-    channel_layer = get_channel_layer()
-
     # Construir la URL absoluta
     url_relativa = reverse('editObama', args=[obama.id, 2])
     url_absoluta = request.build_absolute_uri(url_relativa)
 
-    async_to_sync(channel_layer.group_send)(
-        group_name,
-        {
-            'type': 'send_alert',
-            'event_type': 'newAccionRequired',
-            'icon': 'warning',
-            'title': 'New Action Required',
-            'buttonMessage': 'Go to customer with required action.',
-            'message': f'New action required for the customer: {obama.client.first_name} {obama.client.last_name}',
-            'absoluteUrl': url_absoluta,
-            'agent': {
-                'id': obama.agent.id,
-                'username': obama.agent.username
-            }
-        }
+    websocketAlertGeneric(
+        request,
+        'send_alert',
+        'newAccionRequired',
+        'warning',
+        'New Action Required',
+        'Go to customer with required action.',
+        f'New action required for the customer: {obama.client.first_name} {obama.client.last_name}',
+        url_absoluta,
+        obama.agent.id,
+        obama.agent.username
     )
     
     return redirect('editObama', obama.id, 1 )  

@@ -13,7 +13,7 @@
             margin: 0;
             padding: 0;
             color: #333;
-            line-height: 1.6;
+            line-height: normal;
             background-color: #f7f9fc;
         }
 
@@ -33,13 +33,13 @@
         }
 
         .header h1 {
-            font-size: 22px;
+            font-size: 18px;
             text-transform: uppercase;
             margin-bottom: 5px;
         }
 
         .header p {
-            font-size: 14px;
+            font-size: 12px;
         }
 
         .info-table {
@@ -55,7 +55,7 @@
         .info-table th, .info-table td {
             padding: 8px;
             text-align: left;
-            font-size: 14px;
+            font-size: 12px;
             border-bottom: 1px solid #e0e0e0;
         }
 
@@ -79,7 +79,7 @@
         }
 
         .section h2 {
-            font-size: 18px;
+            font-size: 15px;
             color: #34495e;
             border-bottom: 2px solid #ecf0f1;
             padding-bottom: 5px;
@@ -91,12 +91,12 @@
             padding: 10px;
             border-radius: 6px;
             border-left: 4px solid #3498db;
-            font-size: 14px;
+            font-size: 12px;
         }
 
         .footer {
             text-align: center;
-            font-size: 12px;
+            font-size: 10px;
             color: #7f8c8d;
             margin-top: 10px;
         }
@@ -143,10 +143,7 @@
         <div class="section">
             <h2>{% trans "Cómo enviar por correo:" %}</h2>
             <p>
-                {% blocktrans %}
-                Incluya la página de código de barras impresa que vino con su carta. Si no tiene un código de barras,
-                incluya su nombre completo impreso y la identificación de la solicitud en cada página de su formulario.
-                {% endblocktrans %}
+                {% blocktrans %}Incluya la página de código de barras impresa que vino con su carta. Si no tiene un código barras, incluya su nombre completo impreso y la identificación de la solicitud en cada página de su formulario.{% endblocktrans %}
             </p>
             <p>{% trans "Envíe el formulario a:" %}</p>
             <div class="highlight">
@@ -160,10 +157,7 @@
         <div class="section">
             <h2>{% trans "Nota" %}</h2>
             <p>
-                {% blocktrans %}
-                El ingreso anual que informe debe coincidir con el ingreso que informó en su solicitud del Mercado u otra
-                solicitud de seguro médico. Si no es así, actualice su solicitud del Mercado.
-                {% endblocktrans %}
+                {% blocktrans %}El ingreso anual que informe debe coincidir con el ingreso que informó en su solicitud del Mercado u otra solicitud de seguro médico. Si no es así, actualice su solicitud del Mercado.{% endblocktrans %}
             </p>
             <p>
                 {% trans "Visite" %}  <a href="https://CuidadoDeSalud.gov/es/income-and-household-information/how-to-report/"> {% trans "CuidadoDeSalud.gov" %} </a>
