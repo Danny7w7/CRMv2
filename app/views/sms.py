@@ -330,6 +330,38 @@ def chat(request, phoneNumber):
     }
     return render(request, 'sms/chat.html', context)
 
+@csrf_exempt
+def startChat(request, phoneNumber):
+    try:
+        if request.POST.get('language') == 'english':
+            message = "Reply YES to receive updates and information about your policy from Lapeira & Associates LLC. Msg & data rates may apply. Up to 5 msgs/month. Reply STOP to opt-out at any time."
+        else: 
+            message = "Favor de responder SI para recibir actualizaciones e información sobre su póliza de Lapeira & Associates LLC. Pueden aplicarse tarifas estándar de mensaje y datos. Hasta 5 mensajes/mes. Responder STOP para cancelar en cualquier momento."
+        
+        sendIndividualsSms(
+            request.user.assigned_phone.phone_number,
+            phoneNumber,
+            request.user,
+            request.user.company,
+            message
+        )
+        return JsonResponse({'message': message})
+    
+    except Exception as e:
+        error_response = {"error": "An error occurred while sending the message"}
+
+        # Verifica si el error es una excepción de Telnyx
+        if hasattr(e, "errors") and isinstance(e.errors, list):
+            telnyx_error = e.errors[0]  # Normalmente, Telnyx devuelve una lista de errores
+            error_response.update({
+                "error_code": telnyx_error.get("code"),
+                "error_title": telnyx_error.get("title"),
+                "error_detail": telnyx_error.get("detail"),
+            })
+
+        return JsonResponse(error_response, status=500)
+
+
 def sendIndividualsSms(from_number, to_number, user, company, message_context):
     telnyx.api_key = settings.TELNYX_API_KEY
     telnyx.Message.create(

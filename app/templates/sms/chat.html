@@ -1,52 +1,72 @@
 {% extends "sms/indexSms.html" %}
 
     {% block chatBlock %}
-    {% for message in messages %}
-        {%if message.sender_type == 'Client'%}
-            <div class="chat-content-leftside">
-                <div class="d-flex">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
-                    </svg>
-                    <div class="flex-grow-1 ms-2">
-                        <p class="mb-0 chat-time">{% if client.name %}{{client.name}}{% else %}{{client.phone_number}}{%endif%}, {{message.created_at|date:"g:i A"}}</p>
-                        {% if message.file %}
-                        <p class="chat-left-msg">
-                            <img class="img-responsive" src="{{ message.file.file.url }}" alt="">
-                        </p>
-                        {% else %}
-                        <p class="chat-left-msg" style="white-space: pre-wrap;">{{message.message_content}}</p>
-                        {% endif %}
+    {% if not messages %}
+
+    <div class="d-flex justify-content-center align-items-center" id="buttonStartChat">
+        <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle custom-dropdown" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                🌍 Select Language
+            </button>
+            <ul class="dropdown-menu animate-dropdown" aria-labelledby="languageDropdown">
+                <li><a class="dropdown-item" href="#" onclick="setLanguage('english')">🇺🇸 English</a></li>
+                <li><a class="dropdown-item" href="#" onclick="setLanguage('spanish')">🇪🇸 Español</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- <div class="uwu d-flex justify-content-center align-items-center">
+        <button class="btn btn-primary" id="buttonStartChat">Start Chat</button>
+    </div> -->
+    
+    {% else %}
+        {% for message in messages %}
+            {%if message.sender_type == 'Client'%}
+                <div class="chat-content-leftside">
+                    <div class="d-flex">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <div class="flex-grow-1 ms-2">
+                            <p class="mb-0 chat-time">{% if client.name %}{{client.name}}{% else %}{{client.phone_number}}{%endif%}, {{ message.created_at|date:"m:H - d/m" }}</p>
+                            {% if message.file %}
+                            <p class="chat-left-msg">
+                                <img class="img-responsive" src="{{ message.file.file.url }}" alt="">
+                            </p>
+                            {% else %}
+                            <p class="chat-left-msg" style="white-space: pre-wrap;">{{message.message_content}}</p>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
-            </div>
-        {%elif message.sender_type == 'Agent'%}
-            <div class="chat-content-rightside">
-                <div class="d-flex ms-auto">
-                    <div class="flex-grow-1 me-2">
-                        <p class="mb-0 chat-time text-end">{{message.sender.username}}, {{ message.created_at|date:"m:H - d/m" }}</p>
-                        {% if message.file %}
-                        <p class="chat-left-msg">
-                            <img class="img-responsive" src="{{ message.file.file.url }}" alt="">
-                        </p>
-                        {% else %}
-                        <p class="chat-right-msg">{{message.message_content|linebreaksbr}}</p>
-                        {% endif %}
+            {%elif message.sender_type == 'Agent'%}
+                <div class="chat-content-rightside">
+                    <div class="d-flex ms-auto">
+                        <div class="flex-grow-1 me-2">
+                            <p class="mb-0 chat-time text-end">{{message.sender.username}}, {{ message.created_at|date:"m:H - d/m" }}</p>
+                            {% if message.file %}
+                            <p class="chat-left-msg">
+                                <img class="img-responsive" src="{{ message.file.file.url }}" alt="">
+                            </p>
+                            {% else %}
+                            <p class="chat-right-msg">{{message.message_content|linebreaksbr}}</p>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
-            </div>
-        {% endif %}
-    {% endfor %}
-    <style>
-        .img-responsive {
-            width: 100%;
-            height: auto;
-            max-width: 600px;
-            max-width: 600px;
-            object-fit: contain;
-            border-radius: 10px;
-        }
-    </style>
-{% endblock %}
+            {% endif %}
+        {% endfor %}
+        <style>
+            .img-responsive {
+                width: 100%;
+                height: auto;
+                max-width: 600px;
+                max-width: 600px;
+                object-fit: contain;
+                border-radius: 10px;
+            }
+        </style>
+    {% endif %}
+    {% endblock %}

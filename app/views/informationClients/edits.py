@@ -472,7 +472,12 @@ def editObama(request ,obamacare_id, way):
     obamacare.premium = f"{float(obamacare.premium):.2f}"
 
     # Obtener los mensajes de texto del Cliente.
-    contact = Contacts.objects.filter(phone_number=obamacare.client.phone_number, company_id=company_id).first()
+    if request.user.is_superuser:
+        contact = Contacts.objects.filter(phone_number=obamacare.client.phone_number, company_id=obamacare.company.id).first()
+    else:
+        contact = Contacts.objects.filter(phone_number=obamacare.client.phone_number, company_id=company_id).first()
+
+        
     chats = Chat.objects.filter(contact=contact)
     messages = Messages.objects.filter(chat_id=chats[0].id)
     secretKey = SecretKey.objects.filter(contact_id=contact.id).first()
@@ -681,7 +686,11 @@ def editSupp(request, supp_id):
     supp.premium = f"{float(supp.premium):.2f}"
 
     # Obtener los mensajes de texto del Cliente.
-    contact = Contacts.objects.filter(phone_number=supp.client.phone_number, company_id=company_id).first()
+    if request.user.is_superuser:
+        contact = Contacts.objects.filter(phone_number=supp.client.phone_number, company_id=supp.company.id).first()
+    else:
+        contact = Contacts.objects.filter(phone_number=supp.client.phone_number, company_id=company_id).first()
+
     chats = Chat.objects.filter(contact=contact)
     messages = Messages.objects.filter(chat_id=chats[0].id)
     secretKey = SecretKey.objects.filter(contact_id=contact.id).first()

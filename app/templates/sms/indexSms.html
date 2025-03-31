@@ -154,7 +154,12 @@
 					{% endif %}
 				</div>
 			</div>
+			{% if messages %}
 			<div class="chat-content" id="chat-content">
+			{% else %}
+			<div class="chat-content chat-content-center" id="chat-content">
+			{% endif %}
+
 			{% block chatBlock %}
 			{% endblock %}
 			

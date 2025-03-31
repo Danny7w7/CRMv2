@@ -92,7 +92,8 @@
     flex: 1;
     padding: 10px;
     overflow-y: auto;
-    max-height: 400px;
+    min-height: 150px;
+    max-height: 500px;
     background: var(--secondary-color);
     display: flex; 
     flex-direction: column;
@@ -146,7 +147,7 @@
     padding: 8px 12px;
     border-radius: 10px;
     margin: 5px 0;
-    max-width: 80%;
+    max-width: 90%;
     word-wrap: break-word;
 }
 

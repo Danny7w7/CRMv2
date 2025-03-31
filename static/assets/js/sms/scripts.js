@@ -251,6 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     const buttonCreateSecretKey = document.getElementById('buttonCreateSecretKey');
     const buttonSendSecretKey = document.getElementById('buttonSendSecretKey');
+    const buttonStartChat = document.getElementById('buttonStartChat');
     
     if (buttonCreateSecretKey) {
         buttonCreateSecretKey.addEventListener('click', () => SecretKey('Create'));
@@ -288,8 +289,60 @@ function SecretKey(type) {
     });
 }
 
-function SendSecretKey() {
-    
+function setLanguage(lenguaje) {
+    StartChat(lenguaje)
+}
+
+function StartChat(lenguaje) {
+    const formData = new FormData();
+    formData.append('language', lenguaje);
+
+    fetch(`/startChat/${chat_id}/`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => { throw err });
+        }
+        return response.json();
+    })
+    .then(data => {
+        addMessage(data.message, 'Agent', 'SMS');
+        toggleClass('chat-content', 'chat-content-center')
+        hideObject('languageDropdown')
+    })
+    .catch(error => {
+        let errorMessage = "Error when trying to create a chat, contact your system administrator.";
+        
+        if (error.error_detail) {
+            errorMessage = `${error.error_title}: ${error.error_detail}`;
+        }
+
+        Swal.fire({
+            title: "Error",
+            text: errorMessage,
+            icon: "error"
+        });
+    });
+}
+
+function toggleClass(id, className) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.classList.toggle(className);
+    } else {
+        console.error(`Element with id "${id}" not found.`);
+    }
+}
+
+function hideObject(id) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.style.display = "none";
+    } else {
+        console.error(`Element with id "${id}" not found.`);
+    }
 }
 
 function validatePhoneNumber(phoneNumber) {
