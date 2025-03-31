@@ -104,6 +104,13 @@ class Users(AbstractUser):
             formatted = f"+{phone_str[0]} ({phone_str[1:4]}) {phone_str[4:7]} {phone_str[7:]}"
             return formatted
         return None
+    
+class UserPreference(models.Model):
+    user = models.OneToOneField(Users, on_delete=models.CASCADE)
+    darkMode = models.BooleanField(default=False)
+    
+    class Meta:
+        db_table = 'userPreference'
 
 class Clients(models.Model):
     agent = models.ForeignKey(Users, on_delete=models.CASCADE)

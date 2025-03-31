@@ -20,15 +20,21 @@ $(function() {
 
 
 
-		$(".dark-mode").on("click", function() {
+		$("#dark-mode").on("click", function() {
+			let currentTheme;
 
 			if($(".dark-mode-icon i").attr("class") == 'bx bx-sun') {
 				$(".dark-mode-icon i").attr("class", "bx bx-moon");
-				$("html").attr("class", "light-theme")
+				$("html").attr("class", "light-theme");
+				currentTheme = false;
 			} else {
 				$(".dark-mode-icon i").attr("class", "bx bx-sun");
-				$("html").attr("class", "dark-theme")
+				$("html").attr("class", "dark-theme");
+				currentTheme = true;
 			}
+
+			$.post( "/toggleDarkMode/", { theme: currentTheme }, function( data ) {
+			});
 
 		}), 
 

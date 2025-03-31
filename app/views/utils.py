@@ -1,5 +1,4 @@
 # Standard Python libraries
-import json
 import logging
 import smtplib
 import ssl
@@ -8,13 +7,11 @@ from typing import Dict
 
 # Django core libraries
 from django.conf import settings
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
+
 
 # Django utilities
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.template.loader import render_to_string
 
 # Third-party libraries
@@ -99,3 +96,17 @@ def send_email(subject: str, receiver_email: str, template_name: str, context_da
     except Exception as e:
         logger.error(f"Error inesperado: {str(e)}")
         return False
+    
+@csrf_exempt
+def toggleDarkMode(request):
+    try:
+        userPreference = UserPreference.objects.get(user_id=request.user.id)
+        darkMode = True if request.POST.get('theme').lower() == "true" else False
+        userPreference.darkMode = darkMode
+        userPreference.save()
+    except:
+        userPreference = UserPreference.objects.create(
+            user = request.user,
+            darkMode = True
+        )
+    return JsonResponse({'message':'success'})

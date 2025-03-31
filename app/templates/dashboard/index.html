@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" >
+<html lang="en" {% if userPreference.darkMode %} class='dark-theme'{% endif %}>
 
 {% load static %}
 
@@ -268,7 +268,7 @@
 						
 							
 							<li class="nav-item dark-mode d-none d-sm-flex">
-								<a id='dark-mode' class="nav-link dark-mode-icon" href="javascript:;"><i class='bx bx-moon'></i>
+								<a id='dark-mode' class="nav-link dark-mode-icon" href="javascript:;"><i class='bx {%if userPreference.darkMode%}bx-sun{%else%}bx-moon{%endif%}'></i>
 								</a>
 							</li>
 

@@ -25,9 +25,8 @@ from .views.reports import fecths as fetchsReports
 from .views.reports import table as tableReports
 from .views.reports import charts, download
 from .views.users import users, companies
-from .views import dbExcel, quality, consents
+from .views import dbExcel, quality, consents, sms, utils
 
-from .views import sms
 
 urlpatterns = [
     #<---------------------------Auth--------------------------->
@@ -178,11 +177,13 @@ urlpatterns = [
     path('consetMedicare/<client_id>/<language>/', consents.consetMedicare, name='consetMedicare'),
 
 
-    #<---------------------------Companny---------------------------> 
+    #<---------------------------Company---------------------------> 
     path('formCreateCompanies/', companies.formCreateCompanies, name='formCreateCompanies'),
     path('editCompanies/<companies_id>', companies.editCompanies, name='editCompanies'),
     path('toggleCompanies/<companies_id>/', companies.toggleCompanies, name='toggleCompanies'),
     path('createServices/', companies.createServices, name='createServices'),
     path('addSubscription/', companies.addSubscription, name='addSubscription'),
     
+    #<---------------------------Utils---------------------------> 
+    path('toggleDarkMode/', utils.toggleDarkMode, name='toggleDarkMode'),
 ]
