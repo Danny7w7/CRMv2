@@ -37,6 +37,7 @@ from ..forms import *
 from .utils import *
 from ..alertWebsocket import websocketAlertGeneric
 from .decoratorsCompany import *
+from ..contextProcessors import validateSms
 
 # Create your views here.
 logger = logging.getLogger('django')
@@ -237,6 +238,9 @@ def deactivatecontact(contact, message):
 
 @login_required(login_url='/login')
 def index(request):
+    validSms = validateSms(request)
+    if not validSms or not validSms.get('smsIsActive'):
+        return HttpResponse('Paga MMGV')
     if request.user.is_superuser:
         chats = Chat.objects.all()
     elif request.user.is_staff:
@@ -262,11 +266,14 @@ def index(request):
                 request.user.company,
                 message
             )
-        return redirect('chatSms', contact.phone_number)
+        return redirect('chatSms', chat.id)
     return render(request, 'sms/indexSms.html', {'chats': chats})
 
 @login_required(login_url='/login')
-def chat(request, phoneNumber):
+def chat(request, chatId):
+    validSms = validateSms(request)
+    if not validSms or not validSms.get('smsIsActive'):
+        return HttpResponse('Paga MMGV')
     if request.method == 'POST':
         phoneNumber = request.POST.get('phoneNumber')
         name = request.POST.get('name', None)
@@ -284,10 +291,14 @@ def chat(request, phoneNumber):
                 request.user.company,
                 message
             )
+        return redirect('chatSms', chat.id)
             
-    contact = Contacts.objects.get(phone_number=phoneNumber, company=request.user.company)
-    chat = Chat.objects.get(contact=contact.id, company=request.user.company)
-    secretKey = SecretKey.objects.filter(contact=contact).first()
+    if request.user.is_superuser:
+        chat = Chat.objects.select_related('contact').get(id=chatId)
+    else:
+        chat = Chat.objects.select_related('contact').get(id=chatId, company=request.user.company)
+        
+    secretKey = SecretKey.objects.filter(contact=chat.contact).first()
     # Usamos select_related para optimizar las consultas
     messages = Messages.objects.filter(chat=chat.id).select_related('filessms')
     
@@ -322,8 +333,8 @@ def chat(request, phoneNumber):
         
     chats = get_last_message_for_chats(chats)
     context = {
-        "chat_url": f"/chatSms/{contact.phone_number}/",
-        'contact': contact,
+        "chat_url": f"/chatSms/{chatId}/",
+        'contact': chat.contact,
         'chats': chats,
         'messages': messages_with_files,
         'secretKey':secretKey

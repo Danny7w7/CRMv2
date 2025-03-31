@@ -364,18 +364,22 @@ function validatePhoneNumber(phoneNumber) {
 }
 
 const listChats = document.getElementById('listChats');
-const anchorsArray = Array.from(listChats.querySelectorAll('a'));
+if (listChats){
+    var anchorsArray = Array.from(listChats.querySelectorAll('a'));
+}
 
 const searchInput = document.getElementById('searchInput');
-searchInput.addEventListener('input', function() {
-    anchorsArray.forEach(anchor => {
-        if (isSubsequence(searchInput.value.toLowerCase(), anchor.id.toLowerCase())){
-            anchor.style.display = 'block'; 
-        }else{
-            anchor.style.display = 'none';
-        }
+if (searchInput){
+    searchInput.addEventListener('input', function() {
+        anchorsArray.forEach(anchor => {
+            if (isSubsequence(searchInput.value.toLowerCase(), anchor.id.toLowerCase())){
+                anchor.style.display = 'block'; 
+            }else{
+                anchor.style.display = 'none';
+            }
+        });
     });
-});
+}
 
 function isSubsequence(sub, str) {
     let subIndex = 0;
@@ -412,8 +416,9 @@ function toggleChat() {
 }
 
 buttonDarkMode = document.getElementById('dark-mode')
+floatingChat = document.getElementById('floating-chat')
 buttonDarkMode.addEventListener('click', toggleDarkMode)
 
 function toggleDarkMode() {
-    document.body.classList.toggle('dark-mode');
+    floatingChat.classList.toggle('dark-mode');
 }

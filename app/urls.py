@@ -102,7 +102,7 @@ urlpatterns = [
 
     #<---------------------------SMS--------------------------->
     path('smsBlue/', sms.index, name='smsBlue'),
-    path('chatSms/<phoneNumber>/', sms.chat, name='chatSms'),
+    path('chatSms/<chatId>/', sms.chat, name='chatSms'),
     path('startChat/<phoneNumber>/', sms.startChat, name='startChat'),
     path('sendMessage/', sms.sendMessage, name='sendMessage'),
     path('deleteChat/<id>/', sms.deleteContact, name='deleteContact'),

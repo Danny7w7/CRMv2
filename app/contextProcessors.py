@@ -1,4 +1,4 @@
-from .models import UserPreference
+from .models import UserPreference, Companies, Services, Subscriptions
 
 def themeMode(request):
     try:
@@ -8,3 +8,13 @@ def themeMode(request):
     return {
         'userPreference': userPreference,
     }
+
+def validateSms(request):
+    if request.user.is_authenticated:
+        companyId = request.user.company.id
+        subscripcions = Subscriptions.objects.select_related('service').filter(company_id=companyId, is_active=True)
+        for subscripcion in subscripcions:
+            if subscripcion.service.name == 'SMS':
+                return {'smsIsActive':True}
+
+    return {'smsIsActive':False}

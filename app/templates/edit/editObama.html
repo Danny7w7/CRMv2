@@ -1083,8 +1083,9 @@
     </div>
 </div>
 
+{% if smsIsActive %}
 <!-- Chat UI -->
-<div class="light-mode">
+<div {% if userPreference.darkMode %} class='dark-mode'{% endif %}>
 	<button class="floating-chat-button flex-grow-1" onclick="toggleChat()">
 		<i class="lni lni-comments-alt"></i>
 		{% if chat.is_message_unread %}<span class="alert-count">{{ chat.unread_messages }}</span>{% endif %}
@@ -1161,6 +1162,7 @@
 		</div>
 	</div>
 </div>
+{% endif %}
 
 {% endblock %}
 {% block end_js %}

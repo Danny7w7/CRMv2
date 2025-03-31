@@ -115,6 +115,7 @@
 							</li>
 						</ul>
 					</li>
+					{% if smsIsActive %}
 					<li class="menu-label">Applications</li>
 					<li {% if request.path == chat_url %}class='mm-active'{% endif %}>
 						<a class="has-arrow" href="javascript:;">
@@ -127,6 +128,7 @@
 							</li>
 						</ul>
 					</li>
+					{% endif %}
 					{% if request.user.role == 'Admin' or request.user.role == 'S'  %}
 					<li class="menu-label">Reports</li>
 					<li>
