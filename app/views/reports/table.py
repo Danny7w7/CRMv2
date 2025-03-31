@@ -7,7 +7,7 @@ from django.utils.timezone import make_aware
 
 # Django core libraries
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count, F, Q
+from django.db.models import Count, F, Q, Subquery
 from django.db.models.functions import Substr
 from django.shortcuts import render
 from django.utils.text import Truncator
@@ -82,15 +82,18 @@ def sale(request):
 
 def saleObamaAgent(request, company_id, start_date=None, end_date=None):
 
+    # Obtener los IDs de ObamaCare que están en CustomerRedFlag
+    excluded_obama_ids = CustomerRedFlag.objects.values('obama_id')
+
     if request.user.is_superuser:
         # Definir la consulta base para Supp, utilizando `select_related` para obtener el nombre completo del agente (User)
-        sales_query = ObamaCare.objects.select_related('agent').filter(is_active=True) \
+        sales_query = ObamaCare.objects.select_related('agent').filter(is_active=True).exclude( id__in=Subquery(excluded_obama_ids)) \
             .values('agent__username', 'agent__first_name', 'agent__last_name', 'status_color') \
             .annotate(total_sales=Count('id')) \
             .order_by('agent', 'status_color')
     else:
         # Definir la consulta base para Supp, utilizando `select_related` para obtener el nombre completo del agente (User)
-        sales_query = ObamaCare.objects.select_related('agent').filter(is_active=True, company = company_id) \
+        sales_query = ObamaCare.objects.select_related('agent').filter(is_active=True, company = company_id).exclude( id__in=Subquery(excluded_obama_ids)) \
             .values('agent__username', 'agent__first_name', 'agent__last_name', 'status_color') \
             .annotate(total_sales=Count('id')) \
             .order_by('agent', 'status_color')
@@ -150,14 +153,17 @@ def saleObamaAgent(request, company_id, start_date=None, end_date=None):
 
 def saleObamaAgentUsa(request, company_id, start_date=None, end_date=None):
 
+    # Obtener los IDs de ObamaCare que están en CustomerRedFlag
+    excluded_obama_ids = CustomerRedFlag.objects.values('obama_id')
+
     if request.user.is_superuser:
         # Definir la consulta base para Supp, utilizando `values` para obtener el nombre del agente (agent_usa)
-        sales_query = ObamaCare.objects.values('agent_usa', 'status_color').filter(is_active=True) \
+        sales_query = ObamaCare.objects.values('agent_usa', 'status_color').filter(is_active=True).exclude( id__in=Subquery(excluded_obama_ids)) \
             .annotate(total_sales=Count('id')) \
             .order_by('agent_usa', 'status_color')
     else:
         # Definir la consulta base para Supp, utilizando `values` para obtener el nombre del agente (agent_usa)
-        sales_query = ObamaCare.objects.values('agent_usa', 'status_color').filter(is_active=True, company = company_id) \
+        sales_query = ObamaCare.objects.values('agent_usa', 'status_color').filter(is_active=True, company = company_id).exclude( id__in=Subquery(excluded_obama_ids)) \
             .annotate(total_sales=Count('id')) \
             .order_by('agent_usa', 'status_color')
 
@@ -353,6 +359,8 @@ def saleSuppAgentUsa(request, company_id, start_date=None, end_date=None):
 def salesBonusAgent(request, company_id, start_date=None, end_date=None):
 
     company_filter = {'company': company_id} if not request.user.is_superuser else {}
+    # Obtener los IDs de ObamaCare que están en CustomerRedFlag
+    excluded_obama_ids = CustomerRedFlag.objects.values('obama_id')
 
     # Consulta para Supp
     sales_query_supp = Supp.objects.select_related('agent').filter(is_active=True,  **company_filter) \
@@ -360,7 +368,7 @@ def salesBonusAgent(request, company_id, start_date=None, end_date=None):
         .annotate(total_sales=Count('id'))
 
     # Consulta para ObamaCare
-    sales_query_obamacare = ObamaCare.objects.select_related('agent').filter(is_active = True,  **company_filter) \
+    sales_query_obamacare = ObamaCare.objects.select_related('agent').filter(is_active = True,  **company_filter).exclude( id__in=Subquery(excluded_obama_ids)) \
         .values('agent__id', 'agent__username', 'agent__first_name', 'agent__last_name', 'status_color') \
         .annotate(total_sales=Count('id'))
 
@@ -469,22 +477,24 @@ def salesBonusAgent(request, company_id, start_date=None, end_date=None):
 def saleClientStatusObama(request, company_id, start_date=None, end_date=None):
 
     company_filter = {'company': company_id} if not request.user.is_superuser else {}
+    # Obtener los IDs de ObamaCare que están en CustomerRedFlag
+    excluded_obama_ids = CustomerRedFlag.objects.values('obama_id')
 
     # Consulta para Registered
     sales_query_registered = ObamaCare.objects.select_related('agent','client').annotate(
-        truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 1, is_active = True,  **company_filter)
+        truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 1, is_active = True,  **company_filter).exclude( id__in=Subquery(excluded_obama_ids))
     
     # Consulta para Proccessing
     sales_query_proccessing = ObamaCare.objects.select_related('agent','client').annotate(
-        truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 2, is_active = True,  **company_filter ) 
+        truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 2, is_active = True,  **company_filter ).exclude( id__in=Subquery(excluded_obama_ids))
 
     # Consulta para Profiling
     sales_query_profiling = ObamaCare.objects.select_related('agent','client').annotate(
-        truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 3, is_active = True,  **company_filter ) 
+        truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 3, is_active = True,  **company_filter ).exclude( id__in=Subquery(excluded_obama_ids))
     
     # Consulta para Canceled
     sales_query_canceled = ObamaCare.objects.select_related('agent','client').annotate(
-        truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 4, is_active = True,  **company_filter )
+        truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 4, is_active = True,  **company_filter ).exclude( id__in=Subquery(excluded_obama_ids))
 
     # Si no se proporcionan fechas, filtrar por el mes actual
     if not start_date and not end_date:
@@ -589,10 +599,14 @@ def saleClientStatusSupp(request, company_id, start_date=None, end_date=None):
 @login_required(login_url='/login') 
 @company_ownership_required_sinURL
 def customerPerformance(request):
+
     company_id = request.company_id  # Obtener company_id desde request
     # Definir el filtro de compañía (será un diccionario vacío si es superusuario)
     company_filter = {'company': company_id} if not request.user.is_superuser else {}
     company_filter2 = {'obama__company': company_id} if not request.user.is_superuser else {}
+
+    # Obtener los IDs de ObamaCare que están en CustomerRedFlag
+    excluded_obama_ids = CustomerRedFlag.objects.values('obama_id')
 
     if request.method == 'POST':
         # Convertir fechas a objetos datetime con zona horaria
@@ -612,14 +626,14 @@ def customerPerformance(request):
         next_month = now.replace(day=28) + timedelta(days=4)  # Garantiza que pasamos al siguiente mes
         end_date = next_month.replace(day=1, hour=23, minute=59, second=59, microsecond=999999) - timedelta(days=1)
 
-    obamacare = ObamaCare.objects.filter(created_at__range=(start_date, end_date), is_active=1, **company_filter)
-    totalEnroled = obamacare.exclude(profiling='NO')
-    totalNoEnroled = obamacare.filter(profiling='NO').count()
-    totalOtherParty = obamacare.filter(status__in=('OTHER PARTY', 'OTHER AGENT')).count()
-    enroledActiveCms = totalEnroled.filter(Q(status='ACTIVE') | Q(status='SELF-ENROLMENT')).count()
-    totalEnroledNoActiveCms = totalEnroled.exclude(Q(status='ACTIVE') | Q(status='SELF-ENROLMENT')).count()
-    totalActiveCms = obamacare.filter(Q(status='ACTIVE') | Q(status='SELF-ENROLMENT')).count()
-    totalNoActiveCms = obamacare.exclude(Q(status='ACTIVE') | Q(status='SELF-ENROLMENT')).count()
+    obamacare = ObamaCare.objects.filter(created_at__range=(start_date, end_date), is_active=1, **company_filter).exclude( id__in=Subquery(excluded_obama_ids))
+    totalEnroled = obamacare.exclude(profiling='NO').exclude( id__in=Subquery(excluded_obama_ids))
+    totalNoEnroled = obamacare.filter(profiling='NO').exclude( id__in=Subquery(excluded_obama_ids)).count()
+    totalOtherParty = obamacare.filter(status__in=('OTHER PARTY', 'OTHER AGENT')).exclude( id__in=Subquery(excluded_obama_ids)).count()
+    enroledActiveCms = totalEnroled.filter(Q(status='ACTIVE') | Q(status='SELF-ENROLMENT')).exclude( id__in=Subquery(excluded_obama_ids)).count()
+    totalEnroledNoActiveCms = totalEnroled.exclude(Q(status='ACTIVE') | Q(status='SELF-ENROLMENT')).exclude( id__in=Subquery(excluded_obama_ids)).count()
+    totalActiveCms = obamacare.filter(Q(status='ACTIVE') | Q(status='SELF-ENROLMENT')).exclude( id__in=Subquery(excluded_obama_ids)).count()
+    totalNoActiveCms = obamacare.exclude(Q(status='ACTIVE') | Q(status='SELF-ENROLMENT')).exclude( id__in=Subquery(excluded_obama_ids)).count()
 
     documents = DocumentObama.objects.select_related('agent_create').filter(created_at__range=(start_date, end_date), **company_filter2)
     appointments = AppointmentClient.objects.select_related('agent_create').filter(created_at__range=(start_date, end_date), **company_filter2)
@@ -687,8 +701,6 @@ def customerPerformance(request):
         else:
             agent_performance[full_name]['personalGoal'] = 4
             
-
-
     # Evitar divisiones por cero en todos los cálculos
     obamacare_count = obamacare.count() if obamacare.exists() else 1
     totalEnroled_count = totalEnroled.count() if totalEnroled.exists() else 1
@@ -737,7 +749,8 @@ def customerPerformance(request):
     }
     return render(request, 'customerReports/customerPerformance.html', context)
 
-def table6Week(request, company_id):
+@company_ownership_required_sinURL
+def table6Week(request):
 
     # Obtener la fecha actual
     today = datetime.datetime.today()
@@ -770,16 +783,20 @@ def table6Week(request, company_id):
     excludedUsernames = ['Calidad01', 'mariluz', 'MariaCaTi','StephanieMkt','CarmenR']  # Excluimos a gente que no debe aparecer en la vista
     userRoles = ['A', 'C', 'S']
 
+    company_id = request.company_id  # Obtener company_id desde request
     company_filter = {'company': company_id} if not request.user.is_superuser else {}
+
+    # Obtener los IDs de ObamaCare que están en CustomerRedFlag
+    excluded_obama_ids = CustomerRedFlag.objects.values('obama_id')
 
     users = Users.objects.filter(role__in=userRoles, is_active=True,  **company_filter).exclude(username__in=excludedUsernames)
 
     # Filtrar todas las ventas realizadas en las últimas 6 semanas
-    obamaSales = ObamaCare.objects.filter(created_at__range=[startDate, endOfCurrentWeek],  **company_filter)
+    obamaSales = ObamaCare.objects.filter(created_at__range=[startDate, endOfCurrentWeek],  **company_filter).exclude( id__in=Subquery(excluded_obama_ids))
     suppSales = Supp.objects.filter(created_at__range=[startDate, endOfCurrentWeek],  **company_filter)
         
     # Agregar el conteo de pólizas activas para las últimas 6 semanas
-    activeObamaPolicies = ObamaCare.objects.filter(status='Active', created_at__range=[startDate, endOfCurrentWeek],is_active = True,  **company_filter)
+    activeObamaPolicies = ObamaCare.objects.filter(status='Active', created_at__range=[startDate, endOfCurrentWeek],is_active = True,  **company_filter).exclude( id__in=Subquery(excluded_obama_ids))
     activeSuppPolicies = Supp.objects.filter(status='Active', created_at__range=[startDate, endOfCurrentWeek], is_active = True,  **company_filter)
 
     salesSummary = {
@@ -796,8 +813,6 @@ def table6Week(request, company_id):
             for i in range(numWeeks)
         } for user in users
     }
-
-
 
     # Procesar las ventas de Obamacare y Supp para las últimas 6 semanas
     for sale in obamaSales:
@@ -825,8 +840,6 @@ def table6Week(request, company_id):
                         salesSummary[agentName][f"Week{saleWeek + 1}"]["total"] += 1
                     except KeyError:
                         pass
-
-
 
     for policy in activeObamaPolicies:
         agentName = policy.agent.username
@@ -867,10 +880,8 @@ def table6Week(request, company_id):
 @company_ownership_required_sinURL
 def sales6WeekReport(request):
 
-    company_id = request.company_id  # Obtener company_id desde request
-
     # Obtener el resumen de ventas para las últimas 6 semanas
-    finalSummary, weekRanges = table6Week(request, company_id)
+    finalSummary, weekRanges = table6Week(request)
 
     # Obtener los datos para la gráfica
     chart_data = chart6WeekSale(request)
@@ -885,7 +896,8 @@ def sales6WeekReport(request):
     # Renderizar la plantilla con los datos
     return render(request, 'saleReports/sale6Week.html', context)
 
-def weekSalesSummary(request, week_number, company_id):
+@company_ownership_required_sinURL
+def weekSalesSummary(request, week_number):
     # Obtener el año actual
     current_year = datetime.datetime.today().year
 
@@ -908,16 +920,20 @@ def weekSalesSummary(request, week_number, company_id):
     excludedUsernames = ['Calidad01', 'mariluz', 'MariaCaTi', 'StephanieMkt', 'CarmenR','admin','tv','zohiraDuarte', 'vladimirDeLaHoz']  # Excluimos a gente que no debe aparecer en la vista
     userRoles = ['A', 'C', 'S','SUPP']
 
+    company_id = request.company_id  # Obtener company_id desde request
     company_filter = {'company': company_id} if not request.user.is_superuser else {}
+
+    # Obtener los IDs de ObamaCare que están en CustomerRedFlag
+    excluded_obama_ids = CustomerRedFlag.objects.values('obama_id')
 
     users = Users.objects.exclude(username__in=excludedUsernames).filter(role__in=userRoles, is_active=True,  **company_filter)
 
     # Filtrar todas las ventas realizadas en la semana seleccionada
-    obamaSales = ObamaCare.objects.filter(created_at__range=[startOfWeek, endOfWeek],  **company_filter)
+    obamaSales = ObamaCare.objects.filter(created_at__range=[startOfWeek, endOfWeek],  **company_filter).exclude( id__in=Subquery(excluded_obama_ids))
     suppSales = Supp.objects.filter(created_at__range=[startOfWeek, endOfWeek],  **company_filter)
 
     # Agregar el conteo de pólizas activas para la semana seleccionada
-    activeObamaPolicies = ObamaCare.objects.filter(status='Active', created_at__range=[startOfWeek, endOfWeek], is_active=True,  **company_filter)
+    activeObamaPolicies = ObamaCare.objects.filter(status='Active', created_at__range=[startOfWeek, endOfWeek], is_active=True,  **company_filter).exclude( id__in=Subquery(excluded_obama_ids))
     activeSuppPolicies = Supp.objects.filter(status='Active', created_at__range=[startOfWeek, endOfWeek], is_active=True,  **company_filter)
 
     salesSummary = {
@@ -931,8 +947,6 @@ def weekSalesSummary(request, week_number, company_id):
             "clientes_supp": []    # Lista de clientes de Supp
         } for user in users
     }
-
-  
 
     # Procesar las ventas de Obamacare para la semana seleccionada
     for sale in obamaSales:
@@ -968,8 +982,6 @@ def weekSalesSummary(request, week_number, company_id):
             }
             salesSummary[agentName]["clientes_supp"].append(cliente_info)
 
-
-
     for policy in activeObamaPolicies:
         agentName = policy.agent.username
         if policy.agent.is_active and agentName not in excludedUsernames:
@@ -1003,15 +1015,14 @@ def weekSalesSummary(request, week_number, company_id):
     return finalSummary, weekRange
 
 @login_required(login_url='/login')
-@company_ownership_required_sinURL
 def weekSalesWiew(request):
-    company_id = request.company_id  # Obtener company_id desde request
+
     if request.method == 'POST':
         # Obtener el número de la semana del formulario
         week_number = int(request.POST.get('week_number'))
 
         # Llamar a la función de lógica para obtener el resumen
-        resumen_semana, rango_fechas = weekSalesSummary(request, week_number,company_id)
+        resumen_semana, rango_fechas = weekSalesSummary(request, week_number)
 
         # Renderizar la plantilla con los resultados
         return render(request, 'saleReports/weekSalesWiew.html', {
@@ -1119,8 +1130,7 @@ def customerTypification(request) :
         'agent_data':agent_data,
         'startDate':startDate,
         'endDate':endDate
-    }   
-    
+    }       
     
     return render(request, 'customerReports/customerTypification.html', context)
 

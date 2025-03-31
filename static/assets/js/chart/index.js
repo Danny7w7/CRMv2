@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Verificar si el elemento con los datos existe
     if (!chartDataElement) {
-        //console.error("No se encontró el script con los datos del gráfico.");
         return;
     }
 
@@ -12,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const chartData = JSON.parse(chartDataElement.textContent);
 
     // Extraer los datos para el gráfico
-    const usernames = chartData.map(item => item.username);
+    const usernames = chartData.map(item => item.first_name);  // Cambio aquí
     const obamacareCounts = chartData.map(item => item.obamacare_count);
     const obamacareTotalCounts = chartData.map(item => item.obamacare_count_total);
     const suppCounts = chartData.map(item => item.supp_count);
@@ -62,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function() {
         },
         colors: ["#0d6efd", '#f01118', '#28a745', '#ffc107'],
         xaxis: {
-            categories: usernames,  // Nombres de usuario como categorías
+            categories: usernames,  // Corregido aquí
         },
         yaxis: {
             title: {
@@ -73,7 +72,7 @@ document.addEventListener("DOMContentLoaded", function() {
             opacity: 1
         },
         tooltip: {
-            theme: 'dark',  // Esto asegura que el tooltip tenga un fondo oscuro
+            theme: 'dark',
             y: {
                 formatter: function(val) {
                     return val + " items";
@@ -88,7 +87,5 @@ document.addEventListener("DOMContentLoaded", function() {
         // Crear el gráfico ApexCharts
         var chart = new ApexCharts(chartContainer, options);
         chart.render();
-    } else {
-        //console.error("El contenedor del gráfico con id 'chartIndex' no existe.");
     }
 });

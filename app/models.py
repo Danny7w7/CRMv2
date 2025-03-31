@@ -539,5 +539,15 @@ class CustomerRedFlag(models.Model):
     class Meta:
         db_table = 'customerRedFlag'
 
+class paymentDate(models.Model):
+    obama = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null=True)
+    supp = models.ForeignKey(Supp, on_delete=models.CASCADE, null= True)
+    payment_date = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    agent_create = models.ForeignKey(Users,on_delete=models.CASCADE)   
+
+    class Meta:
+        db_table = 'paymentDate'
+
 
 from .modelsSMS import *

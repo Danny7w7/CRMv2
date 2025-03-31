@@ -9,7 +9,7 @@ from django.utils.timezone import make_aware
 
 # Django core libraries
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count
+from django.db.models import Count, Subquery
 from django.shortcuts import render
 
 # Application-specific imports
@@ -50,8 +50,11 @@ def chart6WeekSale(request):
 
     company_filter = {'company': company_id} if not request.user.is_superuser else {}
 
+    # Obtener los IDs de ObamaCare que están en CustomerRedFlag
+    excluded_obama_ids = CustomerRedFlag.objects.values('obama_id')
+
     # Obtener los datos de pólizas activas para las últimas 6 semanas
-    activeObamaPolicies = ObamaCare.objects.filter(status='Active', created_at__range=[startDate, endOfCurrentWeek],is_active = True,  **company_filter)
+    activeObamaPolicies = ObamaCare.objects.filter(status='Active', created_at__range=[startDate, endOfCurrentWeek],is_active = True,  **company_filter).exclude( id__in=Subquery(excluded_obama_ids))
     activeSuppPolicies = Supp.objects.filter(status='Active', created_at__range=[startDate, endOfCurrentWeek], is_active= True,  **company_filter)
 
     # Inicializar diccionario de ventas para las últimas 6 semanas
@@ -111,12 +114,7 @@ def chart6Week(request):
     return render(request, 'graficsReports/chart6Week.html', context)
 
 @login_required(login_url='/login')
-@company_ownership_required_sinURL
 def salesPerformance(request):
-
-    company_id = request.company_id  # Obtener company_id desde request
-    # Definir el filtro de compañía (será un diccionario vacío si es superusuario)
-    company_filter = {'company': company_id} if not request.user.is_superuser else {}
 
     # Obtener la fecha actual
     now = timezone.now()
@@ -242,6 +240,8 @@ def get_agent_sales(request, start_date, end_date):
     # Definir el filtro de compañía (será un diccionario vacío si es superusuario)
     company_filter = {'company': company_id} if not request.user.is_superuser else {}
 
+    # Obtener los IDs de ObamaCare que están en CustomerRedFlag
+    excluded_obama_ids = CustomerRedFlag.objects.values('obama_id')
 
     userExcludes = ['CarmenR', 'MariaCaTi']
 
@@ -255,7 +255,7 @@ def get_agent_sales(request, start_date, end_date):
     obamaCareAgents = set(ObamaCare.objects.filter(
         created_at__range=[start_date, end_date],
         is_active=True, **company_filter
-    ).values_list('agent__username', flat=True))
+    ).exclude( id__in=Subquery(excluded_obama_ids)).values_list('agent__username', flat=True))
 
     suppAgents = set(Supp.objects.filter(
         created_at__range=[start_date, end_date],
@@ -271,7 +271,7 @@ def get_agent_sales(request, start_date, end_date):
     obamaCareCount = ObamaCare.objects.filter(
         created_at__range=[start_date, end_date],
         is_active=True, **company_filter
-    ).values('agent__username').annotate(obama_count=Count('id'))
+    ).exclude( id__in=Subquery(excluded_obama_ids)).values('agent__username').annotate(obama_count=Count('id'))
 
     # Obtener el conteo de Supp dentro del rango de fechas
     suppCount = Supp.objects.filter(

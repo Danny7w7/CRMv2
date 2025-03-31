@@ -16,24 +16,13 @@ from django.shortcuts import render, redirect
 from .decoratorsCompany import *
 
 @login_required(login_url='/login') 
-@company_ownership_required_sinURL
 def index(request):
 
-    company_id = request.company_id  # Obtener company_id desde request
-
-    if request.user.is_superuser:  # Nota: Es is_superuser, no is_super_user
-        obama = countSalesObama(request, company_id)
-        supp = countSalesSupp(request, company_id)
-        chartOne = chartSaleIndex(request, company_id)
-        tableStatusAca = tableStatusObama(request, company_id)
-        tableStatusSup = tableStatusSupp(request, company_id)
-    else:
-        obama = countSalesObama(request)
-        supp = countSalesSupp(request)
-        chartOne = chartSaleIndex(request)
-        tableStatusAca = tableStatusObama(request)
-        tableStatusSup = tableStatusSupp(request)
-
+    obama = countSalesObama(request)
+    supp = countSalesSupp(request)
+    chartOne = chartSaleIndex(request)
+    tableStatusAca = tableStatusObama(request)
+    tableStatusSup = tableStatusSupp(request)
 
     # Asegúrate de que chartOne sea un JSON válido
     chartOne_json = json.dumps(chartOne)
@@ -48,112 +37,69 @@ def index(request):
 
     return render(request, 'dashboard/index.html', context)
 
-def chartSaleIndex(request, company_id=None):
-    # Obtener la fecha y hora actual
+@company_ownership_required_sinURL
+def chartSaleIndex(request):
+    # Fecha actual y límites del mes
     now = timezone.now()
-    current_month = now.month
-    current_year = now.year
-
-    # Calcular inicio y fin del mes actual
-    start_of_month = timezone.make_aware(datetime(current_year, current_month, 1), timezone.get_current_timezone())
-    last_day_of_month = calendar.monthrange(current_year, current_month)[1]
+    start_of_month = timezone.make_aware(datetime(now.year, now.month, 1), timezone.get_current_timezone())
+    last_day_of_month = calendar.monthrange(now.year, now.month)[1]
     end_of_month = timezone.make_aware(
-        datetime(current_year, current_month, last_day_of_month, 23, 59, 59), 
+        datetime(now.year, now.month, last_day_of_month, 23, 59, 59),
         timezone.get_current_timezone()
     )
 
-    # Roles con acceso ampliado
-    roleAuditar = ['S', 'Admin']
-    excludeUsername = ['admin']
+    # Excluir IDs de ObamaCare en CustomerRedFlag
+    excluded_obama_ids = list(CustomerRedFlag.objects.values_list('obama_id', flat=True))
 
-    # Construcción de la consulta basada en el rol del usuario
-    company_filter = {} if request.user.is_superuser else {'company': company_id}
+    company_id = request.company_id  # Obtener company_id desde request
+    # Filtro de compañía si no es superusuario
+    company_filter = Q() if request.user.is_superuser else Q(agent__company=company_id)
 
-    # Construcción de la consulta basada en el rol del usuario
-    if request.user.role in roleAuditar:
+    # Determinar si el usuario tiene acceso ampliado
+    has_extended_access = request.user.is_superuser or request.user.role in ['S', 'Admin']
 
-        # Primero filtramos los usuarios según su compañía (si no es superusuario)
-        base_query = Users.objects.filter(is_active=True, **company_filter).exclude(username__in=excludeUsername)
-        # Para roles con acceso ampliado: consultar datos de todos los usuarios
-        users_data = base_query.annotate(
-            obamacare_count=Count('agent_sale_aca', filter=Q(
-                agent_sale_aca__status_color=3,
-                agent_sale_aca__created_at__gte=start_of_month,
-                agent_sale_aca__created_at__lt=end_of_month,
-                agent_sale_aca__is_active=True,
-                **{'agent_sale_aca__'+k: v for k, v in company_filter.items()} 
-            ), distinct=True),
-            obamacare_count_total=Count('agent_sale_aca', filter=Q(
-                agent_sale_aca__created_at__gte=start_of_month,
-                agent_sale_aca__created_at__lt=end_of_month,
-                agent_sale_aca__is_active=True,
-                **{'agent_sale_aca__'+k: v for k, v in company_filter.items()}
-            ), distinct=True),
-            supp_count=Coalesce(Count('agent_sale_supp', filter=Q(
-                agent_sale_supp__status_color=3,
-                agent_sale_supp__created_at__gte=start_of_month,
-                agent_sale_supp__created_at__lt=end_of_month,
-                agent_sale_supp__is_active=True,
-                **{'agent_sale_supp__'+k: v for k, v in company_filter.items()}
-            ), distinct=True), 0),
-            supp_count_total=Coalesce(Count('agent_sale_supp', filter=Q(
-                agent_sale_supp__created_at__gte=start_of_month,
-                agent_sale_supp__created_at__lt=end_of_month,
-                agent_sale_supp__is_active=True,
-                **{'agent_sale_supp__'+k: v for k, v in company_filter.items()}
-            ), distinct=True), 0)
-        ).exclude(username__in=excludeUsername).values('first_name', 'obamacare_count', 'obamacare_count_total', 'supp_count', 'supp_count_total')
+    # Filtrar por el usuario si no tiene acceso ampliado
+    user_filter = Q() if has_extended_access else Q(agent=request.user)
 
-    elif request.user.role not in roleAuditar:
-        # Para usuarios con rol 'A': consultar datos solo para el usuario actual
-        users_data = Users.objects.filter(id=request.user.id, **company_filter).annotate(
-            obamacare_count=Count('agent_sale_aca', filter=Q(
-                agent_sale_aca__status_color=3,
-                agent_sale_aca__created_at__gte=start_of_month,
-                agent_sale_aca__created_at__lt=end_of_month,
-                agent_sale_aca__agent=request.user.id,
-                agent_sale_aca__is_active=True,
-                **{'agent_sale_aca__'+k: v for k, v in company_filter.items()} 
-            ), distinct=True),
-            obamacare_count_total=Count('agent_sale_aca', filter=Q(
-                agent_sale_aca__created_at__gte=start_of_month,
-                agent_sale_aca__created_at__lt=end_of_month,
-                agent_sale_aca__agent=request.user.id,
-                agent_sale_aca__is_active=True,
-                **{'agent_sale_aca__'+k: v for k, v in company_filter.items()}
-            ), distinct=True),
-            supp_count=Coalesce(Count('agent_sale_supp', filter=Q(
-                agent_sale_supp__status_color=3,
-                agent_sale_supp__created_at__gte=start_of_month,
-                agent_sale_supp__created_at__lt=end_of_month,
-                agent_sale_supp__agent=request.user.id,
-                agent_sale_supp__is_active=True,
-                **{'agent_sale_supp__'+k: v for k, v in company_filter.items()}
-            ), distinct=True), 0),
-            supp_count_total=Coalesce(Count('agent_sale_supp', filter=Q(
-                agent_sale_supp__created_at__gte=start_of_month,
-                agent_sale_supp__created_at__lt=end_of_month,
-                agent_sale_supp__agent=request.user.id,
-                agent_sale_supp__is_active=True,
-                **{'agent_sale_supp__'+k: v for k, v in company_filter.items()}
-            ), distinct=True), 0)
-        ).values('first_name', 'obamacare_count', 'obamacare_count_total', 'supp_count', 'supp_count_total')
+    # 📌 **Consulta Directa en ObamaCare**
+    obamacare_data = ObamaCare.objects.filter(
+        Q(created_at__gte=start_of_month, created_at__lte=end_of_month) & 
+        company_filter & user_filter & ~Q(id__in=excluded_obama_ids)
+    ).values('agent__first_name').annotate(
+        obamacare_count=Count('id', filter=Q(status_color=3), distinct=True),
+        obamacare_count_total=Count('id', distinct=True)
+    )
 
-    # Convertir los datos a una lista de diccionarios para su uso
-    combined_data = [
-        {
-            'username': user['first_name'],
-            'obamacare_count': user['obamacare_count'],
-            'obamacare_count_total': user['obamacare_count_total'],
-            'supp_count': user['supp_count'],
-            'supp_count_total': user['supp_count_total'],
-        }
-        for user in users_data
-    ]
+    # 📌 **Consulta Directa en Supp**
+    supp_data = Supp.objects.filter(
+        Q(created_at__gte=start_of_month, created_at__lte=end_of_month) & 
+        company_filter & user_filter
+    ).values('agent__first_name').annotate(
+        supp_count=Count('id', filter=Q(status_color=3), distinct=True),
+        supp_count_total=Count('id', distinct=True)
+    )
+
+    # Convertir en diccionarios para combinar resultados
+    obamacare_dict = {item['agent__first_name']: item for item in obamacare_data}
+    supp_dict = {item['agent__first_name']: item for item in supp_data}
+
+    # Unir los datos de ObamaCare y Supp
+    combined_data = []
+    all_agents = set(obamacare_dict.keys()).union(set(supp_dict.keys()))
+
+    for agent in all_agents:
+        combined_data.append({
+            'first_name': agent,
+            'obamacare_count': obamacare_dict.get(agent, {}).get('obamacare_count', 0),
+            'obamacare_count_total': obamacare_dict.get(agent, {}).get('obamacare_count_total', 0),
+            'supp_count': supp_dict.get(agent, {}).get('supp_count', 0),
+            'supp_count_total': supp_dict.get(agent, {}).get('supp_count_total', 0),
+        })
 
     return combined_data
- 
-def countSalesObama(request, company_id=None):
+
+@company_ownership_required_sinURL
+def countSalesObama(request):
 
     # Obtener el mes y el año actuales
     now = timezone.now()
@@ -167,19 +113,24 @@ def countSalesObama(request, company_id=None):
 
     roleAuditar = ['S', 'C',  'AU', 'Admin']
 
+
+    company_id = request.company_id  # Obtener company_id desde request
     # Base query con filtro de compañía
     company_filter = {} if request.user.is_superuser else {'company': company_id}
+
+    # Obtener los IDs de ObamaCare que están en CustomerRedFlag
+    excluded_obama_ids = list(CustomerRedFlag.objects.values_list('obama_id', flat=True))
     
     if request.user.role in roleAuditar:        
-        all = ObamaCare.objects.filter(created_at__gte=start_of_month,created_at__lte=end_of_month,is_active = True,**company_filter).count()
-        active = ObamaCare.objects.filter(status_color=3,created_at__gte=start_of_month,created_at__lte=end_of_month,is_active = True, **company_filter).count()
-        process = ObamaCare.objects.filter(created_at__gte=start_of_month,created_at__lte=end_of_month,is_active = True, **company_filter).filter(Q(status_color=2) | Q(status_color=1)).count()
-        cancell = ObamaCare.objects.filter(status_color=4,created_at__gte=start_of_month,created_at__lte=end_of_month,is_active = True, **company_filter).count()
+        all = ObamaCare.objects.filter(created_at__gte=start_of_month,created_at__lte=end_of_month,is_active = True,**company_filter).exclude(id__in=excluded_obama_ids).count()
+        active = ObamaCare.objects.filter(status_color=3,created_at__gte=start_of_month,created_at__lte=end_of_month,is_active = True, **company_filter).exclude(id__in=excluded_obama_ids).count()
+        process = ObamaCare.objects.filter(created_at__gte=start_of_month,created_at__lte=end_of_month,is_active = True, **company_filter).filter(Q(status_color=2) | Q(status_color=1)).exclude(id__in=excluded_obama_ids).count()
+        cancell = ObamaCare.objects.filter(status_color=4,created_at__gte=start_of_month,created_at__lte=end_of_month,is_active = True, **company_filter).exclude(id__in=excluded_obama_ids).count()
     elif request.user.role in ['A','SUPP']:
-        all = ObamaCare.objects.filter(created_at__gte=start_of_month,created_at__lte=end_of_month).filter(agent = request.user.id, is_active = True, **company_filter ).count()
-        active = ObamaCare.objects.filter(status_color=3,created_at__gte=start_of_month,created_at__lte=end_of_month).filter(agent = request.user.id, is_active = True, **company_filter ).count()
-        process = ObamaCare.objects.filter(created_at__gte=start_of_month,created_at__lte=end_of_month).filter(Q(status_color=2) | Q(status_color=1)).filter(agent = request.user.id, is_active = True, **company_filter ).count()
-        cancell = ObamaCare.objects.filter(status_color=4,created_at__gte=start_of_month,created_at__lte=end_of_month).filter(agent = request.user.id, is_active = True, **company_filter ).count()
+        all = ObamaCare.objects.filter(created_at__gte=start_of_month,created_at__lte=end_of_month).filter(agent = request.user.id, is_active = True, **company_filter ).exclude(id__in=excluded_obama_ids).count()
+        active = ObamaCare.objects.filter(status_color=3,created_at__gte=start_of_month,created_at__lte=end_of_month).filter(agent = request.user.id, is_active = True, **company_filter ).exclude(id__in=excluded_obama_ids).count()
+        process = ObamaCare.objects.filter(created_at__gte=start_of_month,created_at__lte=end_of_month).filter(Q(status_color=2) | Q(status_color=1)).filter(agent = request.user.id, is_active = True, **company_filter ).exclude(id__in=excluded_obama_ids).count()
+        cancell = ObamaCare.objects.filter(status_color=4,created_at__gte=start_of_month,created_at__lte=end_of_month).filter(agent = request.user.id, is_active = True, **company_filter ).exclude(id__in=excluded_obama_ids).count()
        
    
     dicts = {
@@ -190,7 +141,8 @@ def countSalesObama(request, company_id=None):
     }
     return dicts
 
-def countSalesSupp(request, company_id=None):
+@company_ownership_required_sinURL
+def countSalesSupp(request):
 
     # Obtener el mes y el año actuales
     now = timezone.now()
@@ -204,6 +156,7 @@ def countSalesSupp(request, company_id=None):
 
     roleAuditar = ['S', 'C',  'AU', 'Admin']
 
+    company_id = request.company_id  # Obtener company_id desde request
     # Base query con filtro de compañía
     company_filter = {} if request.user.is_superuser else {'company': company_id}
     
@@ -227,7 +180,8 @@ def countSalesSupp(request, company_id=None):
     }
     return dicts
 
-def tableStatusObama(request, company_id=None):
+@company_ownership_required_sinURL
+def tableStatusObama(request):
 
     # Obtener la fecha y hora actual
     now = timezone.now()
@@ -240,24 +194,29 @@ def tableStatusObama(request, company_id=None):
 
     roleAuditar = ['S', 'C', 'AU', 'Admin']
 
+    company_id = request.company_id  # Obtener company_id desde request
     # Base query con filtro de compañía
     company_filter = {} if request.user.is_superuser else {'company': company_id}
+
+    # Obtener los IDs de ObamaCare que están en CustomerRedFlag
+    excluded_obama_ids = list(CustomerRedFlag.objects.values_list('obama_id', flat=True))
 
     # Construcción de la consulta basada en el rol del usuario
     if request.user.role in roleAuditar:
 
         # Realizamos la consulta y agrupamos por el campo 'profiling'
-        result = ObamaCare.objects.filter(created_at__gte=start_of_month, created_at__lt=end_of_month,is_active = True, **company_filter).values('profiling').annotate(count=Count('profiling')).order_by('profiling')
+        result = ObamaCare.objects.filter(created_at__gte=start_of_month, created_at__lt=end_of_month,is_active = True, **company_filter).exclude(id__in=excluded_obama_ids).values('profiling').annotate(count=Count('profiling')).order_by('profiling')
     
     elif request.user.role in ['A','SUPP']:
         
         # Realizamos la consulta y agrupamos por el campo 'profiling'
-        result = ObamaCare.objects.filter(created_at__gte=start_of_month, created_at__lt=end_of_month, is_active = True, **company_filter).values('profiling').filter(agent=request.user.id).annotate(count=Count('profiling')).order_by('profiling')
+        result = ObamaCare.objects.filter(created_at__gte=start_of_month, created_at__lt=end_of_month, is_active = True, **company_filter).exclude(id__in=excluded_obama_ids).values('profiling').filter(agent=request.user.id).annotate(count=Count('profiling')).order_by('profiling')
     
 
     return result
 
-def tableStatusSupp(request, company_id=None):
+@company_ownership_required_sinURL
+def tableStatusSupp(request):
 
     # Obtener la fecha y hora actual
     now = timezone.now()
@@ -271,6 +230,7 @@ def tableStatusSupp(request, company_id=None):
     # Roles con acceso ampliado
     roleAuditar = ['S', 'C', 'AU', 'Admin']
 
+    company_id = request.company_id  # Obtener company_id desde request
     # Base query con filtro de compañía
     company_filter = {} if request.user.is_superuser else {'company': company_id}
 

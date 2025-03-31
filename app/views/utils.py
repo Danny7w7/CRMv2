@@ -35,7 +35,6 @@ def format_decimal(number):
     # Si es decimal lo devuelve con dos numeros despues del punto
     return round(number, 2)
 
-
 #Websocket
 def notify_websocket(user_id):
     """
@@ -53,7 +52,7 @@ def notify_websocket(user_id):
         }
     )
 
-
+#Email
 def send_email(subject: str, receiver_email: str, template_name: str, context_data: Dict) -> bool:
     """
     Envía un email usando templates de Django.

@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const startDate = document.getElementById('start_date').value;
         const endDate = document.getElementById('end_date').value;
   
-        fetch(`/detalle-agente/${agenteId}/`,{
+        fetch(`/detalleAgente/${agenteId}/`,{
           method: 'POST',
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded',

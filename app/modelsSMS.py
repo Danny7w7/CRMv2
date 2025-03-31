@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from storages.backends.s3boto3 import S3Boto3Storage
-from .models import *
+from .models import Companies, Users
 
 # Create your models here.
 

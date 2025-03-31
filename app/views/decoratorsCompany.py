@@ -37,7 +37,7 @@ def company_ownership_required_sinURL(view_func):
             return render(request, "auth/404.html", {"message": "Acceso no autorizado."})
 
         if request.user.is_superuser:
-            request.company_id = 1  # O un valor por defecto si es necesario
+            request.company_id = 9999  # O un valor por defecto si es necesario
         else:
             try:
                 user = Users.objects.select_related('company').get(id=request.user.id)

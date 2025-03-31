@@ -95,7 +95,17 @@
 	<script src="{% static "assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js" %}"></script>
 	<script src="{% static "assets/plugins/datatable/js/jquery.dataTables.min.js" %}"></script>
 	<script src="{% static "assets/plugins/datatable/js/dataTables.bootstrap5.min.js" %}"></script>
-	<script src="{% static "assets/js/modalTypification.js" %}"></script>
+
+	<script src="{% static "assets/js/modals/modalTypification.js" %}"></script>
+    <script src="{% static "assets/js/chart/6week.js" %}"></script>
+
+    <script id="chartData" type="application/json">
+        {
+            "labels": {{ chart_data.labels|safe }},
+            "series": {{ chart_data.series|safe }}
+        }
+    </script>
+
 	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
 	<script>	

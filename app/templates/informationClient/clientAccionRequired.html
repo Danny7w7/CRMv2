@@ -81,8 +81,8 @@
 										</form>
 									</li>
 								</ul>
-								<a href="{% url 'editObama' obamacare.company.id obamacare.id 2 %}" class="ms-3"><i class='bx bxs-edit'></i></a>					
-								{% if request.user.is_superuser %}
+								<a href="{% url 'editObama' obamacare.id 2 %}" class="ms-3"><i class='bx bxs-edit'></i></a>					
+								{% if request.user.role == 'Admin' %}
 								<a href="{% url 'toggleObamaStatus' obamacare.id %}" class="ms-3">
 									<i class="bx bxs-trash"></i>
 								</a>

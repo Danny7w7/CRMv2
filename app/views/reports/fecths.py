@@ -3,9 +3,11 @@ import datetime
 
 # Django utilities
 from django.http import JsonResponse
+from django.db.models import Subquery
 
 # Application-specific imports
 from app.models import *
+from ..decoratorsCompany import *
 
 def get_observation_detail(request, observation_id):
     try:
@@ -27,7 +29,13 @@ def get_observation_detail(request, observation_id):
     except ObservationCustomer.DoesNotExist:
         return JsonResponse({'error': 'Registro no encontrado'}, status=404)
 
+@company_ownership_required_sinURL
 def SaleModal(request, agent_id):
+
+    company_id = request.company_id  # Obtener company_id desde request
+    company_filter = {'company': company_id} if not request.user.is_superuser else {}
+    # Obtener los IDs de ObamaCare que están en CustomerRedFlag
+    excluded_obama_ids = CustomerRedFlag.objects.values('obama_id')
 
     start_date = request.POST.get('start_date')  # Obtiene start_date desde la URL
     end_date = request.POST.get('end_date')      # Obtiene end_date desde la URL
@@ -50,8 +58,8 @@ def SaleModal(request, agent_id):
         )
 
     saleModalObama = ObamaCare.objects.select_related('agent', 'client').filter(
-        agent_id=agent_id, created_at__range=[start_date, end_date], is_active = True
-    )
+        agent_id=agent_id, created_at__range=[start_date, end_date], is_active = True, **company_filter
+    ).exclude( id__in=Subquery(excluded_obama_ids))
     saleModalSupp = Supp.objects.select_related('agent', 'client').filter(
         agent_id=agent_id, created_at__range=[start_date, end_date], is_active = True
     )
@@ -73,7 +81,7 @@ def SaleModal(request, agent_id):
                 'client_name':  f'{sale.client.first_name} {sale.client.last_name}',
                 'created_at': sale.created_at.strftime('%Y-%m-%d'),
                 'details': sale.status,  # Asegúrate de tener este campo en tu modelo
-                'carrier':  f'{sale.company} - {sale.policy_type}'
+                'carrier':  f'{sale.carrier} - {sale.policy_type}'
             }
             for sale in saleModalSupp
         ],
