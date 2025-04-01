@@ -57,11 +57,24 @@ document.addEventListener('DOMContentLoaded', function() {
             "#effectiveDateSupp", 
             "[id^='dateBirthDependent']", 
             "#date_effective_coverage", 
-            "#date_effective_coverage_end"
+            "#date_effective_coverage_end",
+            "paymentDate"
         ];
 
         datepickerConfigs.forEach(selector => {
             flatpickr(selector, { dateFormat: "m/d/Y" });
         });
+
+        // Obtén el elemento del modal (reemplaza 'tuModalId' con el ID real de tu modal)
+        const paymentModal = document.getElementById('modalPaymentsDate');
+
+        if (paymentModal) {
+            paymentModal.addEventListener('shown.bs.modal', function () {
+                const paymentDateInput = document.getElementById('paymentDate');
+                if (paymentDateInput) {
+                    flatpickr(paymentDateInput, { dateFormat: "m/d/Y" });
+                }
+            });
+        }
     }
 });

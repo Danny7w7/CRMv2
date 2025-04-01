@@ -586,16 +586,19 @@
 						<!-- Botones para abrir los modales -->
 						{% if request.user.role != 'A' %}
 							<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalSelector">
-								Enter Observation
+								Observation
 							</button>
 							<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalDocument">
-								Enter Documents
+								Documents
 							</button>
 							<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalAppointment">
-								Enter Appointment
+								Appointment
 							</button>
 							<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalPayments">
-								Enter Payments
+								Payments
+							</button>
+							<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalPaymentsDate">
+								Date Payment
 							</button>
 						{% endif %} 
 						<button type="button" class="btn btn-secondary me-2" data-bs-toggle="modal" data-bs-target="#modalVerTexto">
@@ -752,6 +755,37 @@
 											<input type="time" class="form-control" name="timeAppointment" id="timeAppointment" required >
 										</div>
 										<button type="submit" class="btn btn-primary">Send</button>
+									</form>
+									
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Modal para ingresar fecha de recordatorio de pago -->
+					<div class="modal fade" id="modalPaymentsDate" tabindex="-1" aria-labelledby="modalPaymentsDateLabel" aria-hidden="true">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="modalAppointmentLabel">Enter Collection Message Date</h5>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								</div>
+								<div class="modal-body">
+									<form id="paymentDateObama" action="{% url 'paymentDateObama' obamacare.id %}" method="POST">
+										{% csrf_token %}
+										<div class="mb-3">
+											<label for="paymentDate" class="form-label">Collection reminder date:</label>
+											<input type="text" class="form-control" name="paymentDate" id="paymentDate" required >
+											{% if paymentDateObama %}
+												<label for="">📌 Collection date: <strong>{{paymentDateObama.payment_date}}</strong> </label>
+											{% endif %}
+										</div>
+										<div class="d-flex justify-content-between">
+											<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalSelector" data-bs-dismiss="modal">
+												Back
+											</button>
+											<button type="submit" class="btn btn-primary">Saved</button>
+										</div>
 									</form>
 									
 								</div>
@@ -994,34 +1028,62 @@
 								</div>
 								<div class="modal-body">
 									<div class="table-responsive" >
-										<table id="paymentsTable" class="table" >
-											<thead>
-												<tr>
-													<th scope="col">Month</th>
-													<th scope="col">Option</th>
-												</tr>
+										<table id="paymentsTable" class="table table-striped table-hover table-bordered shadow-sm">
+											<thead class="table-light">
+											  <tr>
+												<th scope="col" class="align-middle">Month</th>
+												<th scope="col" class="text-center align-middle">Pay</th>
+												<th scope="col" class="text-center align-middle">Discount</th>
+											  </tr>
 											</thead>
 											<tbody>
-												{% for month in monthInEnglish %}
-													<tr class="">
-														<td scope="row">{{month}}</td>
-														<td>
-															{% if request.user.role == 'Admin' %}
-																<label class="switch">
-																	<input value="{{month}}" type="checkbox" {% for payMonth in monthsPaid %} {% if month == payMonth.month %}checked{% endif %}{% endfor %} >
-																	<span class="slider round"></span>
-																</label>
-															{% else %}
-																<label class="switch">
-																	<input value="{{month}}" type="checkbox" {% for payMonth in monthsPaid %} {% if month == payMonth.month %}checked disabled{% endif %}{% endfor %}>
-																	<span class="slider round"></span>
-																</label>
-															{% endif %}
-														</td>
-													</tr>
-												{% endfor %}
+											  {% for month in monthInEnglish %}
+												<tr>
+												  <td scope="row" class="fw-semibold align-middle">{{month}}</td>
+												  <td class="text-center">
+													<div class="form-check form-switch d-flex justify-content-center">
+													  <input 
+														class="form-check-input" 
+														type="checkbox" 
+														role="switch"
+														value="{{month}}"
+														id="paySwitch{{forloop.counter}}" 
+														name="type_pay_{{PAY}}"  
+														{% for payMonth in monthsPaid %} 
+														  {% if month == payMonth.month %}checked{% endif %}
+														{% endfor %}
+														{% if request.user.role != 'Admin' %} 
+														  {% for payMonth in monthsPaid %}
+															{% if month == payMonth.month %}disabled{% endif %}
+														  {% endfor %}
+														{% endif %}
+													  >
+													</div>
+												  </td>
+												  <td class="text-center">
+													<div class="form-check form-switch d-flex justify-content-center">
+													  <input 
+														class="form-check-input bg-danger border-danger" 
+														type="checkbox" 
+														role="switch"
+														value="{{month}}" 
+														id="discountSwitch{{forloop.counter}}"
+														name="type_pay_{{DISCOUNT}}" 
+														{% for payMonth in monthsPaid %} 
+														  {% if month == payMonth.month %}checked{% endif %}
+														{% endfor %}
+														{% if request.user.role != 'Admin' %} 
+														  {% for payMonth in monthsPaid %}
+															{% if month == payMonth.month %}disabled{% endif %}
+														  {% endfor %}
+														{% endif %}
+													  >
+													</div>
+												  </td>
+												</tr>
+											  {% endfor %}
 											</tbody>
-										</table>
+										</table>									  
 									</div>
 									
 								</div>
@@ -1194,13 +1256,15 @@
 	<script src="{% static 'assets/js/validations/validationZicode.js' %}"></script>
 	<script src="{% static 'assets/js/validations/saveDocumentObama.js' %}" defer></script>	
 	<script src="{% static 'assets/js/payments/fetchPayments.js' %}"></script>
+	<script src="{% static 'assets/js/payments/paymentDateObama.js' %}"></script>
 	<script src="{% static 'assets/js/validations/editObama.js' %}"></script>
+	<script src="{% static 'assets/js/sms/scripts.js' %}"></script>
 
 	<link href="https://unpkg.com/filepond/dist/filepond.min.css" rel="stylesheet">
 	<script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
 	<script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.min.js"></script>
 
-	<script src="{% static 'assets/js/saveDocumentObama.js' %}"></script>
+	<script src="{% static 'assets/js/validations/saveDocumentObama.js' %}"></script>
 
 	<!-- Scripts SMS's -->
 	<script>
@@ -1212,9 +1276,6 @@
 		var chat_name = '{{ contact.name }}'
 		var	is_message_unread = '{{chat.is_message_unread}}'.toLowerCase() === "true";
 	</script>
-	<script src="{% static 'assets/js/sms/scripts.js' %}"></script>
 
-	<!-- Scripts Payments -->
-	<script src="{% static 'assets/js/fetchPayments.js' %}"></script>
 	
 {% endblock %}

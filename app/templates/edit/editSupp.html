@@ -370,6 +370,9 @@
 						<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalIngresarTexto">
 							Enter Observation
 						</button>
+						<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalPaymentsDate">
+							Date Payment
+						</button>
 					{% endif %} 
 
 					<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalVerTexto">
@@ -487,6 +490,37 @@
 							</div>
 						</div>
 					</div>
+
+					<!-- Modal para ingresar fecha de recordatorio de pago -->
+					<div class="modal fade" id="modalPaymentsDate" tabindex="-1" aria-labelledby="modalPaymentsDateLabel" aria-hidden="true">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="modalAppointmentLabel">Enter Collection Message Date</h5>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								</div>
+								<div class="modal-body">
+									<form id="paymentDateSupp" action="{% url 'paymentDateSupp' supps.id %}" method="POST">
+										{% csrf_token %}
+										<div class="mb-3">
+											<label for="paymentDate" class="form-label">Collection reminder date:</label>
+											<input type="text" class="form-control" name="paymentDate" id="paymentDate" required >
+											{% if paymentDateSupp %}
+												<label for="">📌 Collection date: <strong>{{paymentDateSupp.payment_date}}</strong> </label>
+											{% endif %}
+										</div>
+										<div class="d-flex justify-content-between">
+											<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalSelector" data-bs-dismiss="modal">
+												Back
+											</button>
+											<button type="submit" class="btn btn-primary">Saved</button>
+										</div>
+									</form>
+									
+								</div>
+							</div>
+						</div>
+					</div>
 					
 				</div>
             </div>
@@ -600,6 +634,7 @@
 	<script src="{% static 'assets/js/validations/blockSocial.js' %}"></script>
 	<script src="{% static 'assets/js/validations/validationZicode.js' %}"></script>
 	<script src="{% static 'assets/js/validations/editSupp.js' %}"></script>
+	<script src="{% static 'assets/js/payments/paymentDateSupp.js' %}"></script>
 
 	<!-- Scripts SMS's -->
 	<script>

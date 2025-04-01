@@ -81,6 +81,7 @@ urlpatterns = [
     path('viewConsent/<obamacare_id>/', consents.consent, name='viewConsent'),
     path('viewIncomeLetter/<obamacare_id>/', consents.incomeLetter, name='incomeLetter'),
     path('validarCita/', modals.validarCita, name='validarCita'),
+    path('paymentDateObama/<obama_id>/', modals.paymentDateObama, name='paymentDateObama'),
 
     path('clientAccionRequired/', table.clientAccionRequired, name='clientAccionRequired'),
 
@@ -88,6 +89,7 @@ urlpatterns = [
     path('toggleSuppStatus/<supp_id>/', toggles.toggleSuppStatus, name='toggleSuppStatus'),
     path('editSupp/<supp_id>/', edits.editSupp, name='editSupp'),
     path('saveCustomerObservationSupp/', modals.saveCustomerObservationSupp, name='saveCustomerObservationSupp'),
+    path('paymentDateSupp/<supp_id>/', modals.paymentDateSupp, name='paymentDateSupp'),
 
     path('clientMedicare/', table.clientMedicare, name='clientMedicare'),
     path('editClientMedicare/<medicare_id>/', edits.editClientMedicare, name='editClientMedicare'),

@@ -78,34 +78,81 @@ def blockSocialSecurityMedicare(request):
 
     return JsonResponse({'status': 'error', 'message': 'Solicitud no válida.'}, status=400)
 
-@csrf_exempt
+
+
+
+@csrf_exempt  # Solo usar en pruebas; manejar CSRF en producción correctamente
 def fetchPaymentsMonth(request):
-    form = PaymentsForm(request.POST)
     if request.method == 'POST':
+        try:
+            data = json.loads(request.body)  # Leer JSON del request
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'message': 'Invalid JSON'}, status=400)
+
+        obamaCare_id = data.get('obamaCare')
+        month = data.get('month')
+        type_pay = data.get('type_pay')  # Obtener el tipo de pago
+        type_discount = data.get('type_discount')  # Obtener el tipo de descuento
+
+        # Validación de los datos recibidos
+        if not obamaCare_id or not month:
+            return JsonResponse({'success': False, 'message': 'Faltan datos'}, status=400)
+
+        # Obtener la instancia de ObamaCare
+        obama = ObamaCare.objects.filter(id=obamaCare_id).first()
+        if not obama:
+            return JsonResponse({'success': False, 'message': 'ObamaCare no encontrado'}, status=404)
+
+        # Ahora, según el tipo de checkbox seleccionado, asignamos el tipo de pago o descuento
+        if type_pay:
+            type = 'pay'  # Si el tipo de pago es 'pay'
+        elif type_discount:
+            type = 'discount'  # Si el tipo de pago es 'discount'
+        else:
+            type = 'unknown'  # Si ninguno está seleccionado, asignamos 'unknown'
+
+
+        
+        # Crear el formulario de Payments con los datos recibidos
+        form_data = {
+            'obamaCare': obamaCare_id,
+            'month': month,
+            'typePayment': type,  # Asignar el tipo de pago o descuento
+            'company': obama.company.id,  # Asignar la compañía, usando el ID
+        }
+
+        # Crear el formulario de Payments con los datos
+        form = PaymentsForm(form_data)
         if form.is_valid():
             payment = form.save(commit=False)
-            payment.agent = request.user
+            payment.agent = request.user  # Asignar el agente (usuario que hace la solicitud)
             payment.save()
             return JsonResponse({'success': True, 'message': 'Payment creado correctamente', 'role': request.user.role})
         else:
-            # Si el formulario no es válido, devolvemos los errores en formato JSON
             return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+
+
     elif request.method == 'DELETE':
         try:
-            data = json.loads(request.body)
-            obamaCare = data.get('obamaCare')
-            month = data.get('month')
-
-            # Buscar y eliminar el pago
-            payment = Payments.objects.filter(obamaCare=obamaCare, month=month).first()
-            if payment:
-                payment.delete()
-                return JsonResponse({'success': True, 'message': 'Payment eliminado correctamente'})
-            else:
-                return JsonResponse({'success': False, 'message': 'Payment no encontrado'}, status=404)
-
+            # Asegúrate de que el contenido de la solicitud sea JSON
+            data = json.loads(request.body.decode('utf-8'))  # Decodificar correctamente si es necesario
         except json.JSONDecodeError:
             return JsonResponse({'success': False, 'message': 'Invalid JSON'}, status=400)
+
+        obamaCare_id = data.get('obamaCare')
+        month = data.get('month')
+
+        if not obamaCare_id or not month:
+            return JsonResponse({'success': False, 'message': 'Faltan datos'}, status=400)
+
+        # Buscar y eliminar el pago
+        payment = Payments.objects.filter(obamaCare=obamaCare_id, month=month).first()
+        if payment:
+            payment.delete()
+            return JsonResponse({'success': True, 'message': 'Payment eliminado correctamente'})
+        else:
+            return JsonResponse({'success': False, 'message': 'Payment no encontrado'}, status=404)
+
     return JsonResponse({'success': False, 'message': 'Método no permitido'}, status=405)
 
 def delete_dependent(request, dependent_id):

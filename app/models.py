@@ -280,6 +280,7 @@ class Payments(models.Model):
     obamaCare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
     agent = models.ForeignKey(Users, on_delete=models.CASCADE)
     month = models.CharField(max_length=20)
+    typePayment = models.CharField(max_length=20)
     created_at = models.DateTimeField(auto_now_add=True)
     company = models.ForeignKey(Companies, on_delete=models.CASCADE)
     # amount = models.DecimalField(max_digits=6, decimal_places=2) esto lo guardo aqui para un futuro

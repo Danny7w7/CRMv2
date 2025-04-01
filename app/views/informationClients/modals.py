@@ -5,6 +5,7 @@ import re
 # Django utilities
 from django.http import JsonResponse, HttpResponse
 from django.utils.timezone import make_aware
+from django.utils.dateparse import parse_date
 
 # Django core libraries
 from django.contrib import messages
@@ -238,3 +239,60 @@ def saveAppointment(request, obamacare_id):
 
     return redirect('editObama', obamacare_id, way)   
 
+def paymentDateObama(request, obama_id):
+
+    obamacare = get_object_or_404(ObamaCare, id=obama_id)
+
+    if request.method == "POST":
+        payment_date = request.POST.get("paymentDate")
+
+        # Validar que la fecha no sea vacía
+        if not payment_date:
+            return JsonResponse({"error": "Date is required"}, status=400)
+
+        # Intentar parsear la fecha en formato YYYY-MM-DD
+        parsed_date = parse_date(payment_date)
+
+        if parsed_date is None:
+            return JsonResponse({"error": "Invalid date format. Expected YYYY-MM-DD."}, status=400)
+
+        # Actualizar o crear el registro de PaymentDate
+        payment_record, created = paymentDate.objects.update_or_create(
+            obama=obamacare,  
+            defaults={"payment_date": parsed_date},
+            agent_create = request.user
+        )
+
+        message = "Recode SMS Created!" if created else "Date of updated billing SMS!"
+        return JsonResponse({"message": message, "id": payment_record.id})
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
+def paymentDateSupp(request, supp_id):
+
+    supp = get_object_or_404(Supp, id=supp_id)
+
+    if request.method == "POST":
+        payment_date = request.POST.get("paymentDate")
+
+        # Validar que la fecha no sea vacía
+        if not payment_date:
+            return JsonResponse({"error": "Date is required"}, status=400)
+
+        # Intentar parsear la fecha en formato YYYY-MM-DD
+        parsed_date = parse_date(payment_date)
+
+        if parsed_date is None:
+            return JsonResponse({"error": "Invalid date format. Expected YYYY-MM-DD."}, status=400)
+
+        # Actualizar o crear el registro de PaymentDate
+        payment_record, created = paymentDate.objects.update_or_create(
+            supp=supp,  
+            defaults={"payment_date": parsed_date},
+            agent_create = request.user
+        )
+
+        message = "Recode SMS Created!" if created else "Date of updated billing SMS!"
+        return JsonResponse({"message": message, "id": payment_record.id})
+
+    return JsonResponse({"error": "Invalid request"}, status=400)

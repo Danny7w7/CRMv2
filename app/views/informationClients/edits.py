@@ -218,6 +218,7 @@ def editObama(request ,obamacare_id, way):
     apppointment = AppointmentClient.objects.select_related('obama','agent_create').filter(obama = obamacare_id)
     userCarrier = UserCarrier.objects.filter(obama = obamacare_id).first()
     accionRequired = CustomerRedFlag.objects.filter(obama = obamacare)    
+    paymentDateObama = paymentDate.objects.filter(obama = obamacare).first()
         
     if letterCard and letterCard.letters and letterCard.card: 
         newLetterCard = True
@@ -506,6 +507,7 @@ def editObama(request ,obamacare_id, way):
         'way': way,
         'description' : description,
         'old' : old,
+        'paymentDateObama': paymentDateObama,
         #SMS Blue
         'contact':contact,
         'chat':chat,
@@ -562,6 +564,7 @@ def editSupp(request, supp_id):
     obsSupp = ObservationAgent.objects.filter(id_supp=supp_id)
     obsCus = ObservationCustomer.objects.select_related('agent').filter(client_id=supp.client.id, type_police = 'SUPP')
     list_drow = DropDownList.objects.filter(profiling_supp__isnull=False)
+    paymentDateSupp = paymentDate.objects.filter(supp = supp).first()
 
     # Obtener el objeto Supp que tiene el id `supp_id`
     supp_instance = Supp.objects.get(id=supp_id)
@@ -705,6 +708,7 @@ def editSupp(request, supp_id):
         'obsCustomer': obsCus,
         'list_drow': list_drow,
         'old' : old,
+        'paymentDateSupp' : paymentDateSupp,
         #SMS Blue
         'contact':contact,
         'chat':chat,
