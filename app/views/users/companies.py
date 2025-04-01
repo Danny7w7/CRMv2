@@ -23,17 +23,18 @@ def formCreateCompanies(request):
         email = request.POST.get('email')
         
         try:
-            companie = Companies.objects.create(
+            company = Companies.objects.create(
                 owner=owner,
                 company_name=name, 
                 phone_company=phone,
-                company_email=email
+                company_email=email,
+                remaining_balance=20
             )
 
             companies = Companies.objects.all()
 
             context = {
-                'msg':f'Companies {companie.owner} creado con éxito.',
+                'msg':f'Companies {company.company_name} creado con éxito.',
                 'companies':companies,
                 'type':'good'
             }
@@ -50,9 +51,9 @@ def formCreateCompanies(request):
     return render(request, 'companies/formCreateCompanies.html', context)
 
 @login_required(login_url='/login') 
-def editCompanies(request, companies_id):
+def editCompanies(request, company_id):
     # Obtener el usuario a editar o devolver un 404 si no existe
-    company = get_object_or_404(Companies, id=companies_id)
+    company = get_object_or_404(Companies, id=company_id)
 
     if request.method == 'POST':
         # Recuperar los datos del formulario
@@ -81,12 +82,12 @@ def editCompanies(request, companies_id):
     return render(request, ' companies/editCompanies.html', context)
 
 @login_required(login_url='/login') 
-def toggleCompanies(request, companies_id):
+def toggleCompanies(request, company_id):
     # Obtener el cliente por su ID
-    company = get_object_or_404(Companies, id=companies_id)
+    company = get_object_or_404(Companies, id=company_id)
 
     users = Users.objects.filter(company=company)
-    users.update(is_active=F('is_active').invert())    
+    users.update(is_active=~F('is_active'))
     
     # Cambiar el estado de is_active (True a False o viceversa)
     company.is_active = not company.is_active

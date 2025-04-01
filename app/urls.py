@@ -181,8 +181,8 @@ urlpatterns = [
 
     #<---------------------------Company---------------------------> 
     path('formCreateCompanies/', companies.formCreateCompanies, name='formCreateCompanies'),
-    path('editCompanies/<companies_id>', companies.editCompanies, name='editCompanies'),
-    path('toggleCompanies/<companies_id>/', companies.toggleCompanies, name='toggleCompanies'),
+    path('editCompanies/<company_id>', companies.editCompanies, name='editCompanies'),
+    path('toggleCompanies/<company_id>/', companies.toggleCompanies, name='toggleCompanies'),
     path('createServices/', companies.createServices, name='createServices'),
     path('addSubscription/', companies.addSubscription, name='addSubscription'),
     

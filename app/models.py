@@ -516,7 +516,7 @@ class LettersCard(models.Model):
 
 class AppointmentClient(models.Model):
     obama = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
-    agent_create = models.ForeignKey(Users,on_delete=models.CASCADE )    
+    agent_create = models.ForeignKey(Users,on_delete=models.CASCADE)    
     appointment = models.TextField() 
     dateAppointment = models.DateField()
     timeAppointment = models.TimeField()
