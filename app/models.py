@@ -289,10 +289,10 @@ class Payments(models.Model):
         db_table = 'payments'
 
 class ObservationAgent(models.Model):
-    id_client = models.ForeignKey(Clients, on_delete=models.CASCADE)
-    id_obamaCare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null=True, blank=True)
-    id_supp = models.ForeignKey(Supp, on_delete=models.CASCADE, null=True, blank=True)
-    id_user = models.ForeignKey(Users, on_delete=models.CASCADE)
+    client = models.ForeignKey(Clients, on_delete=models.CASCADE)
+    obamaCare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null=True, blank=True)
+    supp = models.ForeignKey(Supp, on_delete=models.CASCADE, null=True, blank=True)
+    user = models.ForeignKey(Users, on_delete=models.CASCADE)
     content = models.TextField()
 
     class Meta:
