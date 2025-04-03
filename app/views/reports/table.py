@@ -83,7 +83,7 @@ def sale(request):
 def saleObamaAgent(request, company_id, start_date=None, end_date=None):
 
     # Obtener los IDs de ObamaCare que están en CustomerRedFlag
-    excluded_obama_ids = CustomerRedFlag.objects.values('obama_id')
+    excluded_obama_ids = CustomerRedFlag.objects.values('obamacare_id')
 
     if request.user.is_superuser:
         # Definir la consulta base para Supp, utilizando `select_related` para obtener el nombre completo del agente (User)
@@ -154,7 +154,7 @@ def saleObamaAgent(request, company_id, start_date=None, end_date=None):
 def saleObamaAgentUsa(request, company_id, start_date=None, end_date=None):
 
     # Obtener los IDs de ObamaCare que están en CustomerRedFlag
-    excluded_obama_ids = CustomerRedFlag.objects.values('obama_id')
+    excluded_obama_ids = CustomerRedFlag.objects.values('obamacare_id')
 
     if request.user.is_superuser:
         # Definir la consulta base para Supp, utilizando `values` para obtener el nombre del agente (agent_usa)
@@ -360,7 +360,7 @@ def salesBonusAgent(request, company_id, start_date=None, end_date=None):
 
     company_filter = {'company': company_id} if not request.user.is_superuser else {}
     # Obtener los IDs de ObamaCare que están en CustomerRedFlag
-    excluded_obama_ids = CustomerRedFlag.objects.values('obama_id')
+    excluded_obama_ids = CustomerRedFlag.objects.values('obamacare')
 
     # Consulta para Supp
     sales_query_supp = Supp.objects.select_related('agent').filter(is_active=True,  **company_filter) \
@@ -478,7 +478,7 @@ def saleClientStatusObama(request, company_id, start_date=None, end_date=None):
 
     company_filter = {'company': company_id} if not request.user.is_superuser else {}
     # Obtener los IDs de ObamaCare que están en CustomerRedFlag
-    excluded_obama_ids = CustomerRedFlag.objects.values('obama_id')
+    excluded_obama_ids = CustomerRedFlag.objects.values('obamacare')
 
     # Consulta para Registered
     sales_query_registered = ObamaCare.objects.select_related('agent','client').annotate(
@@ -606,7 +606,7 @@ def customerPerformance(request):
     company_filter2 = {'obama__company': company_id} if not request.user.is_superuser else {}
 
     # Obtener los IDs de ObamaCare que están en CustomerRedFlag
-    excluded_obama_ids = CustomerRedFlag.objects.values('obama_id')
+    excluded_obama_ids = CustomerRedFlag.objects.values('obamacare')
 
     if request.method == 'POST':
         # Convertir fechas a objetos datetime con zona horaria
@@ -787,7 +787,7 @@ def table6Week(request):
     company_filter = {'company': company_id} if not request.user.is_superuser else {}
 
     # Obtener los IDs de ObamaCare que están en CustomerRedFlag
-    excluded_obama_ids = CustomerRedFlag.objects.values('obama_id')
+    excluded_obama_ids = CustomerRedFlag.objects.values('obamacare')
 
     users = Users.objects.filter(role__in=userRoles, is_active=True,  **company_filter).exclude(username__in=excludedUsernames)
 
@@ -924,7 +924,7 @@ def weekSalesSummary(request, week_number):
     company_filter = {'company': company_id} if not request.user.is_superuser else {}
 
     # Obtener los IDs de ObamaCare que están en CustomerRedFlag
-    excluded_obama_ids = CustomerRedFlag.objects.values('obama_id')
+    excluded_obama_ids = CustomerRedFlag.objects.values('obamacare')
 
     users = Users.objects.exclude(username__in=excludedUsernames).filter(role__in=userRoles, is_active=True,  **company_filter)
 

@@ -1,5 +1,5 @@
 # Standard Python libraries
-from django.http import JsonResponse, HttpResponse
+from django.http import HttpResponse
 from django.db.models import F
 
 # Django core libraries
@@ -28,7 +28,7 @@ def formCreateCompanies(request):
                 company_name=name, 
                 phone_company=phone,
                 company_email=email,
-                remaining_balance=20
+                remaining_balance=0
             )
 
             companies = Companies.objects.all()

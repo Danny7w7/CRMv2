@@ -51,7 +51,7 @@ def chart6WeekSale(request):
     company_filter = {'company': company_id} if not request.user.is_superuser else {}
 
     # Obtener los IDs de ObamaCare que están en CustomerRedFlag
-    excluded_obama_ids = CustomerRedFlag.objects.values('obama_id')
+    excluded_obama_ids = CustomerRedFlag.objects.values('obamacare_id')
 
     # Obtener los datos de pólizas activas para las últimas 6 semanas
     activeObamaPolicies = ObamaCare.objects.filter(status='Active', created_at__range=[startDate, endOfCurrentWeek],is_active = True,  **company_filter).exclude( id__in=Subquery(excluded_obama_ids))
@@ -241,7 +241,7 @@ def get_agent_sales(request, start_date, end_date):
     company_filter = {'company': company_id} if not request.user.is_superuser else {}
 
     # Obtener los IDs de ObamaCare que están en CustomerRedFlag
-    excluded_obama_ids = CustomerRedFlag.objects.values('obama_id')
+    excluded_obama_ids = CustomerRedFlag.objects.values('obamacare_id')
 
     userExcludes = ['CarmenR', 'MariaCaTi']
 

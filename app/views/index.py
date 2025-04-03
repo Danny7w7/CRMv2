@@ -49,7 +49,7 @@ def chartSaleIndex(request):
     )
 
     # Excluir IDs de ObamaCare en CustomerRedFlag
-    excluded_obama_ids = list(CustomerRedFlag.objects.values_list('obama_id', flat=True))
+    excluded_obama_ids = list(CustomerRedFlag.objects.values_list('obamacare_id', flat=True))
 
     company_id = request.company_id  # Obtener company_id desde request
     # Filtro de compañía si no es superusuario
@@ -119,7 +119,7 @@ def countSalesObama(request):
     company_filter = {} if request.user.is_superuser else {'company': company_id}
 
     # Obtener los IDs de ObamaCare que están en CustomerRedFlag
-    excluded_obama_ids = list(CustomerRedFlag.objects.values_list('obama_id', flat=True))
+    excluded_obama_ids = list(CustomerRedFlag.objects.values_list('obamacare_id', flat=True))
     
     if request.user.role in roleAuditar:        
         all = ObamaCare.objects.filter(created_at__gte=start_of_month,created_at__lte=end_of_month,is_active = True,**company_filter).exclude(id__in=excluded_obama_ids).count()
@@ -199,7 +199,7 @@ def tableStatusObama(request):
     company_filter = {} if request.user.is_superuser else {'company': company_id}
 
     # Obtener los IDs de ObamaCare que están en CustomerRedFlag
-    excluded_obama_ids = list(CustomerRedFlag.objects.values_list('obama_id', flat=True))
+    excluded_obama_ids = list(CustomerRedFlag.objects.values_list('obamacare_id', flat=True))
 
     # Construcción de la consulta basada en el rol del usuario
     if request.user.role in roleAuditar:

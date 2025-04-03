@@ -21,27 +21,27 @@ def clientObamacare(request):
         obamaCare = ObamaCare.objects.select_related('agent','client').annotate(
             truncated_agent_usa=Substr('agent_usa', 1, 8)).exclude(
                 id__in=CustomerRedFlag.objects.filter(date_completed__isnull=True).values_list(
-                    'obama_id', flat=True)).order_by('-created_at')       
+                    'obamacare_id', flat=True)).order_by('-created_at')       
     elif request.user.role == 'Admin':       
         obamaCare = ObamaCare.objects.select_related('agent','client').annotate(
             truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(company = company_id).exclude(
                 id__in=CustomerRedFlag.objects.filter(date_completed__isnull=True).values_list(
-                    'obama_id', flat=True)).order_by('-created_at')    
+                    'obamacare_id', flat=True)).order_by('-created_at')    
     elif request.user.username == 'zohiraDuarte':
        obamaCare = ObamaCare.objects.select_related('agent','client').annotate(
             truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(is_active = True, agent_usa = zohira).exclude(
                 id__in=CustomerRedFlag.objects.filter(date_completed__isnull=True).values_list(
-                    'obama_id', flat=True)).order_by('-created_at') 
+                    'obamacare_id', flat=True)).order_by('-created_at') 
     elif request.user.username == 'vladimirDeLaHoz':
         obamaCare = ObamaCare.objects.select_related('agent','client').annotate(
             truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(is_active = True, agent_usa = vladimir).exclude(
                 id__in=CustomerRedFlag.objects.filter(date_completed__isnull=True).values_list(
-                    'obama_id', flat=True)).order_by('-created_at')
+                    'obamacare_id', flat=True)).order_by('-created_at')
     else:
         obamaCare = ObamaCare.objects.select_related('agent', 'client').annotate(
             truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(is_active = True, company = company_id).exclude(
                 id__in=CustomerRedFlag.objects.filter(date_completed__isnull=True).values_list(
-                    'obama_id', flat=True)).order_by('-created_at')  
+                    'obamacare_id', flat=True)).order_by('-created_at')  
 
     context = {
         'obamacares': obamaCare,
@@ -61,14 +61,14 @@ def clientAccionRequired(request):
             truncated_agent_usa=Substr('agent_usa', 1, 8),customer_red_flag_clave=Subquery(
                 CustomerRedFlag.objects.filter(obama_id=OuterRef('id'), date_completed__isnull=True
                     ).values('clave')[:1] )).filter( id__in=CustomerRedFlag.objects.filter(
-                        date_completed__isnull=True ).values_list('obama_id', flat=True) ).order_by('-created_at')
+                        date_completed__isnull=True ).values_list('obamacare_id', flat=True) ).order_by('-created_at')
     
     elif request.user.role == 'Admin':       
         obamaCare = ObamaCare.objects.select_related('agent', 'client').annotate(
             truncated_agent_usa=Substr('agent_usa', 1, 8),customer_red_flag_clave=Subquery(
                 CustomerRedFlag.objects.filter(obama_id=OuterRef('id'), date_completed__isnull=True
                     ).values('clave')[:1] )).filter( id__in=CustomerRedFlag.objects.filter(
-                        date_completed__isnull=True ).values_list('obama_id', flat=True), company = company_id ).order_by('-created_at')
+                        date_completed__isnull=True ).values_list('obamacare', flat=True), company = company_id ).order_by('-created_at')
         
     elif request.user.role == 'S' :   
 
@@ -76,14 +76,14 @@ def clientAccionRequired(request):
             truncated_agent_usa=Substr('agent_usa', 1, 8),customer_red_flag_clave=Subquery(
                 CustomerRedFlag.objects.filter(obama_id=OuterRef('id'), date_completed__isnull=True
                     ).values('clave')[:1] )).filter( id__in=CustomerRedFlag.objects.filter(
-                        date_completed__isnull=True ).values_list('obama_id', flat=True), is_active = True, company = company_id ).order_by('-created_at')    
+                        date_completed__isnull=True ).values_list('obamacare', flat=True), is_active = True, company = company_id ).order_by('-created_at')    
 
     else:        
         obamaCare = ObamaCare.objects.select_related('agent', 'client').annotate(
             truncated_agent_usa=Substr('agent_usa', 1, 8),customer_red_flag_clave=Subquery(
                 CustomerRedFlag.objects.filter(obama_id=OuterRef('id'), date_completed__isnull=True
                     ).values('clave')[:1] )).filter( id__in=CustomerRedFlag.objects.filter(
-                        date_completed__isnull=True ).values_list('obama_id', flat=True
+                        date_completed__isnull=True ).values_list('obamacare', flat=True
                             ), is_active = True, agent_id = request.user.id, company = company_id ).order_by('-created_at')
 
 

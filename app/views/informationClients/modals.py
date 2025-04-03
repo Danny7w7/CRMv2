@@ -38,13 +38,13 @@ def saveCustomerObservationACA(request):
         # Convertir las observaciones a una cadena (por ejemplo, separada por comas o saltos de línea)
         typification_text = ", ".join(observations)  # Puedes usar "\n".join(observations) si prefieres saltos de línea
     
-        plan = ObamaCare.objects.get(id=plan_id)
+        obamacare = ObamaCare.objects.get(id=plan_id)
 
         if content.strip():  # Validar que el texto no esté vacío
             ObservationCustomer.objects.create(
-                client=plan.client,
+                client=obamacare.client,
                 agent=request.user,
-                id_plan=plan.id,
+                obamacare=obamacare.id,
                 type_police=type_plan,
                 typeCall=typeCall,
                 typification=typification_text, # Guardamos las observaciones en el campo 'typification'
@@ -54,7 +54,7 @@ def saveCustomerObservationACA(request):
         else:
             messages.error(request, "El contenido de la observación no puede estar vacío.")
 
-        return redirect('editObama', plan.id, way)       
+        return redirect('editObama', obamacare.id, way)       
         
     else:
         return HttpResponse("Método no permitido.", status=405)
@@ -73,13 +73,13 @@ def saveCustomerObservationSupp(request):
         # Convertir las observaciones a una cadena (por ejemplo, separada por comas o saltos de línea)
         typification_text = ", ".join(observations)  # Puedes usar "\n".join(observations) si prefieres saltos de línea
 
-        plan = Supp.objects.get(id=plan_id) 
+        supp = Supp.objects.get(id=plan_id) 
 
         if content.strip():  # Validar que el texto no esté vacío
             ObservationCustomer.objects.create(
-                client=plan.client,
+                client=supp.client,
                 agent=request.user,
-                id_plan=plan.id,
+                supp=supp.id,
                 type_police=type_plan,
                 typeCall=typeCall,
                 typification=typification_text, # Guardamos las observaciones en el campo 'typification'
@@ -89,7 +89,7 @@ def saveCustomerObservationSupp(request):
         else:
             messages.error(request, "El contenido de la observación no puede estar vacío.")
 
-        return redirect('editSupp', plan.id)        
+        return redirect('editSupp', supp.id)        
         
     else:
         return HttpResponse("Método no permitido.", status=405)

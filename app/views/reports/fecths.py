@@ -35,7 +35,7 @@ def SaleModal(request, agent_id):
     company_id = request.company_id  # Obtener company_id desde request
     company_filter = {'company': company_id} if not request.user.is_superuser else {}
     # Obtener los IDs de ObamaCare que están en CustomerRedFlag
-    excluded_obama_ids = CustomerRedFlag.objects.values('obama_id')
+    excluded_obama_ids = CustomerRedFlag.objects.values('obamacare_id')
 
     start_date = request.POST.get('start_date')  # Obtiene start_date desde la URL
     end_date = request.POST.get('end_date')      # Obtiene end_date desde la URL
