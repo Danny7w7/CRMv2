@@ -137,6 +137,9 @@ class Clients(models.Model):
     class Meta:
         db_table = 'clients'
 
+    def _str_(self):
+        return f'{self.first_name} {self.last_name} - {self.phone_number}'
+
 class Medicare(models.Model):
     agent = models.ForeignKey(Users, on_delete=models.CASCADE)
     agent_usa = models.CharField(max_length=100)
@@ -187,24 +190,6 @@ class OptionMedicare(models.Model):
 
     class Meta:
         db_table = 'optionMedicare'
-
-class Calls(models.Model):
-    id_client = models.ForeignKey(Clients, on_delete=models.CASCADE)
-    id_agent = models.ForeignKey(Users, on_delete=models.CASCADE)
-    type = models.CharField(max_length=50)
-    create_at = models.DateTimeField(auto_now_add=True)
-    rating = models.IntegerField(null=True, blank=True)
-
-    class Meta:
-        db_table = 'calls'
-
-class Typifications(models.Model):
-    id_call = models.ForeignKey(Calls, on_delete=models.CASCADE)
-    content = models.CharField(max_length=255)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        db_table = 'typifications'
 
 class ObamaCare(models.Model):
     agent = models.ForeignKey(Users, on_delete=models.CASCADE,related_name='agent_sale_aca')
@@ -301,6 +286,8 @@ class ObservationAgent(models.Model):
 class ObservationCustomer(models.Model):
     client = models.ForeignKey(Clients, on_delete=models.CASCADE)
     agent = models.ForeignKey(Users, on_delete=models.CASCADE)  
+    obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null=True)
+    supp = models.ForeignKey(Supp, on_delete=models.CASCADE, null=True)
     type_police = models.CharField(max_length=20) 
     typeCall = models.CharField(max_length=20)   
     id_plan = models.IntegerField()
@@ -322,27 +309,6 @@ class ObservationCustomerMedicare(models.Model):
 
     class Meta:
         db_table = 'observationsCustomersMedicare'
-
-class CustomerTracking(models.Model):
-    id_obama = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null=True)
-    id_supp = models.ForeignKey(Supp, on_delete=models.CASCADE, null=True)
-    cs4h = models.BooleanField(default=False)
-    cs8d = models.BooleanField(default=False)
-    cs3w = models.BooleanField(default=False)
-    cs5w = models.BooleanField(default=False)
-    activo = models.BooleanField(default=False)
-    gossip = models.BooleanField(default=False)
-
-    class Meta:
-        db_table = 'customerTracking'
-
-class Logs(models.Model):
-    id_agent = models.ForeignKey(Users, on_delete=models.CASCADE)
-    datetime = models.DateTimeField(auto_now_add=True)
-    ip = models.CharField(max_length=255)
-
-    class Meta:
-        db_table = 'logs'
 
 class Motivation(models.Model):
     content = models.TextField()
@@ -495,16 +461,17 @@ class DocumentObama(models.Model):
     file = models.FileField(
         upload_to='DocumentObama',
         storage=S3Boto3Storage())
-    obama = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
+    obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
     agent_create = models.ForeignKey(Users,on_delete=models.CASCADE )   
     name =  models.CharField(max_length=255, default="Unnamed Document")
-    created_at = models.DateTimeField(auto_now_add=True)
+    # created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField()
 
     class Meta:
         db_table = 'documentObama'
 
 class LettersCard(models.Model):
-    obama = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
+    obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
     agent_create = models.ForeignKey(Users,on_delete=models.CASCADE )    
     letters = models.BooleanField(default=False) 
     dateLetters = models.DateField(null=True)
@@ -515,7 +482,7 @@ class LettersCard(models.Model):
         db_table = 'lettersCard'
 
 class AppointmentClient(models.Model):
-    obama = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
+    obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
     agent_create = models.ForeignKey(Users,on_delete=models.CASCADE)    
     appointment = models.TextField() 
     dateAppointment = models.DateField()
@@ -526,7 +493,7 @@ class AppointmentClient(models.Model):
         db_table = 'appointmentClient'
 
 class UserCarrier(models.Model):
-    obama = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
+    obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
     agent_create = models.ForeignKey(Users,on_delete=models.CASCADE)    
     username_carrier = models.CharField(max_length=200,null=True)
     password_carrier = models.CharField(max_length=200,null=True)
@@ -536,7 +503,7 @@ class UserCarrier(models.Model):
         db_table = 'userCarrier'
 
 class CustomerRedFlag(models.Model):
-    obama = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
+    obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
     agent_create = models.ForeignKey(Users,on_delete=models.CASCADE, related_name='created_flags')    
     clave = models.CharField(max_length=100)  
     description = models.TextField() 
@@ -548,7 +515,7 @@ class CustomerRedFlag(models.Model):
         db_table = 'customerRedFlag'
 
 class paymentDate(models.Model):
-    obama = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null=True)
+    obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null=True)
     supp = models.ForeignKey(Supp, on_delete=models.CASCADE, null= True)
     payment_date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
