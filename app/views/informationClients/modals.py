@@ -173,7 +173,7 @@ def saveDocumentClient(request, obamacare_id, way):
             DocumentObama.objects.create(
                 file=document,
                 name=document_name,  # ✅ Guardar nombre del documento
-                obama=obama,
+                obamacare=obama,
                 agent_create=request.user
             )
 
@@ -192,7 +192,7 @@ def saveAccionRequired(request):
     obama = ObamaCare.objects.select_related('client').get(id = plan_id)
 
     CustomerRedFlag.objects.create(
-        obama=obama,
+        obamacare=obama,
         agent_create=request.user,
         description=description,
         clave = opcion.clave
@@ -230,7 +230,7 @@ def saveAppointment(request, obamacare_id):
     dateAppointmentNew = datetime.datetime.strptime(dateAppointment, '%m/%d/%Y').date()          
 
     AppointmentClient.objects.create(
-        obama=obama,
+        obamacare=obama,
         agent_create=request.user,
         appointment=appointment,
         dateAppointment = dateAppointmentNew,
@@ -258,7 +258,7 @@ def paymentDateObama(request, obama_id):
 
         # Actualizar o crear el registro de PaymentDate
         payment_record, created = paymentDate.objects.update_or_create(
-            obama=obamacare,  
+            obamacare=obamacare,  
             defaults={"payment_date": parsed_date},
             agent_create = request.user
         )

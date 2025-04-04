@@ -189,6 +189,7 @@ urlpatterns = [
     path('addSubscription/', companies.addSubscription, name='addSubscription'),
     path('addNumbers/', companies.addNumbers, name='addNumbers'),
     path('toggleNumberCompany/<number_id>/', companies.toggleNumberCompany, name='toggleNumberCompany'),
+    path('addNumbersUsers/', companies.addNumbersUsers, name='addNumbersUsers'),
     
     #<---------------------------Utils---------------------------> 
     path('toggleDarkMode/', utils.toggleDarkMode, name='toggleDarkMode'),

@@ -1,5 +1,6 @@
 {% extends "dashboard/index.html" %}
 {% load static %}
+{% load phoneFormat %}
 {% block head %}
     <title>Client Obamacare</title>
 	<!--plugins-->
@@ -51,7 +52,7 @@
                         <td>{{ obamacare.truncated_agent_usa }}</td>
                         <td>{{obamacare.agent.first_name}} {{obamacare.agent.last_name}}</td>
                         <td>{{obamacare.client.first_name}} {{obamacare.client.last_name}}</td>
-                        <td>+ {{obamacare.client.phone_number}}</td>
+                        <td>{{obamacare.client.phone_number|formatUsaPhone}}</td>
 						<td>{{obamacare.created_at|date:"m-d-Y"}}</td>
 						<td>{% if obamacare.status_color == 1 or obamacare.status_color == None  %}
 								<span class="badge rounded-pill bg-danger">{{obamacare.status}}</span>

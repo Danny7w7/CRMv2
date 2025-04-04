@@ -1,5 +1,6 @@
 {% extends "dashboard/index.html" %}
 {% load static %}
+{% load phoneFormat %}
 {% block head %}
     <title>Client Supp</title>
 	<!--plugins-->
@@ -47,7 +48,7 @@
                         <td>{{supp.short_name}}</td>
                         <td>{{supp.agent.first_name}} {{supp.agent.last_name}}</td>
                         <td>{{supp.client.first_name}} {{supp.client.last_name}}</td>
-                        <td>+ {{supp.client.phone_number}}</td>
+                        <td>+ {{supp.client.phone_number|formatUsaPhone}}</td>
 						<td>{{supp.created_at|date:"m-d-Y"}}</td>
 						<td>{{supp.policy_type}}</td>
 						<td><span class="badge rounded-pill bg-danger">{{supp.status}}</span></td>
@@ -93,7 +94,7 @@
                         <td>{{supp.truncated_agent_usa}}</td>
                         <td>{{supp.agent.first_name}} {{supp.agent.last_name}}</td>
                         <td>{{supp.client.first_name}} {{supp.client.last_name}}</td>
-                        <td>+ {{supp.client.phone_number}}</td>
+                        <td>{{supp.client.phone_number|formatUsaPhone}}</td>
 						<td>{{supp.created_at|date:"m-d-Y"}}</td>
 						<td>{{supp.policy_type}} / {{supp.carrier}}</td>
 						<td>{% if supp.status_color == 1 or supp.status_color == None %}

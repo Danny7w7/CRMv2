@@ -22,7 +22,7 @@ class Companies(models.Model):
 
 class Invoice(models.Model):
     pdf = models.FileField(
-        upload_to='invoice',
+        upload_to='Invoice',
         storage=S3Boto3Storage(),
         null=True)
     company = models.ForeignKey(Companies, on_delete=models.CASCADE)
@@ -427,7 +427,7 @@ class CommentBD(models.Model):
 
 class DocumentsClient(models.Model):
     file = models.FileField(
-        upload_to='consents',
+        upload_to='DocumentsClient',
         storage=S3Boto3Storage(),
         null=True)
     client = models.ForeignKey(Clients, on_delete=models.CASCADE)
@@ -437,7 +437,7 @@ class DocumentsClient(models.Model):
 
 class Consents(models.Model):
     pdf = models.FileField(
-        upload_to='DocumentsClient',
+        upload_to='Consents',
         storage=S3Boto3Storage(),
         null=True)
     obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null = True)
@@ -453,11 +453,11 @@ class Consents(models.Model):
 
 class IncomeLetter(models.Model):
     pdf = models.FileField(
-        upload_to='incomeLetter',
+        upload_to='IncomeLetter',
         storage=S3Boto3Storage(),
         null=True)
     signature = models.FileField(
-        upload_to='SignatureLetterIncome',
+        upload_to='SignatureIncomeLetter',
         storage=S3Boto3Storage(),
         null=True)
     obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
@@ -468,7 +468,7 @@ class IncomeLetter(models.Model):
 
 class IncomeLetterFFM(models.Model):
     pdf = models.FileField(
-        upload_to='incomeLetterFFM',
+        upload_to='IncomeLetterFFM',
         storage=S3Boto3Storage(),
         null=True)
     obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)

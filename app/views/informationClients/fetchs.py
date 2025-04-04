@@ -78,9 +78,6 @@ def blockSocialSecurityMedicare(request):
 
     return JsonResponse({'status': 'error', 'message': 'Solicitud no válida.'}, status=400)
 
-
-
-
 @csrf_exempt  # Solo usar en pruebas; manejar CSRF en producción correctamente
 def fetchPaymentsMonth(request):
     if request.method == 'POST':

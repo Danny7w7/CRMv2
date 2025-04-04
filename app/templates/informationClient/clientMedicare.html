@@ -1,5 +1,6 @@
 {% extends "dashboard/index.html" %}
 {% load static %}
+{% load phoneFormat %}
 {% block head %}
     <title>Client Medicare</title>
 	<!--plugins-->
@@ -50,7 +51,7 @@
                         <td>{{item.truncated_agent_usa }}</td>
                         <td>{{item.agent.first_name}} {{item.last_name}}</td>
                         <td>{{item.first_name}} {{item.last_name}}</td>
-                        <td>+ {{item.phone_number}}</td>
+                        <td>{{item.phone_number|formatUsaPhone}}</td>
 						<td>{{item.created_at|date:"m-d-Y"}}</td>
 						{% if request.user.role == 'Admin' %}
 							<td>{{item.is_active}}</td>

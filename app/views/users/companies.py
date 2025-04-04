@@ -11,6 +11,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 # Application-specific imports
 from app.models import *
 from ...forms import ServicesForm
+from ..decoratorsCompany import company_ownership_required_sinURL
 
 @login_required(login_url='/login') 
 def formCreateCompanies(request):
@@ -161,8 +162,6 @@ def addSubscription(request):
 
     return render(request, 'companies/addSubscription.html' , context)
 
-# ... (otras importaciones)
-
 @login_required(login_url='/login')
 def addNumbers(request):
     company = Companies.objects.filter(is_active=True)
@@ -254,3 +253,54 @@ def toggleNumberCompany(request, number_id):
     
     # Redirigir de nuevo a la página actual con un parámetro de éxito
     return redirect('addNumbers')
+
+@login_required(login_url='/login')
+@company_ownership_required_sinURL
+def addNumbersUsers(request):
+
+    company_id = request.company_id  # Obtener company_id desde request
+    # Base query con filtro de compañía
+    company_filter = {} if request.user.is_superuser else {'company': company_id}
+        
+    users = Users.objects.filter(is_active=True, **company_filter)
+    numbers = Numbers.objects.filter(is_active = True, **company_filter)
+    hasErrors = False
+
+    if request.method == "POST":
+
+        users = request.POST.getlist('users[]')
+        numbers = request.POST.getlist('number[]')
+        validNumbers = 0
+
+        for user, number in zip(users, numbers):
+            
+            try:
+                numberDB = Numbers.objects.get(id=number)           
+
+                if numberDB:
+                    Users.objects.filter(id = user).update(
+                    assigned_phone=numberDB)
+                    validNumbers += 1
+                else:
+                    messages.error(request, f"The # + <strong>{number}</strong> cannot be assigned.")
+                    hasErrors = True               
+
+            except Users.DoesNotExist:
+                messages.error(request, f"The username '{user}' does not exist.")
+                hasErrors = True
+
+        if not hasErrors:
+            messages.success(request, f"The numbers were added correctly.")
+        elif validNumbers > 0:
+            messages.warning(request, f"Added {validNumbers} #, but there were mistakes with some of them.")
+
+        # Redirigir para evitar reenvío del formulario
+        return redirect('addNumbersUsers')
+    
+
+    context = {
+        'users':users,
+        'numbers':numbers
+    }
+
+    return render(request, 'companies/addNumbersUsers.html', context)
