@@ -236,7 +236,7 @@ def editObama(request ,obamacare_id, way):
         banderaCard = False
 
     #Obtener todos los registros de meses pagados de la poliza
-    monthsPaid = Payments.objects.filter(obamaCare=obamacare.id)
+    monthsPaid = Payments.objects.filter(obamacare=obamacare.id)
 
     #calculo de documente
     obamaDocumente = True if obamacare.doc_migration and obamacare.doc_income else False 

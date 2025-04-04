@@ -86,7 +86,7 @@ def fetchPaymentsMonth(request):
         except json.JSONDecodeError:
             return JsonResponse({'success': False, 'message': 'Invalid JSON'}, status=400)
 
-        obamaCare_id = data.get('obamaCare')
+        obamaCare_id = data.get('obamacare')
         month = data.get('month')
         type_pay = data.get('type_pay')  # Obtener el tipo de pago
         type_discount = data.get('type_discount')  # Obtener el tipo de descuento
@@ -136,14 +136,14 @@ def fetchPaymentsMonth(request):
         except json.JSONDecodeError:
             return JsonResponse({'success': False, 'message': 'Invalid JSON'}, status=400)
 
-        obamaCare_id = data.get('obamaCare')
+        obamaCare_id = data.get('obamacare')
         month = data.get('month')
 
         if not obamaCare_id or not month:
             return JsonResponse({'success': False, 'message': 'Faltan datos'}, status=400)
 
         # Buscar y eliminar el pago
-        payment = Payments.objects.filter(obamaCare=obamaCare_id, month=month).first()
+        payment = Payments.objects.filter(obamacare=obamaCare_id, month=month).first()
         if payment:
             payment.delete()
             return JsonResponse({'success': True, 'message': 'Payment eliminado correctamente'})
