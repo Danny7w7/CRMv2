@@ -142,7 +142,7 @@
                 {% for message in messages %}
                     Swal.fire({
                         title: '{{ message.tags|title }}',
-                        text: '{{ message|safe|escapejs }}',
+                        html: '{{ message|safe|escapejs }}',
                         icon: '{{ message.tags }}',
                         confirmButtonText: 'Aceptar'
                     });

@@ -214,11 +214,11 @@ def editObama(request ,obamacare_id, way):
 
     obamacare = ObamaCare.objects.select_related('agent', 'client').filter(id=obamacare_id).first()
     dependents = Dependents.objects.select_related('obamacare').filter(obamacare=obamacare)
-    letterCard = LettersCard.objects.filter(obama = obamacare_id).first()
-    apppointment = AppointmentClient.objects.select_related('obama','agent_create').filter(obama = obamacare_id)
-    userCarrier = UserCarrier.objects.filter(obama = obamacare_id).first()
-    accionRequired = CustomerRedFlag.objects.filter(obama = obamacare)    
-    paymentDateObama = paymentDate.objects.filter(obama = obamacare).first()
+    letterCard = LettersCard.objects.filter(obamacare = obamacare_id).first()
+    apppointment = AppointmentClient.objects.select_related('obamacare','agent_create').filter(obamacare = obamacare_id)
+    userCarrier = UserCarrier.objects.filter(obamacare = obamacare_id).first()
+    accionRequired = CustomerRedFlag.objects.filter(obamacare = obamacare)    
+    paymentDateObama = paymentDate.objects.filter(obamacare = obamacare).first()
         
     if letterCard and letterCard.letters and letterCard.card: 
         newLetterCard = True
@@ -285,7 +285,7 @@ def editObama(request ,obamacare_id, way):
     consent = Consents.objects.filter(obamacare = obamacare_id )
     income = IncomeLetter.objects.filter(obamacare = obamacare_id)
     document = DocumentsClient.objects.filter(client = obamacare.client)
-    documentObama = DocumentObama.objects.filter(obama = obamacare_id)
+    documentObama = DocumentObama.objects.filter(obamacare = obamacare_id)
     incomeffm = IncomeLetterFFM.objects.filter(obamacare = obamacare_id)
 
     if request.method == 'POST':
@@ -425,7 +425,7 @@ def editObama(request ,obamacare_id, way):
                 if idPost:
 
                     LettersCard.objects.filter(id = idPost).update(
-                    obama=obamacare,
+                    obamacare=obamacare,
                     agent_create=request.user,
                     letters=letters,
                     dateLetters = dateLetters,
@@ -435,7 +435,7 @@ def editObama(request ,obamacare_id, way):
                 else:
 
                     LettersCard.objects.create(
-                    obama=obamacare,
+                    obamacare=obamacare,
                     agent_create=request.user,
                     letters=letters,
                     dateLetters = dateLetters,
@@ -459,9 +459,9 @@ def editObama(request ,obamacare_id, way):
 
                 # Crear y guardar la observación
                 ObservationAgent.objects.create(
-                    id_client=client,
-                    id_obamaCare=id_obama,
-                    id_user=id_user,
+                    client=client,
+                    obamaCare=id_obama,
+                    user=id_user,
                     content=obs
                 )
             
@@ -637,7 +637,7 @@ def editSupp(request, supp_id):
                     if selected_status != 'ACTIVE':
                         color = 2
                         break         
-                    if selected_status == 'ACTIVE':
+                    if selected_status == 'ACTIVE' or selected_status == 'SELF-ENROLMENT':
                         color = 3 
                         break  
             
@@ -680,9 +680,9 @@ def editSupp(request, supp_id):
 
                 # Crear y guardar la observación
                 ObservationAgent.objects.create(
-                    id_client=client,
-                    id_supp=id_supp,
-                    id_user=id_user,
+                    client=client,
+                    supp=id_supp,
+                    user=id_user,
                     content=obs
                 )
             

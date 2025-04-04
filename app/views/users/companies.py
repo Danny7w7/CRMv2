@@ -191,11 +191,11 @@ def addNumbers(request):
                         )
                         validNumbers += 1
                     else:
-                        messages.error(request, f"El número '+ <strong>{number}</strong>' no es válido.")
+                        messages.error(request, f"El número + <strong>{number}</strong> no es válido.")
                         hasErrors = True
                 
                 else:
-                    messages.error(request, f"El número '+ <strong> {number} </strong> ' no ya lo tiene otra company.")
+                    messages.error(request, f"El número + <strong> {number} </strong> no ya lo tiene otra company.")
                     hasErrors = True
 
             except Companies.DoesNotExist:
