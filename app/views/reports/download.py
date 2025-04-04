@@ -87,9 +87,9 @@ def downloadAccionRequired(request):
     # ✅ Agregar datos al archivo Excel
     for i in actionRequireds:
         ws.append([
-            i.obamcare.client.first_name,
-            i.obamcare.client.last_name,
-            i.obamcare.status,
+            i.obamacare.client.first_name,
+            i.obamacare.client.last_name,
+            i.obamacare.status,
             i.description,
             i.clave,
             i.created_at.strftime("%m-%d-%Y") if i.created_at else '',
