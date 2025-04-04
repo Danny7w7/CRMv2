@@ -79,7 +79,7 @@ function listenAllCheckInput() {
 function toggleUserStatus(checkbox) {
     const month = checkbox.value;  // Obtener el mes de la checkbox
     const dataToSend = {
-        obamaCare: obamacare_id,  // Asegúrate de que `obamacare_id` está definido
+        obamacare: obamacare_id,  // Asegúrate de que `obamacare_id` está definido
         month: month,
         type_pay: checkbox.id.includes('paySwitch') && checkbox.checked ? 'pay' : '', // Si es un pago
         type_discount: checkbox.id.includes('discountSwitch') && checkbox.checked ? 'discount' : '' // Si es un descuento
