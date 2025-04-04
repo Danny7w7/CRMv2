@@ -124,10 +124,10 @@ def salesPerformance(request):
         startDatePost = request.POST['start_date']
         endDatePost = request.POST['end_date']
         startDate = timezone.make_aware(
-            datetime.strptime(startDatePost, '%Y-%m-%d').replace(hour=0, minute=0, second=0, microsecond=0)
+            datetime.datetime.strptime(startDatePost, '%Y-%m-%d').replace(hour=0, minute=0, second=0, microsecond=0)
         )
         endDate = timezone.make_aware(
-            datetime.strptime(endDatePost, '%Y-%m-%d').replace(hour=23, minute=59, second=59, microsecond=999999)
+            datetime.datetime.strptime(endDatePost, '%Y-%m-%d').replace(hour=23, minute=59, second=59, microsecond=999999)
         )
     else:
         startDate = timezone.make_aware(
