@@ -102,7 +102,7 @@
 								<td>{{user.username}}</td>
 								<td>{{user.role}}</td>
 								<td>{{user.is_active}}</td>
-								<td>{{user.company.company_name}}</td>
+								{% if request.user.is_superuser %}<td>{{user.company.company_name}}</td>{% endif %}								
 								<td>
 									<div class="d-flex order-actions">
 										<a href="{% url 'editUser' user.id %}" class=""><i class='bx bxs-edit'></i></a>
