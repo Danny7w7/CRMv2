@@ -1045,7 +1045,6 @@ def reports(request):
 
     #Reports de Paymet!
     payments = Payments.objects.filter(**company_filter).values('month').annotate(total=Count('id')).order_by('month')
-    print(payments.month)
     # Calcular el total general de todos los meses
     total_general = Payments.objects.filter(**company_filter).aggregate(total=Count('id'))['total']
 
