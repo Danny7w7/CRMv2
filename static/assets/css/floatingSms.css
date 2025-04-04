@@ -244,3 +244,10 @@
 .alert-count {
     left: 12px;
 }
+
+.chat-right-msg {
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%; /* Asegura que no se extienda fuera del contenedor */
+}

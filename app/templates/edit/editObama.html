@@ -1253,7 +1253,7 @@
 			{% endif %}
 		</div>
 		<div class="floating-chat-footer">
-			<input type="text" id="messageContent" placeholder="Type a message...">
+			<input {% if not contact.is_active %}disabled{% endif %} type="text" id="messageContent" placeholder="Type a message...">
 			<button id="sendMessage">Send</button>
 		</div>
 	</div>
