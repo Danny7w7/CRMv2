@@ -89,7 +89,7 @@
                             </select>
                         </div>
                         <div class="col-md-4 align-self-end">
-                            <button type="submit" class="btn btn-success mb-2">Download</button>
+                            <button type="submit" class="btn btn-success">Download</button>
                             <a href="{% url 'reports' %}" class="btn btn-secondary">Reset</a>
                         </div>
                         <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
@@ -198,6 +198,7 @@
 				searchEnabled: true,     // Habilita la búsqueda en el menú desplegable
 				placeholderValue: 'Seleccione una opción...',
 				itemSelectText: '',      // Elimina el texto 'Selecciona un elemento'
+                shouldSort: false,
 			});
 		});	
 	</script>
