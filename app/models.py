@@ -10,11 +10,26 @@ class Companies(models.Model):
     company_name = models.CharField(max_length=250)
     phone_company = models.BigIntegerField()
     company_email = models.EmailField()
+    zipcode = models.IntegerField()
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=50)
+    county = models.CharField(max_length=100)
     is_active = models.BooleanField(default=True)
     remaining_balance = models.DecimalField(max_digits=20, decimal_places=6)
 
     class Meta:
         db_table = 'companies'
+
+class Invoice(models.Model):
+    pdf = models.FileField(
+        upload_to='invoice',
+        storage=S3Boto3Storage(),
+        null=True)
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'invoice'
 
 class Services(models.Model):
     name = models.CharField(max_length=100)
@@ -69,6 +84,15 @@ class Transactions(models.Model):
     class Meta:
         db_table = 'transactions'
 
+class Numbers(models.Model):
+    phone_number = models.BigIntegerField()  
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE) 
+    created_at = models.DateTimeField(auto_now_add=True) 
+    is_active = models.BooleanField(default=True)  
+
+    class Meta:
+        db_table = 'numbers' 
+
 
 class Users(AbstractUser):
 
@@ -88,7 +112,7 @@ class Users(AbstractUser):
         null=True,
         unique=False
     )
-    assigned_phone = models.ForeignKey('app.Numbers', on_delete=models.SET_NULL, null=True, blank=True)
+    assigned_phone = models.ForeignKey(Numbers, on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey(Companies, on_delete=models.CASCADE)
     
     class Meta:
@@ -334,6 +358,7 @@ class DropDownList(models.Model):
     status_bd = models.CharField(max_length=255,null=True)
     clave = models.TextField(null=True)  
     description = models.TextField(null=True) 
+    service_company = models.TextField(null=True) 
 
     class Meta:
         db_table = 'dropDownList'
@@ -384,7 +409,7 @@ class ControlCall(models.Model):
     answered = models.BigIntegerField()
     mins = models.BigIntegerField()
     date = models.DateField()
-    create_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
 
     class Meta:
@@ -395,7 +420,7 @@ class CommentBD(models.Model):
     agent_create = models.ForeignKey(Users, on_delete=models.CASCADE )
     excel_metadata = models.ForeignKey(ExcelFileMetadata,on_delete=models.CASCADE)
     content = models.TextField()
-    create_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'commentBD'
@@ -436,9 +461,21 @@ class IncomeLetter(models.Model):
         storage=S3Boto3Storage(),
         null=True)
     obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'incomeLetter'
+
+class IncomeLetterFFM(models.Model):
+    pdf = models.FileField(
+        upload_to='incomeLetterFFM',
+        storage=S3Boto3Storage(),
+        null=True)
+    obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'incomeLetterFFM'
 
 class TemporaryToken(models.Model):
     client = models.ForeignKey(Clients, on_delete=models.CASCADE, null = True)

@@ -144,7 +144,7 @@ def validarCita(request):
 
     try:
         # Convertir la fecha recibida en un objeto datetime
-        fecha = datetime.strptime(fecha_str, "%Y-%m-%d %H:%M")
+        fecha = datetime.datetime.strptime(fecha_str, "%Y-%m-%d %H:%M")
         fecha = make_aware(fecha)  # Asegurar que tenga zona horaria
 
         # Verificar si ya hay una cita en esa fecha y hora para el mismo agente

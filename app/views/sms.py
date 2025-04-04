@@ -5,8 +5,11 @@ import json
 import requests
 import re
 import logging
-
 import pandas as pd
+import io
+
+# Third-party libraries
+from weasyprint import HTML
 
 # Django utilities
 from django.conf import settings
@@ -92,12 +95,12 @@ def sms(request, company_id):
                         media_url = media[0].get('url')
                         fileUrl = save_image_from_url(message, media_url)
                         SendMessageWebsocketChannel('MMS', payload, contact, company.id, fileUrl)
-                        if company.id != 1:
+                        if company.id not in [1,2]:
                             discountRemainingBalance(company, '0.027')
                         
                 else:
                     SendMessageWebsocketChannel('SMS', payload, contact, company.id)
-                    if company.id != 1:
+                    if company.id not in [1,2]:
                         discountRemainingBalance(company, '0.025')
                 sendAlertToAgent(request, chat, contact)
 
@@ -240,7 +243,7 @@ def deactivatecontact(contact, message):
 def index(request):
     validSms = validateSms(request)
     if not validSms or not validSms.get('smsIsActive'):
-        return HttpResponse('Paga MMGV')
+        return render(request, "auth/404.html", {"message": "Perfil desactivado por falta de pago."})
     if request.user.is_superuser:
         chats = Chat.objects.all()
     elif request.user.is_staff:
@@ -273,7 +276,7 @@ def index(request):
 def chat(request, chatId):
     validSms = validateSms(request)
     if not validSms or not validSms.get('smsIsActive'):
-        return HttpResponse('Paga MMGV')
+        return render(request, "auth/404.html", {"message": "Perfil desactivado por falta de pago."})
     if request.method == 'POST':
         phoneNumber = request.POST.get('phoneNumber')
         name = request.POST.get('name', None)
@@ -383,7 +386,7 @@ def sendIndividualsSms(from_number, to_number, user, company, message_context):
     contact, created = createOrUpdatecontact(to_number, company)
     chat = createOrUpdateChat(contact, company)
     saveMessageInDb('Agent', message_context, chat, user)
-    if company.id != 1: #No descuenta el saldo a Lapeira
+    if company.id not in [1,2]: #No descuenta el saldo a Lapeira
         discountRemainingBalance(company, '0.035')
     
     return True
@@ -493,8 +496,8 @@ def create_stripe_checkout_session(company_id):
                 },
             ],
             mode='payment',
-            success_url=f"{settings.DOMAIN}/payment/Thank-You-Page/{company_id}/",
-            cancel_url=f"{settings.DOMAIN}/payment/Payment-Error/{company_id}/",
+            success_url=f"{settings.DOMAIN}/sms/Thank-You-Page/{company_id}/",
+            cancel_url=f"{settings.DOMAIN}/sms/Payment-Error/{company_id}/",
             automatic_tax={'enabled': True},
             metadata={
                 'company_id': company_id
@@ -544,6 +547,8 @@ def stripe_webhook(request):
         company.notified_at_1 = False
         company.save()
 
+        invoice(company_id, amount)
+
         send_email(
             subject=f"✅ Confirmación de Pago en SMS Blue - {company.company_name}",
             receiver_email=company.company_email,
@@ -560,6 +565,37 @@ def stripe_webhook(request):
         # Aquí puedes actualizar tu base de datos, enviar correos, etc.
 
     return JsonResponse({'status': 'success'})
+
+def invoice(company_id, amount):
+
+    current_date = datetime.datetime.now().strftime("%A, %B %d, %Y %I:%M")
+    company = Companies.objects.filter(id = company_id).first()
+
+    id_formateado = f"{company.id:08d}"
+
+    invoceHtml = Invoice(company=company)
+
+    context = {
+        'company' : company,
+        'amount' : amount,
+        'current_date':current_date,
+        'id_formateado' : id_formateado
+    } 
+
+    # Renderiza la plantilla HTML a un string
+    html_content = render_to_string('companies/invoice.html', context)
+
+    # Genera el PDF
+    pdf_file = HTML(string=html_content).write_pdf()
+
+    # Usa BytesIO para convertir el PDF en un archivo
+    pdf_io = io.BytesIO(pdf_file)
+    pdf_io.seek(0)  # Asegúrate de que el cursor esté al principio del archivo
+
+    # Guarda el PDF en el modelo usando un ContentFile
+    pdf_name = f'Invoice_{company.company_name}_{datetime.datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+
+    invoceHtml.pdf.save(pdf_name, ContentFile(pdf_io.read()), save=True)
 
 def save_image_from_url(message, url):
     try:        
@@ -690,7 +726,7 @@ def invalidate_temporary_url(request, token):
         return "Esta URL temporal no existe"
 
 def comprobate_company(company):
-    if company.id == 1: #No descuenta el saldo a Lapeira
+    if company.id in [1,2]: #No descuenta el saldo a Lapeira
         return False
     if company.remaining_balance <= 0:
         disableAllUserCompany(company)
@@ -762,7 +798,7 @@ def format_number(number):
 def adminSms(request):
 
     company_id = request.company_id  # Obtener company_id desde request
-    company_filter = {'company': company_id} if not request.user.is_superuser else {}
+    company_filter = {'company': company_id}
 
     now = datetime.datetime.now()
     seven_days_ago = now - timedelta(days=6)
@@ -770,6 +806,7 @@ def adminSms(request):
     # Obtener usuarios de la compañia
     company_users = Users.objects.filter(**company_filter)
     company = Companies.objects.get(id=company_id)
+    numberCompanies = Numbers.objects.filter(**company_filter)
 
     # Filtrar mensajes de los últimos 7 días y asociados a chats de usuarios
     messages = Messages.objects.filter(
@@ -792,7 +829,8 @@ def adminSms(request):
         'messages':json.dumps(result),
         "url_recharge": create_stripe_checkout_session(company.id),
         "company":company,
-        "message_count":messages.count()
+        "message_count":messages.count(),
+        'numberCompanies': numberCompanies
     }
 
     return render(request, 'sms/adminSms.html', context)

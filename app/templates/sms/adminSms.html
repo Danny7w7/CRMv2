@@ -87,11 +87,47 @@
             <div class="card text-center shadow-sm border-0">
                 <div class="card-body">
                     <h5 class="card-title text-info">Phone Numbers</h5>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">+123 456 7890</li>
-                        <li class="list-group-item">+098 765 4321</li>
-                        <li class="list-group-item">+456 123 7890</li>
-                    </ul>
+                    <div class="position-relative">
+                        <!-- Contenedor con scroll SIEMPRE ACTIVO -->
+                        <div class="overflow-auto" style="max-height: 200px; min-height: 100px;">
+                            <ul class="list-group list-group-flush">
+                                {% if numberCompanies %}
+                                    <!-- Primeros 2 números -->
+                                    {% for item in numberCompanies|slice:":2" %}
+                                        <li class="list-group-item"><h5 class="mb-0">+ {{item.phone_number}}</h5></li>
+                                    {% endfor %}
+                                    
+                                    <!-- Números adicionales (ocultos inicialmente) -->
+                                    <div class="collapse" id="additionalNumbers">
+                                        {% for item in numberCompanies|slice:"2:" %}
+                                            <li class="list-group-item"><h5 class="mb-0">+ {{item.phone_number}}</h5></li>
+                                        {% endfor %}
+                                    </div>
+                                    
+                                    <!-- Espaciador para forzar scroll con pocos elementos -->
+                                    {% if numberCompanies|length <= 2 %}
+                                        <div style="height: 150px;"></div>
+                                    {% endif %}
+                                {% else %}
+                                    <li class="list-group-item">❌ No hay números</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        
+                        <!-- Botón para mostrar/ocultar (solo si hay más de 2) -->
+                        {% if numberCompanies|length > 2 %}
+                        <div class="text-center mt-2">
+                            <button class="btn btn-sm btn-outline-primary" 
+                                    type="button" 
+                                    data-bs-toggle="collapse" 
+                                    data-bs-target="#additionalNumbers"
+                                    aria-expanded="false" 
+                                    aria-controls="additionalNumbers">
+                                Mostrar {{ numberCompanies|length|add:"-2" }} más
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>

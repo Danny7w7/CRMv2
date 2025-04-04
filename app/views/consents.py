@@ -90,7 +90,7 @@ def consent(request, obamacare_id):
     dependents = Dependents.objects.filter(client=obamacare.client)
     supps = Supp.objects.filter(client_id=obamacare.client.id)
     consent = Consents.objects.select_related('obamacare').filter(obamacare = obamacare_id ).last()
-    contact = ContactClient.objects.filter(client = obamacare.id).first()
+    contact = ContactClient.objects.filter(client = obamacare.client.id).first()
 
     if request.method == 'POST':
         documents = request.FILES.getlist('documents')  # Lista de archivos subidos
@@ -353,6 +353,48 @@ def generateIncomeLetterPDF(request, obamacare, language):
     pdf_name = f'IncomeOfLetter{obamacare.client.first_name}_{obamacare.client.last_name}#{obamacare.client.phone_number} {datetime.now().strftime("%A, %B %d, %Y %I:%M")}.pdf'  # Nombre del archivo
 
     incomeLetter.pdf.save(pdf_name, ContentFile(pdf_io.read()), save=True)
+
+def ILFFM(request, obamacare):
+    current_date = datetime.now().strftime("%A, %B %d, %Y %I:%M")
+    obamacare = ObamaCare.objects.filter(id = obamacare).first()
+    signature = IncomeLetter.objects.filter(obamacare = obamacare).latest('created_at')
+
+    language = request.GET.get('lenguaje', 'es')  # Idioma predeterminado si no se pasa
+    activate(language)
+
+    incomeLetter = IncomeLetterFFM(obamacare=obamacare)
+
+    context = {
+        'obamacare':obamacare,
+        'current_date':current_date,
+        'ip':getIPClient(request),
+        'signature': signature
+    } 
+
+    # Renderiza la plantilla HTML a un string
+    html_content = render_to_string('consent/templatePdfIncomeLetterFFM.html', context)
+
+    # Genera el PDF
+    pdf_file = HTML(string=html_content).write_pdf()
+
+    # Guardar el PDF en el modelo
+    pdf_name = f'IncomeOfLetterFFM_{obamacare.client.first_name}_{obamacare.client.last_name}_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+    
+    # Usar un solo BytesIO para ambas operaciones
+    pdf_buffer = io.BytesIO(pdf_file)
+    
+    # Guardar en el modelo
+    incomeLetter.pdf.save(pdf_name, ContentFile(pdf_buffer.getvalue()))
+    incomeLetter.save()
+    
+    # Reiniciar el buffer para la respuesta
+    pdf_buffer.seek(0)
+
+    # Crear respuesta HTTP
+    response = HttpResponse(pdf_buffer, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{pdf_name}"'
+    
+    return response
 
 def save_data_from_request(model_class, post_data, exempted_fields, instance=None):
     """

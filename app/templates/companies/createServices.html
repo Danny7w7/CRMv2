@@ -34,7 +34,12 @@
 				<form id="formCreateCompanies" class="row g-3 needs-validation" method="POST" >
 					<div class="col-md-6">
 						<label for="name" class="form-label">Name</label>
-						<input type="text" class="form-control" id="name" name="name"required>
+						<select name="name" id="name" class="form-control" required>
+							<option disabled value="no_valid" selected>Please Select</option>
+							{% for item in dropList %}
+								<option value="{{item}}">{{item}}</option>
+							{% endfor %}
+						</select>
 					</div>
 					<div class="col-md-6">
 						<label for="cost" class="form-label">Cost</label>

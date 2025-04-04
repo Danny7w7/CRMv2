@@ -6,12 +6,6 @@ from .models import Companies, Users
 
 # Create your models here.
 
-class Numbers(models.Model):
-    phone_number = models.BigIntegerField()   
-
-    class Meta:
-        db_table = 'sms_numbers' 
-
 class Contacts(models.Model):
     company = models.ForeignKey(Companies, on_delete=models.CASCADE)  # Relación con la compañía
     name = models.CharField(max_length=50, null=True)

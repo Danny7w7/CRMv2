@@ -944,7 +944,41 @@
 													<strong>Letter Income #{{forloop.counter}}:</strong> <a href="{{ incomes.pdf.url }}" target="_blank" >View  <i class="lni lni-display"></i></a> 
 												</li>
 											{% endfor %}
+											<hr>
+											{% if incomeffm %}
+												{% for item in incomeffm %}
+													<li class="list-group-item">
+														<strong>Letter Income FFM #{{forloop.counter}}:</strong> <a href="{{ item.pdf.url }}" target="_blank" >View  <i class="lni lni-display"></i></a> 
+													</li>
+												{% endfor %}
+											{% endif %}
 										</ul>
+										{% if not incomeffm %}
+											{% if obamacare.ffm %}										
+												<hr>
+												<div class="d-flex order-actions">
+													<!-- Botón principal del dropdown -->
+													<button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+														L.I
+													</button>
+													<!-- Lista del dropdown -->
+													<ul class="dropdown-menu">
+														<li>
+															<form action="{% url 'ILFFM' obamacare.id %}" method="get" target="_blank">
+																<input type="hidden" name="lenguaje" value="en">
+																<button type="submit" class="dropdown-item"> English</button>
+															</form>
+														</li>
+														<li>
+															<form action="{% url 'ILFFM' obamacare.id %}" method="get" target="_blank">                                         <input type="hidden" name="lenguaje" value="en">
+																<input type="hidden" name="lenguaje" value="es">
+																<button type="submit" class="dropdown-item"> Spanish</button>
+															</form>
+														</li>
+													</ul>
+												</div>
+											{% endif %}
+										{% endif %}
 									{% else %}
 										<p>No Income.</p>
 									{% endif %}

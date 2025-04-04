@@ -31,21 +31,37 @@
                 <form id="formCreateCompanies" class="row g-3 needs-validation" method="POST" Action="{% url 'editCompanies' company.id %}">
                     <h4>Company Information</h4>					
 					
-					<div class="col-md-4">
+					<div class="col-md-3">
 						<label for="owner" class="form-label">Owner Name</label>
 						<input type="text" class="form-control" id="owner" value="{{company.owner}}" name="owner"required>
 					</div>
-					<div class="col-md-4">
+					<div class="col-md-3">
 						<label for="name" class="form-label">Name Full Company</label>
 						<input type="text" class="form-control" id="name" value="{{company.company_name}}" name="name"required>
 					</div>
-					<div class="col-md-4">
+					<div class="col-md-3">
 						<label for="phone" class="form-label">Phone</label>
 						<input type="number" class="form-control" id="phone" value="{{company.phone_company}}" name="phone"required>
 					</div>
-					<div class="col-md-4">
+					<div class="col-md-3">
 						<label for="email" class="form-label">Email </label>
 						<input type="email" class="form-control" value="{{company.company_email}}" id="email" name="email" required>
+					</div>
+					<div class="col-md-3">
+						<label for="zipcode" class="form-label">ZipCode </label>
+						<input maxlength="5" oninput="this.value = this.value.replace(/[^0-9]/g, '')" type="text" class="form-control" name ="zipcode" id="zipcode" value="{{company.zipcode}}" Required>
+					</div>
+					<div class="col-md-3">
+						<label for="city" class="form-label">city </label>
+						<input readonly type="text" class="form-control" name ="city" id="city" value="{{company.city}}" Required>
+					</div>
+					<div class="col-md-3">
+						<label for="state" class="form-label">State </label>
+						<input readonly type="text" class="form-control" name="state" id="state" value="{{company.state}}" required>
+					</div>
+					<div class="col-md-3">
+						<label for="county" class="form-label">County </label>
+						<input type="text" class="form-control" name ="county" id="county" value="{{company.county}}" Required>
 					</div>
 					<div class="col-md-4">
 						<label for="is_active" class="form-label">Status Active</label>
@@ -83,4 +99,5 @@
 	
     <!--JS-->
 	<script src="{% static "assets/js/validations/validationCompanies.js" %}"></script>
+	<script src="{% static "assets/js/validations/validationZicode.js" %}"></script>
 {% endblock %}

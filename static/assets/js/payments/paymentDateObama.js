@@ -14,27 +14,25 @@ document.addEventListener("DOMContentLoaded", function () {
         let csrfToken = form.querySelector("[name=csrfmiddlewaretoken]").value;
         let actionUrl = form.getAttribute("action"); // 📌 Obtiene la URL con obamacare.id y way
 
-        // 📌 Obtener y formatear la fecha antes de enviarla
-        let paymentDate = form.querySelector("#paymentDate").value;
+        // 📌 Obtener la fecha ingresada en el input
+        let paymentDate = form.querySelector("#paymentDate").value.trim();
 
-        // Verificar si la fecha tiene el formato m/d/y
-        const dateRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;  // Expresión regular para m/d/y
+        // Verificar si la fecha tiene el formato MM/DD/YYYY
+        const dateRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
         const match = paymentDate.match(dateRegex);
+  
 
         if (match) {
-            // Reorganizar la fecha a formato YYYY-MM-DD
-            const month = match[1].padStart(2, '0');  // Asegura que el mes tenga 2 dígitos
-            const day = match[2].padStart(2, '0');  // Asegura que el día tenga 2 dígitos
-            const year = match[3];
-            paymentDate = `${year}-${month}-${day}`;  // Formato final YYYY-MM-DD
+            // Extraer y reorganizar la fecha a formato YYYY-MM-DD
+            let month = match[1].padStart(2, '0');  // Asegurar que el mes tenga 2 dígitos
+            let day = match[2].padStart(2, '0');  // Asegurar que el día tenga 2 dígitos
+            let year = match[3];
+            let formattedDate = `${year}-${month}-${day}`;  // Formato final YYYY-MM-DD
 
-            // Verificar el formato de la fecha antes de enviarla
-            //console.log("Formatted Date:", paymentDate);
-
-            // Actualizar el valor de paymentDate en el FormData
-            //formData.set("paymentDate", paymentDate);
+            // Actualizar el valor en el FormData
+            formData.set("paymentDate", formattedDate);
         } else {
-            // Si el formato no es válido, prevenir el envío del formulario y mostrar alerta
+            // Si la fecha no es válida, mostrar alerta y detener el envío
             Swal.fire({
                 icon: 'error',
                 title: 'Invalid Date Format',

@@ -215,13 +215,23 @@
 						</ul>
 					</li>
 					{% if request.user.role == 'Admin'  %}
-					<li class="menu-label">User</li>
-					<li>
-						<li> <a href="{% url 'formCreateUser'  %}"><i class='bx bx-radio-circle'></i>View User</a>
+					<li class="menu-label">Admin</li>
+						<li>
+							<a class="has-arrow" href="javascript:;">
+								<div class="parent-icon"> <i class="lni lni-network"></i> </div>
+								<div class="menu-title">Profile</div>
+							</a>
+							<ul>
+								<li> <a href="{% url 'formCreateUser'  %}"><i class='bx bx-radio-circle'></i>View User</a>
+								</li>
+								<li> <a href="{% url 'adminSms'  %}"><i class='bx bx-radio-circle'></i>Admin SMS</a>
+								</li>
+								<li> <a href="{% url 'addSubscription' %}"><i class='bx bx-radio-circle'></i>Add  Subscription</a>
+								</li>
+								<li> <a href="{% url 'addNumbers' %}"><i class='bx bx-radio-circle'></i>Add  Numbers</a>
+								</li>
+							</ul>
 						</li>
-						<li> <a href="{% url 'adminSms'  %}"><i class='bx bx-radio-circle'></i>Admin SMS</a>
-						</li>
-					</li>
 					{% endif %}		
 					{% if request.user.is_superuser %}
 						<li class="menu-label">Company</li>
@@ -236,6 +246,8 @@
 								<li> <a href="{% url 'createServices' %}"><i class='bx bx-radio-circle'></i>Create Services</a>
 								</li>
 								<li> <a href="{% url 'addSubscription' %}"><i class='bx bx-radio-circle'></i>Add  Subscription</a>
+								</li>
+								<li> <a href="{% url 'addNumbers' %}"><i class='bx bx-radio-circle'></i>Add  Numbers</a>
 								</li>
 							</ul>
 						</li>

@@ -47,7 +47,14 @@ document.addEventListener('DOMContentLoaded', function () {
             confirmButtonColor: "#3085d6",
             confirmButtonText: "OK",
             background: "#fff url(https://sweetalert2.github.io/images/trees.png)",
-            backdrop: `rgba(255,0,0,0.28)`
+            backdrop: `rgba(255,0,0,0.28)`,
+            didRender: () => {
+                const title = Swal.getTitle();
+                if (title) {
+                  title.style.color = '#CC0000'; 
+                  title.style.fontSize = '1.5em';
+                }
+              }
         });
     }
 
@@ -69,7 +76,6 @@ document.addEventListener('DOMContentLoaded', function () {
     flatpickr("#date_effective_coverage", { dateFormat: "m/d/Y" });
     flatpickr("#date_effective_coverage_end", { dateFormat: "m/d/Y" });
     flatpickr("#dateAppointment", { dateFormat: "m/d/Y" });
-    flatpickr("#paymentDate", { dateFormat: "m/d/Y" });
 
     // ⚡ Validación de fecha antes de enviar formulario
     let saveAppointmentForm = document.getElementById('saveAppointment');

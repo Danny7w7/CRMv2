@@ -236,7 +236,7 @@ def editObama(request ,obamacare_id, way):
         banderaCard = False
 
     #Obtener todos los registros de meses pagados de la poliza
-    monthsPaid = Payments.objects.filter(obamaCare_id=obamacare.id)
+    monthsPaid = Payments.objects.filter(obamaCare=obamacare.id)
 
     #calculo de documente
     obamaDocumente = True if obamacare.doc_migration and obamacare.doc_income else False 
@@ -277,15 +277,16 @@ def editObama(request ,obamacare_id, way):
     hoy = timezone.now().date()
     old = hoy.year - obamacare.client.date_birth.year - ((hoy.month, hoy.day) < (obamacare.client.date_birth.month, obamacare.client.date_birth.day))
    
-    obsObama = ObservationAgent.objects.filter(id_obamaCare=obamacare_id)  
+    obsObama = ObservationAgent.objects.filter(obamaCare=obamacare_id)  
     users = Users.objects.filter(role='C')
     list_drow = DropDownList.objects.filter(profiling_obama__isnull=False)
     description = DropDownList.objects.filter(description__isnull=False)
-    obsCus = ObservationCustomer.objects.select_related('agent').filter(client_id=obamacare.client.id, type_police = 'ACA')
+    obsCus = ObservationCustomer.objects.select_related('agent').filter(client=obamacare.client.id)
     consent = Consents.objects.filter(obamacare = obamacare_id )
     income = IncomeLetter.objects.filter(obamacare = obamacare_id)
     document = DocumentsClient.objects.filter(client = obamacare.client)
     documentObama = DocumentObama.objects.filter(obama = obamacare_id)
+    incomeffm = IncomeLetterFFM.objects.filter(obamacare = obamacare_id)
 
     if request.method == 'POST':
         action = request.POST.get('action')
@@ -474,14 +475,14 @@ def editObama(request ,obamacare_id, way):
 
     # Obtener los mensajes de texto del Cliente.
     if request.user.is_superuser:
-        contact = Contacts.objects.filter(phone_number=obamacare.client.phone_number, company_id=obamacare.company.id).first()
+        contact = Contacts.objects.filter(phone_number=obamacare.client.phone_number, company=obamacare.company.id).first()
     else:
-        contact = Contacts.objects.filter(phone_number=obamacare.client.phone_number, company_id=company_id).first()
+        contact = Contacts.objects.filter(phone_number=obamacare.client.phone_number, company=company_id).first()
 
-        
+
     chats = Chat.objects.filter(contact=contact)
-    messages = Messages.objects.filter(chat_id=chats[0].id)
-    secretKey = SecretKey.objects.filter(contact_id=contact.id).first()
+    messages = Messages.objects.filter(chat=chats[0].id)
+    secretKey = SecretKey.objects.filter(contact=contact.id).first()
     chat = get_last_message_for_chats(chats)[0]
     
     context = {
@@ -508,6 +509,7 @@ def editObama(request ,obamacare_id, way):
         'description' : description,
         'old' : old,
         'paymentDateObama': paymentDateObama,
+        'incomeffm':incomeffm,
         #SMS Blue
         'contact':contact,
         'chat':chat,
@@ -562,7 +564,7 @@ def editSupp(request, supp_id):
 
     supp = Supp.objects.select_related('client','agent').filter(id=supp_id).first()
     obsSupp = ObservationAgent.objects.filter(id_supp=supp_id)
-    obsCus = ObservationCustomer.objects.select_related('agent').filter(client_id=supp.client.id, type_police = 'SUPP')
+    obsCus = ObservationCustomer.objects.select_related('agent').filter(client_id=supp.client.id)
     list_drow = DropDownList.objects.filter(profiling_supp__isnull=False)
     paymentDateSupp = paymentDate.objects.filter(supp = supp).first()
 

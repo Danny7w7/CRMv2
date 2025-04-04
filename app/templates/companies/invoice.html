@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factura - Lapeira & Associates</title>
+    <!-- Bootstrap CSS CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        @page {
+            size: letter;
+            margin: 0;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: white;
+            margin: 0;
+            padding: 0;
+            font-size: 10pt;
+        }
+        .invoice-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .invoice-header {
+            background: linear-gradient(135deg, #4e95d4, #2a6eaa);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px 8px 0 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .header-circle {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            top: -75px;
+            right: -50px;
+        }
+        .invoice-title {
+            font-weight: bold;
+            font-size: 1.6rem;
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+        .company-tagline {
+            font-style: italic;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        .table th {
+            background-color: #4e95d4;
+            color: white;
+            font-size: 10pt;
+            padding: 6px 10px;
+        }
+        .table td {
+            padding: 6px 10px;
+            font-size: 10pt;
+        }
+        .table {
+            margin-bottom: 10px;
+        }
+        .terms {
+            font-size: 8pt;
+            color: #666;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .footer {
+            text-align: center;
+            font-size: 8pt;
+            color: #666;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #ddd;
+        }
+        .text-primary-custom {
+            color: #4e95d4;
+        }
+        .bg-custom-light {
+            background-color: #eef6ff;
+        }
+        .client-info {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-size: 9pt;
+        }
+        .client-info p {
+            margin-bottom: 3px;
+        }
+        .invoice-body {
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            padding: 15px;
+            background-color: white;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .terms h5, .client-info h5 {
+            margin-bottom: 5px;
+            font-size: 10pt;
+        }
+        .terms ol {
+            padding-left: 20px;
+            margin-bottom: 0;
+        }
+        .terms li {
+            margin-bottom: 2px;
+        }
+        .invoice-number-box {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 5px 10px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        .divider {
+            height: 1px;
+            background-color: #eee;
+            margin: 8px 0;
+        }
+        .stripe-design {
+            height: 8px;
+            background: repeating-linear-gradient(
+                45deg,
+                #4e95d4,
+                #4e95d4 10px,
+                #6aa7db 10px,
+                #6aa7db 20px
+            );
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <!-- Header with decorative element -->
+        <div class="invoice-header">
+            <div class="header-circle"></div>
+            <div class="row">
+                <div class="col-7">
+                    <h1 class="invoice-title">Lapeira & Associates LLC</h1>
+                    <p class="company-tagline mb-0">The Art of Execution</p>
+                    <p class="mb-0" style="font-size: 0.8rem;">11240 N Kendall Dr Ste #201, Miami, FL 33176</p>
+                    <p class="mb-0" style="font-size: 0.8rem;">Phone: +1 (855) 963-6901 • luis@lapeira.com</p>
+                </div>
+                <div class="col-5 text-end">
+                    <h2 class="invoice-title" style="font-size: 1.4rem;">INVOICE</h2>
+                    <div class="invoice-number-box">
+                        <strong>Nº: LA-{% now "Y" %}-{{id_formateado}}</strong>
+                    </div>
+                    <p class="mb-0" style="font-size: 0.8rem;"><strong>DATE:</strong> {{current_date}} </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stripe-design"></div>
+        
+        <!-- Invoice Body -->
+        <div class="invoice-body">
+            <!-- Client Info Section -->
+            <div class="info-row">
+                <div class="client-info" style="width: 100%;">
+                    <h5 class="text-primary-custom"><i class="bi bi-person"></i> CLIENT:</h5>
+                    <p><strong id="clientName">{{company.company_name}}</strong></p>
+                    <p id="clientAddress">{{company.email}}</p>
+                    <p id="clientCity">{{company.zipcode}} - {{company.state}} - {{company.county}} - {{company.city}}</p>
+                    <p id="clientPhone">{{company.phone_company}}</p>
+                </div>
+            </div>
+
+            <!-- Services Table -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm">
+                    <thead>
+                        <tr>
+                            <th width="50%">Description</th>
+                            <th class="text-center" width="15%">Quantity</th>
+                            <th class="text-end" width="15%">Price</th>
+                            <th class="text-end" width="20%">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Marketing Consulting</td>
+                            <td class="text-center">1</td>
+                            <td class="text-end">$ USD {{amount|floatformat:2}}</td>
+                            <td class="text-end">$ USD {{amount|floatformat:2}}</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-end"><strong>Subtotal</strong></td>
+                            <td class="text-end">$ USD {{amount|floatformat:2}}</td>
+                        </tr>
+                        <tr class="bg-custom-light">
+                            <td colspan="3" class="text-end"><strong>TOTAL</strong></td>
+                            <td class="text-end"><strong>${{amount}}</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <br><br><br><br>
+
+            <!-- Terms and Conditions -->
+            <div class="terms">
+                <h5 class="text-primary-custom">Terms and Conditions:</h5>
+                <ol>
+                    <li>Lapeira & Associates reserves the right to suspend services if payment is not received by the due date..</li>
+                </ol>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <p>¡Thank you for trusting Lapeira & Associates for your marketing needs.!</p>
+                <p>This invoice was generated electronically and is valid without signature or stamp..</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

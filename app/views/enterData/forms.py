@@ -25,7 +25,7 @@ def formCreateClient(request):
 
     user = Users.objects.select_related('company').filter(company = company_id).first()
 
-    if company_id == 9999:
+    if company_id == 1:
         companies = Companies.objects.filter(is_active = True)
     else:
         companies = None
@@ -87,7 +87,7 @@ def formCreateClientMedicare(request):
     company_id = request.company_id  # Obtener company_id desde request
     user = Users.objects.select_related('company').filter(company = company_id).first()
 
-    if company_id == 9999:
+    if company_id == 1:
         company = Companies.objects.filter(is_active = True)
     else:
         company = None

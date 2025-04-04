@@ -58,7 +58,7 @@ def getSalesForWeekly(company_id):
     userRole = ['A', 'C', 'S']
 
     #validation de lo que se va a mostrar por company o si es super user    
-    if company_id == 9999:
+    if company_id == 1:
         filterCompany = ObamaCare.objects.filter(is_active = True)
     else:
         filterCompany = ObamaCare.objects.filter(company = company_id, is_active = True)
@@ -96,7 +96,7 @@ def getSalesForWeekly(company_id):
             userCounts[obamaActive['agent']][day]['obamaActive'] += obamaActive['obamaProfilingCount']
 
     #validation de lo que se va a mostrar por company o si es super user    
-    if company_id == 9999:
+    if company_id == 1:
         filterCompanySupp = Supp.objects.filter(is_active = True)
     else:
         filterCompanySupp = Supp.objects.filter(company = company_id, is_active = True)
@@ -136,7 +136,7 @@ def getSalesForWeekly(company_id):
     excludedUsernames = ['Calidad01', 'mariluz', 'MariaCaTi'] #Excluimos a gente que no debe aparecer en la vista
 
     #validation de lo que se va a mostrar por company o si es super user    
-    if company_id == 9999:
+    if company_id == 1:
         filterCompanyUser = Users.objects.filter(role__in=userRole, is_active=True)
     else:
         filterCompanyUser = Users.objects.filter(role__in=userRole, is_active=True, company = company_id)
@@ -202,7 +202,7 @@ def getSalesForMonth(company_id):
     }
     
     # Filtrar todas las ventas realizadas en el mes actual
-    if company_id == 9999:
+    if company_id == 1:
         obamaSales = ObamaCare.objects.filter(created_at__range=[startDate, endDate])
         suppSales = Supp.objects.filter(created_at__range=[startDate, endDate])
     else:
@@ -230,7 +230,7 @@ def getSalesForMonth(company_id):
                 pass
 
     # Agregar el conteo de pólizas activas por agente para Obamacare y Supp
-    if company_id == 9999:
+    if company_id == 1:
         activeObamaPolicies = ObamaCare.objects.filter(status='Active')
         activeSuppPolicies = Supp.objects.filter(status='Active')
     else:

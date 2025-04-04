@@ -177,6 +177,8 @@ urlpatterns = [
 
     #<---------------------------Consent---------------------------> 
     path('consetMedicare/<client_id>/<language>/', consents.consetMedicare, name='consetMedicare'),
+    #carta con la FFM
+    path('ILFFM/<obamacare>/', consents.ILFFM, name='ILFFM'),
 
 
     #<---------------------------Company---------------------------> 
@@ -185,6 +187,8 @@ urlpatterns = [
     path('toggleCompanies/<company_id>/', companies.toggleCompanies, name='toggleCompanies'),
     path('createServices/', companies.createServices, name='createServices'),
     path('addSubscription/', companies.addSubscription, name='addSubscription'),
+    path('addNumbers/', companies.addNumbers, name='addNumbers'),
+    path('toggleNumberCompany/<number_id>/', companies.toggleNumberCompany, name='toggleNumberCompany'),
     
     #<---------------------------Utils---------------------------> 
     path('toggleDarkMode/', utils.toggleDarkMode, name='toggleDarkMode'),
