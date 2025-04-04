@@ -611,10 +611,10 @@ def customerPerformance(request):
     if request.method == 'POST':
         # Convertir fechas a objetos datetime con zona horaria
         start_date = timezone.make_aware(
-            datetime.strptime(request.POST.get('start_date'), '%Y-%m-%d').replace(hour=0, minute=0, second=0, microsecond=0)
+            datetime.datetime.strptime(request.POST.get('start_date'), '%Y-%m-%d').replace(hour=0, minute=0, second=0, microsecond=0)
         )
         end_date = timezone.make_aware(
-            datetime.strptime(request.POST.get('end_date'), '%Y-%m-%d').replace(hour=23, minute=59, second=59, microsecond=999999)
+            datetime.datetime.strptime(request.POST.get('end_date'), '%Y-%m-%d').replace(hour=23, minute=59, second=59, microsecond=999999)
         )
     else:
         now = datetime.datetime.now()
@@ -1179,10 +1179,10 @@ def typification(request):
      
         # Convertir fechas a objetos datetime con zona horaria
         start_date = timezone.make_aware(
-            datetime.strptime(start_date, '%Y-%m-%d').replace(hour=0, minute=0, second=0, microsecond=0)
+            datetime.datetime.strptime(start_date, '%Y-%m-%d').replace(hour=0, minute=0, second=0, microsecond=0)
         )
         end_date = timezone.make_aware(
-            datetime.strptime(end_date, '%Y-%m-%d').replace(hour=23, minute=59, second=59, microsecond=999999)
+            datetime.datetime.strptime(end_date, '%Y-%m-%d').replace(hour=23, minute=59, second=59, microsecond=999999)
         )
         
         typification = typification.filter(
