@@ -44,7 +44,7 @@ def saveCustomerObservationACA(request):
             ObservationCustomer.objects.create(
                 client=obamacare.client,
                 agent=request.user,
-                obamacare=obamacare.id,
+                obamacare=obamacare,
                 type_police=type_plan,
                 typeCall=typeCall,
                 typification=typification_text, # Guardamos las observaciones en el campo 'typification'
