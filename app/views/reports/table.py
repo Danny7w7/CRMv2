@@ -183,10 +183,10 @@ def saleObamaAgentUsa(request, company_id, start_date=None, end_date=None):
     # Si se proporcionan fechas, filtrar por el rango de fechas
     elif start_date and end_date:
         start_date = timezone.make_aware(
-            datetime.strptime(start_date, '%Y-%m-%d').replace(hour=0, minute=0, second=0, microsecond=0)
+            datetime.datetime.strptime(start_date, '%Y-%m-%d').replace(hour=0, minute=0, second=0, microsecond=0)
         )
         end_date = timezone.make_aware(
-            datetime.strptime(end_date, '%Y-%m-%d').replace(hour=23, minute=59, second=59, microsecond=999999)
+            datetime.datetime.strptime(end_date, '%Y-%m-%d').replace(hour=23, minute=59, second=59, microsecond=999999)
         )
 
         sales_query = sales_query.filter(created_at__range=[start_date, end_date])
