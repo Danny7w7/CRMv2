@@ -563,8 +563,8 @@ def editSupp(request, supp_id):
     company_id = request.user.company.id
 
     supp = Supp.objects.select_related('client','agent').filter(id=supp_id).first()
-    obsSupp = ObservationAgent.objects.filter(id_supp=supp_id)
-    obsCus = ObservationCustomer.objects.select_related('agent').filter(client_id=supp.client.id)
+    obsSupp = ObservationAgent.objects.filter(supp=supp_id)
+    obsCus = ObservationCustomer.objects.select_related('agent').filter(client=supp.client.id)
     list_drow = DropDownList.objects.filter(profiling_supp__isnull=False)
     paymentDateSupp = paymentDate.objects.filter(supp = supp).first()
 

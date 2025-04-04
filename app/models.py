@@ -286,7 +286,7 @@ class Supp(models.Model):
         db_table = 'supp'
 
 class Payments(models.Model):
-    obamaCare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
+    obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
     agent = models.ForeignKey(Users, on_delete=models.CASCADE)
     month = models.CharField(max_length=20)
     typePayment = models.CharField(max_length=20)
