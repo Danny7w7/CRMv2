@@ -46,7 +46,7 @@ def downloadAccionRequired(request):
 
     company_id = request.company_id  # Obtener company_id desde request
     # Definir el filtro de compañía (será un diccionario vacío si es superusuario)
-    company_filter = Q(obama__company=company_id) if not request.user.is_superuser else Q()
+    company_filter = Q(obamacare__company=company_id) if not request.user.is_superuser else Q()
 
     accionRequired = request.POST.get("accionRequired")
     start_date = request.POST.get("start_date")

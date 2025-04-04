@@ -603,7 +603,7 @@ def customerPerformance(request):
     company_id = request.company_id  # Obtener company_id desde request
     # Definir el filtro de compañía (será un diccionario vacío si es superusuario)
     company_filter = {'company': company_id} if not request.user.is_superuser else {}
-    company_filter2 = {'obama__company': company_id} if not request.user.is_superuser else {}
+    company_filter2 = {'obamacare__company': company_id} if not request.user.is_superuser else {}
 
     # Obtener los IDs de ObamaCare que están en CustomerRedFlag
     excluded_obama_ids = CustomerRedFlag.objects.values('obamacare')
@@ -1041,7 +1041,7 @@ def reports(request):
     company_id = request.company_id  # Obtener company_id desde request
     # Definir el filtro de compañía (será un diccionario vacío si es superusuario)
     company_filter = {'company': company_id} if not request.user.is_superuser else {}
-    company_filter2 = {'obama__company': company_id} if not request.user.is_superuser else {}
+    company_filter2 = {'obamacare__company': company_id} if not request.user.is_superuser else {}
 
     #Reports de Paymet!
     payments = Payments.objects.filter(**company_filter).values('month').annotate(total=Count('id')).order_by('month')
