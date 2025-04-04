@@ -1145,7 +1145,7 @@ def typification(request):
         
     start_date = request.POST.get('start_date')
     end_date = request.POST.get('end_date')
-    agent = Users.objects.filter(role__in=['A', 'C'], **company_filter )
+    agent = Users.objects.filter(role__in=['SUPP', 'C'], **company_filter )
     
     # Consulta base
     typification = ObservationCustomer.objects.select_related('agent', 'client').filter(is_active = True, **company_filter2)
