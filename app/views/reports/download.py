@@ -70,7 +70,7 @@ def downloadAccionRequired(request):
         date_filter = Q(created_at__lte=end_date)
 
     # Obtener las Acciones requeridas que correspondan a los filtros aplicados
-    actionRequireds = CustomerRedFlag.objects.select_related("obama__client", "agent_create","agent_completed").filter(
+    actionRequireds = CustomerRedFlag.objects.select_related("obamacare__client", "agent_create","agent_completed").filter(
         pending_filter & completed_filter & date_filter & company_filter
     )
 
@@ -87,9 +87,9 @@ def downloadAccionRequired(request):
     # ✅ Agregar datos al archivo Excel
     for i in actionRequireds:
         ws.append([
-            i.obama.client.first_name,
-            i.obama.client.last_name,
-            i.obama.status,
+            i.obamcare.client.first_name,
+            i.obamcare.client.last_name,
+            i.obamcare.status,
             i.description,
             i.clave,
             i.created_at.strftime("%m-%d-%Y") if i.created_at else '',
