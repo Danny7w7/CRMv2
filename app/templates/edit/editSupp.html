@@ -390,15 +390,14 @@
 								<div class="modal-body">
 									<form id="formIngresarTexto" action="{% url 'saveCustomerObservationSupp' %}" method="POST">
 										{% csrf_token %}
-										<input type="hidden" name="plan_id" value="{{ supps.id }}">
-										<input type="hidden" name="type_plan" value="SUPP">
+										<input type="hidden" name="supp_id" value="{{ supps.id }}">
 										<div class="mb-3">
 											<label for="textoIngresado" class="form-label">Text:</label>
 											<textarea class="form-control" id="textoIngresado" name="textoIngresado" rows="4" required></textarea>
 										</div>
 										<div class="mb-3">
-											<label for="textoIngresado" class="form-label">Typification:</label>
-											<select class="form-select"  name="observaciones[]"  id="textoIngresados" multiple required>
+											<label for="observaciones" class="form-label">Typification:</label>
+											<select class="form-select"  name="observaciones[]"  id="observaciones" multiple required>
 												<option value="1095-A">1095-A</option>
 												<option value="AUDITED">Audited</option>
 												<option value="ACTIVE">Active</option>

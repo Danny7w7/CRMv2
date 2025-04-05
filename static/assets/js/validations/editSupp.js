@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Configuración de Choices para select
-    const selectElement = document.querySelector('#textoIngresados');
+    const selectElement = document.querySelector('#observaciones');
     if (selectElement && typeof Choices !== 'undefined') {
         new Choices(selectElement, {
             removeItemButton: true,

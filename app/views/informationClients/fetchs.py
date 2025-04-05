@@ -78,72 +78,56 @@ def blockSocialSecurityMedicare(request):
 
     return JsonResponse({'status': 'error', 'message': 'Solicitud no válida.'}, status=400)
 
-@csrf_exempt  # Solo usar en pruebas; manejar CSRF en producción correctamente
+
+@csrf_exempt
 def fetchPaymentsMonth(request):
     if request.method == 'POST':
         try:
-            data = json.loads(request.body)  # Leer JSON del request
+            data = json.loads(request.body)
         except json.JSONDecodeError:
             return JsonResponse({'success': False, 'message': 'Invalid JSON'}, status=400)
 
         obamaCare_id = data.get('obamacare')
         month = data.get('month')
-        type_pay = data.get('type_pay')  # Obtener el tipo de pago
-        type_discount = data.get('type_discount')  # Obtener el tipo de descuento
+        type_payment = data.get('type')  # Solo un campo: 'pay' o 'discount'
 
-        # Validación de los datos recibidos
-        if not obamaCare_id or not month:
+        if not obamaCare_id or not month or not type_payment:
             return JsonResponse({'success': False, 'message': 'Faltan datos'}, status=400)
 
-        # Obtener la instancia de ObamaCare
         obama = ObamaCare.objects.filter(id=obamaCare_id).first()
         if not obama:
             return JsonResponse({'success': False, 'message': 'ObamaCare no encontrado'}, status=404)
 
-        # Ahora, según el tipo de checkbox seleccionado, asignamos el tipo de pago o descuento
-        if type_pay:
-            type = 'pay'  # Si el tipo de pago es 'pay'
-        elif type_discount:
-            type = 'discount'  # Si el tipo de pago es 'discount'
-        else:
-            type = 'unknown'  # Si ninguno está seleccionado, asignamos 'unknown'
-
-
-        
-        # Crear el formulario de Payments con los datos recibidos
         form_data = {
-            'obamaCare': obamaCare_id,
+            'obamacare': obamaCare_id,
             'month': month,
-            'typePayment': type,  # Asignar el tipo de pago o descuento
-            'company': obama.company.id,  # Asignar la compañía, usando el ID
+            'typePayment': type_payment,
+            'company': obama.company.id,
         }
 
-        # Crear el formulario de Payments con los datos
         form = PaymentsForm(form_data)
         if form.is_valid():
             payment = form.save(commit=False)
-            payment.agent = request.user  # Asignar el agente (usuario que hace la solicitud)
+            payment.agent = request.user
             payment.save()
-            return JsonResponse({'success': True, 'message': 'Payment creado correctamente', 'role': request.user.role})
+            return JsonResponse({'success': True, 'message': 'Payment creado correctamente'})
         else:
             return JsonResponse({'success': False, 'errors': form.errors}, status=400)
 
-
     elif request.method == 'DELETE':
         try:
-            # Asegúrate de que el contenido de la solicitud sea JSON
-            data = json.loads(request.body.decode('utf-8'))  # Decodificar correctamente si es necesario
+            data = json.loads(request.body.decode('utf-8'))
         except json.JSONDecodeError:
             return JsonResponse({'success': False, 'message': 'Invalid JSON'}, status=400)
 
         obamaCare_id = data.get('obamacare')
         month = data.get('month')
+        type_payment = data.get('type')
 
-        if not obamaCare_id or not month:
+        if not obamaCare_id or not month or not type_payment:
             return JsonResponse({'success': False, 'message': 'Faltan datos'}, status=400)
 
-        # Buscar y eliminar el pago
-        payment = Payments.objects.filter(obamacare=obamaCare_id, month=month).first()
+        payment = Payments.objects.filter(obamacare=obamaCare_id, month=month, typePayment=type_payment).first()
         if payment:
             payment.delete()
             return JsonResponse({'success': True, 'message': 'Payment eliminado correctamente'})

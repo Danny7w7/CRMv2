@@ -26,8 +26,7 @@ from ...alertWebsocket import websocketAlertGeneric
 def saveCustomerObservationACA(request):
     if request.method == "POST":
         content = request.POST.get('textoIngresado')
-        plan_id = request.POST.get('plan_id')
-        type_plan = request.POST.get('type_plan')
+        obamacare_id = request.POST.get('obamacare_id')
         typeCall = request.POST.get('typeCall')  
         way = request.POST.get('way')        
 
@@ -38,14 +37,13 @@ def saveCustomerObservationACA(request):
         # Convertir las observaciones a una cadena (por ejemplo, separada por comas o saltos de línea)
         typification_text = ", ".join(observations)  # Puedes usar "\n".join(observations) si prefieres saltos de línea
     
-        obamacare = ObamaCare.objects.get(id=plan_id)
+        obamacare = ObamaCare.objects.get(id=obamacare_id)
 
         if content.strip():  # Validar que el texto no esté vacío
             ObservationCustomer.objects.create(
                 client=obamacare.client,
                 agent=request.user,
                 obamacare=obamacare,
-                type_police=type_plan,
                 typeCall=typeCall,
                 typification=typification_text, # Guardamos las observaciones en el campo 'typification'
                 content=content
@@ -63,8 +61,7 @@ def saveCustomerObservationACA(request):
 def saveCustomerObservationSupp(request):
     if request.method == "POST":
         content = request.POST.get('textoIngresado')
-        plan_id = request.POST.get('plan_id')
-        type_plan = request.POST.get('type_plan')
+        supp_id = request.POST.get('supp_id')
         typeCall = request.POST.get('typeCall')        
 
         # Obtenemos las observaciones seleccionadas
@@ -73,14 +70,13 @@ def saveCustomerObservationSupp(request):
         # Convertir las observaciones a una cadena (por ejemplo, separada por comas o saltos de línea)
         typification_text = ", ".join(observations)  # Puedes usar "\n".join(observations) si prefieres saltos de línea
 
-        supp = Supp.objects.get(id=plan_id) 
+        supp = Supp.objects.get(id=supp_id) 
 
         if content.strip():  # Validar que el texto no esté vacío
             ObservationCustomer.objects.create(
                 client=supp.client,
                 agent=request.user,
-                supp=supp.id,
-                type_police=type_plan,
+                supp=supp,
                 typeCall=typeCall,
                 typification=typification_text, # Guardamos las observaciones en el campo 'typification'
                 content=content
@@ -93,7 +89,6 @@ def saveCustomerObservationSupp(request):
         
     else:
         return HttpResponse("Método no permitido.", status=405)
-
 
 @login_required(login_url='/login') 
 def saveCustomerObservationMedicare(request):
@@ -255,16 +250,27 @@ def paymentDateObama(request, obama_id):
 
         if parsed_date is None:
             return JsonResponse({"error": "Invalid date format. Expected YYYY-MM-DD."}, status=400)
+        
+        filtro = paymentDate.objects.filter(obamacare=obamacare).count()
 
-        # Actualizar o crear el registro de PaymentDate
-        payment_record, created = paymentDate.objects.update_or_create(
-            obamacare=obamacare,  
-            defaults={"payment_date": parsed_date},
-            agent_create = request.user
-        )
-
-        message = "Recode SMS Created!" if created else "Date of updated billing SMS!"
-        return JsonResponse({"message": message, "id": payment_record.id})
+        if filtro < 2:
+            filtro = paymentDate.objects.filter(obamacare=obamacare).first()
+            if filtro:
+                paymentDate.objects.filter(id = filtro.id).update(
+                    obamacare=obamacare,  
+                    payment_date = parsed_date,
+                    agent_create = request.user)
+            else:
+                paymentDate.objects.create(
+                    obamacare=obamacare,  
+                    payment_date = parsed_date,
+                    agent_create = request.user)
+                
+            message = "Recode SMS Created!" if parsed_date else "Date of updated billing SMS!"
+            return JsonResponse({"message": message})
+        else:
+            message = "Duplicidad de fecha, contactar con Admin"
+            return JsonResponse({"error": message}, status=400)
 
     return JsonResponse({"error": "Invalid request"}, status=400)
 
@@ -296,3 +302,30 @@ def paymentDateSupp(request, supp_id):
         return JsonResponse({"message": message, "id": payment_record.id})
 
     return JsonResponse({"error": "Invalid request"}, status=400)
+
+@login_required(login_url='/login') 
+def agentTicketAssignment(request):
+    if request.method == "POST":
+        content = request.POST.get('textoIngresado')
+        obamacare_id = request.POST.get('obamacare_id')
+        agent_customer = request.POST.get('agent_customer')  
+        way = request.POST.get('way')        
+    
+        obamacare = ObamaCare.objects.get(id=obamacare_id)
+
+        if content.strip():  # Validar que el texto no esté vacío
+            AgentTicketAssignment.objects.create(
+                obamacare=obamacare,
+                agent_create=request.user,
+                agent_customer=agent_customer,
+                content=content,
+                status="IN PROGRESS",
+            )
+            messages.success(request, "Observación guardada exitosamente.")
+        else:
+            messages.error(request, "El contenido de la observación no puede estar vacío.")
+
+        return redirect('editObama', obamacare.id, way)       
+        
+    else:
+        return render(request, "auth/404.html", {"message": "Método no permitido."})

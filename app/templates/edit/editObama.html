@@ -8,7 +8,6 @@
 	<link href="{% static 'assets/plugins/metismenu/css/metisMenu.min.css' %}" rel="stylesheet"/>
 	<link href="{% static 'assets/plugins/datatable/css/dataTables.bootstrap5.min.css' %}" rel="stylesheet"/>
 	<link href="{% static 'assets/plugins/bs-stepper/css/bs-stepper.css' %}" rel="stylesheet"/>	
-	<link href="{% static 'assets/plugins/Drag-And-Drop/dist/imageuploadify.min.css' %}" rel="stylesheet"/>
 	<!-- loader-->
 	<link href="{% static 'assets/css/pace.min.css' %}" rel="stylesheet" />
 	<script src="{% static 'assets/js/pace.min.js' %}"></script>
@@ -601,6 +600,11 @@
 								Date Payment
 							</button>
 						{% endif %} 
+						{% if request.user.role == 'A' %}
+						<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#AgentTicketAssignment">
+							Ticket to customer
+						</button>
+						{% endif %}
 						<button type="button" class="btn btn-secondary me-2" data-bs-toggle="modal" data-bs-target="#modalVerTexto">
 							See Observations
 						</button>
@@ -646,16 +650,15 @@
 								<div class="modal-body">
 									<form id="formIngresarTexto" action="{% url 'saveCustomerObservationACA' %}" method="POST">
 										{% csrf_token %}
-										<input type="hidden" name="plan_id" value="{{ obamacare.id }}">
-										<input type="hidden" name="type_plan" value="ACA">
+										<input type="hidden" name="obamacare_id" value="{{ obamacare.id }}">
 										<input type="hidden" name="way" value="{{way}}">
 										<div class="mb-3">
 											<label for="textoIngresado" class="form-label">Text:</label>
 											<textarea class="form-control" id="textoIngresado" name="textoIngresado" rows="4" required></textarea>
 										</div>
 										<div class="mb-3">
-											<label for="textoIngresado" class="form-label">Typification:</label>
-											<select class="form-select"  name="observaciones[]" id="textoIngresados" multiple required>
+											<label for="observaciones" class="form-label">Typification:</label>
+											<select class="form-select"  name="observaciones[]" id="observaciones" multiple required>
 												<option value="1095-A">1095-A</option>
 												<option value="AUDITED">Audited</option>
 												<option value="ACTIVE">Active</option>
@@ -715,6 +718,45 @@
 												<option value="WHATSAPP" >WhatsApp</option>
 												<option value="TXT MESSAGE" >Txt Message</option>
 												<option value="SHERPA" >Sherpa</option>
+											</select>
+										</div>
+										<div class="d-flex justify-content-between">
+											<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalSelector" data-bs-dismiss="modal">
+												Back
+											</button>
+											<button type="submit" class="btn btn-primary">Saved</button>
+										</div>
+									</form>
+									
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Modal para ingresar ticket de agent a customer -->
+					<div class="modal fade" id="AgentTicketAssignment" tabindex="-1" aria-labelledby="AgentTicketAssignmentLabel" aria-hidden="true">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="AgentTicketAssignmentLabel">Enter Observation</h5>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								</div>
+								<div class="modal-body">
+									<form id="formIngresarTexto" action="{% url 'agentTicketAssignment' %}" method="POST">
+										{% csrf_token %}
+										<input type="hidden" name="obamacare_id" value="{{ obamacare.id }}">
+										<input type="hidden" name="way" value="{{way}}">
+										<div class="mb-3">
+											<label for="textoIngresado" class="form-label">Text:</label>
+											<textarea class="form-control" id="textoIngresado" name="textoIngresado" rows="4" required></textarea>
+										</div>
+										<div class="mb-3">
+											<label for="agent_customer" class="form-label">Agent to assign:</label>
+											<select class="form-select"  name="agent_customer" id="agent_customer" >
+												<option value="no_valid" disabled selected>Please Select</option>
+												{% for user  in users %}												
+													<option value="{{user.id}}">{{user.first_name}} {{user.last_name}}</option>
+												{% endfor %}
 											</select>
 										</div>
 										<div class="d-flex justify-content-between">
@@ -1082,13 +1124,13 @@
 														role="switch"
 														value="{{month}}"
 														id="paySwitch{{forloop.counter}}" 
-														name="type_pay_{{PAY}}"  
+														name="type_pay_{{month}}"  
 														{% for payMonth in monthsPaid %} 
-														  {% if month == payMonth.month %}checked{% endif %}
+														  {% if month == payMonth.month and payMonth.typePayment == 'pay' %}checked{% endif %}
 														{% endfor %}
 														{% if request.user.role != 'Admin' %} 
 														  {% for payMonth in monthsPaid %}
-															{% if month == payMonth.month %}disabled{% endif %}
+															{% if month == payMonth.month and payMonth.typePayment == 'pay' %}disabled{% endif %}
 														  {% endfor %}
 														{% endif %}
 													  >
@@ -1102,13 +1144,13 @@
 														role="switch"
 														value="{{month}}" 
 														id="discountSwitch{{forloop.counter}}"
-														name="type_pay_{{DISCOUNT}}" 
+														name="type_discount_{{month}}"  
 														{% for payMonth in monthsPaid %} 
-														  {% if month == payMonth.month %}checked{% endif %}
+														  {% if month == payMonth.month and payMonth.typePayment == 'discount' %}checked{% endif %}
 														{% endfor %}
 														{% if request.user.role != 'Admin' %} 
 														  {% for payMonth in monthsPaid %}
-															{% if month == payMonth.month %}disabled{% endif %}
+															{% if month == payMonth.month and payMonth.typePayment == 'discount' %}disabled{% endif %}
 														  {% endfor %}
 														{% endif %}
 													  >

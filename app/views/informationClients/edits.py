@@ -278,7 +278,7 @@ def editObama(request ,obamacare_id, way):
     old = hoy.year - obamacare.client.date_birth.year - ((hoy.month, hoy.day) < (obamacare.client.date_birth.month, obamacare.client.date_birth.day))
    
     obsObama = ObservationAgent.objects.filter(obamaCare=obamacare_id)  
-    users = Users.objects.filter(role='C')
+    users = Users.objects.filter(role='C', company = company_id)
     list_drow = DropDownList.objects.filter(profiling_obama__isnull=False)
     description = DropDownList.objects.filter(description__isnull=False)
     obsCus = ObservationCustomer.objects.select_related('agent').filter(client=obamacare.client.id)

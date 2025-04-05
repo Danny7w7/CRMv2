@@ -77,61 +77,47 @@ function listenAllCheckInput() {
 }
 
 function toggleUserStatus(checkbox) {
-    const month = checkbox.value;  // Obtener el mes de la checkbox
+    const month = checkbox.value;
+
+    // Determinar si es 'pay' o 'discount'
+    let type = '';
+    if (checkbox.id.includes('paySwitch')) {
+        type = 'pay';
+    } else if (checkbox.id.includes('discountSwitch')) {
+        type = 'discount';
+    }
+
     const dataToSend = {
-        obamacare: obamacare_id,  // Asegúrate de que `obamacare_id` está definido
+        obamacare: obamacare_id,  // Asegúrate de que esta variable esté definida globalmente
         month: month,
-        type_pay: checkbox.id.includes('paySwitch') && checkbox.checked ? 'pay' : '', // Si es un pago
-        type_discount: checkbox.id.includes('discountSwitch') && checkbox.checked ? 'discount' : '' // Si es un descuento
+        type: type  // Solo un campo
     };
 
     console.log("Enviando:", dataToSend);
 
-    // Si el checkbox está marcado, se hace un POST para crear el pago
-    if (checkbox.checked) {
-        fetch(`/fetchPaymentsMonth/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'  // Asegurarse de que el backend entienda JSON
-            },
-            body: JSON.stringify(dataToSend)  // Convertimos los datos a JSON
-        })
-        .then(response => response.json())  // Procesar la respuesta (si es JSON)
-        .then(data => {
-            console.log("Datos recibidos:", data);  // Ver los datos que el servidor devuelve
-            if (data.success) {
-                console.log("Pago creado correctamente");
-            } else {
-                console.error("Error al enviar los datos:", data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error al procesar la respuesta:', error);  // Mostrar error al procesar la respuesta
-        });
-    } 
-    // Si el checkbox está desmarcado, se hace un DELETE para eliminar el pago
-    else {
-        fetch(`/fetchPaymentsMonth/`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'  // Asegurarse de que el backend entienda JSON
-            },
-            body: JSON.stringify(dataToSend)  // Convertimos los datos a JSON
-        })
-        .then(response => response.json())  // Procesar la respuesta (si es JSON)
-        .then(data => {
-            console.log("Datos recibidos:", data);  // Ver los datos que el servidor devuelve
-            if (data.success) {
-                console.log("Pago eliminado correctamente");
-            } else {
-                console.error("Error al eliminar el pago:", data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error al procesar la respuesta:', error);  // Mostrar error al procesar la respuesta
-        });
-    }
+    const method = checkbox.checked ? 'POST' : 'DELETE';
+
+    fetch(`/fetchPaymentsMonth/`, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(dataToSend)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Datos recibidos:", data);
+        if (data.success) {
+            console.log(checkbox.checked ? "Pago creado" : "Pago eliminado");
+        } else {
+            console.error("Error:", data.message || data.errors);
+        }
+    })
+    .catch(error => {
+        console.error('Error al procesar la respuesta:', error);
+    });
 }
+
  
 // fetch para Action Required
 let isRequestPending = false;

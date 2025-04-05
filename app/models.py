@@ -312,9 +312,7 @@ class ObservationCustomer(models.Model):
     agent = models.ForeignKey(Users, on_delete=models.CASCADE)  
     obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null=True)
     supp = models.ForeignKey(Supp, on_delete=models.CASCADE, null=True)
-    type_police = models.CharField(max_length=20) 
     typeCall = models.CharField(max_length=20)   
-    id_plan = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True) 
     typification = models.TextField()
     content = models.TextField()
@@ -502,7 +500,7 @@ class DocumentObama(models.Model):
     agent_create = models.ForeignKey(Users,on_delete=models.CASCADE )   
     name =  models.CharField(max_length=255, default="Unnamed Document")
     # created_at = models.DateTimeField(auto_now_add=True)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True) 
 
     class Meta:
         db_table = 'documentObama'
@@ -561,5 +559,17 @@ class paymentDate(models.Model):
     class Meta:
         db_table = 'paymentDate'
 
+class AgentTicketAssignment(models.Model):
+    obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null=True)
+    supp = models.ForeignKey(Supp, on_delete=models.CASCADE, null= True)
+    agent_create = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='agent_create' )
+    agent_customer = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='agent_customer')
+    content = models.TextField()
+    status = models.CharField(max_length=100)  
+    created_at = models.DateTimeField(auto_now_add=True)
+    end_date = models.DateField()
+
+    class Meta:
+        db_table = 'agentTicketAssignment'
 
 from .modelsSMS import *

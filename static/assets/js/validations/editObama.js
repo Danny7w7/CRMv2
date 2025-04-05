@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ⚡ Inicializar Choices.js para los select
-    const selectElement = document.querySelector('#textoIngresados');
+    const selectElement = document.querySelector('#observaciones');
     if (selectElement) {
         new Choices(selectElement, {
             removeItemButton: true,

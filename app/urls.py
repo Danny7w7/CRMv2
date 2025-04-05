@@ -82,6 +82,7 @@ urlpatterns = [
     path('viewIncomeLetter/<obamacare_id>/', consents.incomeLetter, name='incomeLetter'),
     path('validarCita/', modals.validarCita, name='validarCita'),
     path('paymentDateObama/<obama_id>/', modals.paymentDateObama, name='paymentDateObama'),
+    path('agentTicketAssignment/', modals.agentTicketAssignment, name='agentTicketAssignment'),
 
     path('clientAccionRequired/', table.clientAccionRequired, name='clientAccionRequired'),
 
