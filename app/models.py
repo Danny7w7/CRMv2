@@ -568,8 +568,7 @@ class AgentTicketAssignment(models.Model):
     response = models.TextField()
     status = models.CharField(max_length=100)  
     created_at = models.DateTimeField(auto_now_add=True)
-    end_date = models.DateField(null=True)
-    is_active = models.BooleanField(default=True )  
+    end_date = models.DateField(null=True) 
     company = models.ForeignKey(Companies, on_delete=models.CASCADE)
 
     class Meta:
