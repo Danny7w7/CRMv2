@@ -12,7 +12,7 @@ def themeMode(request):
 def company(request):
     try:
         company = Companies.objects.get(id=request.user.company.id)
-    except Companies.DoesNotExist:
+    except:
         company = None
     return {'nameCompany': company}
 
