@@ -134,7 +134,7 @@ class UserPreference(models.Model):
     darkMode = models.BooleanField(default=False)
     
     class Meta:
-        db_table = 'userPreference'
+        db_table = 'user_preference'
 
 class Clients(models.Model):
     agent = models.ForeignKey(Users, on_delete=models.CASCADE)
@@ -201,7 +201,7 @@ class ContactClient(models.Model):
     whatsapp = models.BooleanField(default=True) 
 
     class Meta:
-        db_table = 'contactClient'
+        db_table = 'contact_client'
 
 class OptionMedicare(models.Model):
     client = models.ForeignKey(Medicare, on_delete=models.CASCADE)
@@ -213,7 +213,7 @@ class OptionMedicare(models.Model):
     suplementarios = models.BooleanField(default=True)     
 
     class Meta:
-        db_table = 'optionMedicare'
+        db_table = 'option_medicare'
 
 class ObamaCare(models.Model):
     agent = models.ForeignKey(Users, on_delete=models.CASCADE,related_name='agent_sale_aca')
@@ -305,7 +305,7 @@ class ObservationAgent(models.Model):
     content = models.TextField()
 
     class Meta:
-        db_table = 'observationsAgents'
+        db_table = 'observations_agents'
 
 class ObservationCustomer(models.Model):
     client = models.ForeignKey(Clients, on_delete=models.CASCADE)
@@ -319,7 +319,7 @@ class ObservationCustomer(models.Model):
     is_active = models.BooleanField(default=True) 
 
     class Meta:
-        db_table = 'observationsCustomers'
+        db_table = 'observations_customers'
 
 class ObservationCustomerMedicare(models.Model):
     medicare = models.ForeignKey(Medicare, on_delete=models.CASCADE)
@@ -330,7 +330,7 @@ class ObservationCustomerMedicare(models.Model):
     content = models.TextField()
 
     class Meta:
-        db_table = 'observationsCustomersMedicare'
+        db_table = 'observations_customers_medicare'
 
 class Motivation(models.Model):
     content = models.TextField()
@@ -348,7 +348,7 @@ class ClientAlert(models.Model):
     company = models.ForeignKey(Companies, on_delete=models.CASCADE)
 
     class Meta:
-        db_table = 'clientAlert'
+        db_table = 'client_alert'
 
 class DropDownList(models.Model):
     profiling_obama = models.CharField(max_length=255,null=True)
@@ -359,7 +359,7 @@ class DropDownList(models.Model):
     service_company = models.TextField(null=True) 
 
     class Meta:
-        db_table = 'dropDownList'
+        db_table = 'drop_down_list'
 
 class ExcelFileMetadata(models.Model):
     file_name = models.CharField(max_length=255)
@@ -369,7 +369,7 @@ class ExcelFileMetadata(models.Model):
     company = models.ForeignKey(Companies, on_delete=models.CASCADE)
 
     class Meta:
-        db_table = 'excelFileMetadata'
+        db_table = 'excel_file_metadata'
 
 class BdExcel(models.Model):
     first_name = models.CharField(max_length=255)
@@ -384,7 +384,7 @@ class BdExcel(models.Model):
     is_sold = models.BooleanField(default=False)  # Campo booleano para indicar si está "solds"
     
     class Meta:
-        db_table = 'bdExcel'
+        db_table = 'bd_excel'
 
 class ControlQuality(models.Model):
     agent_create = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='created_controls' )
@@ -398,7 +398,7 @@ class ControlQuality(models.Model):
     is_active = models.BooleanField(default=True)  
 
     class Meta:
-        db_table = 'controlQuality'
+        db_table = 'control_quality'
 
 class ControlCall(models.Model):
     agent_create = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='created_controls_call' )
@@ -411,7 +411,7 @@ class ControlCall(models.Model):
     is_active = models.BooleanField(default=True)
 
     class Meta:
-        db_table = 'controlCall'
+        db_table = 'control_call'
 
 class CommentBD(models.Model):
     bd_excel = models.ForeignKey(BdExcel, on_delete=models.CASCADE)
@@ -421,7 +421,7 @@ class CommentBD(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = 'commentBD'
+        db_table = 'comment_bd'
 
 class DocumentsClient(models.Model):
     file = models.FileField(
@@ -431,7 +431,7 @@ class DocumentsClient(models.Model):
     client = models.ForeignKey(Clients, on_delete=models.CASCADE)
 
     class Meta:
-        db_table = 'documentsClient'
+        db_table = 'documents_client'
 
 class Consents(models.Model):
     pdf = models.FileField(
@@ -462,7 +462,7 @@ class IncomeLetter(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = 'incomeLetter'
+        db_table = 'income_letter'
 
 class IncomeLetterFFM(models.Model):
     pdf = models.FileField(
@@ -473,7 +473,7 @@ class IncomeLetterFFM(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = 'incomeLetterFFM'
+        db_table = 'incomeLetter_ffm'
 
 class TemporaryToken(models.Model):
     client = models.ForeignKey(Clients, on_delete=models.CASCADE, null = True)
@@ -490,7 +490,7 @@ class TemporaryToken(models.Model):
         return f"Temporary URL for {self.client.first_name} (Active: {self.is_active})"
 
     class Meta:
-        db_table = 'temporaryToken'
+        db_table = 'temporary_token'
 
 class DocumentObama(models.Model):
     file = models.FileField(
@@ -503,7 +503,7 @@ class DocumentObama(models.Model):
     created_at = models.DateTimeField(auto_now_add=True) 
 
     class Meta:
-        db_table = 'documentObama'
+        db_table = 'document_obama'
 
 class LettersCard(models.Model):
     obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
@@ -514,7 +514,7 @@ class LettersCard(models.Model):
     dateCard = models.DateField(null=True)
 
     class Meta:
-        db_table = 'lettersCard'
+        db_table = 'letters_card'
 
 class AppointmentClient(models.Model):
     obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
@@ -525,7 +525,7 @@ class AppointmentClient(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = 'appointmentClient'
+        db_table = 'appointment_client'
 
 class UserCarrier(models.Model):
     obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
@@ -535,7 +535,7 @@ class UserCarrier(models.Model):
     dateUserCarrier = models.DateField(null=True)
 
     class Meta:
-        db_table = 'userCarrier'
+        db_table = 'user_carrier'
 
 class CustomerRedFlag(models.Model):
     obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
@@ -547,7 +547,7 @@ class CustomerRedFlag(models.Model):
     date_completed = models.DateField(null=True, blank=True)
 
     class Meta:
-        db_table = 'customerRedFlag'
+        db_table = 'customer_red_flag'
 
 class paymentDate(models.Model):
     obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null=True)
@@ -557,7 +557,7 @@ class paymentDate(models.Model):
     agent_create = models.ForeignKey(Users,on_delete=models.CASCADE)   
 
     class Meta:
-        db_table = 'paymentDate'
+        db_table = 'payment_date'
 
 class AgentTicketAssignment(models.Model):
     obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null=True)
@@ -573,6 +573,6 @@ class AgentTicketAssignment(models.Model):
     company = models.ForeignKey(Companies, on_delete=models.CASCADE)
 
     class Meta:
-        db_table = 'agentTicketAssignment'
+        db_table = 'agent_ticket_assignment'
 
 from .modelsSMS import *
