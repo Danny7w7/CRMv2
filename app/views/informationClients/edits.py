@@ -541,7 +541,7 @@ def usernameCarrier(request, obamacare):
 
         if id:
             UserCarrier.objects.filter(id = id).update(
-            obama = obama,
+            obamacare = obama,
             agent_create=request.user,
             username_carrier=username_carrier,
             password_carrier = password_carrier,
@@ -551,7 +551,7 @@ def usernameCarrier(request, obamacare):
         else:
 
             UserCarrier.objects.create(
-            obama=obama,
+            obamacare=obama,
             agent_create=request.user,
             username_carrier=username_carrier,
             password_carrier = password_carrier,
