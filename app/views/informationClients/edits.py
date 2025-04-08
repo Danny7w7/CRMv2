@@ -282,7 +282,7 @@ def editObama(request ,obamacare_id, way):
     usersActive = Users.objects.filter(role='C', company = company_id, is_active = True)
     list_drow = DropDownList.objects.filter(profiling_obama__isnull=False)
     description = DropDownList.objects.filter(description__isnull=False)
-    obsCus = ObservationCustomer.objects.select_related('agent').filter(client=obamacare.client.id)
+    obsCus = ObservationCustomer.objects.select_related('agent').filter(obamacare=obamacare_id)
     consent = Consents.objects.filter(obamacare = obamacare_id )
     income = IncomeLetter.objects.filter(obamacare = obamacare_id)
     document = DocumentsClient.objects.filter(client = obamacare.client)
