@@ -547,7 +547,7 @@ class CustomerRedFlag(models.Model):
     date_completed = models.DateField(null=True, blank=True)
 
     class Meta:
-        db_table = 'customer_red_flag'
+        db_table = 'CustomerRedFlag'
 
 class paymentDate(models.Model):
     obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null=True)
