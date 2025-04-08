@@ -1,0 +1,54 @@
+
+.report {
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+h2 {
+    text-align: center;
+    color: #333;
+}
+.section {
+    margin-bottom: 15px;
+    padding: 10px;
+    border-left: 5px solid #007bff;
+    border-radius: 5px;
+}
+.section h3 {
+    margin: 0 0 5px 0;
+    color: #007bff;
+}
+ul {
+    margin: 0;
+    padding-left: 20px;
+}
+.note {
+    padding: 10px;
+    border-left: 5px solid;
+    border-radius: 5px;
+    margin-top: 15px;
+}
+
+.performance-perfect {
+    background: #e0f7fa;
+    border-left-color: #00acc1;
+    color: #006064;
+}
+
+.performance-excellent {
+    background: #d4edda;
+    border-left-color: #28a745;
+    color: #155724;
+}
+
+.performance-regular {
+    background: #fff3cd;
+    border-left-color: #ffc107;
+    color: #856404;
+}
+
+.performance-low {
+    background: #f8d7da;
+    border-left-color: #dc3545;
+    color: #721c24;
+}

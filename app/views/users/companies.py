@@ -179,7 +179,7 @@ def addNumbers(request):
                 company = Companies.objects.get(id=company_id)
                 formatted_number = validatePhoneNumber(number)
                 
-                validations = Numbers.objects.filter(phone_number=formatted_number).first()
+                validations = Numbers.objects.filter(phone_number=formatted_number, is_active = True).first()
 
                 if not validations:
 

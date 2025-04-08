@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function() {
-    var username = document.body.getAttribute("data-username"); // Obtener el nombre de usuario
+    var username = document.body.getAttribute("data-user-role"); // Obtener el nombre de usuario
 
-    if (username === "JhonferRaiMercado" ) { 
+    if (username === "S" ) { 
         var table1 = $('#tableClient').DataTable({
             lengthChange: false,
             buttons: ['excel', 'print']

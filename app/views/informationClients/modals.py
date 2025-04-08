@@ -306,26 +306,82 @@ def paymentDateSupp(request, supp_id):
 @login_required(login_url='/login') 
 def agentTicketAssignment(request):
     if request.method == "POST":
-        content = request.POST.get('textoIngresado')
+
         obamacare_id = request.POST.get('obamacare_id')
-        agent_customer = request.POST.get('agent_customer')  
-        way = request.POST.get('way')        
-    
-        obamacare = ObamaCare.objects.get(id=obamacare_id)
+        supp_id = request.POST.get('supp_id')
+        bandera = False
 
-        if content.strip():  # Validar que el texto no esté vacío
-            AgentTicketAssignment.objects.create(
-                obamacare=obamacare,
-                agent_create=request.user,
-                agent_customer=agent_customer,
-                content=content,
-                status="IN PROGRESS",
-            )
-            messages.success(request, "Observación guardada exitosamente.")
-        else:
-            messages.error(request, "El contenido de la observación no puede estar vacío.")
+        if obamacare_id:
+            content = request.POST.get('textoIngresado')
+            agent_customer = request.POST.get('agent_customer')  
+            way = request.POST.get('way')        
+        
+            obamacare = ObamaCare.objects.select_related('client').get(id=obamacare_id)
+            agentAsing  = Users.objects.get(id = agent_customer)
 
-        return redirect('editObama', obamacare.id, way)       
+            if content.strip():  # Validar que el texto no esté vacío
+                id = AgentTicketAssignment.objects.create(
+                    obamacare=obamacare,
+                    agent_create=request.user,
+                    agent_customer=agentAsing,
+                    content=content,
+                    status="IN PROGRESS",
+                    company = obamacare.company
+                )
+
+                newId = id.id
+                client = obamacare.client.first_name + ' ' + obamacare.client.last_name
+                url = f'/ticketAsing/{newId}/'
+
+                bandera = True
+                messages.success(request, "Observación guardada exitosamente.")
+                
+            else:
+                messages.error(request, "El contenido de la observación no puede estar vacío.")
+
+            return redirect('editObama', obamacare.id, way)       
+        
+        if supp_id:
+            content = request.POST.get('textoIngresado')
+            agent_customer = request.POST.get('agent_customer')  
+        
+            supp = Supp.objects.select_related('client').get(id=supp_id)
+            agentAsing  = Users.objects.get(id = agent_customer)
+
+            if content.strip():  # Validar que el texto no esté vacío
+                id = AgentTicketAssignment.objects.create(
+                    supp=supp,
+                    agent_create=request.user,  
+                    agent_customer=agentAsing,
+                    content=content,
+                    status="IN PROGRESS",
+                    company = supp.company
+                )
+
+                newId = id.id
+                client = supp.client.first_name + ' ' + supp.client.last_name
+                url = f'/ticketAsing/{newId}/'
+
+                bandera = True
+                messages.success(request, "Observación guardada exitosamente.")
+            else:
+                messages.error(request, "El contenido de la observación no puede estar vacío.")
+
+            return redirect('editSupp', supp.id) 
+
+        if bandera:
+            websocketAlertGeneric(
+                request,
+                'send_alert',
+                'newAccionRequired',
+                'warning',
+                'New ticket',
+                f'The client {client} has a new ticket.',
+                'Go to the ticket',
+                url,
+                agentAsing.id,
+                agentAsing.username
+            ) 
         
     else:
         return render(request, "auth/404.html", {"message": "Método no permitido."})

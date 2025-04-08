@@ -207,7 +207,7 @@ def editClient(request,client_id):
     return client
 
 @login_required(login_url='/login')
-@company_ownership_required(model_name="ObamaCare", id_field="obamacare_id")
+@company_ownership_required(model_name="obamaCare", id_field="obamacare_id")
 def editObama(request ,obamacare_id, way):
 
     company_id = request.user.company.id
@@ -279,6 +279,7 @@ def editObama(request ,obamacare_id, way):
    
     obsObama = ObservationAgent.objects.filter(obamaCare=obamacare_id)  
     users = Users.objects.filter(role='C', company = company_id)
+    usersActive = Users.objects.filter(role='C', company = company_id, is_active = True)
     list_drow = DropDownList.objects.filter(profiling_obama__isnull=False)
     description = DropDownList.objects.filter(description__isnull=False)
     obsCus = ObservationCustomer.objects.select_related('agent').filter(client=obamacare.client.id)
@@ -489,6 +490,7 @@ def editObama(request ,obamacare_id, way):
         'obamacare': obamacare,
         'formatted_social':formatted_social,
         'users': users,
+        'usersActive' : usersActive,
         'obsObamaText': '\n'.join([obs.content for obs in obsObama]),
         'obsCustomer': obsCus,
         'list_drow': list_drow,
@@ -557,7 +559,7 @@ def usernameCarrier(request, obamacare):
             )
 
 @login_required(login_url='/login')
-@company_ownership_required(model_name="Supp", id_field="supp_id")
+@company_ownership_required(model_name="supp", id_field="supp_id")
 def editSupp(request, supp_id):
 
     company_id = request.user.company.id
@@ -567,6 +569,7 @@ def editSupp(request, supp_id):
     obsCus = ObservationCustomer.objects.select_related('agent').filter(client=supp.client.id)
     list_drow = DropDownList.objects.filter(profiling_supp__isnull=False)
     paymentDateSupp = paymentDate.objects.filter(supp = supp).first()
+    users = Users.objects.filter(role='SUPP', company = company_id, is_active = True)
 
     # Obtener el objeto Supp que tiene el id `supp_id`
     supp_instance = Supp.objects.get(id=supp_id)
@@ -711,6 +714,7 @@ def editSupp(request, supp_id):
         'list_drow': list_drow,
         'old' : old,
         'paymentDateSupp' : paymentDateSupp,
+        'users' : users,
         #SMS Blue
         'contact':contact,
         'chat':chat,
@@ -828,3 +832,17 @@ def clean_fields_to_null(request, field_names):
         value = request.POST.get(field)
         cleaned_data[field] = clean_field_to_null(value)
     return cleaned_data
+
+@login_required(login_url='/login')
+@company_ownership_required(model_name="agentTicketAssignment", id_field="ticket_id")
+def editTicket(request, ticket_id):
+
+    ticket = AgentTicketAssignment.objects.select_related('obamacare', 'supp', 'agent_create', 'agent_customer').filter(id = ticket_id).first()
+
+
+    context = {
+        'ticket' :ticket,
+    }
+
+    return render(request, 'edit/editTicket.html', {'ticket':ticket})
+

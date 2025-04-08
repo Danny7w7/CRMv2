@@ -565,9 +565,12 @@ class AgentTicketAssignment(models.Model):
     agent_create = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='agent_create' )
     agent_customer = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='agent_customer')
     content = models.TextField()
+    response = models.TextField()
     status = models.CharField(max_length=100)  
     created_at = models.DateTimeField(auto_now_add=True)
-    end_date = models.DateField()
+    end_date = models.DateField(null=True)
+    is_active = models.BooleanField(default=True)  
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'agentTicketAssignment'

@@ -896,7 +896,6 @@ def sales6WeekReport(request):
     # Renderizar la plantilla con los datos
     return render(request, 'saleReports/sale6Week.html', context)
 
-@company_ownership_required_sinURL
 def weekSalesSummary(request, week_number):
     # Obtener el año actual
     current_year = datetime.datetime.today().year
@@ -920,7 +919,7 @@ def weekSalesSummary(request, week_number):
     excludedUsernames = ['Calidad01', 'mariluz', 'MariaCaTi', 'StephanieMkt', 'CarmenR','admin','tv','zohiraDuarte', 'vladimirDeLaHoz']  # Excluimos a gente que no debe aparecer en la vista
     userRoles = ['A', 'C', 'S','SUPP']
 
-    company_id = request.company_id  # Obtener company_id desde request
+    company_id = request.user.company  # Obtener company_id desde request
     company_filter = {'company': company_id} if not request.user.is_superuser else {}
 
     # Obtener los IDs de ObamaCare que están en CustomerRedFlag

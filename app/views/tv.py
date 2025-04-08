@@ -193,7 +193,11 @@ def getSalesForMonth(company_id):
         weekRanges.append(weekRange)
     
     # Inicializar diccionario de ventas con todos los usuarios
-    users = Users.objects.filter(role__in=userRoles, is_active=True).exclude(username__in=excludedUsernames)  # Lista completa de usuarios
+    #validation de lo que se va a mostrar por company o si es super user    
+    if company_id == 1:
+        users = Users.objects.filter(role__in=userRoles, is_active=True).exclude(username__in=excludedUsernames)  # Lista completa de usuarios
+    else:
+        users = Users.objects.filter(role__in=userRoles, is_active=True, company = company_id).exclude(username__in=excludedUsernames)  # Lista completa de usuarios
     salesSummary = {
         user.username: {
             f"Week{i + 1}": {"obama": 0, "activeObama": 0, "supp": 0, "activeSupp": 0}

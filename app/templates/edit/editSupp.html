@@ -373,6 +373,11 @@
 						<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalPaymentsDate">
 							Date Payment
 						</button>
+					{% endif %}
+					{% if request.user.role == 'A' %}
+						<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#AgentTicketAssignment">
+							Ticket to customer
+						</button>
 					{% endif %} 
 
 					<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalVerTexto">
@@ -510,6 +515,44 @@
 										</div>
 										<div class="d-flex justify-content-between">
 											<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalSelector" data-bs-dismiss="modal">
+												Back
+											</button>
+											<button type="submit" class="btn btn-primary">Saved</button>
+										</div>
+									</form>
+									
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Modal para ingresar ticket de agent a customer -->
+					<div class="modal fade" id="AgentTicketAssignment" tabindex="-1" aria-labelledby="AgentTicketAssignmentLabel" aria-hidden="true">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="AgentTicketAssignmentLabel">Enter Observation</h5>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								</div>
+								<div class="modal-body">
+									<form id="formIngresarTexto" action="{% url 'agentTicketAssignment' %}" method="POST">
+										{% csrf_token %}
+										<input type="hidden" name="supp_id" value="{{ supps.id }}">
+										<div class="mb-3">
+											<label for="textoIngresado" class="form-label">Text:</label>
+											<textarea class="form-control" id="textoIngresado" name="textoIngresado" rows="4" required style="resize: none;"></textarea>
+										</div>
+										<div class="mb-3">
+											<label for="agent_customer" class="form-label">Agent to assign:</label>
+											<select class="form-select"  name="agent_customer" id="agent_customer" >
+												<option value="no_valid" disabled selected>Please Select</option>
+												{% for user  in users %}												
+													<option value="{{user.id}}">{{user.first_name}} {{user.last_name}}</option>
+												{% endfor %}
+											</select>
+										</div>
+										<div class="d-flex justify-content-between">
+											<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-dismiss="modal">
 												Back
 											</button>
 											<button type="submit" class="btn btn-primary">Saved</button>

@@ -39,12 +39,12 @@
                                 <select class="form-control" name="users[]" required>
                                     <option value="" disabled selected>Select Please</option>
                                     {% for  item in users %}
-										<option value="{{item.id}}" >{{item.first_name}}</option>                      
+										<option value="{{item.id}}" >{{item.first_name}} {{item.last_name}}</option>                      
 									{% endfor %}		
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label for="number" class="form-label">Numbres</label>
+                                <label for="number" class="form-label">Numbers</label>
 								<select class="form-control" name="number[]" required>
                                     <option value="" disabled selected>Select Please</option>
                                     {% for  item in numbers %}
@@ -83,7 +83,7 @@
 						<tbody>
 							{% for item in users %}
 							<tr>
-								<td>{{item.first_name}}</td>
+								<td>{{item.first_name}} {{item.last_name}}</td>
 								<td>{{item.assigned_phone.phone_number|formatUsaPhone }}</td>
 							</tr>
 							{% endfor %}

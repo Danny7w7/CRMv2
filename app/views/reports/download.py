@@ -19,7 +19,7 @@ from ..decoratorsCompany import *
 
 def downloadPdf(request, week_number):
     # Obtener el resumen de la semana seleccionada
-    resumen_semana, rango_fechas = weekSalesSummary(week_number)
+    resumen_semana, rango_fechas = weekSalesSummary(request,week_number)
 
     # Renderizar la plantilla específica para el PDF
     html_string = render_to_string('pdf/reportWekkly.html', {
@@ -135,9 +135,9 @@ def paymentClients(request):
                 client.obamacare.plan_name,
                 client.obamacare.carrier,
                 client.obamacare.profiling,
-                client.obamacare.profiling_date.strftime("%m-%d-%Y") if client.obamaCare.profiling_date else '',
+                client.obamacare.profiling_date.strftime("%m-%d-%Y") if client.obamacare.profiling_date else '',
                 client.obamacare.status,
-                client.obamacare.created_at.strftime("%m-%d-%Y") if client.obamaCare.created_at else '',  # Convertir fecha a string legible
+                client.obamacare.created_at.strftime("%m-%d-%Y") if client.obamacare.created_at else '',  # Convertir fecha a string legible
                 client.month,
                 client.created_at.strftime("%m-%d-%Y")
             ])

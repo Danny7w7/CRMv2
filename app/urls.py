@@ -82,7 +82,6 @@ urlpatterns = [
     path('viewIncomeLetter/<obamacare_id>/', consents.incomeLetter, name='incomeLetter'),
     path('validarCita/', modals.validarCita, name='validarCita'),
     path('paymentDateObama/<obama_id>/', modals.paymentDateObama, name='paymentDateObama'),
-    path('agentTicketAssignment/', modals.agentTicketAssignment, name='agentTicketAssignment'),
 
     path('clientAccionRequired/', table.clientAccionRequired, name='clientAccionRequired'),
 
@@ -101,6 +100,12 @@ urlpatterns = [
     path('alert/', table.tableAlert, name='alert'),
     path('toggleAlert/<alertClient_id>/', toggles.toggleAlert, name='toggleAlert'),
     path('editAlert/<int:alertClient_id>/', edits.editAlert, name='editAlert'),
+
+    #<---------------------------tiketc--------------------------->
+    path('ticketAsing/', table.ticketAsing, name='ticketAsing'),
+    path('agentTicketAssignment/', modals.agentTicketAssignment, name='agentTicketAssignment'),
+    path('editTicket/<ticket_id>/', edits.editTicket, name='editTicket'),
+    path('toggleTicketStatus/<ticket_id>/', toggles.toggleTicketStatus, name='toggleTicketStatus'),
 
 
     #<---------------------------SMS--------------------------->

@@ -167,4 +167,41 @@ def tableAlert(request):
     
     return render(request, 'informationClient/alert.html', {'alertC':alert})
 
+@login_required(login_url='/login')   
+@company_ownership_required_sinURL 
+def ticketAsing(request):
+        
+    roleAuditar = ['S', 'C',  'AU']
+    company_id = request.company_id
+    
+    if request.user.is_superuser:
+        ticket = AgentTicketAssignment.objects.select_related('obamacare', 'supp', 'agent_create', 'agent_customer')    
+    elif request.user.role in roleAuditar:
+        ticket = AgentTicketAssignment.objects.select_related('obamacare', 'supp', 'agent_create', 'agent_customer').filter(
+            company = company_id, is_active = True)
+    elif request.user.role == 'Admin':
+        ticket = AgentTicketAssignment.objects.select_related('obamacare', 'supp', 'agent_create', 'agent_customer').filter(company = company_id)
+    elif request.user.role == 'A':
+        ticket = AgentTicketAssignment.objects.select_related('obamacare', 'supp', 'agent_create', 'agent_customer').filter(
+            agent_create = request.user.id, company = company_id, is_active = True)
+        
+    color = []
+        
+    for item in ticket:    
+        if item.status == 'IN PROGRESS':
+            color.append('warning')
+        if item.status == 'CANCELLED':
+            color.append('danger')
+        if item.status == 'COMPLETED':
+            color.append('success')
+
+    lista = zip(ticket, color)
+
+    context = {
+        'lista' : lista
+    }
+
+    return render(request, 'informationClient/ticketAsing.html',context)
+
+
 
