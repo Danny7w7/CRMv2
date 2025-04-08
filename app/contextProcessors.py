@@ -9,6 +9,13 @@ def themeMode(request):
         'userPreference': userPreference,
     }
 
+def company(request):
+    try:
+        company = Companies.objects.get(id=request.user.company.id)
+    except Companies.DoesNotExist:
+        company = None
+    return {'nameCompany': company}
+
 def validateSms(request):
     if request.user.is_authenticated:
         companyId = request.user.company.id

@@ -17,11 +17,7 @@ from django.shortcuts import render, redirect
 from .decoratorsCompany import *
 
 @login_required(login_url='/login') 
-@company_ownership_required_sinURL 
 def index(request):
-
-    company_id = request.company_id
-    nameCompany = Companies.objects.get(id = company_id)
 
     obama = countSalesObama(request)
     supp = countSalesSupp(request)
@@ -37,8 +33,7 @@ def index(request):
         'supp':supp,
         'chartOne':chartOne_json,
         'tableStatusObama':tableStatusAca,
-        'tableStatusSup':tableStatusSup,
-        'nameCompany' : nameCompany
+        'tableStatusSup':tableStatusSup
     }      
 
     return render(request, 'dashboard/index.html', context)
