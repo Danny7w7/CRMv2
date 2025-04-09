@@ -55,7 +55,7 @@ def smsPayment():
 
     now = datetime.now().date()
     
-    smsPaymentClients = paymentDate.objects.select_related('obama__client', 'supp__client').filter(
+    smsPaymentClients = paymentDate.objects.select_related('obamacare__client', 'supp__client').filter(
         payment_date__month=now.month,
         payment_date__day=now.day,
     )
@@ -65,8 +65,8 @@ def smsPayment():
 
     for clientBluePayment in smsPaymentClients:
 
-        if clientBluePayment.obama or clientBluePayment.supp:
-            selectedAgent = clientBluePayment.supp or clientBluePayment.obama
+        if clientBluePayment.obamacare or clientBluePayment.supp:
+            selectedAgent = clientBluePayment.supp or clientBluePayment.obamacare
 
         if not selectedAgent:  # Si no hay agente, continuar con el siguiente cliente
             print(f"Cliente {clientBluePayment.id} no tiene agente asignado.")
@@ -80,9 +80,13 @@ def smsPayment():
 
         if clientSmsPayment:
 
+            print('Aqui andamos ******')
+
             company = selectedAgent.client.company  # Obtén la empresa asociada al cliente
 
             if not comprobate_company(company):
+
+                print('Aqui cxcxzczxczczcandamos ******')
 
                 message = f'''Buen día {clientSmsPayment.first_name} {clientSmsPayment.last_name} 
                 Nos comunicamos  de {getCompanyPerAgent(agentFirstName)},  para recordarle que su pago mensual de {obmaCliente.premium}.Si tiene algún inconveniente con el pago, no dude en comunicarse con nuestro departamento de servicio al cliente al 1.855.963.6900. ¡Disfrute los beneficios de su plan de salud!
@@ -91,10 +95,10 @@ def smsPayment():
                 # Simulación de envío de mensaje
                 #print(f"Simulando envío de SMS a {clientSmsPayment.phone_number}: {message}")
                 sendIndividualsSms(
-                    request.user.assigned_phone.phone_number,
+                    obmaCliente.agent.assigned_phone.phone_number,
                     clientSmsPayment.phone_number,
-                    request.user,
-                    request.user.company,
+                    obmaCliente.agent,
+                    obmaCliente.company,
                     message
                 )
 
