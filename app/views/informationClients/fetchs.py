@@ -165,7 +165,7 @@ def fetchActionRequired(request):
         id_value = request.POST.get('id')
 
         customerRedFlag = CustomerRedFlag.objects.get(id = id_value)
-        obama = customerRedFlag.obama
+        obama = customerRedFlag.obamacare
         clients = obama.client
 
         CustomerRedFlag.objects.filter(id=id_value).update(
