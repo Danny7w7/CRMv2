@@ -148,7 +148,7 @@ class Clients(models.Model):
     zipcode = models.IntegerField()
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=50)
-    county = models.CharField(max_length=100)
+    county = models.CharField(max_length=100, null=True)
     sex = models.CharField(max_length=1) 
     date_birth = models.DateField()
     migration_status = models.CharField(max_length=100)
