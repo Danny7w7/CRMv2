@@ -77,7 +77,7 @@ def smsPayment():
         lines = selectedAgent.agent_usa.split("\n")
         agentFirstName = lines[0].split()[0]
 
-        clientSmsPayment = Clients.objects.select_related(agent).filter(phone_number=selectedAgent.client.phone_number).first()
+        clientSmsPayment = Clients.objects.select_related('agent').filter(phone_number=selectedAgent.client.phone_number).first()
         obmaCliente = ObamaCare.objects.select_related('agent').filter(client = clientSmsPayment.id).first()
 
         print('numero',clientSmsPayment.agent.assigned_phone.phone_number,'*********************')
