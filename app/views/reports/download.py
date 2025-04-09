@@ -123,13 +123,14 @@ def paymentClients(request):
     ws.title = "Clientes_PAYMENT"
 
     # ✅ Encabezados
-    headers = ["First Name", "Last Name", "Plan", "Carrier", "Profiling", "Date-Profiling", "Status", "Created At","Month","Date payment was marked"]
+    headers = ["Agent","First Name", "Last Name", "Plan", "Carrier", "Profiling", "Date-Profiling", "Status", "Created At","Month","Date payment was marked"]
     ws.append(headers)
 
     # ✅ Agregar datos al archivo Excel
     for client in clients:
         if client.obamacare.is_active:
             ws.append([
+                f"{client.obamacare.agent.first_name} {client.obamacare.agent.last_name}",
                 client.obamacare.client.first_name,
                 client.obamacare.client.last_name,
                 client.obamacare.plan_name,
