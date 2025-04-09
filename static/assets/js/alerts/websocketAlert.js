@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 cancelButtonText:"Ignore"
             }).then((result) => {
                 if (result.isConfirmed) {
-                window.open(data.extra_info, '_blank'); // Abre la URL en una nueva pestaña
+                window.open(data.absoluteUrl, '_blank'); // Abre la URL en una nueva pestaña
                 }
             });
         }

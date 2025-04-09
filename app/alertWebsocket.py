@@ -32,3 +32,5 @@ def websocketAlertGeneric(request, type, eventType, icon, title, message, button
             }
         }
     )
+
+    

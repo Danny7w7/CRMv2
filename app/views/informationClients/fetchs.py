@@ -164,7 +164,7 @@ def fetchActionRequired(request):
     if request.method == 'POST':
         id_value = request.POST.get('id')
 
-        customerRedFlag = CustomerRedFlag.objects.get(id = id_value)
+        customerRedFlag = CustomerRedFlag.objects.select_related('agent_create').get(id = id_value)
         obama = customerRedFlag.obamacare
         clients = obama.client
 
@@ -174,7 +174,7 @@ def fetchActionRequired(request):
         )
 
         # Construir la URL absoluta
-        url_relativa = reverse('editObama', args=[obama.company.id,obama.id, 1])
+        url_relativa = reverse('editObama', args=[obama.id, 1])
         url_absoluta = request.build_absolute_uri(url_relativa)
 
         websocketAlertGeneric(
@@ -185,7 +185,10 @@ def fetchActionRequired(request):
             'New Action Required completed',
             f'The required action ({customerRedFlag.description}) of the client {clients.first_name} {clients.last_name} has already been performed.',
             'Go to customer with the required action completed.',
-            url_absoluta
+            url_absoluta,
+            customerRedFlag.agent_create.id,
+            customerRedFlag.agent_create.username
+
         )
 
         return JsonResponse({'success': True, 'message': 'Acción POST procesada', 'id': id_value})
