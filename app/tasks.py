@@ -53,6 +53,8 @@ def my_daily_task():
 @shared_task
 def smsPayment():
 
+    print(f'Se ejecuto el SmsPayment')
+
     now = datetime.now().date()
     
     smsPaymentClients = paymentDate.objects.select_related('obamacare__client', 'supp__client').filter(
