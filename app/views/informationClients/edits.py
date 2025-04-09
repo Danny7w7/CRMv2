@@ -839,10 +839,19 @@ def editTicket(request, ticket_id):
 
     ticket = AgentTicketAssignment.objects.select_related('obamacare', 'supp', 'agent_create', 'agent_customer').filter(id = ticket_id).first()
 
+    if request.method == 'POST':
 
-    context = {
-        'ticket' :ticket,
-    }
+        response = request.POST.get('response') 
+        status = request.POST.get('status')  
+
+        AgentTicketAssignment.objects.filter(id = ticket_id).update(
+            response=response,
+            status=status,
+            end_date = timezone.now().date(),
+            company=request.user.company 
+        )  
+
+        return redirect('ticketAsing')
 
     return render(request, 'edit/editTicket.html', {'ticket':ticket})
 
