@@ -77,10 +77,10 @@ def smsPayment():
         lines = selectedAgent.agent_usa.split("\n")
         agentFirstName = lines[0].split()[0]
 
-        clientSmsPayment = Clients.objects.filter(phone_number=selectedAgent.client.phone_number).first()
-        obmaCliente = ObamaCare.objects.select_related('agent__assigned_phone').filter(client = clientSmsPayment.id).first()
+        clientSmsPayment = Clients.objects.select_related(agent).filter(phone_number=selectedAgent.client.phone_number).first()
+        obmaCliente = ObamaCare.objects.select_related('agent').filter(client = clientSmsPayment.id).first()
 
-        print(clientSmsPayment.phone_number,'*********************')
+        print('numero',clientSmsPayment.agent.assigned_phone.phone_number,'*********************')
 
         if clientSmsPayment:
 
@@ -101,7 +101,7 @@ def smsPayment():
                 # Simulación de envío de mensaje
                 #print(f"Simulando envío de SMS a {clientSmsPayment.phone_number}: {message}")
                 sendIndividualsSms(
-                    obmaCliente.agent.assigned_phone.phone_number,
+                    clientSmsPayment.agent.assigned_phone.phone_number,
                     clientSmsPayment.phone_number,
                     obmaCliente.agent,
                     obmaCliente.company,
