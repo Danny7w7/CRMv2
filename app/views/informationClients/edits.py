@@ -736,7 +736,7 @@ def editDepentsObama(request, obamacare_id):
 
             # Conversión solo si los valores no son nulos o vacíos
             if date_birth not in [None, '']:
-                date_birth_new = datetime.strptime(date_birth, '%m/%d/%Y').date()
+                date_birth_new = datetime.datetime.strptime(date_birth, '%m/%d/%Y').date()
             else:
                 date_birth_new = None
             
