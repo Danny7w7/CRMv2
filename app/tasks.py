@@ -51,7 +51,7 @@ def my_daily_task():
             print(f'Al cliente {clientBlue.first_name} {clientBlue.last_name} - {clientBlue.phone_number} No se le mando mensaje de cumpleaño') 
 
 @shared_task
-def smsPayment(request):
+def smsPayment():
 
     now = datetime.now().date()
     
