@@ -14,13 +14,19 @@ logger = get_task_logger(__name__)
 @shared_task
 def my_daily_task():
 
+    print('Se ejecuto la tarea')
+
     now = datetime.now().date()
+
+    print(f'Hora: {now}')
 
     # Filtramos los clientes que cumplen años hoy, ignorando el año
     birthdayClients = Clients.objects.filter(
         date_birth__month=now.month,
         date_birth__day=now.day
     )
+
+    print(f'Clientes: {birthdayClients}')
 
     for clientBlue in birthdayClients:
         lines = clientBlue.agent_usa.split("\n")
@@ -29,6 +35,8 @@ def my_daily_task():
         clientSms = Clients.objects.using('message_app').filter(phone_number=clientBlue.phone_number).first()
 
         if clientSms:
+
+            print('Aqui entro al clientSms')
             chat = Chat.objects.select_related('agent').using('message_app').filter(client=clientSms).first()
             telnyx.api_key = settings.TELNYX_API_KEY
             telnyx.Message.create(
