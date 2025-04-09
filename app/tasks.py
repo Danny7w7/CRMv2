@@ -19,8 +19,7 @@ def my_daily_task():
     # Filtramos los clientes que cumplen años hoy, ignorando el año
     birthdayClients = Clients.objects.filter(
         date_birth__month=now.month,
-        date_birth__day=now.day,
-        is_active=True
+        date_birth__day=now.day
     )
 
     for clientBlue in birthdayClients:
@@ -47,7 +46,7 @@ def my_daily_task():
 def smsPayment(request):
 
     now = datetime.now().date()
-    # Filtramos los clientes que cumplen años hoy, ignorando el año
+    
     smsPaymentClients = paymentDate.objects.select_related('obama__client', 'supp__client').filter(
         payment_date__month=now.month,
         payment_date__day=now.day,
