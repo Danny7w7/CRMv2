@@ -80,6 +80,8 @@ def smsPayment():
         clientSmsPayment = Clients.objects.filter(phone_number=selectedAgent.client.phone_number).first()
         obmaCliente = ObamaCare.objects.select_related('agent__assigned_phone').filter(client = clientSmsPayment.id).first()
 
+        print(clientSmsPayment.phone_number,'*********************')
+
         if clientSmsPayment:
 
             print('Aqui andamos ******')
@@ -93,6 +95,8 @@ def smsPayment():
                 message = f'''Buen día {clientSmsPayment.first_name} {clientSmsPayment.last_name} 
                 Nos comunicamos  de {getCompanyPerAgent(agentFirstName)},  para recordarle que su pago mensual de {obmaCliente.premium}.Si tiene algún inconveniente con el pago, no dude en comunicarse con nuestro departamento de servicio al cliente al 1.855.963.6900. ¡Disfrute los beneficios de su plan de salud!
                 Esto es una prueba del salto de linea y del mensaje'''
+
+                print(message)
 
                 # Simulación de envío de mensaje
                 #print(f"Simulando envío de SMS a {clientSmsPayment.phone_number}: {message}")
