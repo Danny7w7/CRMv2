@@ -37,7 +37,7 @@ def my_daily_task():
         if clientSms:
 
             print('Aqui entro al clientSms')
-            chat = Chat.objects.select_related('agent').using('message_app').filter(client=clientSms).first()
+            chat = Chat.objects.select_related('agent').filter(contact_id=clientSms.id).first()
             telnyx.api_key = settings.TELNYX_API_KEY
             telnyx.Message.create(
                 from_=f"+{chat.agent.assigned_phone.phone_number}",
