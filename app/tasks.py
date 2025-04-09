@@ -32,7 +32,7 @@ def my_daily_task():
         lines = clientBlue.agent_usa.split("\n")
         agentFirstName = lines[0].split()[0] 
         
-        clientSms = Clients.objects.using('message_app').filter(phone_number=clientBlue.phone_number).first()
+        clientSms = Clients.objects.filter(phone_number=clientBlue.phone_number).first()
 
         if clientSms:
 
