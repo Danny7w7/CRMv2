@@ -559,20 +559,6 @@ class paymentDate(models.Model):
     class Meta:
         db_table = 'payment_date'
 
-class AgentTicketAssignment(models.Model):
-    obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null=True)
-    supp = models.ForeignKey(Supp, on_delete=models.CASCADE, null= True)
-    agent_create = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='agent_create' )
-    agent_customer = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='agent_customer')
-    content = models.TextField()
-    response = models.TextField()
-    status = models.CharField(max_length=100)  
-    created_at = models.DateTimeField(auto_now_add=True)
-    end_date = models.DateField(null=True)
-    is_active = models.BooleanField(default=True )  
-    company = models.ForeignKey(Companies, on_delete=models.CASCADE)
 
-    class Meta:
-        db_table = 'agent_ticket_assignment'
 
 from .modelsSMS import *
