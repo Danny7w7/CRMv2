@@ -496,8 +496,8 @@ def create_stripe_checkout_session(company_id):
                 },
             ],
             mode='payment',
-            success_url=f"{settings.DOMAIN}/sms/Thank-You-Page/{company_id}/",
-            cancel_url=f"{settings.DOMAIN}/sms/Payment-Error/{company_id}/",
+            success_url=f"{settings.DOMAIN}/payment/Thank-You-Page/{company_id}/",
+            cancel_url=f"{settings.DOMAIN}/payment/Payment-Error/{company_id}/",
             automatic_tax={'enabled': True},
             metadata={
                 'company_id': company_id
