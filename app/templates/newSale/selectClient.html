@@ -52,7 +52,7 @@
                         {% elif client.type_sales == "ACA/SUPLEMENTARIO" %} 
                             <td>OBAMACARE / SUPPLEMENTAL</td> 
                         {%else%}
-                            <td></td>
+                            <td>{{client.type_sales}}</td>
                         {% endif %}
                         
                         {% if request.user.is_superuser %}
@@ -81,7 +81,7 @@
                                             <input type="hidden" name="route" id="DEPEND" value="DEPEND">
                                         </form>
                                     </li>                                                                      
-                                {% elif client.type_sales == "SUPLEMENTARIO" %}
+                                {% elif client.type_sales == "SUPLEMENTARIO" or client.type_sales == "NO POLICY" %}
                                     <!-- Mostrar SUPP y ACA/SUPP si tiene SUPP -->
                                     <li>
                                         <form method="POST" action="{% url 'update_type_sales' client.id %}">
