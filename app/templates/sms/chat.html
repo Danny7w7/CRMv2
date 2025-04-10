@@ -45,7 +45,7 @@
                 <div class="chat-content-rightside">
                     <div class="d-flex ms-auto">
                         <div class="flex-grow-1 me-2">
-                            <p class="mb-0 chat-time text-end">{{message.sender.username}}, {{ message.created_at|date:"m:H - d/m" }}</p>
+                            <p class="mb-0 chat-time text-end">{{message.sender.first_name}} {{message.sender.last_name}}, {{ message.created_at|date:"m:H - d/m" }}</p>
                             {% if message.file %}
                             <p class="chat-left-msg">
                                 <img class="img-responsive" src="{{ message.file.file.url }}" alt="">
