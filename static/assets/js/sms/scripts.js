@@ -227,6 +227,7 @@ async function sendFirstMessage(message) {
 
 // Obtener el formulario cuando el DOM esté cargado
 document.addEventListener('DOMContentLoaded', function() {
+    scrollToBottom()
     const form = document.getElementById('newChat');
     if (form){
         const phoneInput = form.querySelector('input[name="phoneNumber"]');
