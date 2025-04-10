@@ -22,6 +22,6 @@ app.conf.beat_schedule = {
     },
     'run-sms-payment-task': {
         'task': 'app.tasks.smsPayment',
-        'schedule': crontab(minute=28, hour=9),  # Ejecutar a las 8:00 AM todos los días
+        'schedule': crontab(minute=33, hour=9),  # Ejecutar a las 8:00 AM todos los días
     },
 }
