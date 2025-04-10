@@ -92,9 +92,8 @@ def smsPayment():
 
                 print('Aqui cxcxzczxczczcandamos ******')
 
-                message = f'''Buen día {clientSmsPayment.first_name} {clientSmsPayment.last_name} 
-                Nos comunicamos  de {getCompanyPerAgent(agentFirstName)},  para recordarle que su pago mensual de {obmaCliente.premium}.Si tiene algún inconveniente con el pago, no dude en comunicarse con nuestro departamento de servicio al cliente al 1.855.963.6900. ¡Disfrute los beneficios de su plan de salud!
-                Esto es una prueba del salto de linea y del mensaje'''
+                message = f'''Hola {clientSmsPayment.first_name} {clientSmsPayment.last_name}, 👋\nDesde {getCompanyPerAgent(agentFirstName)} queremos recordarle que su pago mensual de ${obmaCliente.premium} está pendiente.\nSi tiene algún inconveniente o necesita asistencia, puede comunicarse con nuestro equipo de servicio al cliente al 1.855.963.6900. 💬\nGracias por confiar en nosotros. ¡Siga disfrutando de los beneficios de su plan de salud! 💙'''
+
 
                 print(message)
 
