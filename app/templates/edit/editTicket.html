@@ -53,7 +53,7 @@
 					<div class="col-md-2">
 						<label for="status" class="form-label">Status</label>
 						<select name="status"  class="form-control" id="status" {% if request.user.role != 'A' %}Required {% endif %} {% if ticket.status != 'IN PROGRESS' %}disabled {% endif %}>
-							<option value="IN PROGESS" {% if ticket.status == "IN PROGRESS" %}selected{% endif %} >IN PROGRESS</option>
+							<option value="IN PROGRESS" {% if ticket.status == "IN PROGRESS" %}selected{% endif %} >IN PROGRESS</option>
 							<option value="CANCELLED" {% if ticket.status == "CANCELLED" %}selected{% endif %}  > CANCELLED </option>
 							<option value="COMPLETED" {% if ticket.status == "COMPLETED" %}selected{% endif %}  > COMPLETED </option>
 						</select>

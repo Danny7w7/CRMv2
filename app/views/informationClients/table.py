@@ -186,6 +186,8 @@ def ticketAsing(request):
             agent_create = request.user.id, company = company_id, is_active = True)
         
     color = []
+
+    lista = zip(ticket, color)
         
     for item in ticket:    
         if item.status == 'IN PROGRESS':
@@ -195,7 +197,7 @@ def ticketAsing(request):
         if item.status == 'COMPLETED':
             color.append('success')
 
-    lista = zip(ticket, color)
+
 
     context = {
         'lista' : lista
