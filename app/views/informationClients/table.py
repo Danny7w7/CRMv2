@@ -171,7 +171,7 @@ def tableAlert(request):
 @company_ownership_required_sinURL 
 def ticketAsing(request):
         
-    roleAuditar = ['S', 'C',  'AU']
+    roleAuditar = ['S', 'C',  'AU','SUPP']
     company_id = request.company_id
     
     if request.user.is_superuser:
