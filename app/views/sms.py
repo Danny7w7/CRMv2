@@ -121,7 +121,7 @@ def sendAlertToAgent(request, chat, contact):
         'New Message',
         f'{contact.name} sent a message.',
         'Go to chat with Client',
-        f'/chatSms/{contact.phone_number}/',
+        f'/chatSms/{chat.id}/',
         agent.id,
         agent.username
     )
