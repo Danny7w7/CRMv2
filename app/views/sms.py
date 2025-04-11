@@ -376,20 +376,31 @@ def startChat(request, phoneNumber):
         return JsonResponse(error_response, status=500)
 
 
-def sendIndividualsSms(from_number, to_number, user, company, message_context):
+def sendIndividualsSms(from_number, to_number, user, company, messageContent, messageType=None):
     telnyx.api_key = settings.TELNYX_API_KEY
     telnyx.Message.create(
         from_=f"+{from_number}", # Your Telnyx number
         to=f'+{to_number}',
-        text= message_context
+        text= messageContent
     )
+
     contact, created = createOrUpdatecontact(to_number, company)
     chat = createOrUpdateChat(contact, company)
-    saveMessageInDb('Agent', message_context, chat, user)
+    messageContent = validateMessageType(messageType, messageContent)
+    saveMessageInDb('Agent', messageContent, chat, user)
     if company.id not in [1,2]: #No descuenta el saldo a Lapeira
         discountRemainingBalance(company, '0.035')
     
     return True
+
+def validateMessageType(messageType, messageContent):
+    messageMap = {
+        'sendSecretKey': 'Secret key link successfully sent',
+        'createSecretKey': 'Secret key creation link sent successfully',
+    }
+
+    return messageMap.get(messageType, messageContent)
+
 
 @csrf_exempt
 def sendSecretKey(request, contact_id):
@@ -397,27 +408,29 @@ def sendSecretKey(request, contact_id):
     secretKey = SecretKey.objects.get(contact=contact)
     chat = Chat.objects.get(contact=contact)
 
-    telnyx.api_key = settings.TELNYX_API_KEY
-    telnyx.Message.create(
-        from_=f"+{request.user.assigned_phone.phone_number}", # Your Telnyx number
-        to=f'+{contact.phone_number}',
-        text=generate_temporary_url(request, contact, secretKey.secretKey)
+    sendIndividualsSms(
+        request.user.assigned_phone.phone_number,
+        contact.phone_number,
+        request.user,
+        request.user.company,
+        generate_temporary_url(request, contact, secretKey.secretKey),
+        'sendSecretKey'
     )
-    saveMessageInDb('Agent', 'Link to secret key sent', chat, request.user)
     return JsonResponse({'message': 'ok'}, status=200)
 
 @csrf_exempt
 def sendCreateSecretKey(request, id):
     contact = Contacts.objects.get(id=id)
     chat = Chat.objects.get(contact=contact)
-    
-    telnyx.api_key = settings.TELNYX_API_KEY
-    telnyx.Message.create(
-        from_=f"+{request.user.assigned_phone.phone_number}", # Your Telnyx number
-        to=f'+{contact.phone_number}',
-        text= generate_temporary_url(request, contact)
+
+    sendIndividualsSms(
+        request.user.assigned_phone.phone_number,
+        contact.phone_number,
+        request.user,
+        request.user.company,
+        generate_temporary_url(request, contact),
+        'createSecretKey'
     )
-    saveMessageInDb('Agent', 'Secret key creation link sent', chat, request.user)
     return JsonResponse({'message': 'ok'}, status=200)
 
 def createSecretKey(request):
