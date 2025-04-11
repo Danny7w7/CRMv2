@@ -63,6 +63,9 @@ def SaleModal(request, agent_id):
     saleModalSupp = Supp.objects.select_related('agent', 'client').filter(
         agent_id=agent_id, created_at__range=[start_date, end_date], is_active = True
     )
+    saleModalAssure = ClientsAssure.objects.select_related('agent').filter(
+        agent_id=agent_id, created_at__range=[start_date, end_date], is_active = True
+    )
 
 
     # Preparar los datos en formato JSON
@@ -84,6 +87,14 @@ def SaleModal(request, agent_id):
                 'carrier':  f'{sale.carrier} - {sale.policy_type}'
             }
             for sale in saleModalSupp
+        ] + [
+            {
+                'client_name': f'{sale.first_name} {sale.last_name}',  # Ajusta si el campo se llama distinto
+                'created_at': sale.created_at.strftime('%Y-%m-%d'),
+                'details': sale.status,        # Ejemplo: tipo de plan funerario
+                'carrier': 'ASSURE - FUNERAL MENBRESIA'     # Nombre de la empresa o aseguradora
+            }
+            for sale in saleModalAssure
         ],
     }
 

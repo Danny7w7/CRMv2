@@ -39,8 +39,7 @@ def sale(request):
     sales_data, total_status_color_1_2_obama, total_status_color_3_obama, total_status_color_1_2_supp, total_status_color_3_supp, total_sales = salesBonusAgent(request, company_id, start_date, end_date)
 
     registered, proccessing, profiling, canceled, countRegistered,countProccsing,countProfiling,countCanceled = saleClientStatusObama(request, company_id, start_date, end_date)
-    registeredSupp, proccessingSupp, activeSupp, canceledSupp,countRegisteredSupp,countProccsingSupp,countActiveSupp,countCanceledSupp = saleClientStatusSupp(request, company_id, start_date, end_date)
-
+    registeredSupp, proccessingSupp, activeSupp, canceledSupp,countRegisteredSupp,countProccsingSupp,countActiveSupp,countCanceledSupp,registeredAssure,proccessingAssure,activeAssure,canceledAssure = saleClientStatusSupp(request, company_id, start_date, end_date)
 
 
     # Calcular los totales por agente antes de pasar los datos a la plantilla
@@ -75,7 +74,11 @@ def sale(request):
         'countActiveSupp':countActiveSupp,
         'countCanceledSupp':countCanceledSupp,
         'start_date' : start_date,
-        'end_date': end_date
+        'end_date': end_date,
+        'registeredAssure':registeredAssure,
+        'proccessingAssure':proccessingAssure,
+        'activeAssure': activeAssure,
+        'canceledAssure' : canceledAssure
     }
 
     return render (request, 'saleReports/sale.html', context)
@@ -229,9 +232,17 @@ def saleSuppAgent(request, company_id, start_date=None, end_date=None):
             .values('agent__username', 'agent__first_name', 'agent__last_name', 'status_color') \
             .annotate(total_sales=Count('id')) \
             .order_by('agent', 'status_color')
+        sales_query_assure = ClientsAssure.objects.select_related('agent').filter(is_active=True) \
+            .values('agent__username', 'agent__first_name', 'agent__last_name', 'status_color') \
+            .annotate(total_sales=Count('id')) \
+            .order_by('agent', 'status_color')
     else:
         # Definir la consulta base para Supp, utilizando `select_related` para obtener el nombre completo del agente (User)
         sales_query = Supp.objects.select_related('agent').filter(is_active=True, company = company_id) \
+            .values('agent__username', 'agent__first_name', 'agent__last_name', 'status_color') \
+            .annotate(total_sales=Count('id')) \
+            .order_by('agent', 'status_color')
+        sales_query_assure = ClientsAssure.objects.select_related('agent').filter(is_active=True, company = company_id) \
             .values('agent__username', 'agent__first_name', 'agent__last_name', 'status_color') \
             .annotate(total_sales=Count('id')) \
             .order_by('agent', 'status_color')
@@ -248,6 +259,7 @@ def saleSuppAgent(request, company_id, start_date=None, end_date=None):
             last_day_of_month = (first_day_of_month.replace(month=first_day_of_month.month + 1) - timezone.timedelta(seconds=1))
 
         sales_query = sales_query.filter(created_at__range=[first_day_of_month, last_day_of_month])
+        sales_query_assure = sales_query_assure.filter(created_at__range=[first_day_of_month, last_day_of_month])
 
     # Si se proporcionan fechas, filtrar por el rango de fechas
     elif start_date and end_date:
@@ -259,6 +271,7 @@ def saleSuppAgent(request, company_id, start_date=None, end_date=None):
         )
 
         sales_query = sales_query.filter(created_at__range=[start_date, end_date])
+        sales_query_assure = sales_query_assure.filter(created_at__range=[first_day_of_month, last_day_of_month])
 
     # Crear un diccionario para almacenar los resultados por agente y status color
     agents_sales = {}
@@ -274,19 +287,52 @@ def saleSuppAgent(request, company_id, start_date=None, end_date=None):
         total_sales = entry['total_sales']
 
         if agent_full_name not in agents_sales:
-            agents_sales[agent_full_name] = {'status_color_1': 0, 'status_color_2': 0, 'status_color_3': 0, 'status_color_4': 0, 'total_sales': 0}
+            agents_sales[agent_full_name] = {
+                'status_color_1': 0,
+                'status_color_2': 0,
+                'status_color_3': 0,
+                'status_color_4': 0,
+                'total_sales': 0
+            }
 
         if status_color == 1:
-            agents_sales[agent_full_name]['status_color_1'] = total_sales
+            agents_sales[agent_full_name]['status_color_1'] += total_sales
         elif status_color == 2:
-            agents_sales[agent_full_name]['status_color_2'] = total_sales
+            agents_sales[agent_full_name]['status_color_2'] += total_sales
         elif status_color == 3:
-            agents_sales[agent_full_name]['status_color_3'] = total_sales
+            agents_sales[agent_full_name]['status_color_3'] += total_sales
         elif status_color == 4:
-            agents_sales[agent_full_name]['status_color_4'] = total_sales
+            agents_sales[agent_full_name]['status_color_4'] += total_sales
 
         agents_sales[agent_full_name]['total_sales'] += total_sales
 
+    for entry in sales_query_assure:
+        agent_username = entry['agent__username']
+        first_name = entry['agent__first_name']
+        last_name = entry['agent__last_name']
+        agent_full_name = f"{first_name} {last_name}"
+        status_color = entry['status_color']
+        total_sales = entry['total_sales']
+
+        if agent_full_name not in agents_sales:
+            agents_sales[agent_full_name] = {
+                'status_color_1': 0,
+                'status_color_2': 0,
+                'status_color_3': 0,
+                'status_color_4': 0,
+                'total_sales': 0
+            }
+
+        if status_color == 1:
+            agents_sales[agent_full_name]['status_color_1'] += total_sales
+        elif status_color == 2:
+            agents_sales[agent_full_name]['status_color_2'] += total_sales
+        elif status_color == 3:
+            agents_sales[agent_full_name]['status_color_3'] += total_sales
+        elif status_color == 4:
+            agents_sales[agent_full_name]['status_color_4'] += total_sales
+
+        agents_sales[agent_full_name]['total_sales'] += total_sales
 
     return agents_sales
 
@@ -297,9 +343,15 @@ def saleSuppAgentUsa(request, company_id, start_date=None, end_date=None):
         sales_query = Supp.objects.values('agent_usa', 'status_color').filter(is_active = True) \
             .annotate(total_sales=Count('id')) \
             .order_by('agent_usa', 'status_color')
+        sales_query_assure = ClientsAssure.objects.values('agent_usa', 'status_color').filter(is_active = True) \
+            .annotate(total_sales=Count('id')) \
+            .order_by('agent_usa', 'status_color')
     else:
         # Definir la consulta base para Supp, utilizando `values` para obtener el nombre del agente (agent_usa)
         sales_query = Supp.objects.values('agent_usa', 'status_color').filter(is_active = True, company = company_id) \
+            .annotate(total_sales=Count('id')) \
+            .order_by('agent_usa', 'status_color')
+        sales_query_assure = ClientsAssure.objects.values('agent_usa', 'status_color').filter(is_active = True, company = company_id) \
             .annotate(total_sales=Count('id')) \
             .order_by('agent_usa', 'status_color')
 
@@ -315,6 +367,7 @@ def saleSuppAgentUsa(request, company_id, start_date=None, end_date=None):
             last_day_of_month = (first_day_of_month.replace(month=first_day_of_month.month + 1) - timezone.timedelta(seconds=1))
 
         sales_query = sales_query.filter(created_at__range=[first_day_of_month, last_day_of_month])
+        sales_query_assure = sales_query_assure.filter(created_at__range=[first_day_of_month, last_day_of_month])
 
     # Si se proporcionan fechas, filtrar por el rango de fechas
     elif start_date and end_date:
@@ -326,6 +379,7 @@ def saleSuppAgentUsa(request, company_id, start_date=None, end_date=None):
         )
 
         sales_query = sales_query.filter(created_at__range=[start_date, end_date])
+        sales_query_assure = sales_query_assure.filter(created_at__range=[first_day_of_month, last_day_of_month])
 
     # Crear un diccionario para almacenar los resultados por agente y status color
     agents_sales = {}
@@ -333,26 +387,59 @@ def saleSuppAgentUsa(request, company_id, start_date=None, end_date=None):
 
     # Procesar los resultados y organizar los totales por agente
     for entry in sales_query:
-        agent_name = entry['agent_usa']  # Ahora tenemos el nombre del agente usando el campo `agent_usa`
+        agent_name = entry['agent_usa']
         status_color = entry['status_color']
         total_sales = entry['total_sales']
 
-        # Truncar el nombre del agente a un máximo de 15 caracteres
         short_name = Truncator(agent_name).chars(8)
 
         if short_name not in agents_sales:
-            agents_sales[short_name] = {'status_color_1': 0, 'status_color_2': 0, 'status_color_3': 0, 'status_color_4': 0, 'total_sales': 0}
+            agents_sales[short_name] = {
+                'status_color_1': 0,
+                'status_color_2': 0,
+                'status_color_3': 0,
+                'status_color_4': 0,
+                'total_sales': 0
+            }
 
         if status_color == 1:
-            agents_sales[short_name]['status_color_1'] = total_sales
+            agents_sales[short_name]['status_color_1'] += total_sales
         elif status_color == 2:
-            agents_sales[short_name]['status_color_2'] = total_sales
+            agents_sales[short_name]['status_color_2'] += total_sales
         elif status_color == 3:
-            agents_sales[short_name]['status_color_3'] = total_sales
+            agents_sales[short_name]['status_color_3'] += total_sales
         elif status_color == 4:
-            agents_sales[short_name]['status_color_4'] = total_sales
+            agents_sales[short_name]['status_color_4'] += total_sales
 
         agents_sales[short_name]['total_sales'] += total_sales
+
+    for entry in sales_query_assure:
+        agent_name = entry['agent_usa']
+        status_color = entry['status_color']
+        total_sales = entry['total_sales']
+
+        short_name = Truncator(agent_name).chars(8)
+
+        if short_name not in agents_sales:
+            agents_sales[short_name] = {
+                'status_color_1': 0,
+                'status_color_2': 0,
+                'status_color_3': 0,
+                'status_color_4': 0,
+                'total_sales': 0
+            }
+
+        if status_color == 1:
+            agents_sales[short_name]['status_color_1'] += total_sales
+        elif status_color == 2:
+            agents_sales[short_name]['status_color_2'] += total_sales
+        elif status_color == 3:
+            agents_sales[short_name]['status_color_3'] += total_sales
+        elif status_color == 4:
+            agents_sales[short_name]['status_color_4'] += total_sales
+
+        agents_sales[short_name]['total_sales'] += total_sales
+
 
     return agents_sales
 
@@ -371,6 +458,11 @@ def salesBonusAgent(request, company_id, start_date=None, end_date=None):
     sales_query_obamacare = ObamaCare.objects.select_related('agent').filter(is_active = True,  **company_filter).exclude( id__in=Subquery(excluded_obama_ids)) \
         .values('agent__id', 'agent__username', 'agent__first_name', 'agent__last_name', 'status_color') \
         .annotate(total_sales=Count('id'))
+    
+    # Consulta para Assure
+    sales_query_assure = ClientsAssure.objects.select_related('agent').filter(is_active=True,  **company_filter) \
+        .values('agent__id', 'agent__username', 'agent__first_name', 'agent__last_name', 'status_color') \
+        .annotate(total_sales=Count('id'))
 
     # Si no se proporcionan fechas, filtrar por el mes actual
     if not start_date and not end_date:
@@ -384,6 +476,7 @@ def salesBonusAgent(request, company_id, start_date=None, end_date=None):
 
         sales_query_supp = sales_query_supp.filter(created_at__range=[first_day_of_month, last_day_of_month])
         sales_query_obamacare = sales_query_obamacare.filter(created_at__range=[first_day_of_month, last_day_of_month])
+        sales_query_assure = sales_query_assure.filter(created_at__range=[first_day_of_month, last_day_of_month])
 
     # Si se proporcionan fechas, filtrar por el rango de fechas
     elif start_date and end_date:
@@ -396,6 +489,7 @@ def salesBonusAgent(request, company_id, start_date=None, end_date=None):
 
         sales_query_supp = sales_query_supp.filter(created_at__range=[start_date, end_date])
         sales_query_obamacare = sales_query_obamacare.filter(created_at__range=[start_date, end_date])
+        sales_query_assure = sales_query_assure.filter(created_at__range=[first_day_of_month, last_day_of_month])
 
     # Diccionario para almacenar las ventas por agente
     sales_data = {}
@@ -461,6 +555,40 @@ def salesBonusAgent(request, company_id, start_date=None, end_date=None):
 
         # Actualizar total_sales
         sales_data[agent_id]['total_sales'] += total_sales
+
+        # Procesar los resultados de Supp
+    
+    # Procesar los resultados de Assure
+    for entry in sales_query_assure:
+        agent_id = entry['agent__id']
+        username = entry['agent__username']
+        first_name = entry['agent__first_name']
+        last_name = entry['agent__last_name']
+        agent_full_name = f"{first_name} {last_name} ({username})"
+        status_color = entry['status_color']
+        total_sales = entry['total_sales']
+
+        if agent_id not in sales_data:
+            sales_data[agent_id] = {
+                'id': agent_id,
+                'username': username,
+                'full_name': agent_full_name,
+                'status_color_1_2_obama': 0,
+                'status_color_3_obama': 0,
+                'status_color_1_2_supp': 0,
+                'status_color_3_supp': 0,
+                'total_sales': 0
+            }
+
+        # Sumar las ventas de status_color 1 y 2 en Supp
+        if status_color in [1, 2]:
+            sales_data[agent_id]['status_color_1_2_supp'] += total_sales
+        elif status_color == 3:
+            sales_data[agent_id]['status_color_3_supp'] += total_sales
+        
+        # Actualizar total_sales
+        sales_data[agent_id]['total_sales'] += total_sales
+
 
     # Calcular los totales generales
     total_status_color_1_2_obama = sum([data['status_color_1_2_obama'] for data in sales_data.values()])
@@ -540,18 +668,25 @@ def saleClientStatusSupp(request, company_id, start_date=None, end_date=None):
     # Consulta para Registered
     registered_supp = Supp.objects.select_related('agent','client').annotate(
         truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 1, is_active = True,  **company_filter)
-    
+    registered_assure = ClientsAssure.objects.select_related('agent').annotate(
+        truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 1, is_active = True,  **company_filter)
     
     # Consulta para Proccessing
     proccessing_supp = Supp.objects.select_related('agent','client').annotate(
+        truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 2, is_active = True,  **company_filter ) 
+    proccessing_assure = ClientsAssure.objects.select_related('agent','client').annotate(
         truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 2, is_active = True,  **company_filter ) 
 
     # Consulta para Active
     active_supp = Supp.objects.select_related('agent','client').annotate(
         truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 3, is_active = True,  **company_filter ) 
+    active_assure = ClientsAssure.objects.select_related('agent','client').annotate(
+        truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 3, is_active = True,  **company_filter ) 
     
     # Consulta para Canceled
     canceled_supp = Supp.objects.select_related('agent','client').annotate(
+        truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 4, is_active = True,  **company_filter )
+    canceled_assure = ClientsAssure.objects.select_related('agent','client').annotate(
         truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 4, is_active = True,  **company_filter )
 
     # Si no se proporcionan fechas, filtrar por el mes actual
@@ -569,10 +704,15 @@ def saleClientStatusSupp(request, company_id, start_date=None, end_date=None):
         active_supp = active_supp.filter(created_at__range=[first_day_of_month, last_day_of_month])
         canceled_supp = canceled_supp.filter(created_at__range=[first_day_of_month, last_day_of_month])
 
-        countRegisteredSupp = registered_supp.count()
-        countProccsingSupp = proccessing_supp.count()
-        countActiveSupp = active_supp.count()
-        countCanceledSupp = canceled_supp.count()
+        registered_assure = registered_assure.filter(created_at__range=[first_day_of_month, last_day_of_month])
+        proccessing_assure = proccessing_assure.filter(created_at__range=[first_day_of_month, last_day_of_month])
+        active_assure = active_assure.filter(created_at__range=[first_day_of_month, last_day_of_month])
+        canceled_assure = canceled_assure.filter(created_at__range=[first_day_of_month, last_day_of_month])
+
+        countRegisteredSupp = registered_assure.count() + registered_supp.count()
+        countProccsingSupp = proccessing_assure.count() + proccessing_supp.count()
+        countActiveSupp = active_assure.count() + active_supp.count()
+        countCanceledSupp = canceled_assure.count() + canceled_supp.count()
 
     # Si se proporcionan fechas, filtrar por el rango de fechas
     elif start_date and end_date:
@@ -588,13 +728,18 @@ def saleClientStatusSupp(request, company_id, start_date=None, end_date=None):
         active_supp = active_supp.filter(created_at__range=[start_date, end_date])
         canceled_supp = canceled_supp.filter(created_at__range=[start_date, end_date])
 
-        countRegisteredSupp = registered_supp.count()
-        countProccsingSupp = proccessing_supp.count()
-        countActiveSupp = active_supp.count()
-        countCanceledSupp = canceled_supp.count()
+        registered_assure = registered_assure.filter(created_at__range=[start_date, end_date])
+        proccessing_assure = proccessing_assure.filter(created_at__range=[start_date, end_date])
+        active_assure = active_assure.filter(created_at__range=[start_date, end_date])
+        canceled_assure = canceled_assure.filter(created_at__range=[start_date, end_date])
+
+        countRegisteredSupp = registered_assure.count() + registered_supp.count()
+        countProccsingSupp = proccessing_assure.count() + proccessing_supp.count()
+        countActiveSupp = active_assure.count() + active_supp.count()
+        countCanceledSupp = canceled_assure.count() + canceled_supp.count()
 
     
-    return registered_supp,proccessing_supp,active_supp,canceled_supp,countRegisteredSupp,countProccsingSupp,countActiveSupp,countCanceledSupp
+    return registered_supp,proccessing_supp,active_supp,canceled_supp,countRegisteredSupp,countProccsingSupp,countActiveSupp,countCanceledSupp,registered_assure,proccessing_assure,active_assure,canceled_assure
 
 @login_required(login_url='/login') 
 @company_ownership_required_sinURL
@@ -794,10 +939,12 @@ def table6Week(request):
     # Filtrar todas las ventas realizadas en las últimas 6 semanas
     obamaSales = ObamaCare.objects.filter(created_at__range=[startDate, endOfCurrentWeek],  **company_filter).exclude( id__in=Subquery(excluded_obama_ids))
     suppSales = Supp.objects.filter(created_at__range=[startDate, endOfCurrentWeek],  **company_filter)
+    assureSales = ClientsAssure.objects.filter(created_at__range=[startDate, endOfCurrentWeek],  **company_filter)
         
     # Agregar el conteo de pólizas activas para las últimas 6 semanas
     activeObamaPolicies = ObamaCare.objects.filter(status='Active', created_at__range=[startDate, endOfCurrentWeek],is_active = True,  **company_filter).exclude( id__in=Subquery(excluded_obama_ids))
     activeSuppPolicies = Supp.objects.filter(status='Active', created_at__range=[startDate, endOfCurrentWeek], is_active = True,  **company_filter)
+    activeAssurePolicies = ClientsAssure.objects.filter(status='Active', created_at__range=[startDate, endOfCurrentWeek], is_active = True,  **company_filter)
 
     salesSummary = {
         user.username: {
@@ -840,6 +987,19 @@ def table6Week(request):
                         salesSummary[agentName][f"Week{saleWeek + 1}"]["total"] += 1
                     except KeyError:
                         pass
+    
+    for sale in assureSales:
+        agentName = sale.agent.username
+        if sale.agent.is_active:
+            if agentName not in excludedUsernames:
+                saleWeek = (sale.created_at - startDate).days // 7  # Calcular la semana (0 a 5)
+                if 0 <= saleWeek < numWeeks:
+                    try:
+                        salesSummary[agentName][f"Week{saleWeek + 1}"]["supp"] += 1
+                        salesSummary[agentName][f"Week{saleWeek + 1}"]["totalSupp"] += 1
+                        salesSummary[agentName][f"Week{saleWeek + 1}"]["total"] += 1
+                    except KeyError:
+                        pass
 
     for policy in activeObamaPolicies:
         agentName = policy.agent.username
@@ -855,6 +1015,19 @@ def table6Week(request):
                         pass
 
     for policy in activeSuppPolicies:
+        agentName = policy.agent.username
+        if policy.agent.is_active:
+            if agentName not in excludedUsernames:
+                policyWeek = (policy.created_at - startDate).days // 7  # Calcular la semana (0 a 5)
+                if 0 <= policyWeek < numWeeks:
+                    try:
+                        salesSummary[agentName][f"Week{policyWeek + 1}"]["activeSupp"] += 1
+                        salesSummary[agentName][f"Week{policyWeek + 1}"]["totalSupp"] += 1
+                        salesSummary[agentName][f"Week{policyWeek + 1}"]["total"] += 1
+                    except KeyError:
+                        pass
+
+    for policy in activeAssurePolicies:
         agentName = policy.agent.username
         if policy.agent.is_active:
             if agentName not in excludedUsernames:
@@ -916,8 +1089,8 @@ def weekSalesSummary(request, week_number):
     totalActiveSupp = 0
 
     # Inicializar diccionario de ventas para la semana seleccionada
-    excludedUsernames = ['Calidad01', 'mariluz', 'MariaCaTi', 'StephanieMkt', 'CarmenR','admin','tv','zohiraDuarte', 'vladimirDeLaHoz']  # Excluimos a gente que no debe aparecer en la vista
-    userRoles = ['A', 'C', 'S','SUPP']
+    excludedUsernames = ['Calidad01', 'mariluz', 'MariaCaTi', 'StephanieMkt', 'CarmenR','tv','zohiraDuarte', 'vladimirDeLaHoz']  # Excluimos a gente que no debe aparecer en la vista
+    userRoles = ['A', 'C', 'S','SUPP','Admin']
 
     company_id = request.user.company  # Obtener company_id desde request
     company_filter = {'company': company_id} if not request.user.is_superuser else {}
@@ -930,10 +1103,12 @@ def weekSalesSummary(request, week_number):
     # Filtrar todas las ventas realizadas en la semana seleccionada
     obamaSales = ObamaCare.objects.filter(created_at__range=[startOfWeek, endOfWeek],  **company_filter).exclude( id__in=Subquery(excluded_obama_ids))
     suppSales = Supp.objects.filter(created_at__range=[startOfWeek, endOfWeek],  **company_filter)
+    assureSales = ClientsAssure.objects.filter(created_at__range=[startOfWeek, endOfWeek],  **company_filter)
 
     # Agregar el conteo de pólizas activas para la semana seleccionada
     activeObamaPolicies = ObamaCare.objects.filter(status='Active', created_at__range=[startOfWeek, endOfWeek], is_active=True,  **company_filter).exclude( id__in=Subquery(excluded_obama_ids))
     activeSuppPolicies = Supp.objects.filter(status='Active', created_at__range=[startOfWeek, endOfWeek], is_active=True,  **company_filter)
+    activeAssurePolicies = ClientsAssure.objects.filter(status='Active', created_at__range=[startOfWeek, endOfWeek], is_active=True,  **company_filter)
 
     salesSummary = {
         user.username: {
@@ -981,6 +1156,22 @@ def weekSalesSummary(request, week_number):
             }
             salesSummary[agentName]["clientes_supp"].append(cliente_info)
 
+    for sale in assureSales:
+        agentName = sale.agent.username
+        if sale.agent.is_active and agentName not in excludedUsernames:
+            salesSummary[agentName]["supp"] += 1
+            salesSummary[agentName]["total"] += 1
+            total_supp += 1  # Incrementar total general de SUPP
+
+            # Agregar detalles del cliente
+            cliente_info = {
+                "nombre": f"{sale.first_name} {sale.last_name}",
+                "fecha_poliza": sale.created_at.strftime('%d/%m/%Y'),
+                "estatus": sale.status,
+                "estatus_color": sale.status_color
+            }
+            salesSummary[agentName]["clientes_supp"].append(cliente_info)
+
     for policy in activeObamaPolicies:
         agentName = policy.agent.username
         if policy.agent.is_active and agentName not in excludedUsernames:
@@ -988,6 +1179,12 @@ def weekSalesSummary(request, week_number):
             totalActiveAca += 1  # Incrementar total general de ACA
 
     for policy in activeSuppPolicies:
+        agentName = policy.agent.username
+        if policy.agent.is_active and agentName not in excludedUsernames:
+            salesSummary[agentName]["activeSupp"] += 1
+            totalActiveSupp += 1  # Incrementar total general de SUPP
+
+    for policy in activeAssurePolicies:
         agentName = policy.agent.username
         if policy.agent.is_active and agentName not in excludedUsernames:
             salesSummary[agentName]["activeSupp"] += 1

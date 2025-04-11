@@ -3,6 +3,10 @@ import calendar
 import datetime
 import json
 
+#libreria de paises
+import urllib.request
+from django.shortcuts import render
+
 # Django utilities
 from django.http import JsonResponse
 
@@ -723,6 +727,181 @@ def editSupp(request, supp_id):
     }
     
     return render(request, 'edit/editSupp.html', context)
+
+@login_required(login_url='/login')
+@company_ownership_required(model_name="ClientsAssure", id_field="assure_id")
+def editAssure(request, assure_id):
+
+    company_id = request.user.company.id
+
+    assure = ClientsAssure.objects.select_related('agent').filter(id=assure_id).first()
+    obsAssure = ObservationAgent.objects.filter(assure=assure_id)
+    obsCus = ObservationCustomer.objects.select_related('agent').filter(assure=assure_id)
+    list_drow = DropDownList.objects.filter(profiling_supp__isnull=False)
+    paymentDateAssure = paymentDate.objects.filter(assure = assure_id).first()
+    users = Users.objects.filter(role='SUPP', company = company_id, is_active = True)
+
+    # Obtener todos los dependientes asociados a este Supp
+    dependents = DependentsAssure.objects.filter(client = assure_id)
+  
+    social_number = assure.social_security  # Campo real del modelo
+    # Asegurarse de que social_number no sea None antes de formatear
+    if social_number:
+        formatted_social = f"xxx-xx-{social_number[-4:]}"  # Obtener el formato deseado
+    else:
+        formatted_social = "N/A"  # Valor predeterminado si no hay número disponible
+
+    action = request.POST.get('action')
+
+    #calculo de edad
+    hoy = timezone.now().date()
+    old = hoy.year - assure.date_birth.year - ((hoy.month, hoy.day) < (assure.date_birth.month, assure.date_birth.day)) 
+
+    url = "https://restcountries.com/v3.1/all"
+ 
+    with urllib.request.urlopen(url) as response:
+        data = json.loads(response.read().decode())
+
+        paises = []
+
+        for country in sorted(data, key=lambda x: x.get('name', {}).get('common', '')):
+            nombre = country.get('name', {}).get('common', 'N/A')
+            gentilicio = country.get('demonyms', {}).get('eng', {}).get('m', 'N/A')
+            paises.append({
+                "nombre": nombre,
+                "gentilicio": gentilicio
+            }) 
+
+
+    if request.method == 'POST':
+
+        if action == 'saveAssure':
+
+            #formateo de fecha para guardalar como se debe en BD ya que la obtengo USA
+            date_effective_coverage = request.POST.get('date_effective_coverage')  # Formato MM/DD/YYYY
+            date_effective_coverage_end = request.POST.get('date_effective_coverage_end')  # Formato MM/DD/YYYY
+            date_birth = request.POST.get('date_birth')  # Formato MM/DD/YYYY
+
+            # Si la fecha no viene vacia la convertimos y si viene vacia la colocamos null
+            if date_effective_coverage not in [None, '']:
+                date_effective_coverage_new = datetime.datetime.strptime(date_effective_coverage, '%m/%d/%Y').date()
+            else:
+                date_effective_coverage_new = None
+
+            if date_effective_coverage_end not in [None, '']:
+                date_effective_coverage_end_new = datetime.datetime.strptime(date_effective_coverage_end, '%m/%d/%Y').date()
+            else:
+                date_effective_coverage_end_new = None  
+
+            if date_birth not in [None, '']:
+                date_birth_new = datetime.datetime.strptime(date_birth, '%m/%d/%Y').date()
+            else:
+                date_birth_new = None 
+                
+            # Campos de Supp
+            assure_fields = [
+                'agent_usa', 'first_name', 'last_name','phone_number','email','address','zipcode','city','state','county',
+                'sex','migration_status','nationality','status','policyNumber','payment_type'
+            ]
+            
+            # Limpiar los campos de ObamaCare convirtiendo los vacíos en None
+            cleaned_assure_data = clean_fields_to_null(request, assure_fields)
+
+            # Recibir el valor seleccionado del formulario
+            selected_status= request.POST.get('statusAssure')
+
+            color = 1         
+
+            for list_drow in list_drow:
+                if selected_status == list_drow.profiling_supp:
+                    if selected_status != 'ACTIVE':
+                        color = 2
+                        break         
+                    if selected_status == 'ACTIVE' or selected_status == 'SELF-ENROLMENT':
+                        color = 3 
+                        break  
+            
+            statusRed = ['BANK DRAFT CANCELLED - CUSTOMER REQUEST','TERM - INSURED REQUEST','TERM - LAPSE NON PAYMENT'
+                            ,'AUTOMATIC TERMINATION','TERM - INSURED REQUEST (PAYMENT ERROR)','WITHDRAWN (PAYMENT ERROR)']
+
+            if selected_status in statusRed:
+                color = 4   
+        
+
+            # Actualizar Supp
+            ClientsAssure.objects.filter(id=assure_id).update(
+                agent_usa=cleaned_assure_data['agent_usa'],
+                first_name=cleaned_assure_data['first_name'],
+                last_name=cleaned_assure_data['last_name'],
+                phone_number=cleaned_assure_data['phone_number'],
+                email=cleaned_assure_data['email'],
+                address=cleaned_assure_data['address'],
+                zipcode=cleaned_assure_data['zipcode'],
+                city=cleaned_assure_data['city'],
+                state=cleaned_assure_data['state'],
+                county=cleaned_assure_data['county'],
+                nationality=cleaned_assure_data['nationality'],
+                sex=cleaned_assure_data['sex'],
+                migration_status=cleaned_assure_data['migration_status'],
+                status=cleaned_assure_data['status'],
+                status_color=color,
+                date_birth=date_birth_new,
+                date_effective_coverage=date_effective_coverage_new,
+                date_effective_coverage_end=date_effective_coverage_end_new,
+                policyNumber=cleaned_assure_data['policyNumber'],
+                payment_type=cleaned_assure_data['payment_type'],
+            )
+
+            return redirect('clientAssure' )  
+
+        if action == 'saveAssureAgent':
+
+            obs = request.POST.get('obs_agent')
+
+            if obs:
+                id_assure = ClientsAssure.objects.get(id=assure_id)
+                id_user = request.user
+
+                # Crear y guardar la observación
+                ObservationAgent.objects.create(
+                    assure=id_assure,
+                    user=id_user,
+                    content=obs
+                )
+            
+                return redirect('clientAssure')
+            
+    # Obtener los mensajes de texto del Cliente.
+    if request.user.is_superuser:
+        contact = Contacts.objects.filter(phone_number=assure.phone_number, company_id=assure.company.id).first()
+    else:
+        contact = Contacts.objects.filter(phone_number=assure.phone_number, company_id=company_id).first()
+
+    chats = Chat.objects.filter(contact=contact)
+    messages = Messages.objects.filter(chat_id=chats[0].id)
+    secretKey = SecretKey.objects.filter(contact_id=contact.id).first()
+    chat = get_last_message_for_chats(chats)[0]
+
+
+    context = {
+        'assure': assure,
+        'paises' : paises,
+        'formatted_social':formatted_social,
+        'dependents': dependents,
+        'obsSuppText': '\n'.join([obs.content for obs in obsAssure]),
+        'obsCustomer': obsCus,
+        'list_drow': list_drow,
+        'old' : old,
+        'paymentDateAssure' : paymentDateAssure,
+        'users' : users,
+        #SMS Blue
+        'contact':contact,
+        'chat':chat,
+        'messages':messages,
+        'secretKey':secretKey
+    }
+    
+    return render(request, 'edit/editAssure.html', context)
 
 def editDepentsObama(request, obamacare_id):
     # Obtener todos los dependientes asociados al ObamaCare

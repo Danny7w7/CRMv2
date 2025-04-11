@@ -60,3 +60,16 @@ def toggleTicketStatus(ticket_id):
     # Redirigir de nuevo a la página actual con un parámetro de éxito
     return redirect('ticketAsing')
 
+def toggleAssureStatus(request,assure_id):
+    
+    # Obtener el cliente por su ID
+    assure = get_object_or_404(ClientsAssure, id=assure_id)
+    
+    # Cambiar el estado de is_active (True a False o viceversa)
+    assure.is_active = not assure.is_active
+    assure.save()  # Guardar los cambios en la base de datos
+    
+    # Redirigir de nuevo a la página actual con un parámetro de éxito
+    return redirect('clientAssure')
+
+

@@ -494,8 +494,19 @@
 										<td	style="vertical-align: middle;">{{ registeredSupps.client.first_name }} {{registeredSupps.client.last_name }}</td>									
 										<td	style="vertical-align: middle;">{{ registeredSupps.created_at|date:'m-d-Y' }}</td>
 										<td	style="vertical-align: middle;">{{ registeredSupps.policy_type }}</td>
-										<td	style="vertical-align: middle;">{{ registeredSupps.company }}</td>
+										<td	style="vertical-align: middle;">{{ registeredSupps.company.company_name }}</td>
 										<td	style="vertical-align: middle;">{{ registeredSupps.observation }}</td>
+									</tr>
+								{% endfor %}
+								{% for item in registeredAssure %}
+									<tr>
+										<td	style="vertical-align: middle;">{{ item.agent.first_name }} {{item.agent.last_name }}</td>
+										<td	style="vertical-align: middle;">{{ item.truncated_agent_usa }}</td>
+										<td	style="vertical-align: middle;">{{ item.first_name }} {{item.last_name }}</td>									
+										<td	style="vertical-align: middle;">{{ item.created_at|date:'m-d-Y' }}</td>
+										<td	style="vertical-align: middle;"> ASSURE - FUNERAL MENBRESIA </td>
+										<td	style="vertical-align: middle;">{{ item.company.company_name }}</td>
+										<td	style="vertical-align: middle;"></td>
 									</tr>
 								{% endfor %}
 							</tbody>
@@ -542,8 +553,19 @@
 										<td style="vertical-align: middle;">{{ proccessingSupps.status }}</td>
 										<td style="vertical-align: middle;">{{ proccessingSupps.created_at|date:'m-d-Y' }}</td>
 										<td style="vertical-align: middle;">{{ proccessingSupps.policy_type }}</td>
-										<td style="vertical-align: middle;">{{ proccessingSupps.company }}</td>
+										<td style="vertical-align: middle;">{{ proccessingSupps.company.company_name }}</td>
 										<td style="vertical-align: middle;">{{ proccessingSupps.observation }}</td>
+									</tr>
+								{% endfor %}
+								{% for item in proccessingAssure %}
+									<tr>
+										<td	style="vertical-align: middle;">{{ item.agent.first_name }} {{item.agent.last_name }}</td>
+										<td	style="vertical-align: middle;">{{ item.truncated_agent_usa }}</td>
+										<td	style="vertical-align: middle;">{{ item.first_name }} {{item.last_name }}</td>									
+										<td	style="vertical-align: middle;">{{ item.created_at|date:'m-d-Y' }}</td>
+										<td	style="vertical-align: middle;"> ASSURE - FUNERAL MENBRESIA </td>
+										<td	style="vertical-align: middle;">{{ item.company.company_name }}</td>
+										<td	style="vertical-align: middle;"></td>
 									</tr>
 								{% endfor %}
 							</tbody>
@@ -588,8 +610,19 @@
 										<td style="vertical-align: middle;">{{ activeSupps.client.first_name }} {{activeSupps.client.last_name }}</td>									
 										<td style="vertical-align: middle;">{{ activeSupps.created_at|date:'m-d-Y' }}</td>
 										<td style="vertical-align: middle;">{{ activeSupps.policy_type }}</td>
-										<td style="vertical-align: middle;">{{ activeSupps.company }}</td>
+										<td style="vertical-align: middle;">{{ activeSupps.company.company_name }}</td>
 										<td style="vertical-align: middle;">{{ activeSupps.observation }}</td>
+									</tr>
+								{% endfor %}
+								{% for item in activeAssure %}
+									<tr>
+										<td	style="vertical-align: middle;">{{ item.agent.first_name }} {{item.agent.last_name }}</td>
+										<td	style="vertical-align: middle;">{{ item.truncated_agent_usa }}</td>
+										<td	style="vertical-align: middle;">{{ item.first_name }} {{item.last_name }}</td>									
+										<td	style="vertical-align: middle;">{{ item.created_at|date:'m-d-Y' }}</td>
+										<td	style="vertical-align: middle;"> ASSURE - FUNERAL MENBRESIA </td>
+										<td	style="vertical-align: middle;">{{ item.company.company_name }}</td>
+										<td	style="vertical-align: middle;"></td>
 									</tr>
 								{% endfor %}
 							</tbody>
@@ -635,8 +668,19 @@
 										<td style="vertical-align: middle;">{{ canceledSupps.client.first_name }} {{canceledSupps.client.last_name }}</td>									
 										<td style="vertical-align: middle;">{{ canceledSupps.created_at|date:'m-d-Y' }}</td>
 										<td style="vertical-align: middle;">{{ canceledSupps.policy_type }}</td>
-										<td style="vertical-align: middle;">{{ canceledSupps.company }}</td>
+										<td style="vertical-align: middle;">{{ canceledSupps.company.company_name }}</td>
 										<td style="vertical-align: middle;">{{ canceledSupps.observation }}</td>
+									</tr>
+								{% endfor %}
+								{% for item in canceledAssure %}
+									<tr>
+										<td	style="vertical-align: middle;">{{ item.agent.first_name }} {{item.agent.last_name }}</td>
+										<td	style="vertical-align: middle;">{{ item.truncated_agent_usa }}</td>
+										<td	style="vertical-align: middle;">{{ item.first_name }} {{item.last_name }}</td>									
+										<td	style="vertical-align: middle;">{{ item.created_at|date:'m-d-Y' }}</td>
+										<td	style="vertical-align: middle;"> ASSURE - FUNERAL MENBRESIA </td>
+										<td	style="vertical-align: middle;">{{ item.company.company_name }}</td>
+										<td	style="vertical-align: middle;"></td>
 									</tr>
 								{% endfor %}
 							</tbody>

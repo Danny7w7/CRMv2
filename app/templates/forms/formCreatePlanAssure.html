@@ -1,0 +1,135 @@
+{% extends "dashboard/index.html" %}
+{% load static %}
+{% block head %}
+    <title>Add of Numbers</title>
+	<!--plugins-->
+	<link href="{% static "assets/plugins/simplebar/css/simplebar.css" %}" rel="stylesheet" />
+	<link href="{% static "assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" %}" rel="stylesheet" />
+	<link href="{% static "assets/plugins/metismenu/css/metisMenu.min.css" %}" rel="stylesheet" />
+	<link href="{% static "assets/plugins/datatable/css/dataTables.bootstrap5.min.css" %}" rel="stylesheet" />
+	<!-- loader-->
+	<link href="{% static "assets/css/pace.min.css" %}" rel="stylesheet" />
+	<script src="{% static "assets/js/pace.min.js" %}"></script>
+	<!-- Bootstrap CSS -->
+	<link href="{% static "assets/css/bootstrap.min.css" %}" rel="stylesheet">
+	<link href="{% static "assets/css/bootstrap-extended.css" %}" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&amp;display=swap" rel="stylesheet">
+	<link href="{% static "assets/css/app.css" %}" rel="stylesheet">
+	<link href="{% static "assets/css/icons.css" %}" rel="stylesheet">
+	<!-- Theme Style CSS -->
+	<link rel="stylesheet" href="{% static "assets/css/dark-theme.css" %}" />
+	<link rel="stylesheet" href="{% static "assets/css/semi-dark.css" %}" />
+	<link rel="stylesheet" href="{% static "assets/css/header-colors.css" %}" />
+{% endblock %}
+{% block page_content %}
+<h6 class="mb-0 text-uppercase">ADD Numbers</h6>
+<hr/>
+<div class="row">
+    <div class="col-xl-10 mx-auto">
+        <div class="card">
+            <div class="card-header px-4 py-3">
+                <h5 class="mb-0">Add New Numbers</h5>
+            </div>
+            <div class="card-body p-4">
+                <form id="formCreateCompanies" class="row g-3 needs-validation" method="POST">
+                    <div id="dependents-container">
+                        <div class="dependents-item row g-3">
+							<div class="col-12 col-lg-6">
+								<label class="form-label">Name of Dependent</label>
+								<input type="text" class="form-control" name="full_name[]">
+							</div>
+							<div class="col-12 col-lg-6">
+								<label class="form-label">Date Birth (MM-DD-AAAA)</label>
+								<input type="text" class="form-control" name="date_birth[]" id="date_birth" >
+							</div>
+							<div class="col-12 col-lg-6">
+								<label class="form-label">Sex</label>
+								<select class="form-select" name="sex[]" id="sex[]">
+									<option disabled selected value=""></option>
+									<option value="M">MALE</option>
+									<option value="F">FEMALE</option>
+								</select>
+							</div>
+							<div class="col-12 col-lg-6">
+								<label for="kinship" class="form-label">Relationship</label>
+								<select class="form-select" id="kinship[]" name="kinship[]" aria-label="Default select example">
+									<option disabled selected value=""></option>
+									<option value="DAD">DAD</option>
+									<option value="MOM">MOM</option>
+									<option value="SON">SON</option>
+									<option value="GRANDPARENT">GRANDPARENT</option>
+									<option value="GRANDMOTHER">GRANDMOTHER</option>
+									<option value="COUPLE">COUPLE</option>
+									<option value="OTHER">OTHER</option>
+								</select>
+							</div>
+                            <div class="col-md-6">
+                                <label for="nationality" class="form-label">Nationality</label>
+								<select class="form-select" id="nationality[]" name="nationality[]" aria-label="Default select example">
+										<option disabled selected value=""></option>
+									{% for pais in paises %}
+										<option value="{{ pais.nombre }}">{{ pais.nombre }} ({{ pais.gentilicio }})</option>
+									{% endfor %}
+								</select>
+                            </div>
+                            <div class="col-md-12 text-end">
+                                <button type="button" class="btn btn-danger remove-dependents">Remove</button>
+                            </div>
+                        </div>
+                    </div>                   
+                    <div class="col-md-12">
+                        <div class="d-md-flex d-grid align-items-center gap-3">
+							<a href="{% url 'formCreateAssure' %}" class="btn btn-secondary">Back</a>
+                            <button type="button" id="addDependents" class="btn btn-success px-4">ADD</button>
+                            <button type="submit" class="btn btn-primary px-4">Submit</button>
+                        </div>
+                    </div>
+                    {% csrf_token %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="alert-data"
+     data-type="{{ type }}"
+     data-message="{{ msg|safe }}"
+     style="display: none;">
+</div>
+
+
+
+{% endblock %}
+{% block end_js %}
+	<!-- Bootstrap JS -->
+	<script src="{% static "assets/js/bootstrap.bundle.min.js" %}"></script>
+	<!--plugins-->
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script src="{% static "assets/js/jquery.min.js" %}"></script>
+	<script src="{% static "assets/plugins/simplebar/js/simplebar.min.js" %}"></script>
+	<script src="{% static "assets/plugins/metismenu/js/metisMenu.min.js" %}"></script>
+	<script src="{% static "assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js" %}"></script>
+	<script src="{% static "assets/plugins/datatable/js/jquery.dataTables.min.js" %}"></script>
+	<script src="{% static "assets/plugins/datatable/js/dataTables.bootstrap5.min.js" %}"></script>
+
+	<!--app JS-->
+	<script src="{% static "assets/js/app.js" %}"></script>
+	<script src="{% static "assets/js/assure/repeat.js" %}"></script>
+
+
+    {% if messages %}
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                {% for message in messages %}
+                    Swal.fire({
+                        title: '{{ message.tags|title }}',
+                        html: '{{ message|safe|escapejs }}',
+                        icon: '{{ message.tags }}',
+                        confirmButtonText: 'Aceptar'
+                    });
+                {% endfor %}
+            });
+        </script>
+    {% endif %}
+
+{% endblock %}

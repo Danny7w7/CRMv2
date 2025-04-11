@@ -175,14 +175,14 @@ def ticketAsing(request):
     company_id = request.company_id
     
     if request.user.is_superuser:
-        ticket = AgentTicketAssignment.objects.select_related('obamacare', 'supp', 'agent_create', 'agent_customer')    
+        ticket = AgentTicketAssignment.objects.select_related('obamacare', 'supp','assure', 'agent_create', 'agent_customer').all()
     elif request.user.role in roleAuditar:
-        ticket = AgentTicketAssignment.objects.select_related('obamacare', 'supp', 'agent_create', 'agent_customer').filter(
+        ticket = AgentTicketAssignment.objects.select_related('obamacare', 'supp', 'assure','agent_create', 'agent_customer').filter(
             company = company_id, is_active = True)
     elif request.user.role == 'Admin':
-        ticket = AgentTicketAssignment.objects.select_related('obamacare', 'supp', 'agent_create', 'agent_customer').filter(company = company_id)
+        ticket = AgentTicketAssignment.objects.select_related('obamacare', 'supp', 'assure','agent_create', 'agent_customer').filter(company = company_id)
     elif request.user.role == 'A':
-        ticket = AgentTicketAssignment.objects.select_related('obamacare', 'supp', 'agent_create', 'agent_customer').filter(
+        ticket = AgentTicketAssignment.objects.select_related('obamacare', 'supp', 'assure','agent_create', 'agent_customer').filter(
             agent_create = request.user.id, company = company_id, is_active = True)
         
     color = []
@@ -203,5 +203,24 @@ def ticketAsing(request):
 
     return render(request, 'informationClient/ticketAsing.html',context)
 
+@login_required(login_url='/login')   
+@company_ownership_required_sinURL 
+def clientAssure(request):
+        
+    roleAuditar = ['S', 'C',  'AU','SUPP']
+    company_id = request.company_id
+    
+    if request.user.is_superuser:
+        assure = ClientsAssure.objects.select_related('agent').all()
+    elif request.user.role in roleAuditar:
+        assure = ClientsAssure.objects.select_related('agent').filter(
+            company = company_id, is_active = True)
+    elif request.user.role == 'Admin':
+        assure = ClientsAssure.objects.select_related('agent').filter(company = company_id)
+    elif request.user.role == 'A':
+        assure = ClientsAssure.objects.select_related('agent').filter(
+            agent = request.user.id, company = company_id, is_active = True)
+
+    return render(request, 'informationClient/clientAssure.html', {'assure':assure})
 
 

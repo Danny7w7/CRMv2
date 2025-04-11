@@ -1,3 +1,8 @@
+#libreria de paises
+import json
+import urllib.request
+from django.shortcuts import render
+
 # Standard Python libraries
 import datetime
 
@@ -8,6 +13,7 @@ from django.utils.timezone import make_aware
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib import messages
 
 # Application-specific imports
 from app.forms import *
@@ -79,6 +85,85 @@ def formCreateClient(request):
             return render(request, 'newSale/formCreateClient.html', {'error_message': form.errors})
     else:
         return render(request, 'newSale/formCreateClient.html',context)
+
+@login_required(login_url='/login') 
+@company_ownership_required_sinURL
+def formCreateAssure(request):
+
+    company_id = request.company_id  # Obtener company_id desde request
+
+    user = Users.objects.select_related('company').filter(company = company_id).first()
+
+    url = "https://restcountries.com/v3.1/all"
+ 
+    with urllib.request.urlopen(url) as response:
+        data = json.loads(response.read().decode())
+
+        paises = []
+
+        for country in sorted(data, key=lambda x: x.get('name', {}).get('common', '')):
+            nombre = country.get('name', {}).get('common', 'N/A')
+            gentilicio = country.get('demonyms', {}).get('eng', {}).get('m', 'N/A')
+            paises.append({
+                "nombre": nombre,
+                "gentilicio": gentilicio
+            })  
+
+    if company_id == 1:
+        companies = Companies.objects.filter(is_active = True)
+    else:
+        companies = None
+
+    context = {
+        'user' : user,
+        'companies' : companies,
+        'paises' : paises
+    }
+
+    if request.method == 'POST':
+
+        date_births = request.POST.get('date_birth')
+        fecha_obj = datetime.datetime.strptime(date_births, '%m/%d/%Y').date()
+        company = request.POST.get('company')
+        companyInstance = Companies.objects.filter(id = company).first()
+
+        social = request.POST.get('social_security')
+        if social: formatSocial = social.replace('-','')
+        else: formatSocial = None
+
+        status = 'REGISTERED'
+
+        form = ClientFormAssure(request.POST)
+        if form.is_valid():
+            client = form.save(commit=False)
+            client.agent = request.user
+            client.is_active = 1
+            client.date_birth = fecha_obj
+            client.social_security = formatSocial
+            client.company = companyInstance
+            client.status = status
+            client.status_color = 1                 
+            client.save()
+
+            contact = Contacts.objects.filter(phone_number=client.phone_number).first()
+            if not contact:
+                contact = Contacts()
+                contact.company = companyInstance
+                contact.name = f'{client.first_name} {client.last_name}'
+                contact.phone_number = client.phone_number
+                contact.is_active = False
+                contact.save()
+
+            createOrUpdateChat(contact, companyInstance, request.user)
+            
+            # Responder con éxito y la URL de redirección
+            return redirect('formCreatePlanAssure' ,client.id)
+        else:
+            return render(request, 'newSale/formCreateAssure.html', {'error_message': form.errors})
+    else:
+        return render(request, 'newSale/formCreateAssure.html',context)
+
+
 
 @login_required(login_url='/login') 
 @company_ownership_required_sinURL
@@ -180,6 +265,86 @@ def formCreatePlan(request ,client_id):
         'type_sale':type_sale,
         'company': company
     })
+
+
+@login_required(login_url='/login') 
+@company_ownership_required_sinURL
+def formCreatePlanAssure(request ,client_id):   
+
+    url = "https://restcountries.com/v3.1/all"
+ 
+    with urllib.request.urlopen(url) as response:
+        data = json.loads(response.read().decode())
+
+        paises = []
+
+        for country in sorted(data, key=lambda x: x.get('name', {}).get('common', '')):
+            nombre = country.get('name', {}).get('common', 'N/A')
+            gentilicio = country.get('demonyms', {}).get('eng', {}).get('m', 'N/A')
+            paises.append({
+                "nombre": nombre,
+                "gentilicio": gentilicio
+            })     
+
+    if request.method == 'POST':    
+        client = get_object_or_404(ClientsAssure, id=client_id)
+
+        full_name_list = request.POST.getlist('full_name[]')
+        date_birth_list = request.POST.getlist('date_birth[]')
+        sex_list = request.POST.getlist('sex[]')
+        kinship_list = request.POST.getlist('kinship[]')
+        nationality_list = request.POST.getlist('nationality[]')
+
+        validated_data = []
+        hasErrors = False
+
+        # Validar fechas primero
+        for full_name, date_birth, sex, kinship, nationality in zip(full_name_list, date_birth_list, sex_list, kinship_list, nationality_list):
+            try:
+                birthdate_obj = datetime.datetime.strptime(date_birth, "%m-%d-%Y")
+                date_birth_formatted = birthdate_obj.strftime("%Y-%m-%d")
+
+                validated_data.append({
+                    'full_name': full_name,
+                    'date_birth': date_birth_formatted,
+                    'sex': sex,
+                    'kinship': kinship,
+                    'nationality': nationality
+                })
+            except ValueError:
+                hasErrors = True
+                messages.error(request, f"Invalid date format for {full_name}. Please use MM-DD-YYYY.")
+
+        if hasErrors:
+            messages.error(request, "Some dates were invalid. Please correct them and try again.")
+
+        # Contar cuántos ya tiene
+        current_count = DependentsAssure.objects.filter(client=client).count()
+        remaining_slots = 6 - current_count
+
+        if remaining_slots <= 0:
+            messages.error(request, "This client already has the maximum number of 6 dependents.")
+
+        if not hasErrors and not remaining_slots <= 0 :
+            saved_count = 0
+            for data in validated_data[:remaining_slots]:  # solo los que quepan
+                DependentsAssure.objects.create(
+                    client=client,
+                    full_name=data['full_name'],
+                    date_birth=data['date_birth'],
+                    sex=data['sex'],
+                    kinship=data['kinship'],
+                    country=data['nationality']
+                )
+                saved_count += 1
+
+            if saved_count < len(validated_data):
+                messages.warning(request, f"Only {saved_count} dependents were saved to reach the limit of 6.")
+            else:
+                messages.success(request, f"All dependents were added successfully.")
+                return redirect('formCreateAssure')
+
+    return render(request, 'forms/formCreatePlanAssure.html', {'paises': paises})
 
 @login_required(login_url='/login')
 @company_ownership_required_sinURL

@@ -1,7 +1,8 @@
 {% extends "dashboard/index.html" %}
 {% load static %}
+{% load phoneFormat %}
 {% block head %}
-    <title>Table Tikect Asing</title>
+    <title>Table Assure</title>
 	<!--plugins-->
 	<link href="{% static "assets/plugins/simplebar/css/simplebar.css" %}" rel="stylesheet" />
 	<link href="{% static "assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" %}" rel="stylesheet" />
@@ -22,69 +23,54 @@
 	<link rel="stylesheet" href="{% static "assets/css/header-colors.css" %}" />
 {% endblock %}
 {% block page_content %}
-<h6 class="mb-0 text-uppercase">Tikect Asing</h6>
+<h6 class="mb-0 text-uppercase">Assure</h6>
 <hr/>
 <div class="card">
-	<div class="card-body">
+    <div class="card-body">
         <div class="table-responsive">
             <table id="tableClient" class="table table-striped table-bordered">
                 <thead>
                     <tr>
-                        <th>Client</th>
-						<th>Client Type</th>
-                        <th>User</th>
-						<th>User Asing</th>
+                        <th>Agent COL</th>
+                        <th>Name Client</th>
+						<th>Phone</th>
+						<th>Date</th>
 						<th>Status</th>
-						{% if request.user.role == 'Admin' %} <th>Active</th> {% endif %}						
+						{% if request.user.role == 'Admin' %} <th>Is Active</th> {% endif %}
 						{% if request.user.is_superuser %} <th>Company</th> {% endif %}
 						<th>Option</th>
                     </tr>
                 </thead>
                 <tbody>
-					{% for ticket,color in lista %}
-						<tr>
-							{% if ticket.obamacare  %}
-								<td>{{ticket.obamacare.client.first_name}} {{ticket.obamacare.client.last_name}}</td>
-								<td>ACA</td>
-							{% elif ticket.supp %}
-								<td>{{ticket.supp.client.first_name}} {{ticket.supp.client.last_name}}</td>
-								<td>SUPP</td>
-							{% elif ticket.assure %}
-								<td>{{ticket.first_name}} {{ticket.last_name}}</td>
-								<td>ASSURE</td>
-							{% endif %}
-							<td>{{ticket.agent_create.first_name}} {{ticket.agent_create.last_name}}</td>
-							<td>{{ticket.agent_customer.first_name}} {{ticket.agent_customer.last_name}}</td>
-							
-							<td>
-								<div class="d-flex align-items-center text-{{color}}">	<i class='bx bx-radio-circle-marked bx-burst bx-rotate-90 align-middle font-18 me-1'></i>
-									<span>{{ticket.status}}</span>
-								</div>
-							</td>
-							{% if request.user.role == 'Admin' %}
-								{% if  ticket.is_active%}								
-									<td>Vigente</td>
-								{% else %}
-									<td> Eliminada</td>
-								{% endif %}		
-							{% endif %}
-							{% if request.user.is_superuser %} <td>{{ticket.company.company_name}}</td> {% endif %}				
-							<td>
-								<div class="d-flex order-actions">
-									<a href="{% url 'editTicket' ticket.id %}" class=""><i class='bx bxs-edit'></i></a>
-									{% if request.user.role == 'Admin' or request.user.is_superuser %}
-										<a href="{% url 'toggleTicketStatus' ticket.id %}" class="ms-3"><i class='bx bxs-trash'></i></a>
-									{% endif %}
-								</div>
-							</td> 
-						</tr>
+                    {% for item in assure %}
+                    <tr>
+                        <td>{{item.agent.first_name}} {{item.agent.last_name}}</td>
+                        <td>{{item.first_name}} {{item.last_name}}</td>
+                        <td>{{item.phone_number|formatUsaPhone}}</td>
+						<td>{{item.created_at|date:"m-d-Y"}}</td>
+						<td>{% if item.status_color == 1 or item.status_color == None or item.status_color == 4 %}
+								<div class="badge rounded-pill text-danger bg-light-danger p-2 text-uppercase px-3"><i class='bx bxs-circle me-1'></i>{{item.status}}</div>
+							{% elif item.status_color == 2 %}
+								<div class="badge rounded-pill text-warning bg-light-warning p-2 text-uppercase px-3"><i class='bx bxs-circle me-1'></i>{{item.status}}</div>
+							{% elif item.status_color == 3 %}
+								<div class="badge rounded-pill text-success bg-light-success p-2 text-uppercase px-3"><i class='bx bxs-circle me-1'></i>{{item.status}}</div>
+							{% endif  %}
+						</td>
+						{% if request.user.role == 'Admin' %} <td>{{item.is_active}}</td> {% endif %}		
+						{% if request.user.is_superuser %} <td>{{item.company.company_name}}</td> {% endif %}				
+						<td>
+							<div class="d-flex order-actions">
+								<a href="{% url 'editAssure' item.id %}" class=""><i class='bx bxs-edit'></i></a>
+								<a href="{% url 'toggleAssureStatus' item.id %}" class="ms-3"><i class='bx bxs-trash'></i></a>
+							</div>
+						</td> 
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
 </div>
-
 {% endblock %}
 {% block end_js %}
 	<!-- Bootstrap JS -->

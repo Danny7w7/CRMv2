@@ -285,6 +285,52 @@ class Supp(models.Model):
     class Meta:
         db_table = 'supp'
 
+class ClientsAssure(models.Model):
+    agent = models.ForeignKey(Users, on_delete=models.CASCADE)
+    agent_usa = models.CharField(max_length=100)
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    phone_number = models.BigIntegerField()
+    email = models.EmailField()
+    created_at = models.DateTimeField(auto_now_add=True) 
+    address = models.CharField(max_length=255)
+    zipcode = models.IntegerField()
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=50)
+    county = models.CharField(max_length=100, null=True)
+    nationality = models.CharField(max_length=200)
+    sex = models.CharField(max_length=1) 
+    date_birth = models.DateField()
+    migration_status = models.CharField(max_length=100)
+    social_security = models.CharField(max_length=9,null=True)
+    status = models.CharField(max_length=50,null=True)
+    status_color = models.IntegerField(null = True)
+    date_effective_coverage = models.DateField(null=True)
+    date_effective_coverage_end = models.DateField(null=True)
+    policyNumber = models.CharField(max_length=200, null=True)
+    payment_type = models.CharField(max_length=50,null=True)
+    is_active = models.BooleanField(default=True)  
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE)
+
+
+    class Meta:
+        db_table = 'Clients_assure'
+
+    def _str_(self):
+        return f'{self.first_name} {self.last_name} - {self.phone_number}'
+    
+class DependentsAssure(models.Model):  
+    client = models.ForeignKey(ClientsAssure, on_delete=models.CASCADE)
+    full_name = models.CharField(max_length=200)
+    date_birth = models.DateField(null=True)
+    sex = models.CharField(max_length=1) 
+    country = models.CharField(max_length=200)
+    kinship = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True) 
+
+    class Meta:
+        db_table = 'dependents_assure'
+
 class Payments(models.Model):
     obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
     agent = models.ForeignKey(Users, on_delete=models.CASCADE)
@@ -298,9 +344,10 @@ class Payments(models.Model):
         db_table = 'payments'
 
 class ObservationAgent(models.Model):
-    client = models.ForeignKey(Clients, on_delete=models.CASCADE)
+    client = models.ForeignKey(Clients, on_delete=models.CASCADE, null=True)
     obamaCare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null=True, blank=True)
     supp = models.ForeignKey(Supp, on_delete=models.CASCADE, null=True, blank=True)
+    assure = models.ForeignKey(ClientsAssure, on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey(Users, on_delete=models.CASCADE)
     content = models.TextField()
 
@@ -308,10 +355,11 @@ class ObservationAgent(models.Model):
         db_table = 'observations_agents'
 
 class ObservationCustomer(models.Model):
-    client = models.ForeignKey(Clients, on_delete=models.CASCADE)
+    client = models.ForeignKey(Clients, on_delete=models.CASCADE, null=True)
     agent = models.ForeignKey(Users, on_delete=models.CASCADE)  
     obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null=True)
     supp = models.ForeignKey(Supp, on_delete=models.CASCADE, null=True)
+    assure = models.ForeignKey(ClientsAssure, on_delete=models.CASCADE, null=True, blank=True)
     typeCall = models.CharField(max_length=20)   
     created_at = models.DateTimeField(auto_now_add=True) 
     typification = models.TextField()
@@ -552,6 +600,7 @@ class CustomerRedFlag(models.Model):
 class paymentDate(models.Model):
     obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null=True)
     supp = models.ForeignKey(Supp, on_delete=models.CASCADE, null= True)
+    assure = models.ForeignKey(ClientsAssure, on_delete=models.CASCADE, null=True, blank=True)
     payment_date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
     agent_create = models.ForeignKey(Users,on_delete=models.CASCADE)   
@@ -562,6 +611,7 @@ class paymentDate(models.Model):
 class AgentTicketAssignment(models.Model):
     obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null=True)
     supp = models.ForeignKey(Supp, on_delete=models.CASCADE, null= True)
+    assure = models.ForeignKey(ClientsAssure, on_delete=models.CASCADE, null=True, blank=True)
     agent_create = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='agent_create' )
     agent_customer = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='agent_customer')
     content = models.TextField()

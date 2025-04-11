@@ -91,6 +91,38 @@ def saveCustomerObservationSupp(request):
         return HttpResponse("Método no permitido.", status=405)
 
 @login_required(login_url='/login') 
+def saveCustomerObservationAssure(request):
+    if request.method == "POST":
+        content = request.POST.get('textoIngresado')
+        assure_id = request.POST.get('assure_id')
+        typeCall = request.POST.get('typeCall')        
+
+        # Obtenemos las observaciones seleccionadas
+        observations = request.POST.getlist('observaciones[]')  # Lista de valores seleccionados
+        
+        # Convertir las observaciones a una cadena (por ejemplo, separada por comas o saltos de línea)
+        typification_text = ", ".join(observations)  # Puedes usar "\n".join(observations) si prefieres saltos de línea
+
+        assure = ClientsAssure.objects.get(id=assure_id) 
+
+        if content.strip():  # Validar que el texto no esté vacío
+            ObservationCustomer.objects.create(
+                agent=request.user,
+                assure=assure,
+                typeCall=typeCall,
+                typification=typification_text, # Guardamos las observaciones en el campo 'typification'
+                content=content
+            )
+            messages.success(request, "Observación guardada exitosamente.")
+        else:
+            messages.error(request, "El contenido de la observación no puede estar vacío.")
+
+        return redirect('editAssure', assure.id)        
+        
+    else:
+        return HttpResponse("Método no permitido.", status=405)
+
+@login_required(login_url='/login') 
 def saveCustomerObservationMedicare(request):
     if request.method == "POST":
         content = request.POST.get('textoIngresado')
@@ -303,12 +335,43 @@ def paymentDateSupp(request, supp_id):
 
     return JsonResponse({"error": "Invalid request"}, status=400)
 
+def paymentDateAssure(request, assure_id):
+
+    assure = get_object_or_404(ClientsAssure, id=assure_id)
+
+    if request.method == "POST":
+        payment_date = request.POST.get("paymentDate")
+
+        # Validar que la fecha no sea vacía
+        if not payment_date:
+            return JsonResponse({"error": "Date is required"}, status=400)
+
+        # Intentar parsear la fecha en formato YYYY-MM-DD
+        parsed_date = parse_date(payment_date)
+
+        if parsed_date is None:
+            return JsonResponse({"error": "Invalid date format. Expected YYYY-MM-DD."}, status=400)
+
+        # Actualizar o crear el registro de PaymentDate
+        payment_record, created = paymentDate.objects.update_or_create(
+            assure=assure,  
+            defaults={"payment_date": parsed_date},
+            agent_create = request.user
+        )
+
+        message = "Recode SMS Created!" if created else "Date of updated billing SMS!"
+        return JsonResponse({"message": message, "id": payment_record.id})
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
 @login_required(login_url='/login') 
 def agentTicketAssignment(request):
     if request.method == "POST":
 
         obamacare_id = request.POST.get('obamacare_id')
         supp_id = request.POST.get('supp_id')
+        assure_id = request.POST.get('assure_id')
+
         bandera = False
 
         if obamacare_id:
@@ -368,6 +431,34 @@ def agentTicketAssignment(request):
                 messages.error(request, "El contenido de la observación no puede estar vacío.")
 
             return redirect('editSupp', supp.id) 
+
+        if assure_id:
+            content = request.POST.get('textoIngresado')
+            agent_customer = request.POST.get('agent_customer')  
+        
+            assure = ClientsAssure.objects.get(id=assure_id)
+            agentAsing  = Users.objects.get(id = agent_customer)
+
+            if content.strip():  # Validar que el texto no esté vacío
+                id = AgentTicketAssignment.objects.create(
+                    assure=assure,
+                    agent_create=request.user,  
+                    agent_customer=agentAsing,
+                    content=content,
+                    status="IN PROGRESS",
+                    company = assure.company
+                )
+
+                newId = id.id
+                client = assure.first_name + ' ' + assure.last_name
+                url = f'/ticketAsing/{newId}/'
+
+                bandera = True
+                messages.success(request, "Observación guardada exitosamente.")
+            else:
+                messages.error(request, "El contenido de la observación no puede estar vacío.")
+
+            return redirect('editAssure', assure.id) 
 
         if bandera:
             websocketAlertGeneric(

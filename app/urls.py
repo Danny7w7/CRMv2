@@ -48,6 +48,10 @@ urlpatterns = [
     path('formCreateClient/', forms.formCreateClient, name='formCreateClient'), # Formulario para crear Clientes Obamacare
     path('formEditClient/<client_id>/', edits.formEditClient, name='formEditClient'),
 
+    path('formCreateAssure/', forms.formCreateAssure, name='formCreateAssure'),
+    path('formCreatePlanAssure/<client_id>/', forms.formCreatePlanAssure, name='formCreatePlanAssure'),
+    path('selectClientAssure/', existClient.selectClientAssure, name='selectClientAssure'), # Vista para seleccionar clientes existentes
+
 
     path('formCreatePlan/<client_id>/', forms.formCreatePlan, name='formCreatePlan'),
     path('fetchAca/<client_id>/', fetchsEnterData.fetchAca, name='fetchAca'),
@@ -84,6 +88,13 @@ urlpatterns = [
     path('paymentDateObama/<obama_id>/', modals.paymentDateObama, name='paymentDateObama'),
 
     path('clientAccionRequired/', table.clientAccionRequired, name='clientAccionRequired'),
+
+    path('clientAssure/', table.clientAssure, name='clientAssure'),
+    path('editAssure/<assure_id>/', edits.editAssure, name='editAssure'),
+    path('toggleAssureStatus/<assure_id>/', toggles.toggleAssureStatus, name='toggleAssureStatus'),
+    path('blockSocialSecurityAssure/', fetchInformations.blockSocialSecurityAssure, name='blockSocialSecurityAssure'),
+    path('paymentDateAssure/<assure_id>/', modals.paymentDateAssure, name='paymentDateAssure'),
+    path('saveCustomerObservationAssure/', modals.saveCustomerObservationAssure, name='saveCustomerObservationAssure'),
 
     path('clientSupp/', table.clientSupp, name='clientSupp'),
     path('toggleSuppStatus/<supp_id>/', toggles.toggleSuppStatus, name='toggleSuppStatus'),

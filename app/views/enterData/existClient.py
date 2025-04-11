@@ -26,7 +26,6 @@ def select_client(request):
     
     return render(request, 'newSale/selectClient.html', context)
 
-
 @company_ownership_required_sinURL
 def update_type_sales(request ,client_id):
     company_id = request.company_id  # Obtener company_id desde request
@@ -41,4 +40,22 @@ def update_type_sales(request ,client_id):
         elif route == 'SUPP': return redirect('formAddSupp', client_id)
         elif route == 'DEPEND': return redirect('formAddDepend', client_id)
         else: return redirect('select_client')
+
+@company_ownership_required_sinURL
+def selectClientAssure(request):
+
+    company_id = request.company_id  # Obtener company_id desde request
+
+    if request.user.is_superuser: 
+        clients = ClientsAssure.objects.all()
+    elif request.user.role == 'Admin': 
+        clients = ClientsAssure.objects.filter(company = company_id)
+    else: clients = ClientsAssure.objects.filter(is_active = True, company = company_id)
+
+    context = {
+        'clients' : clients,
+        'company_id' : company_id
+    }
+
+    return render(request, 'newSale/selectClientAssure.html', context)
 
