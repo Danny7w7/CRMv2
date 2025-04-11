@@ -6,6 +6,7 @@ from django.shortcuts import render
 from django.apps import apps  # Para obtener modelos dinámicamente
 from django.core.exceptions import PermissionDenied
 from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import redirect
 
 def company_ownership_required(view_func):
     @wraps(view_func)
@@ -85,3 +86,19 @@ def company_ownership_required(model_name, id_field, company_field="company_id")
         return _wrapped_view
 
     return decorator
+
+def superuserRequired(viewFunc):
+    @wraps(viewFunc)
+    def _wrappedView(request, *args, **kwargs):
+        if not request.user.is_authenticated or not request.user.is_superuser:
+            return redirect('index')  # Asegúrate de tener definida la URL 'index' en tu archivo urls.py
+        return viewFunc(request, *args, **kwargs)
+    return _wrappedView
+
+def staffUserRequired(viewFunc):
+    @wraps(viewFunc)
+    def _wrappedView(request, *args, **kwargs):
+        if not request.user.is_authenticated or not request.user.role == 'Admin':
+            return redirect('index')  # Asegúrate de tener definida la URL 'index' en tu archivo urls.py
+        return viewFunc(request, *args, **kwargs)
+    return _wrappedView

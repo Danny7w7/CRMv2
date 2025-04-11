@@ -19,6 +19,7 @@ from ..decoratorsCompany import *
 
 @login_required(login_url='/login') 
 @company_ownership_required_sinURL
+@staffUserRequired
 def formCreateUser(request):
 
     company_id = request.company_id  # Obtener company_id desde request
@@ -81,6 +82,7 @@ def formCreateUser(request):
 
 @login_required(login_url='/login') 
 @company_ownership_required(model_name="Users", id_field="user_id")
+@staffUserRequired
 def editUser(request, user_id):
     # Obtener el usuario a editar o devolver un 404 si no existe
     user = Users.objects.select_related('company').filter(id=user_id).exclude(is_superuser=True).first()
@@ -115,7 +117,8 @@ def editUser(request, user_id):
     context = {'users': user}
     return render(request, 'edit/editUser.html', context)
 
-@login_required(login_url='/login') 
+@login_required(login_url='/login')
+@staffUserRequired
 def toggleUser(request, user_id):
     # Obtener el cliente por su ID
     user = get_object_or_404(Users, id=user_id)

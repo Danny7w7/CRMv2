@@ -11,9 +11,10 @@ from django.shortcuts import get_object_or_404, redirect, render
 # Application-specific imports
 from app.models import *
 from ...forms import ServicesForm
-from ..decoratorsCompany import company_ownership_required_sinURL
+from ..decoratorsCompany import *
 
 @login_required(login_url='/login') 
+@superuserRequired
 def formCreateCompanies(request):
 
     companies = Companies.objects.exclude(id = 1)
@@ -59,6 +60,7 @@ def formCreateCompanies(request):
     return render(request, 'companies/formCreateCompanies.html', context)
 
 @login_required(login_url='/login') 
+@superuserRequired
 def editCompanies(request, company_id):
     # Obtener el usuario a editar o devolver un 404 si no existe
     company = get_object_or_404(Companies, id=company_id)
@@ -98,6 +100,7 @@ def editCompanies(request, company_id):
     return render(request, 'companies/editCompanies.html', context)
 
 @login_required(login_url='/login') 
+@superuserRequired
 def toggleCompanies(request, company_id):
     # Obtener el cliente por su ID
     company = get_object_or_404(Companies, id=company_id)
@@ -113,6 +116,7 @@ def toggleCompanies(request, company_id):
     return redirect('formCreateCompanies')
 
 @login_required(login_url='/login')
+@superuserRequired
 def createServices(request):
 
     dropList = DropDownList.objects.filter(service_company__isnull=False).values_list('service_company', flat=True)
@@ -127,7 +131,8 @@ def createServices(request):
     
     return render(request, 'companies/createServices.html', {'dropList':dropList})
 
-@login_required(login_url='/login') 
+@login_required(login_url='/login')
+@superuserRequired
 def addSubscription(request):
 
     company = Companies.objects.filter(is_active = True)
@@ -163,6 +168,7 @@ def addSubscription(request):
     return render(request, 'companies/addSubscription.html' , context)
 
 @login_required(login_url='/login')
+@superuserRequired
 def addNumbers(request):
     company = Companies.objects.filter(is_active=True)
     numbersBD = Numbers.objects.all()
@@ -243,6 +249,7 @@ def validatePhoneNumber(phoneNumber):
     else:
         return False
     
+@superuserRequired
 def toggleNumberCompany(request, number_id):
     # Obtener el cliente por su ID
     number = get_object_or_404(Numbers, id=number_id)
@@ -256,6 +263,7 @@ def toggleNumberCompany(request, number_id):
 
 @login_required(login_url='/login')
 @company_ownership_required_sinURL
+@staffUserRequired
 def addNumbersUsers(request):
 
     company_id = request.company_id  # Obtener company_id desde request
