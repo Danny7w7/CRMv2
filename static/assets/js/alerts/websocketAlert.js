@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
         
-        else if (userRole === "S" || userRole === "C" || userRole === "Admin" && data.event_type === 'actionCompleted') {
+        else if ((userRole === "S" || userRole === "C" || userRole === "Admin") && data.event_type === 'actionCompleted') {
             Swal.fire({
                 title: data.title,
                 text: data.message,
