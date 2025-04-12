@@ -674,19 +674,19 @@ def saleClientStatusSupp(request, company_id, start_date=None, end_date=None):
     # Consulta para Proccessing
     proccessing_supp = Supp.objects.select_related('agent','client').annotate(
         truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 2, is_active = True,  **company_filter ) 
-    proccessing_assure = ClientsAssure.objects.select_related('agent','client').annotate(
+    proccessing_assure = ClientsAssure.objects.select_related('agent').annotate(
         truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 2, is_active = True,  **company_filter ) 
 
     # Consulta para Active
     active_supp = Supp.objects.select_related('agent','client').annotate(
         truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 3, is_active = True,  **company_filter ) 
-    active_assure = ClientsAssure.objects.select_related('agent','client').annotate(
+    active_assure = ClientsAssure.objects.select_related('agent').annotate(
         truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 3, is_active = True,  **company_filter ) 
     
     # Consulta para Canceled
     canceled_supp = Supp.objects.select_related('agent','client').annotate(
         truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 4, is_active = True,  **company_filter )
-    canceled_assure = ClientsAssure.objects.select_related('agent','client').annotate(
+    canceled_assure = ClientsAssure.objects.select_related('agent').annotate(
         truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(status_color = 4, is_active = True,  **company_filter )
 
     # Si no se proporcionan fechas, filtrar por el mes actual
