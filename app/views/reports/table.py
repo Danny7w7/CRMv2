@@ -379,7 +379,7 @@ def saleSuppAgentUsa(request, company_id, start_date=None, end_date=None):
         )
 
         sales_query = sales_query.filter(created_at__range=[start_date, end_date])
-        sales_query_assure = sales_query_assure.filter(created_at__range=[first_day_of_month, last_day_of_month])
+        sales_query_assure = sales_query_assure.filter(created_at__range=[start_date, end_date])
 
     # Crear un diccionario para almacenar los resultados por agente y status color
     agents_sales = {}
