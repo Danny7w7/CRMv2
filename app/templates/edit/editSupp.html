@@ -374,12 +374,9 @@
 							Date Payment
 						</button>
 					{% endif %}
-					{% if request.user.role == 'A' %}
-						<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#AgentTicketAssignment">
-							Ticket to customer
-						</button>
-					{% endif %} 
-
+					<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#AgentTicketAssignment">
+						Ticket
+					</button>
 					<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalVerTexto">
 						See Observations
 					</button>

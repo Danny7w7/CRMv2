@@ -86,7 +86,7 @@
                                     <li>
                                         <form method="POST" action="{% url 'update_type_sales' client.id %}">
                                             {% csrf_token %}
-                                            <input type="hidden" name="type_sales" value="ACA/SUPLEMENTARIO">
+                                            <input type="hidden" name="type_sales" value="ACA">
                                             <button type="submit" class="dropdown-item">ADD ACA</button>
                                             <input type="hidden" name="route" id="ACA" value="ACA">
                                         </form>
@@ -98,15 +98,7 @@
                                             <button type="submit" class="dropdown-item">ADD. SUPP</button>
                                             <input type="hidden" name="route" id="SUPP" value="SUPP">
                                         </form>
-                                    </li>
-                                    <li>
-                                        <form method="POST" action="{% url 'update_type_sales' client.id %}">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="type_sales" value="SUPLEMENTARIO">
-                                            <button type="submit" class="dropdown-item">ADD. DEPENDENTS</button>
-                                            <input type="hidden" name="route" id="DEPEND" value="DEPEND">
-                                        </form>
-                                    </li>                                    
+                                    </li>                                
                                 {% elif client.type_sales == "ACA/SUPLEMENTARIO" %}
                                     <!-- Solo mostrar ACA/SUPP si ya tiene ACA/SUPP -->
                                     <li>

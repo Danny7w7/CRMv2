@@ -21,62 +21,14 @@ function listenAllCheckInput() {
     });
 }
 
-
-function listenAllCheckInput() {
-    let paymentsTable = document.getElementById('paymentsTable');
-    let checkboxes = paymentsTable.querySelectorAll('input[type="checkbox"]');
-
-    checkboxes.forEach(function(checkbox) {
-        checkbox.addEventListener('change', function(event) {
-            toggleUserStatus(checkbox);
-        });
-    });
-}
-
 function toggleUserStatus(checkbox) {
-    const formData = new FormData();
-    const month = checkbox.value;  // Obtener el mes de la checkbox
 
-    // Añadir tanto el tipo de pago como el tipo de descuento
-    if (checkbox.id.includes('paySwitch')) {  // Si es el checkbox de "pago"
-        formData.append('type_pay_' + month, checkbox.checked ? 'pay' : '');
-    } else if (checkbox.id.includes('discountSwitch')) {  // Si es el checkbox de "descuento"
-        formData.append('type_discount_' + month, checkbox.checked ? 'discount' : '');
+    const userRole = document.body.getAttribute("data-user-role");
+
+    if (!['Admin', 'S'].includes(userRole)){
+        checkbox.disabled = true;
     }
 
-    // Asegurarse de que el mes y el valor del checkbox están siendo enviados correctamente
-    console.log("Enviando:", {
-        type_pay: formData.get('type_pay_' + month),
-        type_discount: formData.get('type_discount_' + month),
-    });
-
-    fetch(`/fetchPaymentsMonth/`, {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())  // Procesar la respuesta (si es JSON)
-    .then(data => {
-        if (data.success) {
-            console.log("Datos enviados correctamente");
-        } else {
-            console.error("Error al enviar los datos:", data.message);
-        }
-    })
-    .catch(error => console.error('Error:', error));  // Manejo de errores
-}
-
-function listenAllCheckInput() {
-    let paymentsTable = document.getElementById('paymentsTable');
-    let checkboxes = paymentsTable.querySelectorAll('input[type="checkbox"]');
-
-    checkboxes.forEach(function(checkbox) {
-        checkbox.addEventListener('change', function(event) {
-            toggleUserStatus(checkbox);
-        });
-    });
-}
-
-function toggleUserStatus(checkbox) {
     const month = checkbox.value;
 
     // Determinar si es 'pay' o 'discount'
@@ -93,7 +45,7 @@ function toggleUserStatus(checkbox) {
         type: type  // Solo un campo
     };
 
-    console.log("Enviando:", dataToSend);
+    //console.log("Enviando:", dataToSend);
 
     const method = checkbox.checked ? 'POST' : 'DELETE';
 
@@ -106,18 +58,17 @@ function toggleUserStatus(checkbox) {
     })
     .then(response => response.json())
     .then(data => {
-        console.log("Datos recibidos:", data);
+        //console.log("Datos recibidos:", data);
         if (data.success) {
-            console.log(checkbox.checked ? "Pago creado" : "Pago eliminado");
+            //console.log(checkbox.checked ? "Pago creado" : "Pago eliminado");
         } else {
-            console.error("Error:", data.message || data.errors);
+            //console.error("Error:", data.message || data.errors);
         }
     })
     .catch(error => {
-        console.error('Error al procesar la respuesta:', error);
+        //console.error('Error al procesar la respuesta:', error);
     });
 }
-
  
 // fetch para Action Required
 let isRequestPending = false;

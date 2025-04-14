@@ -56,6 +56,7 @@ def chart6WeekSale(request):
     # Obtener los datos de pólizas activas para las últimas 6 semanas
     activeObamaPolicies = ObamaCare.objects.filter(status='Active', created_at__range=[startDate, endOfCurrentWeek],is_active = True,  **company_filter).exclude( id__in=Subquery(excluded_obama_ids))
     activeSuppPolicies = Supp.objects.filter(status='Active', created_at__range=[startDate, endOfCurrentWeek], is_active= True,  **company_filter)
+    activeAssurePolicies = ClientsAssure.objects.filter(status='Active', created_at__range=[startDate, endOfCurrentWeek], is_active= True,  **company_filter)
 
     # Inicializar diccionario de ventas para las últimas 6 semanas
     excludedUsernames = ['Calidad01', 'mariluz', 'MariaCaTi','StephanieMkt','CarmenR']  # Excluimos a gente que no debe aparecer en la vista
@@ -83,6 +84,20 @@ def chart6WeekSale(request):
 
     # Procesar las pólizas activas de Supp
     for policy in activeSuppPolicies:
+        agentName = policy.agent.username
+        if policy.agent.is_active:
+            if agentName not in excludedUsernames:
+                agentName = f"{policy.agent.first_name} {policy.agent.last_name}".strip()        
+                policyWeek = (policy.created_at - startDate).days // 7  # Calcular la semana (0 a 5)
+                if 0 <= policyWeek < numWeeks:
+                    if agentName not in chart_data["series"]:
+                        chart_data["series"][agentName] = {
+                            "activeObama": [0] * numWeeks,
+                            "activeSupp": [0] * numWeeks
+                        }
+                    chart_data["series"][agentName]["activeSupp"][policyWeek] += 1
+
+    for policy in activeAssurePolicies:
         agentName = policy.agent.username
         if policy.agent.is_active:
             if agentName not in excludedUsernames:
@@ -262,10 +277,15 @@ def get_agent_sales(request, start_date, end_date):
         is_active=True, **company_filter
     ).values_list('agent__username', flat=True))
 
+    assureAgents = set(ClientsAssure.objects.filter(
+        created_at__range=[start_date, end_date],
+        is_active=True, **company_filter
+    ).values_list('agent__username', flat=True))
+
     # Unir todos los agentes que tienen ventas con los agentes filtrados inicialmente
     allUsernames = set(agentNameMap.keys())
     allUsernames.update(obamaCareAgents)
-    allUsernames.update(suppAgents)
+    allUsernames.update(suppAgents,assureAgents)
 
     # Obtener el conteo de ObamaCare dentro del rango de fechas
     obamaCareCount = ObamaCare.objects.filter(
@@ -278,6 +298,11 @@ def get_agent_sales(request, start_date, end_date):
         created_at__range=[start_date, end_date],
         is_active=True, **company_filter
     ).values('agent__username').annotate(supp_count=Count('id'))
+
+    assureCount = ClientsAssure.objects.filter(
+        created_at__range=[start_date, end_date],
+        is_active=True, **company_filter
+    ).values('agent__username').annotate(assure_count=Count('id'))
 
     # Diccionario para almacenar los resultados con nombres completos
     agentSales = {}
@@ -320,6 +345,19 @@ def get_agent_sales(request, start_date, end_date):
         if fullName not in agentSales:
             agentSales[fullName] = {'obamas': 0, 'supp': 0}
         agentSales[fullName]['supp'] = entry['supp_count']
+
+    for entry in assureCount:
+        username = entry['agent__username']
+        if username not in agentNameMap:
+            agent = Users.objects.filter(username=username, **company_filter).values('first_name', 'last_name').first()
+            fullName = f"{agent['first_name']} {agent['last_name']}".strip() if agent else username
+        else:
+            fullName = agentNameMap[username]
+        
+        if fullName not in agentSales:
+            agentSales[fullName] = {'obamas': 0, 'supp': 0}
+        
+        agentSales[fullName]['supp'] += entry['assure_count']  # Aquí sumamos
 
     return agentSales
 
