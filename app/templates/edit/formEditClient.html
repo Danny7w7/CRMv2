@@ -139,7 +139,7 @@
 							<label for="migration_status" class="form-label">Migration Status</label>
 							<select class="form-select" id="migration_status" name="migration_status">
 								<option value="no_valid" disabled {% if client.migration_status == None %}selected{% endif %}>Please Select</option>
-								<option value="EMPLOYMENT_AUTHORIZATION" {% if client.migration_status == "EMPLOYMENT_AUTHORIZATION" %}selected{% endif %}>Employment Authorization</option>
+								<option value="EMPLOYMENT AUTHORIZATION" {% if client.migration_status == "EMPLOYMENT AUTHORIZATION" %}selected{% endif %}>Employment Authorization</option>
 								<option value="NOTICE OF ACTION" {% if client.migration_status == "NOTICE OF ACTION" %}selected{% endif %} >Notice of Action (i-797)</option>
 								<option value="REFUGEE" {% if client.migration_status == "REFUGEE" %}selected{% endif %} >Refugee</option>
 								<option value="ASYLUM" {% if client.migration_status == "ASYLUM" %}selected{% endif %} >Asylum</option>

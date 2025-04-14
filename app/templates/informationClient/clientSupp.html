@@ -48,7 +48,7 @@
                         <td>{{supp.short_name}}</td>
                         <td>{{supp.agent.first_name}} {{supp.agent.last_name}}</td>
                         <td>{{supp.client.first_name}} {{supp.client.last_name}}</td>
-                        <td>+ {{supp.client.phone_number|formatUsaPhone}}</td>
+                        <td>{{supp.client.phone_number|formatUsaPhone}}</td>
 						<td>{{supp.created_at|date:"m-d-Y"}}</td>
 						<td>{{supp.policy_type}}</td>
 						<td><span class="badge rounded-pill bg-danger">{{supp.status}}</span></td>
