@@ -169,6 +169,7 @@
 							</li>
 						</ul>
 					</li>
+					{% if request.user.role == 'Admin' or request.user.role == 'S'  %}
 					<li class="menu-label">Supervisor Panel</li>
 					<li>
 						<a class="has-arrow" href="javascript:;">
@@ -180,6 +181,7 @@
 							</li>
 						</ul>
 					</li>
+					{% endif %}
 					<li class="menu-label">Chart</li>
 					<li>
 						<a class="has-arrow" href="javascript:;">

@@ -1,16 +1,16 @@
 # Standard Python libraries
-from datetime import datetime
 
 # Django utilities
-from django.template.loader import render_to_string
 
 # Django core libraries
 from django.contrib import messages
-from django.shortcuts import redirect, render
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
 
 # Application-specific imports
 from app.models import *
 
+@login_required(login_url='/login') 
 def customerAssginments(request):
     if request.method == 'POST':
         userId = request.POST.get('user')
