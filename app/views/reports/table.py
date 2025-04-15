@@ -774,7 +774,7 @@ def customerPerformance(request):
     obamacare = ObamaCare.objects.filter(created_at__range=(start_date, end_date), is_active=1, **company_filter).exclude( id__in=Subquery(excluded_obama_ids))
     totalEnroled = obamacare.exclude(profiling='NO').exclude( id__in=Subquery(excluded_obama_ids))
     totalNoEnroled = obamacare.filter(profiling='NO').exclude( id__in=Subquery(excluded_obama_ids)).count()
-    totalOtherParty = obamacare.filter(status__in=('OTHER PARTY', 'OTHER AGENT')).exclude( id__in=Subquery(excluded_obama_ids)).count()
+    totalOtherParty = obamacare.filter(status__in=('OTHER PARTY')).exclude( id__in=Subquery(excluded_obama_ids)).count()
     enroledActiveCms = totalEnroled.filter(Q(status='ACTIVE') | Q(status='SELF-ENROLMENT')).exclude( id__in=Subquery(excluded_obama_ids)).count()
     totalEnroledNoActiveCms = totalEnroled.exclude(Q(status='ACTIVE') | Q(status='SELF-ENROLMENT')).exclude( id__in=Subquery(excluded_obama_ids)).count()
     totalActiveCms = obamacare.filter(Q(status='ACTIVE') | Q(status='SELF-ENROLMENT')).exclude( id__in=Subquery(excluded_obama_ids)).count()

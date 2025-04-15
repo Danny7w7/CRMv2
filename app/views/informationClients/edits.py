@@ -361,7 +361,7 @@ def editObama(request ,obamacare_id, way):
                         break
             
             
-            statusRed = ['CANCELED','SALE FALL','PRICING ISSUE','OTHER AGENT','CUSTOMER CANCELED','OTHER PARTY']
+            statusRed = ['CANCELED','SALE FALL','PRICING ISSUE','CUSTOMER CANCELED','OTHER PARTY']
 
             if selected_profiling in statusRed:
                 sw = False
