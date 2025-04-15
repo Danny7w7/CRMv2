@@ -785,17 +785,22 @@ def customerPerformance(request):
     payments = Payments.objects.select_related('agent').filter(created_at__range=(start_date, end_date), **company_filter)
 
     # Obtener agentes Customer, excluyendo a Maria Tinoco y Carmen Rodriguez
-    agents = Users.objects.filter(role='C', is_active=1, **company_filter).exclude(username__in=('MariaCaTi', 'CarmenR'))
+    agents = Users.objects.prefetch_related('usaAgents').filter(role='C', is_active=1, **company_filter).exclude(username__in=('MariaCaTi', 'CarmenR'))
     agent_performance = {}
 
+
     for agent in agents:
+         
+        usaAgentNames = list(agent.usaAgents.values_list('name', flat=True))
+        matchingObamacare = obamacare.filter(agent_usa__in=usaAgentNames)
+
         full_name = f"{agent.first_name} {agent.last_name}".strip()
-        profilingAgent = obamacare.filter(profiling=full_name)
-        enroledActiveCmsPerAgent = profilingAgent.filter(Q(status='ACTIVE') | Q(status='SELF-ENROLMENT')).count()
-        enroledNoActiveCmsPerAgent = profilingAgent.exclude(Q(status='ACTIVE') | Q(status='SELF-ENROLMENT')).count()
+        matchingObamacare = obamacare.filter(agent_usa__in=usaAgentNames)
+        enroledActiveCmsPerAgent = matchingObamacare.filter(Q(status='ACTIVE') | Q(status='SELF-ENROLMENT')).count()
+        enroledNoActiveCmsPerAgent = matchingObamacare.exclude(Q(status='ACTIVE') | Q(status='SELF-ENROLMENT')).count()
         percentageEnroledActiveCms = format_decimal(
-            (enroledActiveCmsPerAgent / profilingAgent.count()) * 100
-        ) if profilingAgent.count() else 0
+            (enroledActiveCmsPerAgent / matchingObamacare.count()) * 100
+        ) if matchingObamacare.count() else 0
 
         # Inicializar la clave si no existe
         if full_name not in agent_performance:
@@ -815,16 +820,16 @@ def customerPerformance(request):
             }
 
         # Asignar valores con validación de división por cero
-        agent_performance[full_name]['totalEnroled'] = profilingAgent.count()
+        agent_performance[full_name]['totalEnroled'] = matchingObamacare.count()
         agent_performance[full_name]['percentageEnroled'] = format_decimal(
-            (profilingAgent.count() / obamacare.count()) * 100
+            (matchingObamacare.count() / obamacare.count()) * 100
         ) if obamacare.count() else 0
         agent_performance[full_name]['enroledActiveCms'] = enroledActiveCmsPerAgent
         agent_performance[full_name]['percentageEnroledActiveCms'] = percentageEnroledActiveCms
         agent_performance[full_name]['enroledNoActiveCms'] = enroledNoActiveCmsPerAgent
         agent_performance[full_name]['percentageEnroledNoActiveCms'] = format_decimal(
-            (enroledNoActiveCmsPerAgent / profilingAgent.count()) * 100
-        ) if profilingAgent.count() else 0
+            (enroledNoActiveCmsPerAgent / matchingObamacare.count()) * 100
+        ) if matchingObamacare.count() else 0
         agent_performance[full_name]['percentageTotalActiveCms'] = format_decimal(
             (enroledActiveCmsPerAgent / obamacare.count()) * 100
         ) if obamacare.count() else 0

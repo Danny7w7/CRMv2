@@ -25,7 +25,7 @@ from .views.reports import fecths as fetchsReports
 from .views.reports import table as tableReports
 from .views.reports import charts, download
 from .views.users import users, companies
-from .views import dbExcel, quality, consents, sms, utils
+from .views import dbExcel, quality, consents, sms, utils, supervisorPanel
 
 
 urlpatterns = [
@@ -169,6 +169,10 @@ urlpatterns = [
     path('salesPerformance/', charts.salesPerformance, name='salesPerformance'),
     path('chart6Week/', charts.chart6Week, name='chart6Week'), 
     path('averageCustomer/', charts.averageCustomer, name='averageCustomer'),
+
+    
+    #<---------------------------Supervisor Panel--------------------------->
+    path('customerAssginments/', supervisorPanel.customerAssginments, name='customerAssginments'),
 
 
     #<---------------------------Users--------------------------->    

@@ -88,11 +88,20 @@ class Numbers(models.Model):
     phone_number = models.BigIntegerField()  
     company = models.ForeignKey(Companies, on_delete=models.CASCADE) 
     created_at = models.DateTimeField(auto_now_add=True) 
-    is_active = models.BooleanField(default=True)  
+    is_active = models.BooleanField(default=True)
 
     class Meta:
-        db_table = 'numbers' 
+        db_table = 'numbers'
 
+class USAgent(models.Model):
+    name = models.CharField(max_length=50)
+    company = models.ManyToManyField(Companies)
+
+    class Meta:
+        db_table = 'us_agents'
+
+    def getFirstName(self):
+        return self.name.strip().split()[0] if self.name.strip() else ""
 
 class Users(AbstractUser):
 
@@ -114,6 +123,7 @@ class Users(AbstractUser):
     )
     assigned_phone = models.ForeignKey(Numbers, on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey(Companies, on_delete=models.CASCADE)
+    usaAgents = models.ManyToManyField(USAgent)
     
     class Meta:
         db_table = 'users'
@@ -128,7 +138,7 @@ class Users(AbstractUser):
             formatted = f"+{phone_str[0]} ({phone_str[1:4]}) {phone_str[4:7]} {phone_str[7:]}"
             return formatted
         return None
-    
+
 class UserPreference(models.Model):
     user = models.OneToOneField(Users, on_delete=models.CASCADE)
     darkMode = models.BooleanField(default=False)
