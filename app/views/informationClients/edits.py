@@ -592,7 +592,9 @@ def editSupp(request, supp_id):
 
     #calculo de edad
     hoy = timezone.now().date()
-    old = hoy.year - supp.client.date_birth.year - ((hoy.month, hoy.day) < (supp.client.date_birth.month, supp.client.date_birth.day)) 
+    old = ''
+    if supp.client.date_birth:
+        old = hoy.year - supp.client.date_birth.year - ((hoy.month, hoy.day) < (supp.client.date_birth.month, supp.client.date_birth.day)) 
 
 
     if request.method == 'POST':
