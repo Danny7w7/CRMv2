@@ -771,10 +771,10 @@ def customerPerformance(request):
         next_month = now.replace(day=28) + timedelta(days=4)  # Garantiza que pasamos al siguiente mes
         end_date = next_month.replace(day=1, hour=23, minute=59, second=59, microsecond=999999) - timedelta(days=1)
 
-    obamacare = ObamaCare.objects.filter(created_at__range=(start_date, end_date), is_active=1, **company_filter).exclude( id__in=Subquery(excluded_obama_ids))
+    obamacare = ObamaCare.objects.filter(created_at__range=(start_date, end_date), is_active=1, **company_filter).exclude( id__in=Subquery(excluded_obama_ids), status='NO CALL')
     totalEnroled = obamacare.exclude(profiling='NO').exclude( id__in=Subquery(excluded_obama_ids))
     totalNoEnroled = obamacare.filter(profiling='NO').exclude( id__in=Subquery(excluded_obama_ids)).count()
-    totalOtherParty = obamacare.filter(status__in=('OTHER PARTY')).exclude( id__in=Subquery(excluded_obama_ids)).count()
+    totalOtherParty = obamacare.filter(status='OTHER PARTY').exclude( id__in=Subquery(excluded_obama_ids)).count()
     enroledActiveCms = totalEnroled.filter(Q(status='ACTIVE') | Q(status='SELF-ENROLMENT')).exclude( id__in=Subquery(excluded_obama_ids)).count()
     totalEnroledNoActiveCms = totalEnroled.exclude(Q(status='ACTIVE') | Q(status='SELF-ENROLMENT')).exclude( id__in=Subquery(excluded_obama_ids)).count()
     totalActiveCms = obamacare.filter(Q(status='ACTIVE') | Q(status='SELF-ENROLMENT')).exclude( id__in=Subquery(excluded_obama_ids)).count()
