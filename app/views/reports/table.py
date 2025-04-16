@@ -450,17 +450,17 @@ def salesBonusAgent(request, company_id, start_date=None, end_date=None):
     excluded_obama_ids = CustomerRedFlag.objects.values('obamacare')
 
     # Consulta para Supp
-    sales_query_supp = Supp.objects.select_related('agent').filter(is_active=True,  **company_filter) \
+    sales_query_supp = Supp.objects.select_related('agent').filter(is_active=True, status_color__in=[1, 2, 3],  **company_filter) \
         .values('agent__id', 'agent__username', 'agent__first_name', 'agent__last_name', 'status_color') \
         .annotate(total_sales=Count('id'))
 
     # Consulta para ObamaCare
-    sales_query_obamacare = ObamaCare.objects.select_related('agent').filter(is_active = True,  **company_filter).exclude( id__in=Subquery(excluded_obama_ids)) \
+    sales_query_obamacare = ObamaCare.objects.select_related('agent').filter(is_active = True, status_color__in=[1, 2, 3] ,  **company_filter).exclude( id__in=Subquery(excluded_obama_ids)) \
         .values('agent__id', 'agent__username', 'agent__first_name', 'agent__last_name', 'status_color') \
         .annotate(total_sales=Count('id'))
     
     # Consulta para Assure
-    sales_query_assure = ClientsAssure.objects.select_related('agent').filter(is_active=True,  **company_filter) \
+    sales_query_assure = ClientsAssure.objects.select_related('agent').filter(is_active=True, status_color__in=[1, 2, 3],  **company_filter) \
         .values('agent__id', 'agent__username', 'agent__first_name', 'agent__last_name', 'status_color') \
         .annotate(total_sales=Count('id'))
 
