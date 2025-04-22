@@ -278,8 +278,11 @@ def editObama(request ,obamacare_id, way):
         formatted_social = "N/A"  # Valor predeterminado si no hay número disponible
 
     #calculo de edad
-    hoy = timezone.now().date()
-    old = hoy.year - obamacare.client.date_birth.year - ((hoy.month, hoy.day) < (obamacare.client.date_birth.month, obamacare.client.date_birth.day))
+    if not obamacare.client.date_birth:
+        old = None
+    else:
+        hoy = timezone.now().date()
+        old = hoy.year - obamacare.client.date_birth.year - ((hoy.month, hoy.day) < (obamacare.client.date_birth.month, obamacare.client.date_birth.day))
    
     obsObama = ObservationAgent.objects.filter(obamaCare=obamacare_id)  
     users = Users.objects.filter(role='C', company = company_id)
