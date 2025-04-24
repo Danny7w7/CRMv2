@@ -236,6 +236,10 @@ def saleSuppAgent(request, company_id, start_date=None, end_date=None):
             .values('agent__username', 'agent__first_name', 'agent__last_name', 'status_color') \
             .annotate(total_sales=Count('id')) \
             .order_by('agent', 'status_color')
+        sales_query_life = ClientsLifeInsurance.objects.select_related('agent').filter(is_active=True) \
+            .values('agent__username', 'agent__first_name', 'agent__last_name', 'status_color') \
+            .annotate(total_sales=Count('id')) \
+            .order_by('agent', 'status_color')
     else:
         # Definir la consulta base para Supp, utilizando `select_related` para obtener el nombre completo del agente (User)
         sales_query = Supp.objects.select_related('agent').filter(is_active=True, company = company_id) \
@@ -243,6 +247,10 @@ def saleSuppAgent(request, company_id, start_date=None, end_date=None):
             .annotate(total_sales=Count('id')) \
             .order_by('agent', 'status_color')
         sales_query_assure = ClientsAssure.objects.select_related('agent').filter(is_active=True, company = company_id) \
+            .values('agent__username', 'agent__first_name', 'agent__last_name', 'status_color') \
+            .annotate(total_sales=Count('id')) \
+            .order_by('agent', 'status_color')
+        sales_query_life = ClientsLifeInsurance.objects.select_related('agent').filter(is_active=True, company = company_id) \
             .values('agent__username', 'agent__first_name', 'agent__last_name', 'status_color') \
             .annotate(total_sales=Count('id')) \
             .order_by('agent', 'status_color')
@@ -260,6 +268,7 @@ def saleSuppAgent(request, company_id, start_date=None, end_date=None):
 
         sales_query = sales_query.filter(created_at__range=[first_day_of_month, last_day_of_month])
         sales_query_assure = sales_query_assure.filter(created_at__range=[first_day_of_month, last_day_of_month])
+        sales_query_life = sales_query_life.filter(created_at__range=[first_day_of_month, last_day_of_month])
 
     # Si se proporcionan fechas, filtrar por el rango de fechas
     elif start_date and end_date:
@@ -272,6 +281,7 @@ def saleSuppAgent(request, company_id, start_date=None, end_date=None):
 
         sales_query = sales_query.filter(created_at__range=[start_date, end_date])
         sales_query_assure = sales_query_assure.filter(created_at__range=[start_date, end_date])
+        sales_query_life = sales_query_life.filter(created_at__range=[start_date, end_date])
 
     # Crear un diccionario para almacenar los resultados por agente y status color
     agents_sales = {}
@@ -307,6 +317,34 @@ def saleSuppAgent(request, company_id, start_date=None, end_date=None):
         agents_sales[agent_full_name]['total_sales'] += total_sales
 
     for entry in sales_query_assure:
+        agent_username = entry['agent__username']
+        first_name = entry['agent__first_name']
+        last_name = entry['agent__last_name']
+        agent_full_name = f"{first_name} {last_name}"
+        status_color = entry['status_color']
+        total_sales = entry['total_sales']
+
+        if agent_full_name not in agents_sales:
+            agents_sales[agent_full_name] = {
+                'status_color_1': 0,
+                'status_color_2': 0,
+                'status_color_3': 0,
+                'status_color_4': 0,
+                'total_sales': 0
+            }
+
+        if status_color == 1:
+            agents_sales[agent_full_name]['status_color_1'] += total_sales
+        elif status_color == 2:
+            agents_sales[agent_full_name]['status_color_2'] += total_sales
+        elif status_color == 3:
+            agents_sales[agent_full_name]['status_color_3'] += total_sales
+        elif status_color == 4:
+            agents_sales[agent_full_name]['status_color_4'] += total_sales
+
+        agents_sales[agent_full_name]['total_sales'] += total_sales
+
+    for entry in sales_query_life:
         agent_username = entry['agent__username']
         first_name = entry['agent__first_name']
         last_name = entry['agent__last_name']
@@ -346,12 +384,18 @@ def saleSuppAgentUsa(request, company_id, start_date=None, end_date=None):
         sales_query_assure = ClientsAssure.objects.values('agent_usa', 'status_color').filter(is_active = True) \
             .annotate(total_sales=Count('id')) \
             .order_by('agent_usa', 'status_color')
+        sales_query_life = ClientsLifeInsurance.objects.values('agent_usa', 'status_color').filter(is_active = True) \
+            .annotate(total_sales=Count('id')) \
+            .order_by('agent_usa', 'status_color')
     else:
         # Definir la consulta base para Supp, utilizando `values` para obtener el nombre del agente (agent_usa)
         sales_query = Supp.objects.values('agent_usa', 'status_color').filter(is_active = True, company = company_id) \
             .annotate(total_sales=Count('id')) \
             .order_by('agent_usa', 'status_color')
         sales_query_assure = ClientsAssure.objects.values('agent_usa', 'status_color').filter(is_active = True, company = company_id) \
+            .annotate(total_sales=Count('id')) \
+            .order_by('agent_usa', 'status_color')
+        sales_query_life = ClientsLifeInsurance.objects.values('agent_usa', 'status_color').filter(is_active = True, company = company_id) \
             .annotate(total_sales=Count('id')) \
             .order_by('agent_usa', 'status_color')
 
@@ -368,6 +412,7 @@ def saleSuppAgentUsa(request, company_id, start_date=None, end_date=None):
 
         sales_query = sales_query.filter(created_at__range=[first_day_of_month, last_day_of_month])
         sales_query_assure = sales_query_assure.filter(created_at__range=[first_day_of_month, last_day_of_month])
+        sales_query_life = sales_query_life.filter(created_at__range=[first_day_of_month, last_day_of_month])
 
     # Si se proporcionan fechas, filtrar por el rango de fechas
     elif start_date and end_date:
@@ -380,6 +425,7 @@ def saleSuppAgentUsa(request, company_id, start_date=None, end_date=None):
 
         sales_query = sales_query.filter(created_at__range=[start_date, end_date])
         sales_query_assure = sales_query_assure.filter(created_at__range=[start_date, end_date])
+        sales_query_life = sales_query_life.filter(created_at__range=[start_date, end_date])
 
     # Crear un diccionario para almacenar los resultados por agente y status color
     agents_sales = {}
@@ -440,6 +486,32 @@ def saleSuppAgentUsa(request, company_id, start_date=None, end_date=None):
 
         agents_sales[short_name]['total_sales'] += total_sales
 
+    for entry in sales_query_life:
+        agent_name = entry['agent_usa']
+        status_color = entry['status_color']
+        total_sales = entry['total_sales']
+
+        short_name = Truncator(agent_name).chars(8)
+
+        if short_name not in agents_sales:
+            agents_sales[short_name] = {
+                'status_color_1': 0,
+                'status_color_2': 0,
+                'status_color_3': 0,
+                'status_color_4': 0,
+                'total_sales': 0
+            }
+
+        if status_color == 1:
+            agents_sales[short_name]['status_color_1'] += total_sales
+        elif status_color == 2:
+            agents_sales[short_name]['status_color_2'] += total_sales
+        elif status_color == 3:
+            agents_sales[short_name]['status_color_3'] += total_sales
+        elif status_color == 4:
+            agents_sales[short_name]['status_color_4'] += total_sales
+
+        agents_sales[short_name]['total_sales'] += total_sales
 
     return agents_sales
 
@@ -464,6 +536,11 @@ def salesBonusAgent(request, company_id, start_date=None, end_date=None):
         .values('agent__id', 'agent__username', 'agent__first_name', 'agent__last_name', 'status_color') \
         .annotate(total_sales=Count('id'))
 
+    # Consulta para Life
+    sales_query_life = ClientsLifeInsurance.objects.select_related('agent').filter(is_active=True, status_color__in=[1, 2, 3],  **company_filter) \
+        .values('agent__id', 'agent__username', 'agent__first_name', 'agent__last_name', 'status_color') \
+        .annotate(total_sales=Count('id'))
+
     # Si no se proporcionan fechas, filtrar por el mes actual
     if not start_date and not end_date:
         today = timezone.now()
@@ -477,6 +554,7 @@ def salesBonusAgent(request, company_id, start_date=None, end_date=None):
         sales_query_supp = sales_query_supp.filter(created_at__range=[first_day_of_month, last_day_of_month])
         sales_query_obamacare = sales_query_obamacare.filter(created_at__range=[first_day_of_month, last_day_of_month])
         sales_query_assure = sales_query_assure.filter(created_at__range=[first_day_of_month, last_day_of_month])
+        sales_query_life = sales_query_life.filter(created_at__range=[first_day_of_month, last_day_of_month])
 
     # Si se proporcionan fechas, filtrar por el rango de fechas
     elif start_date and end_date:
@@ -490,6 +568,7 @@ def salesBonusAgent(request, company_id, start_date=None, end_date=None):
         sales_query_supp = sales_query_supp.filter(created_at__range=[start_date, end_date])
         sales_query_obamacare = sales_query_obamacare.filter(created_at__range=[start_date, end_date])
         sales_query_assure = sales_query_assure.filter(created_at__range=[start_date, end_date])
+        sales_query_life = sales_query_life.filter(created_at__range=[start_date, end_date])
 
     # Diccionario para almacenar las ventas por agente
     sales_data = {}
@@ -560,6 +639,39 @@ def salesBonusAgent(request, company_id, start_date=None, end_date=None):
     
     # Procesar los resultados de Assure
     for entry in sales_query_assure:
+        agent_id = entry['agent__id']
+        username = entry['agent__username']
+        first_name = entry['agent__first_name']
+        last_name = entry['agent__last_name']
+        agent_full_name = f"{first_name} {last_name} ({username})"
+        status_color = entry['status_color']
+        total_sales = entry['total_sales']
+
+        if agent_id not in sales_data:
+            sales_data[agent_id] = {
+                'id': agent_id,
+                'username': username,
+                'full_name': agent_full_name,
+                'status_color_1_2_obama': 0,
+                'status_color_3_obama': 0,
+                'status_color_1_2_supp': 0,
+                'status_color_3_supp': 0,
+                'total_sales': 0
+            }
+
+        # Sumar las ventas de status_color 1 y 2 en Supp
+        if status_color in [1, 2]:
+            sales_data[agent_id]['status_color_1_2_supp'] += total_sales
+        elif status_color == 3:
+            sales_data[agent_id]['status_color_3_supp'] += total_sales
+        
+        # Actualizar total_sales
+        sales_data[agent_id]['total_sales'] += total_sales
+
+        # Procesar los resultados de Assure
+    
+    #Procesar los resultados de Life
+    for entry in sales_query_life:
         agent_id = entry['agent__id']
         username = entry['agent__username']
         first_name = entry['agent__first_name']
