@@ -427,7 +427,7 @@ def ConsentLifeInsurance(request, client_id):
 
     if request.method == 'POST':
 
-        if temporalyURL:
+        if request.user.is_authenticated:
             asks = AskLifeInsurance.objects.all()  
             answersUpdate = AnswerLifeInsurance.objects.filter(client = client_id)  
             
@@ -435,10 +435,9 @@ def ConsentLifeInsurance(request, client_id):
             if answersUpdate:
                 for ask in asks:
                     answer = request.POST.get(str(ask.id)) 
-                    AnswerLifeInsurance.objects.filter(ask = ask.id).update(
+                    AnswerLifeInsurance.objects.filter(client=client, ask=ask).update(
                         answer=answer
                     )    
-                print('actualice')
             else:
                 for ask in asks:
                     answer = request.POST.get(str(ask.id)) 
@@ -455,7 +454,7 @@ def ConsentLifeInsurance(request, client_id):
                     )
                 
 
-            return render(request,'informationClient/clientLifeInsurance.html')
+            return redirect('ConsentLifeInsurance', client_id)
 
         else:
 
