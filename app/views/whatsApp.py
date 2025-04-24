@@ -177,7 +177,7 @@ def sendTemplateWhatsapp(from_number, to_number, user, company, messageContent):
         message = client.messages.create(
             from_=f"whatsapp:+{from_number}",
             to=f"whatsapp:+{to_number}",
-            content_sid="YOUR_TEMPLATE_SID",  # ← Reemplaza esto
+            content_sid="HXaaf97ed41d37a93fa7368ed31b45ef76",  # ← Reemplaza esto
             content_variables=json.dumps({
                 "1": 'PRUEBA'  # Asigna la variable [first_name] (ej: "John")
             })
@@ -208,6 +208,7 @@ def sendWhatsapp(from_number, to_number, user, company, messageContent):
 
     else:
 
+        print('no cogi plantilla')
         # Enviar el mensaje
         message = client.messages.create(
             body=messageContent,
