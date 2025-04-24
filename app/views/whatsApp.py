@@ -168,7 +168,7 @@ def verificationTemplate(chat):
     if not last_message:
         return True  # Nunca te ha escrito -> necesitas usar plantilla
 
-    return last_message.created_at < datetime.now(timezone.utc) - timedelta(hours=24)
+    return last_message.created_at < datetime.datetime.now(timezone.utc) - timedelta(hours=24)
 
 def sendTemplateWhatsapp(from_number, to_number, user, company, messageContent):
     client = Client(settings.ACCOUNT_SID, settings.AUTH_TOKEN)
