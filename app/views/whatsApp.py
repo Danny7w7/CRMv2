@@ -159,20 +159,66 @@ def createOrUpdateChat(contact, company, agent=None):
 
     return chat
 
+def verificationTemplate(chat):
+    last_message = Messages_whatsapp.objects.filter(
+        chat=chat,
+        sender_type='C'  # C de Client
+    ).order_by('-created_at').first()
+
+    if not last_message:
+        return True  # Nunca te ha escrito -> necesitas usar plantilla
+
+    return last_message.created_at < datetime.now(timezone.utc) - timedelta(hours=24)
+
+def sendTemplateWhatsapp(from_number, to_number, user, company, messageContent):
+    client = Client(settings.ACCOUNT_SID, settings.AUTH_TOKEN)
+
+    try:
+        message = client.messages.create(
+            from_=f"whatsapp:+{from_number}",
+            to=f"whatsapp:+{to_number}",
+            content_sid="YOUR_TEMPLATE_SID",  # ← Reemplaza esto
+            content_variables=json.dumps({
+                "1": 'PRUEBA'  # Asigna la variable [first_name] (ej: "John")
+            })
+        )
+        return True
+
+    except Exception as e:
+        print(f"Error al enviar plantilla: {e}")
+        return False
+
 def sendWhatsapp(from_number, to_number, user, company, messageContent):
 
     client = Client(settings.ACCOUNT_SID, settings.AUTH_TOKEN)
 
-    # Enviar el mensaje
-    message = client.messages.create(
-        body=messageContent,
-        from_=f"whatsapp:+{from_number}", #numero de what del client
-        to=f"whatsapp:+{to_number}" #numero de what mio 320788
-    )
+    chat = Chat_whatsapp.objects.filter(contact__phone=to_number, company=company).first()
 
-    contact, created = createOrUpdatecontact(to_number, company)
-    chat = createOrUpdateChat(contact, company)
-    saveMessageInDb('Agent', messageContent, chat, user)
+    if  verificationTemplate(chat):
+        success = sendTemplateWhatsapp(from_number, to_number, user, company, messageContent) 
+
+        if not success:
+            print("❌ No se pudo enviar plantilla")
+            return False
+
+        # Crear o actualizar contacto/chat después de enviar plantilla
+        contact, created = createOrUpdatecontact(to_number, company)
+        chat = createOrUpdateChat(contact, company)
+        saveMessageInDb('Agent', f"[PLANTILLA] {messageContent}", chat, user)
+
+    else:
+
+        # Enviar el mensaje
+        message = client.messages.create(
+            body=messageContent,
+            from_=f"whatsapp:+{from_number}", #numero de what del client
+            to=f"whatsapp:+{to_number}" #numero de what mio 320788
+        )
+
+        contact, created = createOrUpdatecontact(to_number, company)
+        chat = createOrUpdateChat(contact, company)
+        saveMessageInDb('Agent', messageContent, chat, user)
+
     if company.id not in [1,2]: #No descuenta el saldo a Lapeira
         discountRemainingBalance(company, '0.4')
 
