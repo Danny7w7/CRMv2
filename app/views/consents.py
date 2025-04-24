@@ -430,19 +430,23 @@ def ConsentLifeInsurance(request, client_id):
         from django.http import HttpResponse
 
         if request.user.is_authenticated:
+            debug_log = "<h2>DEBUG CONSENTIMIENTO</h2>"
             try:
                 asks = AskLifeInsurance.objects.all()  
                 answersUpdate = AnswerLifeInsurance.objects.filter(client=client_id)  
+                
+                debug_log += f"<p>Preguntas encontradas: {asks.count()}</p>"
+                debug_log += f"<p>Respuestas previas: {answersUpdate.count()}</p>"
 
                 if answersUpdate.exists():
                     for ask in asks:
                         answer = request.POST.get(str(ask.id)) 
-                        AnswerLifeInsurance.objects.filter(client=client, ask=ask).update(
-                            answer=answer
-                        )    
+                        debug_log += f"<p>Actualizando → PREGUNTA: {ask.id} | RESPUESTA: {answer}</p>"
+                        AnswerLifeInsurance.objects.filter(client=client, ask=ask).update(answer=answer)
                 else:
                     for ask in asks:
-                        answer = request.POST.get(str(ask.id)) 
+                        answer = request.POST.get(str(ask.id))
+                        debug_log += f"<p>Creando → PREGUNTA: {ask.id} | RESPUESTA: {answer}</p>"
                         AnswerLifeInsurance.objects.create(
                             client=client,
                             agent=request.user,
@@ -451,10 +455,10 @@ def ConsentLifeInsurance(request, client_id):
                             company=client.company
                         )
 
-                return redirect('ConsentLifeInsurance', client_id)
+                return HttpResponse(debug_log + "<hr><strong>✔️ GUARDADO</strong>")
 
             except Exception as e:
-                return HttpResponse(f"<h3>Error al guardar respuestas:</h3><pre>{str(e)}</pre>")
+                return HttpResponse(debug_log + f"<hr><strong>❌ ERROR:</strong> {str(e)}")
 
         else:
 
