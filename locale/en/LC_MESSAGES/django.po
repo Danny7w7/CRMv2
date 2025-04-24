@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-28 13:57-0500\n"
+"POT-Creation-Date: 2025-04-22 16:46-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,13 +29,13 @@ msgstr "PLEASE VERIFY THAT YOUR INFORMATION IS ACCURATE AND CORRECT"
 
 #: .\app\templates\consent\consent1.html:162
 #: .\app\templates\consent\consent1.html:443
-#: .\app\templates\consent\templatePdfConsent.html:221
+#: .\app\templates\consent\templatePdfConsent.html:233
 msgid "Nombre del Aplicante"
 msgstr "Applicant Name"
 
 #: .\app\templates\consent\consent1.html:177
 #: .\app\templates\consent\consent1.html:447
-#: .\app\templates\consent\templatePdfConsent.html:225
+#: .\app\templates\consent\templatePdfConsent.html:237
 #: .\app\templates\consent\templatePdfConsentMedicare.html:235
 msgid "Teléfono"
 msgstr "Phone"
@@ -72,18 +72,18 @@ msgstr "Additional coverage"
 
 #: .\app\templates\consent\consent1.html:244
 #: .\app\templates\consent\consent1.html:460
-#: .\app\templates\consent\templatePdfConsent.html:237
-#: .\app\templates\consent\templatePdfConsent.html:283
+#: .\app\templates\consent\templatePdfConsent.html:249
+#: .\app\templates\consent\templatePdfConsent.html:292
 msgid "Aplica"
 msgstr "Applies"
 
 #: .\app\templates\consent\consent1.html:247
-#: .\app\templates\consent\templatePdfConsent.html:362
+#: .\app\templates\consent\templatePdfConsent.html:371
 msgid "SI"
 msgstr "YES"
 
 #: .\app\templates\consent\consent1.html:248
-#: .\app\templates\consent\templatePdfConsent.html:362
+#: .\app\templates\consent\templatePdfConsent.html:371
 msgid "NO"
 msgstr "NO"
 
@@ -134,7 +134,7 @@ msgstr "Other"
 
 #: .\app\templates\consent\consent1.html:322
 #: .\app\templates\consent\consent1.html:503
-#: .\app\templates\consent\templatePdfConsent.html:245
+#: .\app\templates\consent\templatePdfConsent.html:257
 msgid "Estatus de Inmigración "
 msgstr "Immigration Status"
 
@@ -162,7 +162,7 @@ msgstr "Upload File or Photo (Front and Back)"
 
 #: .\app\templates\consent\consent1.html:396
 #: .\app\templates\consent\consent1.html:519
-#: .\app\templates\consent\templatePdfConsent.html:301
+#: .\app\templates\consent\templatePdfConsent.html:310
 msgid "Mis Derechos como Paciente"
 msgstr "My Rights as a Patient"
 
@@ -192,13 +192,13 @@ msgstr ""
 
 #: .\app\templates\consent\consent1.html:399
 #: .\app\templates\consent\consent1.html:522
-#: .\app\templates\consent\templatePdfConsent.html:307
+#: .\app\templates\consent\templatePdfConsent.html:316
 msgid "Al firmar esta forma, autorizo a "
 msgstr "By signing this form, I give my permission to "
 
 #: .\app\templates\consent\consent1.html:399
 #: .\app\templates\consent\consent1.html:522
-#: .\app\templates\consent\templatePdfConsent.html:307
+#: .\app\templates\consent\templatePdfConsent.html:316
 msgid ""
 ", y su staff, a trabajar para mi y las personas en mi núcleo familiar, "
 "cuando aplica, en las siguientes funciones de apoyo de seguro y cualquier "
@@ -366,13 +366,13 @@ msgstr ""
 
 #: .\app\templates\consent\consent1.html:410
 #: .\app\templates\consent\consent1.html:532
-#: .\app\templates\consent\templatePdfConsent.html:323
+#: .\app\templates\consent\templatePdfConsent.html:332
 msgid "Reconocimiento de Información Correcta y No Falsificación"
 msgstr "Acknowledgment of Accurate Information and Non-Misrepresentation"
 
 #: .\app\templates\consent\consent1.html:411
 #: .\app\templates\consent\consent1.html:533
-#: .\app\templates\consent\templatePdfConsent.html:324
+#: .\app\templates\consent\templatePdfConsent.html:333
 msgid ""
 "Al firmar este formulario, afirmo y reconozco que he sido completamente "
 "informado y se me ha brindado una explicación clara sobre lo siguiente:"
@@ -382,7 +382,7 @@ msgstr ""
 
 #: .\app\templates\consent\consent1.html:413
 #: .\app\templates\consent\consent1.html:535
-#: .\app\templates\consent\templatePdfConsent.html:326
+#: .\app\templates\consent\templatePdfConsent.html:335
 msgid ""
 "Los beneficios específicos incluidos en el plan de salud, incluyendo "
 "cualquier cobertura de seguro o beneficios asociados."
@@ -392,7 +392,7 @@ msgstr ""
 
 #: .\app\templates\consent\consent1.html:414
 #: .\app\templates\consent\consent1.html:536
-#: .\app\templates\consent\templatePdfConsent.html:327
+#: .\app\templates\consent\templatePdfConsent.html:336
 msgid ""
 "Si el plan de salud en el que me estoy inscribiendo es considerado un plan "
 "de salud mayor o integral, o si es equivalente a dicha cobertura de seguro."
@@ -403,7 +403,7 @@ msgstr ""
 
 #: .\app\templates\consent\consent1.html:415
 #: .\app\templates\consent\consent1.html:537
-#: .\app\templates\consent\templatePdfConsent.html:328
+#: .\app\templates\consent\templatePdfConsent.html:337
 msgid ""
 "Los costos verdaderos y precisos asociados con el plan de salud, incluyendo "
 "primas, deducibles y otras obligaciones financieras."
@@ -427,7 +427,7 @@ msgstr ""
 
 #: .\app\templates\consent\consent1.html:419
 #: .\app\templates\consent\consent1.html:541
-#: .\app\templates\consent\templatePdfConsent.html:337
+#: .\app\templates\consent\templatePdfConsent.html:346
 msgid ""
 ", he revisado y confirmado que la información para mi aplicación en el "
 "mercado de salud es CORRECTA Y VERIDICA y estará disponible como es "
@@ -521,12 +521,14 @@ msgstr "Back to form"
 #: .\app\templates\consent\consent1.html:597
 #: .\app\templates\consent\consetMedicare.html:228
 #: .\app\templates\consent\incomeLetter.html:321
+#: .\app\templates\consent\lifeInsurance.html:529
 msgid "Copiado!"
 msgstr "Copied!"
 
 #: .\app\templates\consent\consent1.html:606
 #: .\app\templates\consent\consetMedicare.html:237
 #: .\app\templates\consent\incomeLetter.html:330
+#: .\app\templates\consent\lifeInsurance.html:538
 msgid "No se pudo copiar el link. Por favor, inténtalo de nuevo."
 msgstr "Could not copy the link. Please try again."
 
@@ -735,6 +737,7 @@ msgstr "During the year:"
 
 #: .\app\templates\consent\incomeLetter.html:177
 #: .\app\templates\consent\templatePdfIncomeLetter.html:144
+#: .\app\templates\consent\templatePdfIncomeLetterFFM.html:148
 msgid "Cómo enviar por correo:"
 msgstr "How to send by mail: "
 
@@ -752,11 +755,13 @@ msgstr ""
 
 #: .\app\templates\consent\incomeLetter.html:180
 #: .\app\templates\consent\templatePdfIncomeLetter.html:148
+#: .\app\templates\consent\templatePdfIncomeLetterFFM.html:152
 msgid "Envíe el formulario a:"
 msgstr "Send the form to:"
 
 #: .\app\templates\consent\incomeLetter.html:182
 #: .\app\templates\consent\templatePdfIncomeLetter.html:150
+#: .\app\templates\consent\templatePdfIncomeLetterFFM.html:154
 msgid "Mercado de Seguros Médicos"
 msgstr "Insurance Agency"
 
@@ -778,6 +783,7 @@ msgstr "Note"
 
 #: .\app\templates\consent\incomeLetter.html:190
 #: .\app\templates\consent\templatePdfIncomeLetter.html:160
+#: .\app\templates\consent\templatePdfIncomeLetterFFM.html:164
 msgid ""
 "El ingreso anual que informe debe coincidir con el ingreso que informó en su "
 "solicitud del Mercado u otra solicitud de seguro médico. Si no es así, "
@@ -797,16 +803,19 @@ msgstr "CuidadoDeSalud.gov/es/income-and-household-information/how-to-report/"
 
 #: .\app\templates\consent\incomeLetter.html:191
 #: .\app\templates\consent\templatePdfIncomeLetter.html:164
+#: .\app\templates\consent\templatePdfIncomeLetterFFM.html:168
 msgid "o"
 msgstr "or"
 
 #: .\app\templates\consent\incomeLetter.html:191
 #: .\app\templates\consent\templatePdfIncomeLetter.html:164
+#: .\app\templates\consent\templatePdfIncomeLetterFFM.html:168
 msgid "CuidadoDeSalud.gov/es/income-calculator"
 msgstr "CuidadoDeSalud.gov/es/income-calculator"
 
 #: .\app\templates\consent\incomeLetter.html:191
 #: .\app\templates\consent\templatePdfIncomeLetter.html:165
+#: .\app\templates\consent\templatePdfIncomeLetterFFM.html:169
 msgid "si necesita ayuda para estimar su ingreso anual esperado."
 msgstr "if you need help estimating your expected annual income."
 
@@ -830,79 +839,76 @@ msgstr ""
 "If your estimated income changes during the year, update your Marketplace "
 "application with this information immediately."
 
-#: .\app\templates\consent\templatePdfConsent.html:211
+#: .\app\templates\consent\templatePdfConsent.html:223
 msgid "INFORMACIÓN DE MIEMBRO APLICANTE"
 msgstr "APPLICANT MEMBER INFORMATION"
 
-#: .\app\templates\consent\templatePdfConsent.html:212
-#: .\app\templates\consent\templatePdfConsent.html:268
+#: .\app\templates\consent\templatePdfConsent.html:224
+#: .\app\templates\consent\templatePdfConsent.html:280
 msgid "PARA ENROLAMIENTO EN EL MERCADO DE SALUD"
 msgstr "PLEASE VERIFY THAT YOUR INFORMATION IS ACCURATE AND CORRECT"
 
-#: .\app\templates\consent\templatePdfConsent.html:233
+#: .\app\templates\consent\templatePdfConsent.html:245
 #: .\app\templates\consent\templatePdfIncomeLetter.html:129
+#: .\app\templates\consent\templatePdfIncomeLetterFFM.html:129
 msgid "Fecha de Nacimiento"
 msgstr "Date of Birth"
 
-#: .\app\templates\consent\templatePdfConsent.html:241
+#: .\app\templates\consent\templatePdfConsent.html:253
 msgid "Dirección"
 msgstr "Address"
 
-#: .\app\templates\consent\templatePdfConsent.html:249
+#: .\app\templates\consent\templatePdfConsent.html:261
 msgid "Social Security"
 msgstr "Social Security"
 
-#: .\app\templates\consent\templatePdfConsent.html:253
+#: .\app\templates\consent\templatePdfConsent.html:265
 msgid "Tipo de Ingreso"
 msgstr "Type of Income"
 
-#: .\app\templates\consent\templatePdfConsent.html:257
+#: .\app\templates\consent\templatePdfConsent.html:269
 msgid "Ingreso Anual Estimado"
 msgstr "Estimated Income"
 
-#: .\app\templates\consent\templatePdfConsent.html:267
+#: .\app\templates\consent\templatePdfConsent.html:279
 msgid "INFORMACIÓN DE LOS DEPENDIENTES"
 msgstr "DEPENDENT INFORMATION"
 
-#: .\app\templates\consent\templatePdfConsent.html:275
-msgid "Dependientes"
-msgstr "Dependents"
-
-#: .\app\templates\consent\templatePdfConsent.html:278
+#: .\app\templates\consent\templatePdfConsent.html:287
 msgid "Nombre"
 msgstr "Name"
 
-#: .\app\templates\consent\templatePdfConsent.html:279
+#: .\app\templates\consent\templatePdfConsent.html:288
 msgid "Sexo"
 msgstr "Sex"
 
-#: .\app\templates\consent\templatePdfConsent.html:280
+#: .\app\templates\consent\templatePdfConsent.html:289
 msgid "Estatus de inmigración"
 msgstr "Immigration Status"
 
-#: .\app\templates\consent\templatePdfConsent.html:281
+#: .\app\templates\consent\templatePdfConsent.html:290
 msgid "Fecha de Cumpleaños"
 msgstr "Birthday Date"
 
-#: .\app\templates\consent\templatePdfConsent.html:282
+#: .\app\templates\consent\templatePdfConsent.html:291
 msgid "Parentesco"
 msgstr "Relationship"
 
-#: .\app\templates\consent\templatePdfConsent.html:304
-#: .\app\templates\consent\templatePdfConsent.html:337
-#: .\app\templates\consent\templatePdfConsent.html:354
+#: .\app\templates\consent\templatePdfConsent.html:313
+#: .\app\templates\consent\templatePdfConsent.html:346
+#: .\app\templates\consent\templatePdfConsent.html:363
 msgid "Yo,"
 msgstr "I, "
 
-#: .\app\templates\consent\templatePdfConsent.html:304
+#: .\app\templates\consent\templatePdfConsent.html:313
 msgid ", autorizo a"
 msgstr " give consent to "
 
-#: .\app\templates\consent\templatePdfConsent.html:304
+#: .\app\templates\consent\templatePdfConsent.html:313
 msgid "de"
 msgstr "the"
 
-#: .\app\templates\consent\templatePdfConsent.html:304
+#: .\app\templates\consent\templatePdfConsent.html:313
 msgid ""
 "para servir como mi agente y broker de seguros de salud, es decir mi Agente "
 "de Registro, para mi y las personas en mi núcleo familiar, cuando aplica, "
@@ -913,12 +919,12 @@ msgstr ""
 "for myself and my entire household if applicable, for purposes of enrollment "
 "in a Qualified Health Plan offered on the Federally Facilitated Marketplace."
 
-#: .\app\templates\consent\templatePdfConsent.html:312
+#: .\app\templates\consent\templatePdfConsent.html:321
 msgid ""
 " Realizar búsquedas de aplicaciones nuevas o actuales en el mercado de salud."
 msgstr "Search for a new or existing Marketplace application."
 
-#: .\app\templates\consent\templatePdfConsent.html:313
+#: .\app\templates\consent\templatePdfConsent.html:322
 msgid ""
 " Completar una aplicación para búsqueda de eligibilidad y enrolamiento en el "
 "Mercado de Salud Federal, o en programas de gobierno tales como Medicaid y "
@@ -928,7 +934,7 @@ msgstr ""
 "theFederal Health Care Marketplace, or in government programs such as "
 "Medicaid andCHIP."
 
-#: .\app\templates\consent\templatePdfConsent.html:314
+#: .\app\templates\consent\templatePdfConsent.html:323
 msgid ""
 " Proveer mantenimiento de mi cuenta en el Mercado de Salud Federal, "
 "asistencia en enrolamiento e información sobre los beneficios."
@@ -937,7 +943,7 @@ msgstr ""
 "plan benefits, new products, the benefits of new products, and payment "
 "transactions as necessary"
 
-#: .\app\templates\consent\templatePdfConsent.html:315
+#: .\app\templates\consent\templatePdfConsent.html:324
 msgid ""
 " Apoyar si es necesario en responder inquietudes del Mercado de Salud "
 "Federal."
@@ -945,15 +951,15 @@ msgstr ""
 "Responding to inquiries from the Marketplace regarding my Marketplace "
 "application. "
 
-#: .\app\templates\consent\templatePdfConsent.html:316
+#: .\app\templates\consent\templatePdfConsent.html:325
 msgid "Consentimiento de comunicación (Cumplimiento de TCPA): Yo,"
 msgstr ""
 
-#: .\app\templates\consent\templatePdfConsent.html:317
+#: .\app\templates\consent\templatePdfConsent.html:326
 msgid "doy mi consentimiento para recibir comunicaciones de"
 msgstr ""
 
-#: .\app\templates\consent\templatePdfConsent.html:318
+#: .\app\templates\consent\templatePdfConsent.html:327
 msgid ""
 " sobre opciones de seguro médico, beneficios, productos de seguros, "
 "actualizaciones de pólizas, primas, solicitudes y asuntos relacionados a "
@@ -964,14 +970,14 @@ msgid ""
 "pregrabados de "
 msgstr ""
 
-#: .\app\templates\consent\templatePdfConsent.html:319
+#: .\app\templates\consent\templatePdfConsent.html:328
 msgid ""
 "al número proporcionado. Al proporcionar mi información de contacto con mi "
 "firma electrónica, cuando hago clic en el botón 'enviar', acepto los "
 "Términos de uso de"
 msgstr ""
 
-#: .\app\templates\consent\templatePdfConsent.html:320
+#: .\app\templates\consent\templatePdfConsent.html:329
 msgid ""
 " Este consentimiento incluye aceptar resolver cualquier reclamo de la Ley de "
 "Protección al Consumidor Telefónico mediante arbitraje. Esto se aplica "
@@ -990,7 +996,7 @@ msgid ""
 "\"><strong>Lapeira Insurance Terminos</strong> </a>"
 msgstr ""
 
-#: .\app\templates\consent\templatePdfConsent.html:330
+#: .\app\templates\consent\templatePdfConsent.html:339
 msgid ""
 "Además, confirmo que no se me ha ofrecido ni prometido ningún tipo de "
 "ofertas gratuitas, recompensas en efectivo, reembolsos u otros incentivos "
@@ -1003,7 +1009,7 @@ msgstr ""
 "the healthcare plan. I acknowledge that no such claims or promises have been "
 "made to me during the enrollment process."
 
-#: .\app\templates\consent\templatePdfConsent.html:334
+#: .\app\templates\consent\templatePdfConsent.html:343
 msgid ""
 " Entiendo que mi Agente de Registro no utilizará o compartirá mi información "
 "de identificación personal (PII) para ningún propósito excepto los aquí "
@@ -1018,7 +1024,7 @@ msgstr ""
 "kept private andsafe when collecting, storing, and using my PII for the "
 "stated purposes above."
 
-#: .\app\templates\consent\templatePdfConsent.html:340
+#: .\app\templates\consent\templatePdfConsent.html:349
 msgid ""
 " Entiendo que la información que yo le suministre a mi Agente de Registro se "
 "va a utilizar ÚNICAMENTE para asistirme en verificar mi elegibilidad y mi "
@@ -1036,16 +1042,16 @@ msgstr ""
 "for a current application using an approvedClassic Direct Enrollment (DE) or "
 "Enhanced Direct Enrollment (EDE)website (Marketplace)."
 
-#: .\app\templates\consent\templatePdfConsent.html:347
+#: .\app\templates\consent\templatePdfConsent.html:356
 msgid "Acepto ser contactado via: "
 msgstr ""
 "I accept to be contacted by my broker, my carrier or the marketplace via:"
 
-#: .\app\templates\consent\templatePdfConsent.html:352
+#: .\app\templates\consent\templatePdfConsent.html:361
 msgid "Información Adicional"
 msgstr "Additional Information"
 
-#: .\app\templates\consent\templatePdfConsent.html:354
+#: .\app\templates\consent\templatePdfConsent.html:363
 msgid ""
 ", confirmo que la información para mi aplicación es correcta y válida según "
 "los requisitos del Mercado de Salud Federal."
@@ -1054,61 +1060,62 @@ msgstr ""
 "according to the following informationthe requirements of the Federal Health "
 "Marketplace."
 
-#: .\app\templates\consent\templatePdfConsent.html:356
+#: .\app\templates\consent\templatePdfConsent.html:365
 msgid "Nombre del Aplicante:"
 msgstr "Applicant Name"
 
-#: .\app\templates\consent\templatePdfConsent.html:357
+#: .\app\templates\consent\templatePdfConsent.html:366
 msgid "Nombre Agente en Registro [AOR]:"
 msgstr "Name of Agent of Record [AOR]: "
 
-#: .\app\templates\consent\templatePdfConsent.html:358
+#: .\app\templates\consent\templatePdfConsent.html:367
 msgid "Nombre Agencia en Registro:"
 msgstr "Name of Agency of Record: "
 
-#: .\app\templates\consent\templatePdfConsent.html:359
+#: .\app\templates\consent\templatePdfConsent.html:368
 msgid "Teléfono Agencia:"
 msgstr "Agency Phone: "
 
-#: .\app\templates\consent\templatePdfConsent.html:362
+#: .\app\templates\consent\templatePdfConsent.html:371
 msgid "Necesita cobertura adicional?:"
 msgstr "Additional coverage"
 
-#: .\app\templates\consent\templatePdfConsent.html:364
+#: .\app\templates\consent\templatePdfConsent.html:373
 msgid "Coberturas adicionales solicitadas:"
 msgstr "Additional coverage"
 
-#: .\app\templates\consent\templatePdfConsent.html:374
+#: .\app\templates\consent\templatePdfConsent.html:383
 #: .\app\templates\consent\templatePdfIncomeLetter.html:170
+#: .\app\templates\consent\templatePdfIncomeLetterFFM.html:174
 msgid "Firma"
 msgstr "Signed"
 
-#: .\app\templates\consent\templatePdfConsent.html:378
+#: .\app\templates\consent\templatePdfConsent.html:387
 #: .\app\templates\consent\templatePdfConsentMedicare.html:206
 msgid "Fecha y Hora de Firma:"
 msgstr "Date and Time of Signature:"
 
-#: .\app\templates\consent\templatePdfConsent.html:382
+#: .\app\templates\consent\templatePdfConsent.html:391
 msgid "Documentos Requeridos"
 msgstr "Required Documents"
 
-#: .\app\templates\consent\templatePdfConsent.html:385
+#: .\app\templates\consent\templatePdfConsent.html:394
 msgid "Documento de Inmigración"
 msgstr "Immigration Status"
 
-#: .\app\templates\consent\templatePdfConsent.html:388
+#: .\app\templates\consent\templatePdfConsent.html:397
 msgid "Foto selfie con ID"
 msgstr ""
 
-#: .\app\templates\consent\templatePdfConsent.html:394
+#: .\app\templates\consent\templatePdfConsent.html:403
 msgid "Validez de la Autorización"
 msgstr "Selfie photo with ID"
 
-#: .\app\templates\consent\templatePdfConsent.html:395
+#: .\app\templates\consent\templatePdfConsent.html:404
 msgid "Autorización válida hasta:"
 msgstr "Authorization valid until:"
 
-#: .\app\templates\consent\templatePdfConsent.html:399
+#: .\app\templates\consent\templatePdfConsent.html:408
 #: .\app\templates\consent\templatePdfConsentMedicare.html:291
 msgid "- SECURE PLUS INSURANCE LLC. Todos los derechos reservados."
 msgstr "Health Insurance Marketplace. All rights reserved."
@@ -1127,26 +1134,33 @@ msgstr "Home Address (To find a plan in your area) "
 
 #: .\app\templates\consent\templatePdfIncomeLetter.html:7
 #: .\app\templates\consent\templatePdfIncomeLetter.html:114
+#: .\app\templates\consent\templatePdfIncomeLetterFFM.html:7
+#: .\app\templates\consent\templatePdfIncomeLetterFFM.html:114
 msgid "Carta Explicativa de los Ingresos Anuales"
 msgstr "Annual Income Statement "
 
 #: .\app\templates\consent\templatePdfIncomeLetter.html:121
+#: .\app\templates\consent\templatePdfIncomeLetterFFM.html:121
 msgid "Fecha de Hoy"
 msgstr "Date today"
 
 #: .\app\templates\consent\templatePdfIncomeLetter.html:125
+#: .\app\templates\consent\templatePdfIncomeLetterFFM.html:125
 msgid "Nombre Completo"
 msgstr "Full Name"
 
 #: .\app\templates\consent\templatePdfIncomeLetter.html:133
+#: .\app\templates\consent\templatePdfIncomeLetterFFM.html:133
 msgid "Ingreso Estimado"
 msgstr "Estimated Income"
 
 #: .\app\templates\consent\templatePdfIncomeLetter.html:137
+#: .\app\templates\consent\templatePdfIncomeLetterFFM.html:137
 msgid "Año"
 msgstr "Year"
 
 #: .\app\templates\consent\templatePdfIncomeLetter.html:146
+#: .\app\templates\consent\templatePdfIncomeLetterFFM.html:150
 msgid ""
 "Incluya la página de código de barras impresa que vino con su carta. Si no "
 "tiene un código barras, incluya su nombre completo impreso y la "
@@ -1158,14 +1172,17 @@ msgstr ""
 "top of your letter."
 
 #: .\app\templates\consent\templatePdfIncomeLetter.html:158
+#: .\app\templates\consent\templatePdfIncomeLetterFFM.html:162
 msgid "Nota"
 msgstr "Note"
 
 #: .\app\templates\consent\templatePdfIncomeLetter.html:163
+#: .\app\templates\consent\templatePdfIncomeLetterFFM.html:167
 msgid "Visite"
 msgstr "Visit:"
 
 #: .\app\templates\consent\templatePdfIncomeLetter.html:163
+#: .\app\templates\consent\templatePdfIncomeLetterFFM.html:167
 msgid "CuidadoDeSalud.gov"
 msgstr "CuidadoDeSalud.gov/es/income-calculator"
 
@@ -1174,6 +1191,7 @@ msgid "Firma:"
 msgstr "Signed"
 
 #: .\app\templates\consent\templatePdfIncomeLetter.html:178
+#: .\app\templates\consent\templatePdfIncomeLetterFFM.html:181
 msgid "Mercado de Seguros Médicos. Todos los derechos reservados."
 msgstr "Health Insurance Marketplace. All rights reserved."
 
@@ -1256,7 +1274,7 @@ msgstr ""
 "Conditions</a></p>\n"
 "            "
 
-#: .\app\views\sms.py:686
+#: .\app\views\sms.py:780
 #, python-brace-format
 msgid "Tu saldo en SMS Blue es de {balance:.2f} USD. No te quedes sin servicio"
 msgstr ""
@@ -2788,3 +2806,6 @@ msgstr ""
 #: .\venv\Lib\site-packages\timezone_field\rest_framework.py:10
 msgid "A valid timezone is required."
 msgstr ""
+
+#~ msgid "Dependientes"
+#~ msgstr "Dependents"

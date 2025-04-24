@@ -21,7 +21,7 @@ from app.forms import *
 from app.models import *
 
 from ..sms import createOrUpdateChat
-
+from ..whatsApp import createOrUpdateChat as whatssap
 from ..decoratorsCompany import *
 from ..consents import generateTemporaryToken, validateTemporaryToken
 
@@ -365,7 +365,6 @@ def formCreatePlan(request ,client_id):
         'type_sale':type_sale,
         'company': company
     })
-
 
 @login_required(login_url='/login') 
 @company_ownership_required_sinURL

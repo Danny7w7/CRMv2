@@ -1,0 +1,458 @@
+# Standard Python libraries
+from datetime import datetime, timedelta
+from decimal import Decimal
+import json
+import requests
+import re
+import logging
+import pandas as pd
+import io
+import stripe
+import os
+
+# Third-party libraries
+from weasyprint import HTML
+from requests.auth import HTTPBasicAuth
+
+# Django utilities
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.core.files.base import ContentFile
+from django.core.signing import BadSignature, Signer
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import redirect, render
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+
+# Django core libraries
+from django.utils import timezone
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.timezone import timedelta
+from django.utils.translation import activate, gettext as _
+
+# Third-party imports
+import twilio
+from twilio.rest import Client
+
+# Application-specific imports
+from app.modelsWhatsapp import *
+from ..forms import *
+from .utils import *
+from ..alertWebsocket import websocketAlertGeneric
+from .decoratorsCompany import *
+from ..contextProcessors import validateSms
+from .sms import disableAllUserCompany , paymend_recording, deactivatecontact, activatecontact, discountRemainingBalance
+
+
+@login_required(login_url='/login')
+def index(request):
+
+    if request.user.is_superuser:
+        chats = Chat_whatsapp.objects.all()
+    elif request.user.is_staff:
+        chats = Chat_whatsapp.objects.select_related('contact').filter(company=request.user.company).order_by('-last_message')
+    else:
+        chats = Chat_whatsapp.objects.select_related('contact').filter(agent_id=request.user.id).order_by('-last_message')
+
+    print(chats)
+
+    chats = get_last_message_for_chats(chats)
+
+    if request.method == 'POST':
+        phoneNumber = request.POST.get('phoneNumber')
+        name = request.POST.get('name', None)
+        contact, created = createOrUpdatecontact(phoneNumber, request.user.company, name)
+        chat = createOrUpdateChat(contact, request.user.company, request.user)
+        if created:
+            if request.POST.get('language') == 'english':
+                message = "Reply YES to receive updates and information about your policy from Lapeira & Associates LLC. Msg & data rates may apply. Up to 5 msgs/month. Reply STOP to opt-out at any time."
+            else: 
+                message = "Favor de responder SI para recibir actualizaciones e información sobre su póliza de Lapeira & Associates LLC. Pueden aplicarse tarifas estándar de mensaje y datos. Hasta 5 mensajes/mes. Responder STOP para cancelar en cualquier momento."
+            sendWhatsapp(
+                request.user.assigned_phone_whatsapp.phone_number,
+                phoneNumber,
+                request.user,
+                request.user.company,
+                message
+            )
+        return redirect('chatWatsapp', chat.id)
+    return render(request, 'whatsapp/indexWhatsapp.html', {'chats': chats})
+
+def get_last_message_for_chats(chats):
+    """
+    Función que enriquece los chats con información del último mensaje
+    y cuenta los mensajes no leídos
+    """
+    for chat in chats:
+        # Obtener el último mensaje del chat
+        last_message = Messages_whatsapp.objects.filter(chat=chat).order_by('-created_at').first()
+        
+        # Contar mensajes no leídos
+        unread_count = Messages_whatsapp.objects.filter(
+            chat=chat,
+            is_read=False,
+            sender_type='Client'  # Solo mensajes del contacte
+        ).count()
+        
+        # Si existe último mensaje, agregar atributos personalizados
+        if last_message:
+            # Truncar el mensaje a 27 caracteres
+            content = last_message.message_content
+            if len(content) > 24:
+                content = content[:24] + "..."
+
+            chat.last_message_content = content
+            chat.last_message_time = last_message.created_at
+            chat.has_attachment = hasattr(last_message, 'files')
+            chat.is_message_unread = not last_message.is_read
+        else:
+            chat.last_message_content = "No hay mensajes"
+            chat.last_message_time = None
+            chat.has_attachment = False
+            chat.is_message_unread = False
+        
+        # Agregar contador de mensajes no leídos
+        chat.unread_messages = unread_count
+    
+    return chats
+
+def createOrUpdatecontact(phoneNumber, company, name=None):
+    # Intenta obtener o crear un contact
+    contact, created = Contacts_whatsapp.objects.get_or_create(
+        phone_number=phoneNumber,
+        company=company,
+        defaults={
+            'name': name,
+            'is_active': False
+            }
+    )
+    if not created and name:
+        # Si el contacte ya existía y se proporcionó un nombre, actualizamos el nombre
+        contact.name = name
+        contact.save()
+        created = False  # El contacte no fue creado, solo actualizado
+    return contact, created
+
+def createOrUpdateChat(contact, company, agent=None):
+    try:
+        # Intenta obtener un chat existente para el contacte en la empresa especificada
+        chat = Chat_whatsapp.objects.get(contact=contact.id, company=company)
+
+        # Si se proporciona un nuevo agente, actualiza el chat
+        if agent:
+            chat.agent = agent
+            chat.save()
+
+    except Chat_whatsapp.DoesNotExist:
+        # Si el chat no existe, crea uno nuevo
+        if not agent:
+            # Define un agente por defecto si no se proporciona (opcional)
+            agent = Users.objects.get(id=1)  # ID de un agente genérico (En este caso sera el ID de Maria Carolina.)
+
+        chat = Chat_whatsapp(
+            agent=agent,
+            contact=contact,
+            company=company  # Asocia el chat con la compañía
+        )
+        chat.save()
+
+    return chat
+
+def sendWhatsapp(from_number, to_number, user, company, messageContent):
+
+    client = Client(settings.ACCOUNT_SID, settings.AUTH_TOKEN)
+
+    # Enviar el mensaje
+    message = client.messages.create(
+        body=messageContent,
+        from_=f"whatsapp:+{from_number}", #numero de what del client
+        to=f"whatsapp:+{to_number}" #numero de what mio 320788
+    )
+
+    contact, created = createOrUpdatecontact(to_number, company)
+    chat = createOrUpdateChat(contact, company)
+    saveMessageInDb('Agent', messageContent, chat, user)
+    if company.id not in [1,2]: #No descuenta el saldo a Lapeira
+        discountRemainingBalance(company, '0.4')
+
+    return True
+
+def saveMessageInDb(inboundOrOutbound, message_content, chat, sender=None):
+    message = Messages_whatsapp(
+        sender_type=inboundOrOutbound,
+        message_content=message_content,
+        chat=chat,
+    )
+    if sender:
+        message.sender = sender
+        message.is_read = True
+    else:
+        message.is_read = False
+
+    message.save()
+    
+    #Upload last message
+    chat.last_message = timezone.localtime(timezone.now())
+    chat.save()
+    return message
+
+@login_required(login_url='/login')
+def chat(request, chatId):
+    validSms = validateSms(request)
+   
+    if not validSms or not validSms.get('whatsAppIsActive'):
+        return render(request, "auth/404.html", {"message": "Perfil desactivado por falta de pago."})
+    if request.method == 'POST':
+        phoneNumber = request.POST.get('phoneNumber')
+        name = request.POST.get('name', None)
+        contact, created = createOrUpdatecontact(phoneNumber, request.user.company, name)
+        chat = createOrUpdateChat(contact, request.user.company, request.user)
+        if created:
+            if request.POST.get('language') == 'english':
+                message = "Reply YES to receive updates and information about your policy from Lapeira & Associates LLC. Msg & data rates may apply. Up to 5 msgs/month. Reply STOP to opt-out at any time."
+            else: 
+                message = "Favor de responder SI para recibir actualizaciones e información sobre su póliza de Lapeira & Associates LLC. Pueden aplicarse tarifas estándar de mensaje y datos. Hasta 5 mensajes/mes. Responder STOP para cancelar en cualquier momento."
+            sendWhatsapp(
+                request.user.assigned_phone_whatsapp.phone_number,
+                phoneNumber,
+                request.user,
+                request.user.company,
+                message
+            )
+        return redirect('chatWatsapp', chat.id)
+            
+    if request.user.is_superuser:
+        chat = Chat_whatsapp.objects.select_related('contact').get(id=chatId)
+    else:
+        chat = Chat_whatsapp.objects.select_related('contact').get(id=chatId, company=request.user.company)
+        
+    # Usamos select_related para optimizar las consultas
+    messages = Messages_whatsapp.objects.filter(chat=chat.id).select_related('files_whatsapp')
+    
+    # Creamos una lista para almacenar los mensajes con sus archivos
+    messages_with_files = []
+    for message in messages:
+        message_dict = {
+            'id': message.id,
+            'sender_type': message.sender_type,
+            'sender': message.sender,
+            'message_content': message.message_content,
+            'created_at': message.created_at,
+            'is_read': message.is_read,
+            'file': None
+        }
+
+        # Intentamos obtener el archivo asociado
+        try:
+            message_dict['file'] = message.files_whatsapp
+        except Files_whatsapp.DoesNotExist:
+            pass
+            
+        messages_with_files.append(message_dict)
+    messages.update(is_read=True)
+
+    if request.user.is_superuser:
+        chats = Chat_whatsapp.objects.all()
+    elif request.user.is_staff:
+        chats = Chat_whatsapp.objects.select_related('contact').filter(company=request.user.company).order_by('-last_message')
+    else:
+        chats = Chat_whatsapp.objects.select_related('contact').filter(agent_id=request.user.id).order_by('-last_message')
+        
+    chats = get_last_message_for_chats(chats)
+    context = {
+        "whatsapp_url": f"/chatWatsapp/{chatId}/",
+        'contact': chat.contact,
+        'chats': chats,
+        'messages': messages_with_files
+    }
+    return render(request, 'whatsapp/chat.html', context)
+
+@csrf_exempt
+def startChat(request, phoneNumber):
+    try:
+        if request.POST.get('language') == 'english':
+            message = "Reply YES to receive updates and information about your policy from Lapeira & Associates LLC. Msg & data rates may apply. Up to 5 msgs/month. Reply STOP to opt-out at any time."
+        else: 
+            message = "Favor de responder SI para recibir actualizaciones e información sobre su póliza de Lapeira & Associates LLC. Pueden aplicarse tarifas estándar de mensaje y datos. Hasta 5 mensajes/mes. Responder STOP para cancelar en cualquier momento."
+
+        sendWhatsapp(
+            request.user.assigned_phone_whatsapp.phone_number,
+            phoneNumber,
+            request.user,
+            request.user.company,
+            message
+        )
+        return JsonResponse({'message': message})
+    
+    except Exception as e:
+        error_response = {"error": "An error occurred while sending the message"}
+
+        print(e)
+
+        return JsonResponse(error_response, status=500)
+
+@csrf_exempt
+def whatsappReply(request, company_id):
+    if request.method == 'POST':
+        from_number = request.POST.get('From', '')
+        messageBody = request.POST.get('Body', '').strip()
+        numMedia = int(request.POST.get('NumMedia', 0))
+
+        print(f"📩 Mensaje recibido de {from_number}: {messageBody}")
+
+        try:
+            company = Companies.objects.get(id=company_id)
+
+            # Extraer solo el número sin 'whatsapp:'
+            phone_number = from_number.replace('whatsapp:', '')
+
+            # Crear o actualizar el contacto y el chat
+            contact, created = createOrUpdatecontact(int(phone_number), company)
+            chat = createOrUpdateChat(contact, company)
+
+            # Si hay medios (imágenes, por ejemplo)
+            if numMedia > 0:  
+                media_url = request.POST.get('MediaUrl0', '')
+                media_type = request.POST.get('MediaContentType0', '')
+
+                if media_url:
+                    response = requests.get(media_url, auth=HTTPBasicAuth(settings.ACCOUNT_SID, settings.AUTH_TOKEN))
+
+                    if response.status_code == 200:
+                        file_name = os.path.basename(media_url)
+                        file_content = ContentFile(response.content, name=file_name)
+
+                        # ✅ Primero guarda el mensaje sin texto
+                        message = saveMessageInDb('Client', '', chat)
+
+                        # ✅ Luego guarda el archivo asociado al mensaje
+                        media_file = Files_whatsapp(
+                            file=file_content,
+                            message=message
+                        )
+                        media_file.save()
+
+                        print(f"✅ Imagen guardada en S3 con ID: {media_file.id}")
+
+                        # Enviar el mensaje al WebSocket como imagen
+                        enviar_por_websocket(
+                            tipo_mensaje='imagen',
+                            datos={ 'texto': media_file.file.url  },
+                            contacto=contact,
+                            empresa_id=company.id,
+                            url_media = media_file.file.url,
+                            sender="client" 
+                        )
+                        print(f"✅ Imagen guardada en S3 con URL: {media_file.file.url}")
+
+                    else:
+                        print(f"❌ Error descargando la imagen, código de respuesta: {response.status_code}")
+
+            else:
+                # Si es un mensaje de texto, guardamos el mensaje
+                message = saveMessageInDb('Client', messageBody, chat)
+
+                # Activar o desactivar el contacto según el mensaje
+                if not contact.is_active:
+                    activatecontact(contact, messageBody)
+                else:
+                    deactivatecontact(contact, messageBody)
+
+                # Enviar el mensaje al WebSocket como texto
+                enviar_por_websocket(
+                    tipo_mensaje='texto',
+                    datos={
+                        'texto': messageBody,
+                        'url_media': None
+                    },
+                    contacto=contact,
+                    empresa_id=company.id,
+                    sender="client" 
+                )
+
+                      
+
+            # Aplica descuento si corresponde
+            if company.id not in [1, 2]:
+                discountRemainingBalance(company, '0.03')  # Puedes ajustar según tarifa
+
+            return HttpResponse("ERES EL MEJOR", status=200)
+
+        except Exception as e:
+            print(f"❌ Error procesando mensaje: {e}")
+            return HttpResponse("❌ Error interno del servidor", status=500)
+
+    elif request.method == 'GET':
+        return HttpResponse("Webhook configurado correctamente", status=200)
+
+    return HttpResponse("Método no soportado", status=405)
+
+def enviar_por_websocket(tipo_mensaje, datos, contacto, empresa_id, url_media=None, sender='Agent'):
+    capa_canal = get_channel_layer()
+    nombre_sala = f"whatsapp_{contacto.phone_number}_empresa_{empresa_id}"
+
+    print(f"🌐 Enviando mensaje al WebSocket en el grupo {nombre_sala}")
+    print(url_media,'********tipo de mensajesssssssssa de la foto')
+
+    if tipo_mensaje == 'imagen':
+        async_to_sync(capa_canal.group_send)(
+            nombre_sala,
+            {
+                'type': 'mensaje_media',
+                'url_media': url_media,
+                'usuario': f"{contacto.name}",
+                'fecha': timezone.localtime().strftime('%Y-%m-%d %H:%M:%S'),
+                'sender': sender  # Ahora por defecto será "agent"
+            }
+        )
+    else:
+        async_to_sync(capa_canal.group_send)(
+            nombre_sala,
+            {
+                'type': 'mensaje_texto',
+                'mensaje': datos.get('texto'),
+                'usuario': f"{contacto.name}",
+                'fecha': timezone.localtime().strftime('%Y-%m-%d %H:%M:%S'),
+                'sender': sender  # Ahora por defecto será "agent"
+            }
+        )
+
+    print(f"✅ Mensaje enviado al WebSocket: {datos.get('texto')}")
+
+@csrf_exempt
+def sendWhatsappConversation(request):
+    if comprobate_company(request.user.company):
+        return JsonResponse({'message':'No money'})
+    
+    client = Client(settings.ACCOUNT_SID, settings.AUTH_TOKEN)
+
+    # Enviar el mensaje
+    message = client.messages.create(
+        body=request.POST['messageContent'],
+        from_=f"whatsapp:+{request.user.assigned_phone_whatsapp.phone_number}", #numero de what del client
+        to=f"whatsapp:+{request.POST['phoneNumber']}" #numero de what mio 320788
+    )
+    contact, created = createOrUpdatecontact(request.POST['phoneNumber'], request.user.company)
+    if request.user.role == 'Customer':
+        chat = createOrUpdateChat(contact, request.user.company)
+    else:
+        chat = createOrUpdateChat(contact, request.user.company, request.user)
+    saveMessageInDb('Agent', request.POST['messageContent'], chat, request.user)
+    
+    return JsonResponse({'message':'ok'})
+
+def comprobate_company(company):
+    if company.id in [1,2]: #No descuenta el saldo a Lapeira
+        return False
+    if company.remaining_balance <= 0:
+        disableAllUserCompany(company)
+        return True
+    else:
+        discountRemainingBalance(company, '0.035')
+        paymend_recording(company)
+        return False
+    
+
+
+

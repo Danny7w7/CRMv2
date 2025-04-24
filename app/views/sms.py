@@ -565,7 +565,7 @@ def stripe_webhook(request):
         send_email(
             subject=f"✅ Confirmación de Pago en SMS Blue - {company.company_name}",
             receiver_email=company.company_email,
-            template_name="email_templates/payment_confirmation",
+            template_name="emailTemplates/payment_confirmation",
             context_data={
                 "Owner_name": company.owner,
                 "company": company.company_name,
@@ -754,11 +754,12 @@ def discountRemainingBalance(companyObject, discount):
     companyObject.save()
 
 def disableAllUserCompany(companyObject):
-    usersCompany = Users.objects.filter(role=companyObject.user_role)
+    usersCompany = Users.objects.filter(company=companyObject)
+    print(companyObject.company_email)
     send_email(
-        subject=f"Tu cuenta SMS Blue ha sido desactivada por saldo insuficiente",
+        subject=f"Tu cuenta ha sido desactivada por saldo insuficiente",
         receiver_email=companyObject.company_email,
-        template_name="email_templates/service_cancelled",
+        template_name="emailTemplates/service_cancelled",        
         context_data={
             "Owner_name": companyObject.owner,
             "company": companyObject.company_name,
@@ -778,7 +779,7 @@ def paymend_recording(company):
         send_email(
             subject=_("Tu saldo en SMS Blue es de {balance:.2f} USD. No te quedes sin servicio").format(balance=company.remaining_balance),
             receiver_email=company.company_email,
-            template_name="email_templates/payment_reminder",
+            template_name="emailTemplates/payment_reminder",
             context_data={
                 "Owner_name": company.owner,
                 "company": company.company_name,

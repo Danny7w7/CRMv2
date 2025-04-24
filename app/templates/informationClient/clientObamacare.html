@@ -51,7 +51,10 @@
                     <tr>
                         <td>{{ obamacare.truncated_agent_usa }}</td>
                         <td>{{obamacare.agent.first_name}} {{obamacare.agent.last_name}}</td>
-                        <td>{{obamacare.client.first_name}} {{obamacare.client.last_name}}</td>
+                        <td>{{obamacare.client.first_name}} {{obamacare.client.last_name}}
+							<br>
+							<div class="spinner-grow spinner-grow-sm text-success" > </div>
+						</td>
                         <td>{{obamacare.client.phone_number|formatUsaPhone}}</td>
 						<td>{{obamacare.created_at|date:"m-d-Y"}}</td>
 						<td>{% if obamacare.status_color == 1 or obamacare.status_color == None  %}

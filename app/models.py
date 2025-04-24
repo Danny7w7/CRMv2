@@ -102,6 +102,16 @@ class USAgent(models.Model):
 
     def getFirstName(self):
         return self.name.strip().split()[0] if self.name.strip() else ""
+    
+class Numbers_whatsapp(models.Model):
+    phone_number = models.BigIntegerField()  
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE) 
+    created_at = models.DateTimeField(auto_now_add=True) 
+    is_active = models.BooleanField(default=True)  
+
+    class Meta:
+        db_table = 'numbers_whatsapp' 
+
 
 class Users(AbstractUser):
 
@@ -122,6 +132,7 @@ class Users(AbstractUser):
         unique=False
     )
     assigned_phone = models.ForeignKey(Numbers, on_delete=models.SET_NULL, null=True, blank=True)
+    assigned_phone_whatsapp = models.ForeignKey(Numbers_whatsapp, on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey(Companies, on_delete=models.CASCADE)
     usaAgents = models.ManyToManyField(USAgent)
     
@@ -138,7 +149,14 @@ class Users(AbstractUser):
             formatted = f"+{phone_str[0]} ({phone_str[1:4]}) {phone_str[4:7]} {phone_str[7:]}"
             return formatted
         return None
-
+    
+    def formatted_phone_number_whatsapp(self):
+        if self.assigned_phone_whatsapp and self.assigned_phone_whatsapp.phone_number:
+            phone_str = str(self.assigned_phone_whatsapp.phone_number)
+            formatted = f"+{phone_str[0]} ({phone_str[1:4]}) {phone_str[4:7]} {phone_str[7:]}"
+            return formatted
+        return None
+    
 class UserPreference(models.Model):
     user = models.OneToOneField(Users, on_delete=models.CASCADE)
     darkMode = models.BooleanField(default=False)
@@ -691,3 +709,4 @@ class AgentTicketAssignment(models.Model):
         db_table = 'agent_ticket_assignment'
 
 from .modelsSMS import *
+from .modelsWhatsapp import *

@@ -25,7 +25,7 @@ from .views.reports import fecths as fetchsReports
 from .views.reports import table as tableReports
 from .views.reports import charts, download
 from .views.users import users, companies
-from .views import dbExcel, quality, consents, sms, utils, supervisorPanel
+from .views import dbExcel, quality, consents, sms, utils, supervisorPanel, whatsApp
 
 
 urlpatterns = [
@@ -224,4 +224,12 @@ urlpatterns = [
     
     #<---------------------------Utils---------------------------> 
     path('toggleDarkMode/', utils.toggleDarkMode, name='toggleDarkMode'),
+
+    #<---------------------------WHATSAPP--------------------------->
+    path('sendWhatsapp/', whatsApp.sendWhatsapp, name='sendWhatsapp'),
+    path('whatsappReply/<company_id>/', whatsApp.whatsappReply, name='whatsappReply'),
+    path('whatsappBlue/', whatsApp.index, name='whatsappBlue'),
+    path('chatWatsapp/<chatId>/', whatsApp.chat, name='chatWatsapp'),
+    path('startChatWhasapp/<phoneNumber>/', whatsApp.startChat, name='startChatWhasapp'),
+    path('sendWhatsappConversation/', whatsApp.sendWhatsappConversation, name='sendWhatsappConversation'),
 ]

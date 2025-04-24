@@ -1,0 +1,62 @@
+#buttonSendSecretKey,#buttonSendSecretKey{
+    cursor: pointer;
+}
+
+.chat-content-center {
+    display: flex;
+    flex-direction: column; /* Mantiene el contenido apilado */
+    justify-content: center; /* Centra verticalmente */
+    align-items: center; /* Centra horizontalmente */
+}
+
+/* Personalización del botón */
+.custom-dropdown {
+    font-size: 18px;
+    padding: 10px 20px;
+    border-radius: 12px;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Efecto hover */
+.custom-dropdown:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Animación para desplegar el menú */
+.animate-dropdown {
+    animation: fadeIn 0.3s ease-in-out;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Espaciado y estilos de los elementos */
+.dropdown-item {
+    font-size: 16px;
+    padding: 10px 20px;
+    transition: all 0.2s ease-in-out;
+}
+
+.dropdown-item:hover {
+    background-color: #007bff;
+    color: white;
+    transform: scale(1.05);
+}
+
+.chat-right-msg {
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%; /* Asegura que no se extienda fuera del contenedor */
+}

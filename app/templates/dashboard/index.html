@@ -127,7 +127,7 @@
 							</li>
 						</ul>
 					</li>
-					{% if smsIsActive %}
+					{% if smsIsActive or whatsAppIsActive %}
 					<li class="menu-label">Applications</li>
 					<li {% if request.path == chat_url %}class='mm-active'{% endif %}>
 						<a class="has-arrow" href="javascript:;">
@@ -135,9 +135,12 @@
 							<div class="menu-title">Communications</div>
 						</a>
 						<ul>
-							<li {% if request.path == chat_url %}class='mm-active'{% endif %}> 
-								<a aria-expanded="true" href="{% url 'smsBlue' %}"><i class='bx bx-radio-circle'></i>SMS Blue</a>
-							</li>
+							{% if smsIsActive  %}
+								<li {% if request.path == chat_url %}class='mm-active'{% endif %}> 
+									<a aria-expanded="true" href="{% url 'smsBlue' %}"><i class='bx bx-radio-circle'></i>SMS Blue</a>
+								</li>
+							{% endif %}	
+												
 						</ul>
 					</li>
 					{% endif %}

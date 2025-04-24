@@ -2,6 +2,7 @@ import json
 import re
 from channels.generic.websocket import AsyncWebsocketConsumer
 import logging
+from django.utils import timezone
 
 logger = logging.getLogger('django')
 
@@ -158,4 +159,62 @@ class GenericAlertConsumer(AsyncWebsocketConsumer):
             'buttonMessage': buttonMessage,
             'absoluteUrl': absoluteUrl,
             'agent': agent # Enviar extra_info al frontend
+        }))
+
+class WhatsAppConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.numero_chat = self.scope['url_route']['kwargs']['chat_id']
+        self.id_empresa = self.scope['url_route']['kwargs']['company_id']
+        self.nombre_sala = f"whatsapp_{self.numero_chat}_empresa_{self.id_empresa}"
+
+        logger.info("✅ WebSocket conectado al canal DE WHATSAPP (por logging)")
+
+        print(f"✅ WebSocket conectado al canal DE WHATSAPP: {self.nombre_sala}")
+
+
+        await self.channel_layer.group_add(self.nombre_sala, self.channel_name)
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(self.nombre_sala, self.channel_name)
+        print(f"❌ WebSocket desconectado del canal: {self.nombre_sala}")
+
+    async def receive(self, text_data):
+        datos = json.loads(text_data)
+        contenido = datos.get('mensaje')
+
+        await self.channel_layer.group_send(
+            self.nombre_sala,
+            {
+                'type': 'mensaje_texto',
+                'mensaje': contenido,
+                'usuario': self.scope['user'].username,
+                'fecha': timezone.localtime().strftime('%Y-%m-%d %H:%M:%S'),
+                'sender': 'agent',  # Añadimos este campo para indicar que es un mensaje del agente
+            }
+        )
+
+    async def mensaje_texto(self, event):
+
+        # Obtenemos el valor de 'sender', si no existe, asignamos 'client' por defecto
+        sender = event.get('sender', 'agent')
+
+        await self.send(text_data=json.dumps({
+            'tipo': 'texto',
+            'mensaje': event['mensaje'],
+            'usuario': event['usuario'],
+            'fecha': event['fecha'],
+            'sender': sender,  # Incluimos el campo sender en la respuesta JSON
+        }))
+
+    async def mensaje_media(self, event):
+
+        # Obtenemos el valor de 'sender', si no existe, asignamos 'client' por defecto
+        sender = event.get('sender', 'agent')
+        await self.send(text_data=json.dumps({
+            'tipo': 'media',
+            'url': event['url_media'],
+            'usuario': event['usuario'],
+            'fecha': event['fecha'],
+            'sender': sender,  # Incluimos el campo sender en la respuesta JSON
         }))

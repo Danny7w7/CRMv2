@@ -85,16 +85,20 @@ def send_email(subject: str, receiver_email: str, template_name: str, context_da
             server.login(settings.SENDER_EMAIL_ADDRESS, settings.EMAIL_PASSWORD)
             server.send_message(message)
             logger.info(f"Email enviado exitosamente a {receiver_email}")
+            print(f"Email enviado exitosamente a {receiver_email}")
             return True
             
     except smtplib.SMTPAuthenticationError:
         logger.error("Error de autenticación SMTP")
+        print("Error de autenticación SMTP")
         return False
     except smtplib.SMTPException as e:
         logger.error(f"Error SMTP: {str(e)}")
+        print(f"Error SMTP: {str(e)}")
         return False
     except Exception as e:
         logger.error(f"Error inesperado: {str(e)}")
+        print(f"Error inesperado: {str(e)}")
         return False
     
 @csrf_exempt
