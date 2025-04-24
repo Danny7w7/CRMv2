@@ -324,7 +324,7 @@ function StartChat(lenguaje) {
 
         Swal.fire({
             title: "Error",
-            text: error,
+            text: errorMessage,
             icon: "error"
         });
     });
