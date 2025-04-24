@@ -21,7 +21,7 @@ from app.forms import *
 from app.models import *
 
 from ..sms import createOrUpdateChat
-from ..whatsApp import createOrUpdateChat as whatssap
+
 from ..decoratorsCompany import *
 from ..consents import generateTemporaryToken, validateTemporaryToken
 
