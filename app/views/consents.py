@@ -427,34 +427,34 @@ def ConsentLifeInsurance(request, client_id):
 
     if request.method == 'POST':
 
-        if request.user.is_authenticated:
-            asks = AskLifeInsurance.objects.all()  
-            answersUpdate = AnswerLifeInsurance.objects.filter(client = client_id)  
-            
-            
-            if answersUpdate:
-                for ask in asks:
-                    answer = request.POST.get(str(ask.id)) 
-                    AnswerLifeInsurance.objects.filter(client=client, ask=ask).update(
-                        answer=answer
-                    )    
-            else:
-                for ask in asks:
-                    answer = request.POST.get(str(ask.id)) 
-                    print(ask,'********ask')
-                    print(ask.id,'********id')
-                
-                    print(answer,'********answer')
-                    AnswerLifeInsurance.objects.create(
-                        client=client,
-                        agent=request.user,
-                        ask=ask,
-                        answer=answer,
-                        company=client.company
-                    )
-                
+        from django.http import HttpResponse
 
-            return redirect('ConsentLifeInsurance', client_id)
+        if request.user.is_authenticated:
+            try:
+                asks = AskLifeInsurance.objects.all()  
+                answersUpdate = AnswerLifeInsurance.objects.filter(client=client_id)  
+
+                if answersUpdate.exists():
+                    for ask in asks:
+                        answer = request.POST.get(str(ask.id)) 
+                        AnswerLifeInsurance.objects.filter(client=client, ask=ask).update(
+                            answer=answer
+                        )    
+                else:
+                    for ask in asks:
+                        answer = request.POST.get(str(ask.id)) 
+                        AnswerLifeInsurance.objects.create(
+                            client=client,
+                            agent=request.user,
+                            ask=ask,
+                            answer=answer,
+                            company=client.company
+                        )
+
+                return redirect('ConsentLifeInsurance', client_id)
+
+            except Exception as e:
+                return HttpResponse(f"<h3>Error al guardar respuestas:</h3><pre>{str(e)}</pre>")
 
         else:
 
