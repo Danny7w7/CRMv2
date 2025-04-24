@@ -427,38 +427,34 @@ def ConsentLifeInsurance(request, client_id):
 
     if request.method == 'POST':
 
-        from django.http import HttpResponse
-
         if request.user.is_authenticated:
-            debug_log = "<h2>DEBUG CONSENTIMIENTO</h2>"
-            try:
-                asks = AskLifeInsurance.objects.all()  
-                answersUpdate = AnswerLifeInsurance.objects.filter(client=client_id)  
+            asks = AskLifeInsurance.objects.all()  
+            answersUpdate = AnswerLifeInsurance.objects.filter(client = client_id)  
+            
+            
+            if answersUpdate:
+                for ask in asks:
+                    answer = request.POST.get(str(ask.id)) 
+                    AnswerLifeInsurance.objects.filter(ask = ask.id).update(
+                        answer=answer
+                    )    
+            else:
+                for ask in asks:
+                    answer = request.POST.get(str(ask.id)) 
+                    print(ask,'********ask')
+                    print(ask.id,'********id')
                 
-                debug_log += f"<p>Preguntas encontradas: {asks.count()}</p>"
-                debug_log += f"<p>Respuestas previas: {answersUpdate.count()}</p>"
+                    print(answer,'********answer')
+                    AnswerLifeInsurance.objects.create(
+                        client=client,
+                        agent=request.user,
+                        ask=ask,
+                        answer=answer,
+                        company=client.company
+                    )
+                
 
-                if answersUpdate.exists():
-                    for ask in asks:
-                        answer = request.POST.get(str(ask.id)) 
-                        debug_log += f"<p>Actualizando → PREGUNTA: {ask.id} | RESPUESTA: {answer}</p>"
-                        AnswerLifeInsurance.objects.filter(client=client, ask=ask).update(answer=answer)
-                else:
-                    for ask in asks:
-                        answer = request.POST.get(str(ask.id))
-                        debug_log += f"<p>Creando → PREGUNTA: {ask.id} | RESPUESTA: {answer}</p>"
-                        AnswerLifeInsurance.objects.create(
-                            client=client,
-                            agent=request.user,
-                            ask=ask,
-                            answer=answer,
-                            company=client.company
-                        )
-
-                return HttpResponse(debug_log + "<hr><strong>✔️ GUARDADO</strong>")
-
-            except Exception as e:
-                return HttpResponse(debug_log + f"<hr><strong>❌ ERROR:</strong> {str(e)}")
+            return redirect('ConsentLifeInsurance', client_id)
 
         else:
 
