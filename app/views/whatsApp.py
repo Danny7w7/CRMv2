@@ -170,7 +170,7 @@ def verificationTemplate(chat):
 
     return last_message.created_at < datetime.datetime.now(timezone.utc) - timedelta(hours=24)
 
-def sendTemplateWhatsapp(from_number, to_number, user, company, messageContent):
+def sendTemplateWhatsapp(from_number, to_number):
     client = Client(settings.ACCOUNT_SID, settings.AUTH_TOKEN)
 
     try:
@@ -195,7 +195,7 @@ def sendWhatsapp(from_number, to_number, user, company, messageContent):
     chat = Chat_whatsapp.objects.filter(contact__phone_number=to_number, company=company).first()
 
     if  verificationTemplate(chat):
-        success = sendTemplateWhatsapp(from_number, to_number, user, company, messageContent) 
+        success = sendTemplateWhatsapp(from_number, to_number) 
 
         if not success:
             print("❌ No se pudo enviar plantilla")
@@ -204,7 +204,7 @@ def sendWhatsapp(from_number, to_number, user, company, messageContent):
         # Crear o actualizar contacto/chat después de enviar plantilla
         contact, created = createOrUpdatecontact(to_number, company)
         chat = createOrUpdateChat(contact, company)
-        saveMessageInDb('Agent', f"[PLANTILLA] {messageContent}", chat, user)
+        saveMessageInDb('Agent', f"[PLANTILLA]", chat, user)
 
     else:
 
