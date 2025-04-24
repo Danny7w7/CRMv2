@@ -192,7 +192,7 @@ def sendWhatsapp(from_number, to_number, user, company, messageContent):
 
     client = Client(settings.ACCOUNT_SID, settings.AUTH_TOKEN)
 
-    chat = Chat_whatsapp.objects.filter(contact__phone=to_number, company=company).first()
+    chat = Chat_whatsapp.objects.filter(contact__phone_number=to_number, company=company).first()
 
     if  verificationTemplate(chat):
         success = sendTemplateWhatsapp(from_number, to_number, user, company, messageContent) 
