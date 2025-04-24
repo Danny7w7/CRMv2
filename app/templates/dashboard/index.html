@@ -90,6 +90,8 @@
 							</li>
 							<li> <a href="{% url 'formCreateAssure'  %}"><i class='bx bx-radio-circle'></i>New Assure</a>
 							</li>
+							<li> <a href="{% url 'formCreateClientLife'  %}"><i class='bx bx-radio-circle'></i>New Life Insurance</a>
+							</li>
 							<li> <a href="{% url 'formCreateClientMedicare' %}"><i class='bx bx-radio-circle'></i>New Client Medicare</a>
 							</li>
 							<li> <a href="{% url 'select_client'  %}"><i class='bx bx-radio-circle'></i>Existing Client</a>
@@ -115,6 +117,8 @@
 							</li>
 							<li> <a href="{% url 'clientAssure' %}"><i class='bx bx-radio-circle'></i>Clients Assure</a>
 							</li>
+							<li> <a href="{% url 'clientLifeInsurance' %}"><i class='bx bx-radio-circle'></i>Clients Life Insurance</a>
+							</li>
 							<li> <a href="{% url 'clientMedicare' %}"><i class='bx bx-radio-circle'></i>Clients Medicare</a>
 							</li>
 							<li> <a href="{% url 'alert' %}"><i class='bx bx-radio-circle'></i>Alert</a>
@@ -137,6 +141,7 @@
 						</ul>
 					</li>
 					{% endif %}
+					
 					{% if request.user.role == 'Admin' or request.user.role == 'S'  %}
 					<li class="menu-label">Reports</li>
 					<li>

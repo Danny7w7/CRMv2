@@ -908,6 +908,160 @@ def editAssure(request, assure_id):
     
     return render(request, 'edit/editAssure.html', context)
 
+@login_required(login_url='/login')
+@company_ownership_required(model_name="ClientsLifeInsurance", id_field="client_id")
+def editLife(request, client_id):
+
+    company_id = request.user.company.id
+
+    client = ClientsLifeInsurance.objects.select_related('agent').filter(id=client_id).first()
+    obsCus = ObservationCustomer.objects.select_related('agent').filter(life_insurance=client_id)
+    obsLife = ObservationAgent.objects.filter(life_insurance=client_id)
+    paymentDateLife = paymentDate.objects.filter(life_insurance = client_id).first()
+    list_drow = DropDownList.objects.filter(profiling_supp__isnull=False)
+    consent = Consents.objects.filter(lifeInsurance = client_id )
+
+    action = request.POST.get('action')
+
+    #calculo de edad
+    hoy = timezone.now().date()
+    old = ''
+    if client.date_birth:
+        old = hoy.year - client.date_birth.year - ((hoy.month, hoy.day) < (client.date_birth.month, client.date_birth.day)) 
+
+
+    social_number = client.social_security  # Campo real del modelo
+    # Asegurarse de que social_number no sea None antes de formatear
+    if social_number:
+        formatted_social = f"xxx-xx-{social_number[-4:]}"  # Obtener el formato deseado
+    else:
+        formatted_social = "N/A"  # Valor predeterminado si no hay número disponible
+
+    if request.method == 'POST':
+
+        if action == 'saveLife':
+
+            #formateo de fecha para guardalar como se debe en BD ya que la obtengo USA
+            date_effective_coverage = request.POST.get('date_effective_coverage')  # Formato MM/DD/YYYY
+            date_effective_coverage_end = request.POST.get('date_effective_coverage_end')  # Formato MM/DD/YYYY
+            date_birth = request.POST.get('date_birth')  # Formato MM/DD/YYYY
+
+            # Si la fecha no viene vacia la convertimos y si viene vacia la colocamos null
+            if date_effective_coverage not in [None, '']:
+                date_effective_coverage_new = datetime.datetime.strptime(date_effective_coverage, '%m/%d/%Y').date()
+            else:
+                date_effective_coverage_new = None
+
+            if date_effective_coverage_end not in [None, '']:
+                date_effective_coverage_end_new = datetime.datetime.strptime(date_effective_coverage_end, '%m/%d/%Y').date()
+            else:
+                date_effective_coverage_end_new = None  
+
+            if date_birth not in [None, '']:
+                date_birth_new = datetime.datetime.strptime(date_birth, '%m/%d/%Y').date()
+            else:
+                date_birth_new = None 
+                
+            # Campos de Supp
+            life_fields = [
+                'agent_usa', 'full_name','phone_number','address','zipcode','city','state','county',
+                'sex','status','policyNumber','payment_type'
+            ]
+            
+            # Limpiar los campos de ObamaCare convirtiendo los vacíos en None
+            cleaned_life_data = clean_fields_to_null(request, life_fields)
+
+            # Recibir el valor seleccionado del formulario
+            selected_status= request.POST.get('statusLife')
+
+            color = 1         
+
+            for list_drow in list_drow:
+                if selected_status == list_drow.profiling_supp:
+                    if selected_status != 'ACTIVE':
+                        color = 2
+                        break         
+                    if selected_status == 'ACTIVE' or selected_status == 'SELF-ENROLMENT':
+                        color = 3 
+                        break  
+            
+            statusRed = ['BANK DRAFT CANCELLED - CUSTOMER REQUEST','TERM - INSURED REQUEST','TERM - LAPSE NON PAYMENT'
+                            ,'AUTOMATIC TERMINATION','TERM - INSURED REQUEST (PAYMENT ERROR)','WITHDRAWN (PAYMENT ERROR)']
+
+            if selected_status in statusRed:
+                color = 4   
+        
+
+            # Actualizar Supp
+            ClientsLifeInsurance.objects.filter(id=client_id).update(
+                agent_usa=cleaned_life_data['agent_usa'],
+                full_name=cleaned_life_data['full_name'],
+                phone_number=cleaned_life_data['phone_number'],
+                address=cleaned_life_data['address'],
+                zipcode=cleaned_life_data['zipcode'],
+                city=cleaned_life_data['city'],
+                state=cleaned_life_data['state'],
+                county=cleaned_life_data['county'],
+                sex=cleaned_life_data['sex'],
+                status=cleaned_life_data['status'],
+                status_color=color,
+                date_birth=date_birth_new,
+                date_effective_coverage=date_effective_coverage_new,
+                date_effective_coverage_end=date_effective_coverage_end_new,
+                policyNumber=cleaned_life_data['policyNumber'],
+                payment_type=cleaned_life_data['payment_type'],
+            )
+
+            return redirect('clientLifeInsurance' )  
+
+        if action == 'saveLifeAgent':
+
+            obs = request.POST.get('obs_agent')
+
+            if obs:
+                id_life = ClientsLifeInsurance.objects.get(id=client_id)
+                id_user = request.user
+
+                # Crear y guardar la observación
+                ObservationAgent.objects.create(
+                    life_insurance=id_life,
+                    user=id_user,
+                    content=obs
+                )
+            
+                return redirect('clientLifeInsurance')
+        
+
+    # Obtener los mensajes de texto del Cliente.
+    if request.user.is_superuser:
+        contact = Contacts.objects.filter(phone_number=client.phone_number, company_id=client.company.id).first()
+    else:
+        contact = Contacts.objects.filter(phone_number=client.phone_number, company_id=company_id).first()
+
+    chats = Chat.objects.filter(contact=contact)
+    messages = Messages.objects.filter(chat_id=chats[0].id)
+    secretKey = SecretKey.objects.filter(contact_id=contact.id).first()
+    chat = get_last_message_for_chats(chats)[0]
+
+
+    context = {
+        'client': client,
+        'consent':consent,
+        'formatted_social':formatted_social,
+        'obsSuppText': '\n'.join([obs.content for obs in obsLife]),
+        'obsCustomer': obsCus,
+        'list_drow': list_drow,
+        'old' : old,
+        'paymentDateLife':paymentDateLife,
+        #SMS Blue
+        'contact':contact,
+        'chat':chat,
+        'messages':messages,
+        'secretKey':secretKey
+    }
+    
+    return render(request, 'edit/editLife.html', context)
+
 def editDepentsObama(request, obamacare_id):
     # Obtener todos los dependientes asociados al ObamaCare
     dependents = Dependents.objects.filter(obamacare=obamacare_id)

@@ -1,0 +1,255 @@
+{% extends "dashboard/index.html" %}
+<!doctype html>
+<html lang="en">
+
+{% load static %}
+
+{% block head %}
+	<!-- Required meta tags -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!--plugins-->
+	<link href="{% static "assets/plugins/simplebar/css/simplebar.css" %}" rel="stylesheet" />
+	<link href="{% static "assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" %}" rel="stylesheet" />
+	<link href="{% static "assets/plugins/metismenu/css/metisMenu.min.css" %}" rel="stylesheet" />
+	<!-- loader-->
+	<link href="{% static "assets/css/pace.min.css" %}" rel="stylesheet" />
+	<script src="{% static "assets/js/pace.min.js" %}"></script>
+	<!-- Bootstrap CSS -->
+	<link href="{% static "assets/css/bootstrap.min.css" %}" rel="stylesheet">
+	<link href="{% static "assets/css/bootstrap-extended.css" %}" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&amp;display=swap" rel="stylesheet">
+	<link href="{% static "assets/css/app.css" %}" rel="stylesheet">
+	<link href="{% static "assets/css/icons.css" %}" rel="stylesheet">
+	<!-- Theme Style CSS -->
+	<link rel="stylesheet" href="{% static "assets/css/dark-theme.css" %}" />
+	<link rel="stylesheet" href="{% static "assets/css/semi-dark.css" %}" />
+	<link rel="stylesheet" href="{% static "assets/css/header-colors.css" %}" />
+
+	<!-- Agregar el estilo de Flatpickr -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+	<title>Create Client Life Insurance</title>
+{% endblock %}
+
+{% block page_content %}
+<!--end breadcrumb-->
+<div class="card">
+	<div class="card-body">
+		<form id="formCreateClient" method="POST">
+			<div class="d-flex justify-content-between align-items-start flex-wrap">
+				<div>
+					<h5 class="mb-1">Add Client Life Insurance</h5>
+					<p class="mb-4">Information about the client</p>
+				</div>
+				<div style="min-width: 300px;">
+					<label for="agent_usa" class="form-label font-weight-bold">Companies:</label>
+					{% if companies %}
+						<select class="form-select" id="companies" aria-label="Default select example" name="company">
+							<option value="no_valid" disabled selected>Please Select</option>
+							{% for company in companies %}
+								<option value="{{company.id}}">{{company.company_name}}</option>
+							{% endfor %}
+						</select>
+					{% else %}
+						<p> <strong> {{user.company.company_name}} </strong> </p>
+						<input hidden type="text" class="form-control" name="company" id="companies" value="{{user.company.id}}" >	
+					{% endif %}
+				</div>
+			</div>
+			<hr/>
+			<div id="editor">
+				{% csrf_token %}
+				<div id="test-l-1" role="tabpanel" class="bs-stepper-pane" aria-labelledby="stepper1trigger1">
+					<div class="row g-3">
+						<div class="col-12 col-lg-4">
+							<label for="agent_usa" class="form-label font-weight-bold">Agente USA</label>
+							<select class="form-select" id="agent_usa" aria-label="Default select example" name="agent_usa" required>
+								<option value="no_valid" disabled selected>Please Select</option>
+								<option value="GINA PAOLA LAPEIRA - NPN 19944280">GINA PAOLA LAPEIRA - NPN 19944280</option>
+								<option value="LUIS EDUARDO LAPEIRA - NPN 20556081">LUIS EDUARDO LAPEIRA - NPN 20556081</option>
+							</select>
+						</div>
+						<div class="col-12 col-lg-4">
+							<label for="full_name" class="form-label">Full Name</label>
+							<input type="text" class="form-control" name="full_name" id="full_name" placeholder="First Name" Required>
+						</div>
+						<div class="col-12 col-lg-4">
+							<label for="phone_number" class="form-label">Phone Number</label>
+							<input type="number" class="form-control" name ="phone_number" id="phone_number" placeholder="Phone Number" Required>
+						</div>
+						<div class="col-12 col-lg-4">
+							<label for="address" class="form-label">Address</label>
+							<input type="text" class="form-control" name="address" id="address" placeholder="Address" Required>
+						</div>
+						<div class="col-12 col-lg-4">
+							<label for="zipcode" class="form-label">ZIP Code</label>
+							<input maxlength="5" oninput="this.value = this.value.replace(/[^0-9]/g, '')" type="text" class="form-control" name ="zipcode" id="zipcode" placeholder="ZIP Code" Required>
+						</div>
+						<div class="col-12 col-lg-4">
+							<label for="city" class="form-label">City</label>
+							<input readonly type="text" class="form-control" name ="city" id="city" Required>
+						</div>
+						<div class="col-12 col-lg-2">
+							<label for="state" class="form-label font-weight-bold">State</label>
+							<input readonly type="text" class="form-control" name="state" id="state" required>
+						</div>						
+						<div class="col-12 col-lg-4">
+							<label for="county" class="form-label">County</label>
+							<input readonly type="text" class="form-control" name ="county" id="county"  Required>
+						</div>		
+						<div class="col-12 col-lg-2">
+							<label for="sex" class="form-label">Sex</label>
+							<select class="form-select"  name="sex" id="sex" aria-label="Default select example" required>
+								<option value="no_valid" disabled selected>Please Select</option>
+								<option value="M">MALE</option>
+								<option value="F">FEMALE</option>
+							</select>
+						</div>
+						<div class="col-12 col-lg-4">
+							<label for="date_birth" class="form-label">Date Birth</label>
+							<input type="text" class="form-control" name="date_birth" id="date_birth" required>
+						</div>	
+						<div class="col-12 col-lg-2">
+							<label for="premiun" class="form-label">Premiun</label>
+							<input type="number" class="form-control" name="premiun" id="premiun" step="0.01" required>
+						</div>						
+						<div class="col-12 col-lg-3">
+							<label for="social_security" class="form-label">Social Security</label>
+							<input type="text" maxlength="11" oninput="formatInput(this)" pattern="\d{3}-\d{2}-\d{4}" class="form-control" name ="social_security" id="social_security" >
+						</div>
+						<div class="col-12 col-lg-4">
+							<label for="full_name_beneficiary" class="form-label">Name of Beneficiary</label>
+							<input type="text" class="form-control" name="full_name_beneficiary" id="full_name_beneficiary" required>
+						</div>
+						<div class="col-12 col-lg-3">
+							<label for="phone_number_beneficiary" class="form-label">Phone Number Beneficiary</label>
+							<input type="number" class="form-control" name ="phone_number_beneficiary" id="phone_number_beneficiary" placeholder="Phone Number" Required>
+						</div>
+						<div class="col-12 col-lg-12">
+							<label for="observation" class="form-label">Observation</label>
+							<textarea class="form-control" id="observation" name="observation" rows="3" placeholder="Life Insurance plan observation" style="resize: none"></textarea>
+						</div>
+						<h5 class="text-danger text-center">{{error_message}}</h5>
+						<div class="col-12 col-lg-12">
+							<button type="submit" class="btn btn-primary px-4" id="sendClient">Submit</button>
+						</div>
+						
+					</div><!---end row-->
+				
+				</div>
+			</div>
+		</form>
+	</div>
+
+	<!-- Modal Bootstrap -->
+	<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="successModalLabel">Alert</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<p>Information successfully saved!</p>
+				</div>
+				<div class="modal-footer">
+					<!-- Botón 1 -->
+					<a class="btn btn-primary" {% if client and client.id %}data-url="{% url 'index' %}"{% endif %}  id="buttonHome">Home </a>
+					<!-- Botón 2 -->
+					<button type="button" class="btn btn-primary"  {% if client and client.id %}data-url="{% url 'ConsentLifeInsurance' client.id %}?lenguaje=en"{% endif %}  id="buttonConsentEng">English Consent</button>
+					<button type="button" class="btn btn-primary" {% if client and client.id %}data-url="{% url 'ConsentLifeInsurance' client.id %}?lenguaje=es"{% endif %}  id="buttonConsentSpa">Spanish Consent</button>
+
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+{% endblock %}
+
+{% block end_js %}
+	<!--end switcher-->
+	<!-- Bootstrap JS -->
+	<script src="{% static "assets/js/bootstrap.bundle.min.js" %}"></script>
+	<!--plugins-->
+	<script src="{% static "assets/js/jquery.min.js" %}"></script>
+	<script src="{% static "assets/plugins/simplebar/js/simplebar.min.js" %}"></script>
+	<script src="{% static "assets/plugins/metismenu/js/metisMenu.min.js" %}"></script>
+	<script src="{% static "assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js" %}"></script>
+	
+	<!--app JS-->
+	<script src="{% static "assets/js/app.js" %}"></script>
+	<script src="{% static "assets/js/validations/validationZicode.js" %}"></script>
+
+	<!-- Agregar la librería de Flatpickr -->
+	<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+	<script>
+		// Usar Flatpickr para formatear el campo de fecha
+		document.addEventListener('DOMContentLoaded', function () {
+			flatpickr("#date_birth", {
+				dateFormat: "m/d/Y", // Formato MM/DD/YYYY
+			});
+		});
+	</script>
+
+	
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			// Mostrar modal si show_modal es true
+			{% if show_modal %}
+				new bootstrap.Modal(document.getElementById('successModal')).show();
+
+				// Configurar temporizador para redirección
+				let redirectTimer = setTimeout(() => {
+					window.location.href = '/';  // Redirigir al index
+				}, 4000);  // 3 segundos
+			{% endif %}
+	
+			
+	
+			// Función reutilizable para manejar el clic
+			function handleConsentClick() {
+				// Cancelar la redirección automática si se hace clic
+				clearTimeout(redirectTimer);
+				
+				const url = this.getAttribute('data-url');
+				window.open(url, '_blank');
+				new bootstrap.Modal(document.getElementById('successModal')).show();
+			}
+	
+			// Añadir event listeners a los botones
+			const buttons = [
+				document.getElementById('buttonConsentEng'),
+				document.getElementById('buttonConsentSpa'),
+				document.getElementById('buttonHome')
+			];
+	
+			buttons.forEach(button => {
+				if (button) {
+					button.addEventListener('click', handleConsentClick);
+				}
+			});
+		});
+	</script>
+
+	<script>
+        function formatInput(input) {
+            // Remover cualquier caracter que no sea un dígito
+            let value = input.value.replace(/\D/g, '');
+            
+            // Aplicar el formato 123-45-6789
+            if (value.length > 3 && value.length <= 5) {
+                value = value.slice(0, 3) + '-' + value.slice(3);
+            } else if (value.length > 5) {
+                value = value.slice(0, 3) + '-' + value.slice(3, 5) + '-' + value.slice(5, 9);
+            }
+
+            // Asignar el valor formateado al input
+            input.value = value;
+        }
+    </script>
+
+
+{% endblock %}

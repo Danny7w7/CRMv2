@@ -48,6 +48,8 @@ urlpatterns = [
     path('formCreateClient/', forms.formCreateClient, name='formCreateClient'), # Formulario para crear Clientes Obamacare
     path('formEditClient/<client_id>/', edits.formEditClient, name='formEditClient'),
 
+    path('formCreateClientLife/', forms.formCreateClientLife, name='formCreateClientLife'), # Formulario para crear Clientes Life Life Insurance .. 
+
     path('formCreateAssure/', forms.formCreateAssure, name='formCreateAssure'),
     path('formCreatePlanAssure/<client_id>/', forms.formCreatePlanAssure, name='formCreatePlanAssure'),
     path('selectClientAssure/', existClient.selectClientAssure, name='selectClientAssure'), # Vista para seleccionar clientes existentes
@@ -82,12 +84,17 @@ urlpatterns = [
     path('saveAccionRequired/', modals.saveAccionRequired, name='saveAccionRequired'),
     path('fetchPaymentsMonth/', fetchInformations.fetchPaymentsMonth, name='fetchPaymentsMonth'),
     path('fetchActionRequired/', fetchInformations.fetchActionRequired, name='fetchActionRequired'),
-    path('viewConsent/<obamacare_id>/', consents.consent, name='viewConsent'),
-    path('viewIncomeLetter/<obamacare_id>/', consents.incomeLetter, name='incomeLetter'),
     path('validarCita/', modals.validarCita, name='validarCita'),
     path('paymentDateObama/<obama_id>/', modals.paymentDateObama, name='paymentDateObama'),
 
     path('clientAccionRequired/', table.clientAccionRequired, name='clientAccionRequired'),
+
+    path('clientLifeInsurance/', table.clientLifeInsurance, name='clientLifeInsurance'), # Vista de clientes Life Insurance
+    path('editLife/<client_id>/', edits.editLife, name='editLife'),
+    path('toggleLifeStatus/<client_id>/', toggles.toggleLifeStatus, name='toggleLifeStatus'),
+    path('blockSocialSecurityLife/', fetchInformations.blockSocialSecurityLife, name='blockSocialSecurityLife'),
+    path('paymentDateLife/<client_id>/', modals.paymentDateLife, name='paymentDateLife'),
+    path('saveCustomerObservationLife/', modals.saveCustomerObservationLife, name='saveCustomerObservationLife'),
 
     path('clientAssure/', table.clientAssure, name='clientAssure'),
     path('editAssure/<assure_id>/', edits.editAssure, name='editAssure'),
@@ -197,9 +204,12 @@ urlpatterns = [
 
 
     #<---------------------------Consent---------------------------> 
+    path('viewConsent/<obamacare_id>/', consents.consent, name='viewConsent'),
+    path('viewIncomeLetter/<obamacare_id>/', consents.incomeLetter, name='incomeLetter'),
     path('consetMedicare/<client_id>/<language>/', consents.consetMedicare, name='consetMedicare'),
     #carta con la FFM
     path('ILFFM/<obamacare>/', consents.ILFFM, name='ILFFM'),
+    path('ConsentLifeInsurance/<client_id>/', consents.ConsentLifeInsurance, name='ConsentLifeInsurance'), #Consent Life Insurance
 
 
     #<---------------------------Company---------------------------> 

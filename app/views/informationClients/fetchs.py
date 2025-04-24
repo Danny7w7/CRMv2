@@ -110,6 +110,38 @@ def blockSocialSecurityAssure(request):
 
     return JsonResponse({'status': 'error', 'message': 'Solicitud no válida.'}, status=400)
 
+@csrf_exempt
+def blockSocialSecurityLife(request):
+    if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        action = request.POST.get('action')
+        client_id = request.POST.get('client_id')
+
+        try:
+            client = ClientsLifeInsurance.objects.get(id=client_id)
+        except ClientsLifeInsurance.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Cliente no encontrado.'})
+
+        if action == 'validate_key':
+            provided_key = request.POST.get('key')
+            correct_key = 'Sseguros22@'  # 🔹 Cambia esto por una validación más segura
+
+            if provided_key == correct_key:
+                return JsonResponse({'status': 'success', 'social': client.social_security})
+            else:
+                return JsonResponse({'status': 'error', 'message': 'Clave incorrecta o no hay número disponible.'})
+
+        elif action == 'save_social':
+            new_social = request.POST.get('new_social')
+
+            if not new_social or len(new_social) != 9 or not new_social.isdigit():
+                return JsonResponse({'status': 'error', 'message': 'Número de seguro social inválido.'})
+
+            client.social_security = new_social
+            client.save()
+            return JsonResponse({'status': 'success', 'message': 'Número de seguro social guardado correctamente.'})
+
+    return JsonResponse({'status': 'error', 'message': 'Solicitud no válida.'}, status=400)
+
 
 @csrf_exempt
 def fetchPaymentsMonth(request):

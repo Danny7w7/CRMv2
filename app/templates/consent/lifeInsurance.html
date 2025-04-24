@@ -1,0 +1,553 @@
+{% load i18n %}  <!-- ¡Carga la biblioteca de internacionalización! -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario Médico - National Life Group</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .signature-pad {
+            border: 2px solid rgba(0,0,0,0.1);
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        canvas {
+            border: 2px solid red; /* Para visualizar mejor los bordes */
+            border-radius: 8px;
+            background: #fff;
+            touch-action: none; /* Disable default touch gestures */
+        }
+        /* Floating Container */
+
+		 .floating-container {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        .copy-button {
+            background-color: #00ff08;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .copy-button:hover {
+            background-color: #48aa4d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .copy-button:active {
+            transform: translateY(0);
+        }
+
+        .success-message {
+            color: #00ff08;
+            margin-top: 10px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .input-verde-sombra {
+            border: 2px solid rgb(0, 255, 0);
+            color: rgb(0, 255, 0);
+            box-shadow: 0 0 8px rgb(22, 107, 1); /* Sombra negra alrededor del input */
+        }
+
+        .custom-link {
+            color: black;
+        }
+        .custom-link:hover {
+            color: red; /* Cambia el color al pasar el mouse */
+        }
+    </style>
+</head>
+<body>
+    {% if temporalyURL %}
+	<!-- Div flotante -->
+	<div class="floating-container">
+		<button class="copy-button" onclick="copyCurrentURL()">
+			<i class="fas fa-link"></i>
+			Copy Link
+		</button>
+		<div class="success-message">¡Link copiado!</div>
+	</div>
+	{% endif %}
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white text-center py-3">
+                        <h1 class="mb-0">National Life Group</h1>
+                        <h3>Cuestionario Médico</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <p><strong>Importante:</strong> En el caso de responder Sí a cualquiera de las siguientes preguntas, es necesario saber detalles de la condición como:</p>
+                            <p>(Fecha de diagnóstico, tratamiento, medicamentos, valores de lectura de la condición, doctores que atendieron esta condición específicamente, pruebas de diagnóstico que fueron realizadas junto con las fechas, confirmar si fue hospitalizado.)</p>
+                            <p><em>*Este formulario no representa la aplicación. Por favor vea detalles y preguntas extras médicas en la aplicación electrónica que pueden ser necesarios completar.</em></p>
+                        </div>
+
+                        <form method="POST" id="signatureForm">
+                            {% csrf_token %}
+                            <!-- Pregunta sobre tabaco -->
+                            <div class="form-section">
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">En los últimos 5 años, ¿ha utilizado algún producto que contenga tabaco o nicotina, incluidos, entre otros, cigarrillos, cigarrillos electrónicos, vaporizadores, puros, pipas, tabaco para masticar, rapé, chicles de nicotina y/o parches de nicotina?</label>
+                                    <div class="form-check">
+                                        <input required class="form-check-input" type="radio" name="1" id="tabacoSi" {% if answers.q1 == 'SI' %}checked{% endif %} value="SI">
+                                        <label class="form-check-label" for="tabacoSi">Sí</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="1" id="tabacoNo" {% if answers.q1 == 'NO' %}checked{% endif %} value="NO">
+                                        <label class="form-check-label" for="tabacoNo">No</label>
+                                    </div>
+                                    <div class="mt-2">
+                                        <label class="form-label">Si es así, indique el tipo de producto utilizado, la frecuencia y la fecha del último uso:</label>
+                                        <textarea required class="form-control" name="2" rows="2"> {{answers.q2}}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Historial médico (últimos 10 años) -->
+                            <div class="form-section">
+                                <h4 class="section-title">En los últimos 10 años alguna vez fue diagnosticado o tratado por un miembro licenciado de la profesión médica o ha tomado medicamentos para:</h4>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="3" {% if answers.q3 == 'on' %}checked{% endif %}  id="enfCorazon">
+                                        <label class="form-check-label" for="enfCorazon">Alguna enfermedad o condición anormal del corazón, sistema circulatorio, presión alta, colesterol alto, latidos del corazón irregulares, murmullo, fiebre reumática, enfermedad de la arteria coronaria, dolor de pecho, angina de pecho, ataque isquémico transitorio o accidente cerebrovascular</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="4" {% if answers.q4 == 'on' %}checked{% endif %} id="enfPulmonar">
+                                        <label class="form-check-label" for="enfPulmonar">Alguna enfermedad de los pulmones o del sistema respiratorio, sleep apnea, enfisema pulmonar, asma, bronquitis, tuberculosis, dificultad para respirar, alergias o trastorno de la nariz o garganta</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="5" {% if answers.q5 == 'on' %}checked{% endif %} id="enfDigestivo">
+                                        <label class="form-check-label" for="enfDigestivo">Alguna enfermedad del sistema digestivo, incluido ulceras, indigestiones crónicas, problemas en el hígado, estómago, intestinos o trastornos en el páncreas, hepatitis, cirrosis, ictericia, trastorno en el esófago, trastorno en la vesícula o trastorno en el colon</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="6" {% if answers.q6 == 'on' %}checked{% endif %} id="trastornoNervioso">
+                                        <label class="form-check-label" for="trastornoNervioso">Algún trastorno en el sistema nervioso, mareo, epilepsia, convulsiones, parálisis, perdida de conciencia, trastorno en los ojos o cerebro, dolores de cabeza</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="7" {% if answers.q7 == 'on' %}checked{% endif %} id="trastornoColumna">
+                                        <label class="form-check-label" for="trastornoColumna">Algún trastorno de la columna, cadera, rodilla, hombro, espalda, huesos, músculos, artritis, reumatismo, articulaciones, piel, tiroides, gota u otro trastorno de las glándulas</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="8" {% if answers.q8 == 'on' %}checked{% endif %} id="enfUrinario">
+                                        <label class="form-check-label" for="enfUrinario">Alguna enfermedad del sistema urinario, incluidas proteínas, azúcar o sangre en la orina, infección renal o cálculos, trastorno o enfermedad de la mama, la próstata o la vejiga o los órganos pélvicos</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="9" {% if answers.q9 == 'on' %}checked{% endif %} id="trastornoPiel">
+                                        <label class="form-check-label" for="trastornoPiel">Algún trastorno o condición anormal de la piel, incluyendo psoriasis, eczema, heridas que no sanan, melanoma, nevos o lunares</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" {% if answers.q10 == 'on' %}checked{% endif %} name="10" id="anemia">
+                                        <label class="form-check-label" for="anemia">Cualquier anemia, hemofilia o trastorno de la sangre que no sea el Síndrome de Inmunodeficiencia Adquirida (AIDS), Virus de Inmunodeficiencia Humana (HIV)</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" name="11" {% if answers.q11 == 'on' %}checked{% endif %} type="checkbox" id="sida">
+                                        <label class="form-check-label" for="sida">Síndrome de Inmunodeficiencia Adquirida (SIDA) o Complejo Relacionado con el SIDA (ARC)</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" {% if answers.q12 == 'on' %}checked{% endif %} name="12" id="cancer">
+                                        <label class="form-check-label" for="cancer">Algún cáncer, tumor, pólipo, bulto, nódulo, quiste, linfoma o cualquier trastorno de los ganglios linfáticos</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" {% if answers.q13 == 'on' %}checked{% endif %} name="13" id="diabetes">
+                                        <label class="form-check-label" for="diabetes">Diabetes, hiperglucemia, prediabetes, tolerancia a la glucosa alterada, glucosa en ayunas alterada, deficiencia de insulina, hiperglucemia o diabetes asociada con el embarazo</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" {% if answers.q14 == 'on' %}checked{% endif %} name="14" id="depresion">
+                                        <label class="form-check-label" for="depresion">Alguna depresión, ansiedad, trastorno bipolar, esquizofrenia, Trastorno por Déficit de Atención (TDA), autismo, síndrome de Down o cualquier otra condición de desarrollo o psicológica, incluyendo Alzheimer, demencia o Trastorno de Estrés Postraumático (TEPT)</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" {% if answers.q15 == 'on' %}checked{% endif %} name="15" id="amputacion">
+                                        <label class="form-check-label" for="amputacion">En los últimos 10 años algún miembro licenciado de profesión médica le ha diagnosticado o tratado por alguna enfermedad o alguna otra condición medica que ha resultado en una amputación</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="16" {% if answers.q16 == 'on' %}checked{% endif %} id="ataxia">
+                                        <label class="form-check-label" for="ataxia">En los últimos 10 años algún miembro licenciado de profesión médica le ha diagnosticado o tratado por ataxia, mielitis transversa, miastenia grave, trastorno autoinmune como lupus, ceguera o síndrome pospoliomielítico</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="17" {% if answers.q17 == 'on' %}checked{% endif %} id="parkinson">
+                                        <label class="form-check-label" for="parkinson">En los últimos 10 años algún miembro licenciado de profesión médica le ha diagnosticado o tratado por enfermedad de Parkinson, distrofia muscular, Huntington, enfermedad de las neuronas motoras, enfermedad de Lou Gehrig (ALS) o esclerosis múltiple</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="18" {% if answers.q18 == 'on' %}checked{% endif %} id="drogas">
+                                        <label class="form-check-label" for="drogas">En los últimos 10 años ha usado marijuana, cocaína, heroína o cualquier otra droga ilícita o sustancia controlada. Ha sido alertado por un profesional medico de que necesita discontinuar o reducir el uso del alcohol o la ingesta de drogas, medicamentos no prescritos por su doctor o ha sido miembro de algún grupo de soporte como NA o AA</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="19" {% if answers.q19 == 'on' %}checked{% endif %} id="hiv">
+                                        <label class="form-check-label" for="hiv">Alguna vez ha sido positivo por exposición a la infección de HIV o ha sido diagnosticado teniendo ARC o AIDS causado por el HIV. Se ha sentido enfermo o alguna otra condición derivada de esta infección</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="20" {% if answers.q20 == 'on' %}checked{% endif %} id="familiar">
+                                        <label class="form-check-label" for="familiar">En el mejor de sus conocimientos usted tiene algún padre o hermano que haya sido diagnosticado o tratado por un médico profesional debido a cáncer, alguna condición o enfermedad del corazón, enfermedad de Huntington o enfermedad poliquística de los riñones</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input  class="form-check-input" type="checkbox" {% if answers.q21 == 'on' %}checked{% endif %} name="21" id="citaPendiente">
+                                        <label class="form-check-label" for="citaPendiente">Tiene alguna cita médica pendiente que ya haya realizado antes de esta aplicación con algún medico profesional o especialista</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- En los últimos 5 años -->
+                            <div class="form-section">
+                                <h4 class="section-title">En los últimos 5 años:</h4>
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="22" {% if answers.q22 == 'on' %}checked{% endif %} id="consulta">
+                                        <label class="form-check-label" for="consulta">Consultó a un médico que no sea su médico de cabecera o tuvo radiografías, electrocardiogramas, cateterismo cardíaco, mamografías, ecografías, biopsias o cualquier otra prueba y/o procedimiento médico, excepto aquellos relacionados con el Virus de Inmunodeficiencia Humana (Virus del SIDA)</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="23" {% if answers.q23 == 'on' %}checked{% endif %} id="hospital">
+                                        <label class="form-check-label" for="hospital">Ha sido admitido en un hospital o planea entrar a un hospital en los próximos 30 días; o ha sido aconsejado por un miembro licenciado de la profesión médica que debe entrar a algún hospital para alguna observación, operación o tratamiento de algún tipo</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Actualmente -->
+                            <div class="form-section">
+                                <h4 class="section-title">Actualmente:</h4>
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="24" {% if answers.q24 == 'on' %}checked{% endif %} id="dispositivo">
+                                        <label class="form-check-label" for="dispositivo">Usa o requiere el uso de cualquier dispositivo mecánico o médico como: silla de ruedas, andador, bastón de varias puntas, cama de hospital, máquina de diálisis, respirador de oxígeno, carro motorizado o subidor de escaleras</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="25" {% if answers.q25 == 'on' %}checked{% endif %} id="ayudaBasica">
+                                        <label class="form-check-label" for="ayudaBasica">Necesita ayuda, asistencia o supervisión para: bañarse, comer, vestirse, ir al baño, caminar, trasladarse o mantener la continencia</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="26" {% if answers.q26 == 'on' %}checked{% endif %} id="ayudaCotidiana">
+                                        <label class="form-check-label" for="ayudaCotidiana">Necesita ayuda, asistencia o supervisión para: tomar medicamentos, hacer las tareas de la casa, lavar, ir de compras o preparar alguna comida</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="27" {% if answers.q27 == 'on' %}checked{% endif %} id="infracciones">
+                                        <label class="form-check-label" for="infracciones">Durante los últimos 5 años se ha declarado culpable o ha sido condenado por alguna infracción de vehículo en movimiento o DUI o tiene la licencia suspendida</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="28" {% if answers.q28 == 'on' %}checked{% endif %} id="discapacidad">
+                                        <label class="form-check-label" for="discapacidad">En los últimos 5 años, ¿ha trabajado menos de tiempo completo, recibido o solicitado beneficios por discapacidad o compensación laboral?</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="29" {% if answers.q29 == 'on' %}checked{% endif %} id="trafico">
+                                        <label class="form-check-label" for="trafico">En los últimos 5 años, ¿ha declarado culpable o ha sido condenado por alguna infracción de tránsito o DUI, o ha tenido una licencia suspendida?</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="30" {% if answers.q30 == 'on' %}checked{% endif %} id="delito">
+                                        <label class="form-check-label" for="delito">Alguna vez ha sido condenado por un delito menor o mayor</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="31" {% if answers.q31 == 'on' %}checked{% endif %} id="bancarrota">
+                                        <label class="form-check-label" for="bancarrota">Ha estado alguna vez envuelto en bancarrota o actualmente que no ha sido finalizada</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="32" {% if answers.q32 == 'on' %}checked{% endif %} id="deporteRiesgo">
+                                        <label class="form-check-label" for="deporteRiesgo">Participa en algún deporte de alto riesgo</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="33" {% if answers.q33 == 'on' %}checked{% endif %} id="aviacion">
+                                        <label class="form-check-label" for="aviacion">Participa en otras actividades de aviación que no sea como pasajero</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="34" {% if answers.q34 == 'on' %}checked{% endif %} id="aplicacionPendiente">
+                                        <label class="form-check-label" for="aplicacionPendiente">En los últimos 12 meses ha aplicado o tiene alguna aplicación pendiente de seguro de vida o seguro por discapacidad</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="35" {% if answers.q35 == 'on' %}checked{% endif %} id="seguroDeclinado">
+                                        <label class="form-check-label" for="seguroDeclinado">Ha aplicado alguna vez para una póliza de seguro de vida, salud o discapacidad que resulto declinada, pospuesta, calificada o modificada en alguna forma</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="36" {% if answers.q36 == 'on' %}checked{% endif %} id="incentivo">
+                                        <label class="form-check-label" for="incentivo">Le han ofrecido algún dinero o incentivo bajo este seguro de vida</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="37" {% if answers.q37 == 'on' %}checked{% endif %} id="transferencia">
+                                        <label class="form-check-label" for="transferencia">Ha estado envuelto en alguna discusión sobre la venta o transferencia de una póliza de seguro de vida</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="38" {% if answers.q38 == 'on' %}checked{% endif %} id="extranjero">
+                                        <label class="form-check-label" for="extranjero">Durante los próximos 2 años, ¿tiene la intención de vivir fuera de los Estados Unidos?</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Medicación -->
+                            <div class="form-section">
+                                <h4 class="section-title">Medicación</h4>
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">¿Está tomando actualmente, o ha tomado en los últimos 12 meses, algún medicamento recetado o medicamentos de venta libre, incluyendo aspirina y/o suplementos herbales?</label>
+                                    <div class="form-check">
+                                        <input required class="form-check-input" type="radio" name="39" {% if answers.q39 == 'SI' %}checked{% endif %} id="medicamentosSi" value="SI">
+                                        <label class="form-check-label" for="medicamentosSi">Sí</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="39" id="medicamentosNo" {% if answers.q39 == 'NO' %}checked{% endif %} value="NO">
+                                        <label class="form-check-label" for="medicamentosNo">No</label>
+                                    </div>
+                                    <div class="mt-2">
+                                        <label class="form-label">Si es así, indique el nombre del medicamento y la razón/diagnóstico:</label>
+                                        <textarea required class="form-control"  name="40" rows="3">{{answers.q40}}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Información física -->
+                            <div class="form-section">
+                                <h4 class="section-title">Información Física</h4>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Peso (libras)</label>
+                                        <input required type="number" class="form-control" name="41" id="peso" value="{{answers.q41}}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Altura (pies/pulgadas)</label>
+                                        <div class="input-group">
+                                            <input required type="number" class="form-control" placeholder="Pies" name="42" value="{{answers.q42}}" id="alturaPies">
+                                            <input type="number" class="form-control" placeholder="Pulgadas" name="43" value="{{answers.q43}}" id="alturaPulgadas">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label">¿Ha ganado o perdido peso en los últimos 12 meses?</label>
+                                    <div class="form-check">
+                                        <input required class="form-check-input" type="radio" name="44" {% if answers.q44 == 'SI' %}checked{% endif %} id="cambioPesoSi" value="SI">
+                                        <label class="form-check-label" for="cambioPesoSi">Sí</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input required class="form-check-input" type="radio" name="44" {% if answers.q44 == 'NO' %}checked{% endif %} id="cambioPesoNo" value="NO">
+                                        <label class="form-check-label" for="cambioPesoNo">No</label>
+                                    </div>
+                                    <div class="mt-2">
+                                        <label class="form-label">Si es así, proporcione detalles:</label>
+                                        <textarea required name="45" class="form-control" rows="2">{{answers.q45}}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Información del proveedor médico -->
+                            <div class="form-section">
+                                <h4 class="section-title">Información del Proveedor Médico</h4>
+                                <div class="mb-3">
+                                    <label class="form-label">Nombre y dirección de la instalación de atención médica y/o del proveedor de atención médica (Puede poner NO si no hay ninguno)</label>
+                                    <textarea required name="46" class="form-control" rows="3">{{answers.q46}}</textarea>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Teléfono</label>
+                                        <input required name="47" type="tel" class="form-control" value="{{answers.q47}}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Fecha de última visita</label>
+                                        <input required type="date" name="48" class="form-control" value="{{answers.q48}}">
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label">Razón de la visita y resultado</label>
+                                    <textarea required class="form-control" name="49" rows="2">{{answers.q49}}</textarea>
+                                </div>
+                            </div>
+
+                            <!-- Notas -->
+                            <div class="form-section">
+                                <h4 class="section-title">Notas Adicionales</h4>
+                                <div class="mb-4">
+                                    <textarea required class="form-control" name="50" rows="5">{{answers.q50}}</textarea>
+                                </div>
+                            </div>
+
+                            <!-- Firma -->
+                            {% if not request.user.is_authenticated %}
+                                <div class="form-section">
+                                    <div class="mb-4">
+                                        <label class="form-label fw-bold">Firma del Cliente</label>
+                                        <div class="border p-3">
+                                            <canvas id="drawingCanvas" class="signature-pad" width="1000px"></canvas>
+                                            <input type="hidden" id="signatureInput" name="signature">
+                                        </div>
+                                        <div class="d-flex justify-content-end mt-2">
+                                            <button type="button" class="btn btn-danger" id="clearCanvas">Borrar firma</button>
+                                        </div>
+                                    </div>
+                                    <div class="form-text mb-3">*Es necesario copia de la identificación o licencia de conducir que fue verificada del cliente para adjuntar en la aplicación.</div>
+                                </div>
+                            {% endif %}
+
+                            <!-- Botones de envío -->
+                            <div class="d-flex justify-content-between mt-4">
+                                <a href = "{% url 'clientLifeInsurance' %}" class="btn btn-secondary btn-lg">Cancelar</a>
+                                <button type="submit" class="btn btn-success btn-lg">Enviar Formulario</button>
+                            </div>
+
+                        </form>
+
+                      
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'assets/js/consent/lifeInsurance.js' %}"></script>
+
+    {% if temporalyURL %}
+        <script>
+            function copyCurrentURL() {
+                // Obtener la URL actual
+                const URL = '{{temporalyURL|safe}}';
+                
+                // Copiar al portapapeles
+                navigator.clipboard.writeText(URL).then(() => {
+                    // Mostrar mensaje de éxito
+                    const successMessage = document.querySelector('.success-message');
+                    successMessage.style.display = 'block';
+                    
+                    // Cambiar el texto del botón temporalmente
+                    const button = document.querySelector('.copy-button');
+                    const originalContent = button.innerHTML;
+                    button.innerHTML = '<i class="fas fa-check"></i> {% trans "Copiado!" %}';
+                    
+                    // Restaurar después de 2 segundos
+                    setTimeout(() => {
+                        successMessage.style.display = 'none';
+                        button.innerHTML = originalContent;
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Error al copiar:', err);
+                    alert('{% trans "No se pudo copiar el link. Por favor, inténtalo de nuevo." %}');
+                });
+            }
+        </script>
+    {% endif %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+   
+
+   
+
+</body>
+</html>

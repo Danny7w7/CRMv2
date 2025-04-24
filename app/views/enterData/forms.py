@@ -14,13 +14,16 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
+from django.contrib.auth.models import AnonymousUser
 
 # Application-specific imports
 from app.forms import *
 from app.models import *
 
 from ..sms import createOrUpdateChat
+from ..whatsApp import createOrUpdateChat as whatssap
 from ..decoratorsCompany import *
+from ..consents import generateTemporaryToken, validateTemporaryToken
 
 # Vista para crear cliente
 @login_required(login_url='/login') 
@@ -75,6 +78,17 @@ def formCreateClient(request):
                 contact.save()
 
             createOrUpdateChat(contact, companyInstance, request.user)
+
+            contactWhatssap = Contacts_whatsapp.objects.filter(phone_number=client.phone_number).first()
+            if not contactWhatssap:
+                contactWhatssap = Contacts_whatsapp()
+                contactWhatssap.company = companyInstance
+                contactWhatssap.name = f'{client.first_name} {client.last_name}'
+                contactWhatssap.phone_number = client.phone_number
+                contactWhatssap.is_active = False
+                contactWhatssap.save()
+
+            whatssap(contactWhatssap, companyInstance, request.user)
 
 
             # De forma insofacta se le crea el contacto al cliente.
@@ -155,6 +169,17 @@ def formCreateAssure(request):
                 contact.save()
 
             createOrUpdateChat(contact, companyInstance, request.user)
+
+            contactWhatssap = Contacts_whatsapp.objects.filter(phone_number=client.phone_number).first()
+            if not contactWhatssap:
+                contactWhatssap = Contacts_whatsapp()
+                contactWhatssap.company = companyInstance
+                contactWhatssap.name = f'{client.first_name} {client.last_name}'
+                contactWhatssap.phone_number = client.phone_number
+                contactWhatssap.is_active = False
+                contactWhatssap.save()
+
+            whatssap(contactWhatssap, companyInstance, request.user)
             
             # Responder con éxito y la URL de redirección
             return redirect('formCreatePlanAssure' ,client.id)
@@ -163,7 +188,82 @@ def formCreateAssure(request):
     else:
         return render(request, 'newSale/formCreateAssure.html',context)
 
+@login_required(login_url='/login') 
+@company_ownership_required_sinURL
+def formCreateClientLife(request):
 
+    company_id = request.company_id  # Obtener company_id desde request
+
+    user = Users.objects.select_related('company').filter(company = company_id).first()
+
+    if company_id == 1:
+        companies = Companies.objects.filter(is_active = True)
+    else:
+        companies = None
+
+    context = {
+        'user' : user,
+        'companies' : companies,
+        'show_modal': False
+    }
+
+    if request.method == 'POST':
+
+        date_births = request.POST.get('date_birth')
+        fecha_obj = datetime.datetime.strptime(date_births, '%m/%d/%Y').date()
+        company = request.POST.get('company')
+        companyInstance = Companies.objects.filter(id = company).first()
+
+        social = request.POST.get('social_security')
+        if social: formatSocial = social.replace('-','')
+        else: formatSocial = None
+
+        form = ClientLifeForm(request.POST)
+        if form.is_valid():
+            client = form.save(commit=False)
+            client.agent = request.user
+            client.is_active = 1
+            client.status_color = 1
+            client.status = 'REGISTERED'
+            client.date_birth = fecha_obj
+            client.social_security = formatSocial
+            client.company = companyInstance
+            client.observation = request.POST.get('observation')
+            client.save()
+
+            contact = Contacts.objects.filter(phone_number=client.phone_number).first()
+            if not contact:
+                contact = Contacts()
+                contact.company = companyInstance
+                contact.name = f'{client.full_name}'
+                contact.phone_number = client.phone_number
+                contact.is_active = False
+                contact.save()
+
+            createOrUpdateChat(contact, companyInstance, request.user)
+
+            contactWhatssap = Contacts_whatsapp.objects.filter(phone_number=client.phone_number).first()
+            if not contactWhatssap:
+                contactWhatssap = Contacts_whatsapp()
+                contactWhatssap.company = companyInstance
+                contactWhatssap.name = f'{client.full_name}'
+                contactWhatssap.phone_number = client.phone_number
+                contactWhatssap.is_active = False
+                contactWhatssap.save()
+
+            whatssap(contactWhatssap, companyInstance, request.user)
+
+            context = {
+                'client' : client,
+                'show_modal': True
+            }
+            
+            # Responder con éxito y la URL de redirección
+            return render(request, 'newSale/formCreateClientLife.html', context)
+        else:
+            return render(request, 'newSale/formCreateClientLife.html', {'error_message': form.errors})
+    else:
+        return render(request, 'newSale/formCreateClientLife.html',context)
 
 @login_required(login_url='/login') 
 @company_ownership_required_sinURL

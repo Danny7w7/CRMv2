@@ -33,7 +33,7 @@ def consetMedicare(request, client_id, language):
     contact = OptionMedicare.objects.filter(client = medicare.id).first()
     temporalyURL = None
 
-    typeToken = False
+    typeToken = 'medicare'
 
     activate(language)
     # Validar si el usuario no está logueado y verificar el token
@@ -70,7 +70,7 @@ def consent(request, obamacare_id):
     obamacare = ObamaCare.objects.select_related('client', 'agent').get(id=obamacare_id)
     temporalyURL = None
 
-    typeToken = True
+    typeToken = 'obamacare'
    
     language = request.GET.get('lenguaje', 'es')  # Idioma predeterminado si no se pasa
     activate(language)
@@ -145,7 +145,7 @@ def incomeLetter(request, obamacare_id):
     activate(language)
 
     temporalyURL = None
-    typeToken = True 
+    typeToken = 'obamacare' 
 
 
     # Validar si el usuario no está logueado y verificar el token
@@ -396,6 +396,166 @@ def ILFFM(request, obamacare):
     
     return response
 
+def ConsentLifeInsurance(request, client_id):
+    
+    client = ClientsLifeInsurance.objects.select_related('agent').filter(id=client_id).first()
+    answers = AnswerLifeInsurance.objects.filter(client = client_id)
+
+    answers_dict = {}
+    if answers:
+        for answer in answers:
+            answers_dict[f'q{answer.ask.id}'] = answer.answer
+
+    print(answers_dict,'*********holis como estas')
+    temporalyURL = None
+    typeToken = 'lifeInsurance'
+   
+    language = request.GET.get('lenguaje', 'es')  # Idioma predeterminado si no se pasa
+    activate(language)
+    # Validar si el usuario no está logueado y verificar el token
+    if isinstance(request.user, AnonymousUser):
+        result = validateTemporaryToken(request, typeToken)
+        is_valid_token, *note = result
+        if not is_valid_token:
+            return HttpResponse(note)
+    elif request.user.is_authenticated:
+        # Usuario autenticado
+        temporalyURL = f"{request.build_absolute_uri('/ConsentLifeInsurance/')}{client_id}?token={generateTemporaryToken(client , typeToken)}&lenguaje={language}"
+    else:
+        # Si el usuario no está logueado y no hay token válido
+        return HttpResponse('Acceso denegado. Por favor, inicie sesión o use un enlace válido.')
+
+    if request.method == 'POST':
+
+        if request.user.is_authenticated:
+            asks = AskLifeInsurance.objects.all()  
+            answersUpdate = AnswerLifeInsurance.objects.filter(client = client_id)  
+            
+            
+            if answersUpdate:
+                for ask in asks:
+                    answer = request.POST.get(str(ask.id)) 
+                    AnswerLifeInsurance.objects.filter(ask = ask.id).update(
+                        answer=answer
+                    )    
+            else:
+                for ask in asks:
+                    answer = request.POST.get(str(ask.id)) 
+                    print(ask,'********ask')
+                    print(ask.id,'********id')
+                
+                    print(answer,'********answer')
+                    AnswerLifeInsurance.objects.create(
+                        client=client,
+                        agent=request.user,
+                        ask=ask,
+                        answer=answer,
+                        company=client.company
+                    )
+
+            return redirect('ConsentLifeInsurance', client_id)
+
+        else:
+
+            language = request.GET.get('lenguaje', 'es')  # Idioma predeterminado si no se pasa
+            print('AQUI EMPIEZA A ACTUALIZAR ********************************')
+            print(answers)
+            for answer in answers:
+                # Usa el ID de la pregunta (ask.id) como clave
+                key = str(answer.ask.id)
+                value = request.POST.get(key)
+                
+                # Crea un mini diccionario que tenga el nombre correcto del campo
+                post_data = {'answer': value}
+                
+                print('La instancia es de answer:', answer)
+                print('Antes de actualizar:', answer.answer, '***********')
+                
+                updated = save_data_from_request(AnswerLifeInsurance, post_data, ['signature'], answer)
+                
+                if updated:
+                    print("Después:", updated.answer)
+                else:
+                    print("❌ Error al actualizar.")
+
+
+            print('TERMINE DE ACTUALIZAR **********************')
+            
+            #websocketAlertGeneric(
+            #    request,
+            #    'send_alert',
+            #    'signedConsent',
+            #    'success',
+            #    'Signed consent',
+            #    f'The client {client.first_name} {obamacare.client.last_name} successfully signed the consent form.',
+            #    'Go to client information',
+            #    f'/editObama/{obamacare.id}/{obamacare.company.id}',
+            #    obamacare.agent.id,
+            #    obamacare.agent.username
+            #)
+            
+            generateConsentPdfLifeInsurance(request, client, language)  
+            deactivateTemporaryToken(request)
+            return render(request, 'consent/endView.html')     
+
+    context = {
+        'client':client,
+        'temporalyURL': temporalyURL,
+        'answers':answers_dict
+    }
+    return render(request, 'consent/lifeInsurance.html', context)
+
+def generateConsentPdfLifeInsurance(request, client, language):
+    token = request.GET.get('token')
+
+    current_date = datetime.now().strftime("%A, %B %d, %Y %I:%M")
+    date_more_3_months = (datetime.now() + timedelta(days=360)).strftime("%A, %B %d, %Y %I:%M") 
+     
+    answers = AnswerLifeInsurance.objects.filter(client = client.id)
+    answers_dict = {}
+    if answers:
+        for answer in answers:
+            answers_dict[f'q{answer.ask.id}'] = answer.answer 
+
+    consent = Consents.objects.create(
+        lifeInsurance=client,
+    )
+
+    signature_data = request.POST.get('signature')
+    format, imgstr = signature_data.split(';base64,')
+    ext = format.split('/')[-1]
+    image = ContentFile(base64.b64decode(imgstr), name=f'firma.{ext}')
+
+    consent.signature = image
+    consent.save()
+
+    context = {
+        'answers':answers_dict,
+        'client':client,
+        'consent':consent,
+        'company':getCompanyPerAgent(client.agent_usa),
+        'social_security':request.POST.get('socialSecurity'),
+        'current_date':current_date,
+        'date_more_3_months':date_more_3_months,
+        'ip':getIPClient(request)    
+    }
+
+    activate(language)
+    # Renderiza la plantilla HTML a un string
+    html_content = render_to_string('consent/templatePdfLifeInsurance.html', context)
+
+    # Genera el PDF
+    pdf_file = HTML(string=html_content).write_pdf()
+
+    # Usa BytesIO para convertir el PDF en un archivo
+    pdf_io = io.BytesIO(pdf_file)
+    pdf_io.seek(0)  # Asegúrate de que el cursor esté al principio del archivo
+
+    # Guarda el PDF en el modelo usando un ContentFile
+    pdf_name = f'Consent{client.full_name} #{client.phone_number} {datetime.now().strftime("%m-%d-%Y-%H:%M")}.pdf'  # Nombre del archivo
+
+    consent.pdf.save(pdf_name, ContentFile(pdf_io.read()), save=True)
+
 def save_data_from_request(model_class, post_data, exempted_fields, instance=None):
     """
     Guarda o actualiza los datos de un request.POST en la base de datos utilizando un modelo específico.
@@ -520,7 +680,13 @@ def generateTemporaryToken(client, typeToken):
     token = urlsafe_base64_encode(force_bytes(signed_data))  # Codificar seguro para URL
 
     # Guardar solo el token en la base de datos
-    if typeToken:
+    if typeToken == 'lifeInsurance':
+        TemporaryToken.objects.create(
+            life_insurance=client,
+            token=token,
+            expiration=expiration_time
+        )
+    elif typeToken == 'obamacare':
         TemporaryToken.objects.create(
             client=client,
             token=token,
@@ -549,11 +715,16 @@ def validateTemporaryToken(request, typeToken):
         signed_data = force_str(urlsafe_base64_decode(token))
         data = json.loads(signer.unsign(signed_data))
 
-        if typeToken:
+        if typeToken == 'obamacare':
             client_id = data.get('client_id')
             expiration_time = timezone.datetime.fromisoformat(data['expiration'])
             # Verificar si el token está activo y no ha expirado
             tempToken = TemporaryToken.objects.get(token=token, client_id=client_id)
+        elif typeToken == 'lifeInsurance':
+            life_insurance = data.get('client_id')
+            expiration_time = timezone.datetime.fromisoformat(data['expiration'])
+            # Verificar si el token está activo y no ha expirado
+            tempToken = TemporaryToken.objects.get(token=token, life_insurance_id=life_insurance)
         else:
             medicare_id = data.get('client_id')
             expiration_time = timezone.datetime.fromisoformat(data['expiration'])

@@ -223,4 +223,24 @@ def clientAssure(request):
 
     return render(request, 'informationClient/clientAssure.html', {'assure':assure})
 
+@login_required(login_url='/login')   
+@company_ownership_required_sinURL 
+def clientLifeInsurance(request):
+
+    roleAuditar = ['S', 'C',  'AU','SUPP']
+    company_id = request.company_id
+    
+    if request.user.is_superuser:
+        life = ClientsLifeInsurance.objects.select_related('agent').all()
+    elif request.user.role in roleAuditar:
+        life = ClientsLifeInsurance.objects.select_related('agent').filter(
+            company = company_id, is_active = True)
+    elif request.user.role == 'Admin':
+        life = ClientsLifeInsurance.objects.select_related('agent').filter(company = company_id)
+    elif request.user.role == 'A':
+        life = ClientsLifeInsurance.objects.select_related('agent').filter(
+            agent = request.user.id, company = company_id, is_active = True)
+
+    return render(request, 'informationClient/clientLifeInsurance.html', {'life':life})
+
 

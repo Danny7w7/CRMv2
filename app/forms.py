@@ -8,6 +8,12 @@ class ClientForm(forms.ModelForm):
         fields = '__all__'
         exclude = ['agent','date_birth','social_security','company','created_at']
 
+class ClientLifeForm(forms.ModelForm):
+    class Meta:
+        model = ClientsLifeInsurance
+        fields = '__all__'
+        exclude = ['agent','date_birth','social_security','company','created_at', 'observation','is_active','status','status_color','date_effective_coverage','date_effective_coverage_end','payment_type','policyNumber']
+
 class ClientFormAssure(forms.ModelForm):
     class Meta:
         model = ClientsAssure

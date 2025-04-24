@@ -123,6 +123,39 @@ def saveCustomerObservationAssure(request):
         return HttpResponse("Método no permitido.", status=405)
 
 @login_required(login_url='/login') 
+def saveCustomerObservationLife(request):
+    if request.method == "POST":
+        content = request.POST.get('textoIngresado')
+        client_id = request.POST.get('client_id')
+        typeCall = request.POST.get('typeCall')        
+
+        # Obtenemos las observaciones seleccionadas
+        observations = request.POST.getlist('observaciones[]')  # Lista de valores seleccionados
+        
+        # Convertir las observaciones a una cadena (por ejemplo, separada por comas o saltos de línea)
+        typification_text = ", ".join(observations)  # Puedes usar "\n".join(observations) si prefieres saltos de línea
+
+        client = ClientsLifeInsurance.objects.get(id=client_id) 
+
+        if content.strip():  # Validar que el texto no esté vacío
+            ObservationCustomer.objects.create(
+                agent=request.user,
+                life_insurance=client,
+                typeCall=typeCall,
+                typification=typification_text, # Guardamos las observaciones en el campo 'typification'
+                content=content
+            )
+            messages.success(request, "Observación guardada exitosamente.")
+        else:
+            messages.error(request, "El contenido de la observación no puede estar vacío.")
+
+        return redirect('editLife', client.id)        
+        
+    else:
+        return HttpResponse("Método no permitido.", status=405)
+
+
+@login_required(login_url='/login') 
 def saveCustomerObservationMedicare(request):
     if request.method == "POST":
         content = request.POST.get('textoIngresado')
@@ -476,3 +509,33 @@ def agentTicketAssignment(request):
         
     else:
         return render(request, "auth/404.html", {"message": "Método no permitido."})
+
+def paymentDateLife(request, client_id):
+
+    lifeInsurance = get_object_or_404(ClientsLifeInsurance, id=client_id)
+
+    if request.method == "POST":
+        payment_date = request.POST.get("paymentDate")
+
+        # Validar que la fecha no sea vacía
+        if not payment_date:
+            return JsonResponse({"error": "Date is required"}, status=400)
+
+        # Intentar parsear la fecha en formato YYYY-MM-DD
+        parsed_date = parse_date(payment_date)
+
+        if parsed_date is None:
+            return JsonResponse({"error": "Invalid date format. Expected YYYY-MM-DD."}, status=400)
+
+        # Actualizar o crear el registro de PaymentDate
+        payment_record, created = paymentDate.objects.update_or_create(
+            life_insurance=lifeInsurance,  
+            defaults={"payment_date": parsed_date},
+            agent_create = request.user
+        )
+
+        message = "Recode SMS Created!" if created else "Date of updated billing SMS!"
+        return JsonResponse({"message": message, "id": payment_record.id})
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
+

@@ -202,6 +202,56 @@ class Medicare(models.Model):
     class Meta:
         db_table = 'medicare'
 
+class ClientsLifeInsurance(models.Model):
+    agent = models.ForeignKey(Users, on_delete=models.CASCADE)
+    agent_usa = models.CharField(max_length=100)
+    full_name = models.CharField(max_length=200)
+    phone_number = models.BigIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True) 
+    address = models.CharField(max_length=255)
+    zipcode = models.IntegerField()
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=50)
+    county = models.CharField(max_length=100, null=True)
+    sex = models.CharField(max_length=1) 
+    date_birth = models.DateField()
+    social_security = models.CharField(max_length=9,null=True)
+    full_name_beneficiary = models.CharField(max_length=200)
+    phone_number_beneficiary = models.BigIntegerField()
+    observation = models.TextField(null=True)
+    status = models.CharField(max_length=50,null=True)
+    status_color = models.IntegerField(null = True)
+    date_effective_coverage = models.DateField(null=True)
+    date_effective_coverage_end = models.DateField(null=True)
+    policyNumber = models.CharField(max_length=200, null=True)
+    payment_type = models.CharField(max_length=50,null=True)
+    is_active = models.BooleanField(default=True)  
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'clients_life_insurance'
+
+    def _str_(self):
+        return f'{self.full_name} - {self.phone_number}'
+
+class AskLifeInsurance(models.Model):
+    ask_es =models.TextField(null=True)
+    ask_en = models.TextField(null=True)
+
+    class Meta:
+        db_table = 'ask_life_insurance'
+
+class AnswerLifeInsurance(models.Model):
+    client = models.ForeignKey(ClientsLifeInsurance, on_delete=models.CASCADE)
+    agent = models.ForeignKey(Users, on_delete=models.CASCADE)
+    ask = models.ForeignKey(AskLifeInsurance, on_delete=models.CASCADE)
+    answer = models.TextField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'answer_life_insurance'
+
 class ContactClient(models.Model):
     client = models.ForeignKey(Clients, on_delete=models.CASCADE)
     agent = models.ForeignKey(Users, on_delete=models.CASCADE)
@@ -358,6 +408,7 @@ class ObservationAgent(models.Model):
     obamaCare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null=True, blank=True)
     supp = models.ForeignKey(Supp, on_delete=models.CASCADE, null=True, blank=True)
     assure = models.ForeignKey(ClientsAssure, on_delete=models.CASCADE, null=True, blank=True)
+    life_insurance = models.ForeignKey(ClientsLifeInsurance, on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey(Users, on_delete=models.CASCADE)
     content = models.TextField()
 
@@ -370,6 +421,7 @@ class ObservationCustomer(models.Model):
     obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null=True)
     supp = models.ForeignKey(Supp, on_delete=models.CASCADE, null=True)
     assure = models.ForeignKey(ClientsAssure, on_delete=models.CASCADE, null=True, blank=True)
+    life_insurance = models.ForeignKey(ClientsLifeInsurance, on_delete=models.CASCADE, null=True, blank=True)
     typeCall = models.CharField(max_length=20)   
     created_at = models.DateTimeField(auto_now_add=True) 
     typification = models.TextField()
@@ -498,6 +550,7 @@ class Consents(models.Model):
         null=True)
     obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null = True)
     medicare = models.ForeignKey(Medicare, on_delete=models.CASCADE, null = True)
+    lifeInsurance = models.ForeignKey(ClientsLifeInsurance, on_delete=models.CASCADE, null = True)
     signature = models.FileField(
         upload_to='SignatureConsents',
         storage=S3Boto3Storage(),
@@ -537,6 +590,7 @@ class TemporaryToken(models.Model):
     client = models.ForeignKey(Clients, on_delete=models.CASCADE, null = True)
     contact = models.ForeignKey('app.Contacts', on_delete=models.CASCADE, null = True)
     medicare = models.ForeignKey(Medicare, on_delete=models.CASCADE, null = True)
+    life_insurance = models.ForeignKey(ClientsLifeInsurance, on_delete=models.CASCADE, null = True)
     token = models.TextField()  # Guardar el token firmado
     expiration = models.DateTimeField()
     is_active = models.BooleanField(default=True)  # Para invalidar manualmente
@@ -611,6 +665,7 @@ class paymentDate(models.Model):
     obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null=True)
     supp = models.ForeignKey(Supp, on_delete=models.CASCADE, null= True)
     assure = models.ForeignKey(ClientsAssure, on_delete=models.CASCADE, null=True, blank=True)
+    life_insurance = models.ForeignKey(ClientsLifeInsurance, on_delete=models.CASCADE, null=True, blank=True)
     payment_date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
     agent_create = models.ForeignKey(Users,on_delete=models.CASCADE)   
