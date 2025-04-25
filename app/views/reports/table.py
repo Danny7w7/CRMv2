@@ -573,8 +573,11 @@ def salesBonusAgent(request, company_id, start_date=None, end_date=None):
     # Diccionario para almacenar las ventas por agente
     sales_data = {}
 
-    # Procesar los resultados de Supp
-    for entry in sales_query_supp:
+    # Unir los resultados de Supp, Assure y Life Insurance
+    combined_supp_assure = list(sales_query_supp) + list(sales_query_assure) + list(sales_query_life)
+
+    # Procesar los resultados de Supp, Assure y Life Insurance
+    for entry in combined_supp_assure:
         agent_id = entry['agent__id']
         username = entry['agent__username']
         first_name = entry['agent__first_name']
@@ -582,6 +585,9 @@ def salesBonusAgent(request, company_id, start_date=None, end_date=None):
         agent_full_name = f"{first_name} {last_name} ({username})"
         status_color = entry['status_color']
         total_sales = entry['total_sales']
+
+        # Imprimir el status color para debugging
+        print(f"Agent: {agent_full_name}, Status Color: {status_color}, Sales: {total_sales}")
 
         if agent_id not in sales_data:
             sales_data[agent_id] = {
@@ -595,14 +601,20 @@ def salesBonusAgent(request, company_id, start_date=None, end_date=None):
                 'total_sales': 0
             }
 
+           # Depuración: Ver los datos antes de sumar
+        print(f"Before Summing - Agent: {agent_full_name}, Sales Data: {sales_data[agent_id]}")
+
         # Sumar las ventas de status_color 1 y 2 en Supp
         if status_color in [1, 2]:
             sales_data[agent_id]['status_color_1_2_supp'] += total_sales
         elif status_color == 3:
             sales_data[agent_id]['status_color_3_supp'] += total_sales
-        
+
         # Actualizar total_sales
         sales_data[agent_id]['total_sales'] += total_sales
+
+           # Depuración: Ver los datos después de sumar
+        print(f"After Summing - Agent: {agent_full_name}, Sales Data: {sales_data[agent_id]}")
 
     # Procesar los resultados de ObamaCare
     for entry in sales_query_obamacare:
@@ -637,69 +649,6 @@ def salesBonusAgent(request, company_id, start_date=None, end_date=None):
 
         # Procesar los resultados de Supp
     
-    # Procesar los resultados de Assure
-    for entry in sales_query_assure:
-        agent_id = entry['agent__id']
-        username = entry['agent__username']
-        first_name = entry['agent__first_name']
-        last_name = entry['agent__last_name']
-        agent_full_name = f"{first_name} {last_name} ({username})"
-        status_color = entry['status_color']
-        total_sales = entry['total_sales']
-
-        if agent_id not in sales_data:
-            sales_data[agent_id] = {
-                'id': agent_id,
-                'username': username,
-                'full_name': agent_full_name,
-                'status_color_1_2_obama': 0,
-                'status_color_3_obama': 0,
-                'status_color_1_2_supp': 0,
-                'status_color_3_supp': 0,
-                'total_sales': 0
-            }
-
-        # Sumar las ventas de status_color 1 y 2 en Supp
-        if status_color in [1, 2]:
-            sales_data[agent_id]['status_color_1_2_supp'] += total_sales
-        elif status_color == 3:
-            sales_data[agent_id]['status_color_3_supp'] += total_sales
-        
-        # Actualizar total_sales
-        sales_data[agent_id]['total_sales'] += total_sales
-
-    
-    #Procesar los resultados de Life
-    for entry in sales_query_life:
-        agent_id = entry['agent__id']
-        username = entry['agent__username']
-        first_name = entry['agent__first_name']
-        last_name = entry['agent__last_name']
-        agent_full_name = f"{first_name} {last_name} ({username})"
-        status_color = entry['status_color']
-        total_sales = entry['total_sales']
-
-        if agent_id not in sales_data:
-            sales_data[agent_id] = {
-                'id': agent_id,
-                'username': username,
-                'full_name': agent_full_name,
-                'status_color_1_2_obama': 0,
-                'status_color_3_obama': 0,
-                'status_color_1_2_supp': 0,
-                'status_color_3_supp': 0,
-                'total_sales': 0
-            }
-
-        # Sumar las ventas de status_color 1 y 2 en Supp
-        if status_color in [1, 2]:
-            sales_data[agent_id]['status_color_1_2_supp'] += total_sales
-        elif status_color == 3:
-            sales_data[agent_id]['status_color_3_supp'] += total_sales
-        
-        # Actualizar total_sales
-        sales_data[agent_id]['total_sales'] += total_sales
-
 
     # Calcular los totales generales
     total_status_color_1_2_obama = sum([data['status_color_1_2_obama'] for data in sales_data.values()])
@@ -707,6 +656,8 @@ def salesBonusAgent(request, company_id, start_date=None, end_date=None):
 
     total_status_color_1_2_supp = sum([data['status_color_1_2_supp'] for data in sales_data.values()])
     total_status_color_3_supp = sum([data['status_color_3_supp'] for data in sales_data.values()])
+
+
 
     # Total general
     total_sales = total_status_color_1_2_obama + total_status_color_3_obama + total_status_color_1_2_supp + total_status_color_3_supp
