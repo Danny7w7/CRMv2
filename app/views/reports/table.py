@@ -44,7 +44,7 @@ def sale(request):
 
     # Calcular los totales por agente antes de pasar los datos a la plantilla
     for agent, data in sales_data.items():
-        data['total'] = data['status_color_1_2_obama'] + data['status_color_3_obama'] + data['status_color_1_2_supp'] + data['status_color_3_supp']
+        data['total'] = data['status_color_1_2_obama'] + data['status_color_3_obama'] + data['status_color_1_2_supp'] + data['status_color_3_supp'] + data['status_color_1_2_life'] + data['status_color_3_life']
 
     context = {
         'saleACA': saleACA,
@@ -56,8 +56,6 @@ def sale(request):
         'total_status_color_3_obama': total_status_color_3_obama,
         'total_status_color_1_supp': total_status_color_1_2_supp,
         'total_status_color_3_supp': total_status_color_3_supp,
-        'total_status_color_1_2_life': total_status_color_1_2_life,
-        'total_status_color_3_life': total_status_color_3_life,
         'total_sales': total_sales,
         'registered':registered,
         'proccessing' : proccessing,
