@@ -35,6 +35,7 @@
                         	<th>Agent COL</th>
 						{% endif %}
                         <th>Name</th>
+						<th>Date</th>
                         <th>Action</th>
 						{% if request.user.role == 'Admin' %}
 							<th>Active</th>
@@ -53,6 +54,7 @@
                         	<td>{{obamacare.agent.first_name}} {{obamacare.agent.last_name}}</td>
 						{% endif %}
                         <td>{{obamacare.client.first_name}} {{obamacare.client.last_name}}</td>
+						<td> {{obamacare.created_at}}</td>
 						<td> {{obamacare.customer_red_flag_clave}}</td>
 						{% if request.user.role == 'Admin' %}
 							<td>{{obamacare.is_active}}	</td>
