@@ -62,13 +62,13 @@ def SaleModal(request, agent_id):
     ).exclude( id__in=Subquery(excluded_obama_ids))
 
     saleModalSupp = Supp.objects.select_related('agent', 'client').filter(
-        agent_id=agent_id, created_at__range=[start_date, end_date], is_active = True )
+        agent_id=agent_id, created_at__range=[start_date, end_date], is_active = True, **company_filter )
     
     saleModalAssure = ClientsAssure.objects.select_related('agent').filter(
-        agent_id=agent_id, created_at__range=[start_date, end_date], is_active = True  )
+        agent_id=agent_id, created_at__range=[start_date, end_date], is_active = True, **company_filter )
     
     saleModalLife = ClientsLifeInsurance.objects.select_related('agent').filter(
-        agent_id=agent_id, created_at__range=[start_date, end_date], is_active = True  )
+        agent_id=agent_id, created_at__range=[start_date, end_date], is_active = True, **company_filter )
 
 
     # Preparar los datos en formato JSON
