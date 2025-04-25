@@ -177,7 +177,7 @@ def sendTemplateWhatsapp(from_number, to_number):
         message = client.messages.create(
             from_=f"whatsapp:+{from_number}",
             to=f"whatsapp:+{to_number}",
-            content_sid="HXc1b8bc8b11b4a68fcdfd545d03d061e0",  # ← Reemplaza esto
+            content_sid="HX1070fc7e6dec1ce38634619b21f75d80",  # ← Reemplaza esto
             content_variables=json.dumps({
                 "1": 'PRUEBA'  # Asigna la variable [first_name] (ej: "John")
             })
