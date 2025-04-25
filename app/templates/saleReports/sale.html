@@ -266,13 +266,8 @@
 							  <td class="ver-detalles" data-id="{{ data.id }}" style="cursor: pointer;">{{ data.full_name }}</td>
 							  <td>{{ data.status_color_1_2_obama }}</td>
 							  <td>{{ data.status_color_3_obama }}</td>
-							  <td>{{ data.status_color_1_2_supp|add:data.status_color_1_2_life }} - {{ data.status_color_1_2_life }} <p>
-								Supp: {{ data.status_color_1_2_supp }} (Tipo: {{ data.status_color_1_2_supp|stringformat:"s" }})<br>
-								Life: {{ data.status_color_1_2_life }} (Tipo: {{ data.status_color_1_2_life|stringformat:"s" }})<br>
-								Suma cruda: {{ data.status_color_1_2_supp|add:data.status_color_1_2_life }}<br>
-								Suma con default: {{ data.status_color_1_2_supp|default:0|add:data.status_color_1_2_life|default:0 }}
-							</p></td>
-							  <td>{{ data.status_color_3_supp|add:data.status_color_3_life }} - {{ data.status_color_3_life }}</td>
+							  <td>{{ data.status_color_1_2_supp }}</td>
+							  <td>{{ data.status_color_3_supp }}</td>
 							  <td>{{ data.total_sales }}</td>
 							</tr>
 							{% endfor %}

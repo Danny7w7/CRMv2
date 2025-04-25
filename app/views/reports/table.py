@@ -36,7 +36,7 @@ def sale(request):
     saleACAUsa = saleObamaAgentUsa(request, company_id, start_date, end_date)
     saleSupp = saleSuppAgent(request, company_id, start_date, end_date)
     saleSuppUsa = saleSuppAgentUsa(request, company_id, start_date, end_date)
-    sales_data, total_status_color_1_2_obama, total_status_color_3_obama, total_status_color_1_2_supp, total_status_color_3_supp,     total_status_color_1_2_life, total_status_color_3_life, total_sales = salesBonusAgent(request, company_id, start_date, end_date)
+    sales_data, total_status_color_1_2_obama, total_status_color_3_obama, total_status_color_1_2_supp, total_status_color_3_supp, total_sales = salesBonusAgent(request, company_id, start_date, end_date)
 
     registered, proccessing, profiling, canceled, countRegistered,countProccsing,countProfiling,countCanceled = saleClientStatusObama(request, company_id, start_date, end_date)
     registeredSupp, proccessingSupp, activeSupp, canceledSupp,countRegisteredSupp,countProccsingSupp,countActiveSupp,countCanceledSupp,registeredAssure,proccessingAssure,activeAssure,canceledAssure = saleClientStatusSupp(request, company_id, start_date, end_date)
@@ -44,7 +44,7 @@ def sale(request):
 
     # Calcular los totales por agente antes de pasar los datos a la plantilla
     for agent, data in sales_data.items():
-        data['total'] = data['status_color_1_2_obama'] + data['status_color_3_obama'] + data['status_color_1_2_supp'] + data['status_color_3_supp'] + data['status_color_1_2_life'] + data['status_color_3_life']
+        data['total'] = data['status_color_1_2_obama'] + data['status_color_3_obama'] + data['status_color_1_2_supp'] + data['status_color_3_supp']
 
     context = {
         'saleACA': saleACA,
@@ -571,7 +571,7 @@ def salesBonusAgent(request, company_id, start_date=None, end_date=None):
         {
             'query': ClientsLifeInsurance.objects.select_related('agent')
                 .filter(is_active=True, status_color__in=[1, 2, 3], **company_filter),
-            'type': 'life'
+            'type': 'supp'
         }
     ]
     
@@ -609,15 +609,8 @@ def salesBonusAgent(request, company_id, start_date=None, end_date=None):
                     'status_color_3_obama': 0,
                     'status_color_1_2_supp': 0,
                     'status_color_3_supp': 0,
-                    'status_color_1_2_life': 0,  # Nuevos campos para Life Insurance
-                    'status_color_3_life': 0,    # Nuevos campos para Life Insurance
                     'total_sales': 0
                 }
-            
-            # Asegurarse de que existan las claves necesarias
-            if f'status_color_1_2_{product_type}' not in sales_data[agent_id]:
-                sales_data[agent_id][f'status_color_1_2_{product_type}'] = 0
-                sales_data[agent_id][f'status_color_3_{product_type}'] = 0
             
             # Sumar ventas según el tipo de producto y status_color
             if status_color in [1, 2]:
@@ -633,13 +626,11 @@ def salesBonusAgent(request, company_id, start_date=None, end_date=None):
     total_status_color_3_obama = sum(data['status_color_3_obama'] for data in sales_data.values())
     total_status_color_1_2_supp = sum(data['status_color_1_2_supp'] for data in sales_data.values())
     total_status_color_3_supp = sum(data['status_color_3_supp'] for data in sales_data.values())
-    total_status_color_1_2_life = sum(data.get('status_color_1_2_life', 0) for data in sales_data.values())
-    total_status_color_3_life = sum(data.get('status_color_3_life', 0) for data in sales_data.values())
     
     # Total general
-    total_sales = total_status_color_1_2_obama + total_status_color_3_obama + total_status_color_1_2_supp + total_status_color_3_supp + total_status_color_1_2_life + total_status_color_3_life
+    total_sales = total_status_color_1_2_obama + total_status_color_3_obama + total_status_color_1_2_supp + total_status_color_3_supp
     
-    return sales_data, total_status_color_1_2_obama, total_status_color_3_obama, total_status_color_1_2_supp, total_status_color_3_supp,    total_status_color_1_2_life, total_status_color_3_life, total_sales
+    return sales_data, total_status_color_1_2_obama, total_status_color_3_obama, total_status_color_1_2_supp, total_status_color_3_supp, total_sales
 
 def saleClientStatusObama(request, company_id, start_date=None, end_date=None):
 
