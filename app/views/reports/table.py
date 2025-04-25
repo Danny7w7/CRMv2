@@ -668,7 +668,6 @@ def salesBonusAgent(request, company_id, start_date=None, end_date=None):
         # Actualizar total_sales
         sales_data[agent_id]['total_sales'] += total_sales
 
-        # Procesar los resultados de Assure
     
     #Procesar los resultados de Life
     for entry in sales_query_life:

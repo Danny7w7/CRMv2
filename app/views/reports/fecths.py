@@ -103,7 +103,7 @@ def SaleModal(request, agent_id):
                 'client_name': f'{sale.full_name}',  # Ajusta si el campo se llama distinto
                 'created_at': sale.created_at.strftime('%Y-%m-%d'),
                 'details': sale.status,        # Ejemplo: tipo de plan funerario
-                'carrier': 'Life Insurance - FUNERAL MENBRESIA'     # Nombre de la empresa o aseguradora
+                'carrier': 'LIFE INSURANCE'     # Nombre de la empresa o aseguradora
             }
             for sale in saleModalLife
         ],

@@ -54,7 +54,7 @@
                         	<td>{{obamacare.agent.first_name}} {{obamacare.agent.last_name}}</td>
 						{% endif %}
                         <td>{{obamacare.client.first_name}} {{obamacare.client.last_name}}</td>
-						<td> {{obamacare.created_at}}</td>
+						<td> {{obamacare.created_at|date:"m-d-Y"}}</td>
 						<td> {{obamacare.customer_red_flag_clave}}</td>
 						{% if request.user.role == 'Admin' %}
 							<td>{{obamacare.is_active}}	</td>
