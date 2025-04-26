@@ -150,7 +150,7 @@ def incomeLetter(request, obamacare_id):
 
     # Validar si el usuario no está logueado y verificar el token
     if isinstance(request.user, AnonymousUser):
-        typeToken = True #Aqui le indico si buscar el token temporal por el medicare o client_id
+        typeToken = 'obamacare' #Aqui le indico si buscar el token temporal por el medicare o client_id
         result = validateTemporaryToken(request, typeToken)
         is_valid_token, *note = result
         if not is_valid_token:
