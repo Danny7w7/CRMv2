@@ -68,9 +68,9 @@ urlpatterns = [
     path('formCreateClientMedicare/', forms.formCreateClientMedicare, name='formCreateClientMedicare'), # Formulario para crear clientes Medicare
 
     path('select_client/', existClient.select_client, name='select_client'), # Vista para seleccionar clientes existentes
-    path('update-type-sales/<int:client_id>/', existClient.update_type_sales, name='update_type_sales'), # Funcion intermedia que cambia el TypeSale del cliente
-    path('formAddObama/<client_id>/<path:type_sales>/', forms.formAddObama, name='formAddObama'),
-    path('formAddSupp/<client_id>/<path:type_sales>/', forms.formAddSupp, name='formAddSupp'),
+    path('updateTypeSales/<int:client_id>/', existClient.updateTypeSales, name='updateTypeSales'), # Funcion intermedia que cambia el TypeSale del cliente
+    path('formAddObama/<client_id>/', forms.formAddObama, name='formAddObama'),
+    path('formAddSupp/<client_id>/', forms.formAddSupp, name='formAddSupp'),
     path('formAddDepend/<client_id>/', forms.formAddDepend, name='formAddDepend'),
     path('addDepend/', forms.addDepend, name='addDepend'),
 

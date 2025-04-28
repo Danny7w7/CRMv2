@@ -26,17 +26,17 @@ def select_client(request):
     
     return render(request, 'newSale/selectClient.html', context)
 
-@company_ownership_required_sinURL
-def update_type_sales(request ,client_id):
-    company_id = request.company_id  # Obtener company_id desde request
+def updateTypeSales(request ,client_id):
     type_sales = request.POST.get('type_sales')
     route = request.POST.get('route')
-    if type_sales:
-        # Redirige a la URL previa con el ID del cliente
-        if route == 'ACA': return redirect('formAddObama', client_id, type_sales)
-        elif route == 'SUPP': return redirect('formAddSupp', client_id, type_sales)
-        elif route == 'DEPEND': return redirect('formAddDepend', client_id)
-        else: return redirect('select_client')
+    if route == 'ACA':   
+        request.session['type_sales'] = type_sales 
+        return redirect('formAddObama', client_id)
+    elif route == 'SUPP': 
+        request.session['type_sales'] = type_sales
+        return redirect('formAddSupp', client_id)
+    elif route == 'DEPEND': return redirect('formAddDepend', client_id)
+    else: return redirect('select_client')
 
 @company_ownership_required_sinURL
 def selectClientAssure(request):

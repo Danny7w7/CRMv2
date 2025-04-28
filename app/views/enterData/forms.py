@@ -448,7 +448,11 @@ def formCreatePlanAssure(request ,client_id):
 
 @login_required(login_url='/login')
 @company_ownership_required_sinURL
-def formAddObama(request, client_id, type_sales):
+def formAddObama(request, client_id):
+
+    type_sales = request.session.get('type_sales')
+
+    print(type_sales)
 
     client = Clients.objects.get(id=client_id)
 
@@ -476,7 +480,11 @@ def formAddObama(request, client_id, type_sales):
 
 @login_required(login_url='/login')
 @company_ownership_required_sinURL
-def formAddSupp(request,client_id, type_sales):
+def formAddSupp(request,client_id):
+
+    type_sales = request.session.get('type_sales')
+
+    print(type_sales)
 
     client = Clients.objects.get(id=client_id)    
 
