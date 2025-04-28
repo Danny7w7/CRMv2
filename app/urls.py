@@ -47,6 +47,9 @@ urlpatterns = [
     #<---------------------------Enter Data--------------------------->
     path('formCreateClient/', forms.formCreateClient, name='formCreateClient'), # Formulario para crear Clientes Obamacare
     path('formEditClient/<client_id>/', edits.formEditClient, name='formEditClient'),
+    path('validatePhone/', fetchInformations.validatePhone, name='validatePhone'),
+    path('validateKey/', fetchInformations.validateKey, name='validateKey'),
+
 
     path('formCreateClientLife/', forms.formCreateClientLife, name='formCreateClientLife'), # Formulario para crear Clientes Life Life Insurance .. 
 
@@ -66,9 +69,9 @@ urlpatterns = [
 
     path('select_client/', existClient.select_client, name='select_client'), # Vista para seleccionar clientes existentes
     path('update-type-sales/<int:client_id>/', existClient.update_type_sales, name='update_type_sales'), # Funcion intermedia que cambia el TypeSale del cliente
-    path('formAddObama/<client_id>/', forms.formAddObama, name='formAddObama'),
-    path('formAddSupp/<client_id>', forms.formAddSupp, name='formAddSupp'),
-    path('formAddDepend/<client_id>', forms.formAddDepend, name='formAddDepend'),
+    path('formAddObama/<client_id>/<path:type_sales>/', forms.formAddObama, name='formAddObama'),
+    path('formAddSupp/<client_id>/<path:type_sales>/', forms.formAddSupp, name='formAddSupp'),
+    path('formAddDepend/<client_id>/', forms.formAddDepend, name='formAddDepend'),
     path('addDepend/', forms.addDepend, name='addDepend'),
 
     path('formCreateAlert/', forms.formCreateAlert, name='formCreateAlert'), # Formulario para crear las Alertas

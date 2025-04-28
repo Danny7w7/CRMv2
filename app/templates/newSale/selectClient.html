@@ -76,7 +76,6 @@
                                     <li>
                                         <form method="POST" action="{% url 'update_type_sales' client.id %}">
                                             {% csrf_token %}
-                                            <input type="hidden" name="type_sales" value="ACA">
                                             <button type="submit" class="dropdown-item">ADD DEPENDENTS</button>
                                             <input type="hidden" name="route" id="DEPEND" value="DEPEND">
                                         </form>
@@ -112,7 +111,6 @@
                                     <li>
                                         <form method="POST" action="{% url 'update_type_sales' client.id %}">
                                             {% csrf_token %}
-                                            <input type="hidden" name="type_sales" value="ACA">
                                             <button type="submit" class="dropdown-item">ADD DEPENDENTS</button>
                                             <input type="hidden" name="route" id="DEPEND" value="DEPEND">
                                         </form>

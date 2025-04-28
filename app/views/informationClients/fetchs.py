@@ -258,3 +258,75 @@ def fetchActionRequired(request):
         return JsonResponse({'success': True, 'message': 'Acción POST procesada', 'id': id_value})
 
     return JsonResponse({'success': False, 'message': 'Método no permitido'}, status=405)
+
+def countDigits(numero):
+  """
+  Esta función toma un valor (esperando que sea un número o una cadena numérica)
+  y devuelve la cantidad de dígitos que tiene.
+  Maneja el caso en que la entrada sea una cadena.
+  """
+  try:
+    # Intenta convertir la cadena a un entero
+    numero_entero = int(numero)
+    # Ahora podemos calcular el valor absoluto y luego la longitud de su representación en string
+    return len(str(abs(numero_entero)))
+  except (TypeError, ValueError):
+    # Si la conversión a entero falla (no es una cadena numérica válida),
+    # intentamos contar la longitud de la cadena original (si es una cadena)
+    if isinstance(numero, str):
+      return len(numero)
+    else:
+      # Si no es ni un número convertible a entero ni una cadena, devolvemos 0 o raise un error
+      return 0  # O podrías hacer raise TypeError("Se esperaba un número o una cadena numérica.")
+
+@csrf_exempt
+def validatePhone(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        phoneNumber = data.get('phone_number')
+
+        amount = countDigits(phoneNumber)
+
+        if amount == 10:
+            newNumber = int(f'1{phoneNumber}')
+        else:
+            newNumber = phoneNumber
+
+        exists = Clients.objects.filter(phone_number=newNumber).exists()
+
+        return JsonResponse({'exists': exists})
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+@csrf_exempt
+def validateKey(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        accessKey = data.get('access_key')
+        phoneNumber = data.get('phone_number')
+
+        amount = countDigits(phoneNumber)
+
+        if amount == 10:
+            newNumber = int(f'1{phoneNumber}')
+        else:
+            newNumber = phoneNumber
+
+        keys = KeyAccess.objects.all()
+
+        for key in keys:   
+            if  accessKey == key.password:
+                allowed = True
+
+                client = Clients.objects.filter(phone_number = newNumber).first()
+
+                # Aquí guardamos el registro
+                KeyAccessLog.objects.create(
+                    user=request.user,
+                    client=client,
+                    password=key
+                )               
+
+        return JsonResponse({'allowed': allowed})
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+

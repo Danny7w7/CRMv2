@@ -1,6 +1,7 @@
 #libreria de paises
 import json
 import urllib.request
+from django.http import JsonResponse
 from django.shortcuts import render
 
 # Standard Python libraries
@@ -447,7 +448,7 @@ def formCreatePlanAssure(request ,client_id):
 
 @login_required(login_url='/login')
 @company_ownership_required_sinURL
-def formAddObama(request, client_id):
+def formAddObama(request, client_id, type_sales):
 
     client = Clients.objects.get(id=client_id)
 
@@ -465,13 +466,17 @@ def formAddObama(request, client_id):
             obama.company = company_id
             obama.save()
 
+            client = get_object_or_404(Clients, id=client_id)
+            client.type_sales = type_sales
+            client.save()
+
             return redirect('select_client')  # Cambia a tu página de éxito            
         
     return render(request, 'forms/formAddObama.html')
 
 @login_required(login_url='/login')
 @company_ownership_required_sinURL
-def formAddSupp(request,client_id):
+def formAddSupp(request,client_id, type_sales):
 
     client = Clients.objects.get(id=client_id)    
 
@@ -496,6 +501,12 @@ def formAddSupp(request,client_id):
             supp.status = 'REGISTERED'
             supp.company = company_id
             supp.save()
+
+            print(type_sales)
+            client = get_object_or_404(Clients, id=client_id)
+            client.type_sales = type_sales
+            client.save()          
+
             return redirect('select_client' )  # Cambia a tu página de éxito           
         
     return render(request, 'forms/formAddSupp.html')

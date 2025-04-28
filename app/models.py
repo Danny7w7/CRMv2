@@ -708,5 +708,24 @@ class AgentTicketAssignment(models.Model):
     class Meta:
         db_table = 'agent_ticket_assignment'
 
+class KeyAccess(models.Model):
+    user = models.ForeignKey(Users,  on_delete=models.CASCADE)
+    password = models.CharField(max_length=200)  
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)  
+
+    class Meta:
+        db_table = 'key_access'
+
+class KeyAccessLog(models.Model):
+    user = models.ForeignKey(Users, on_delete=models.SET_NULL, null=True, blank=True)
+    client = models.ForeignKey(Clients, on_delete=models.SET_NULL, null=True, blank=True)
+    password = models.ForeignKey(KeyAccess, on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)  
+
+    class Meta:
+        db_table = 'key_access_log'
+
 from .modelsSMS import *
 from .modelsWhatsapp import *
