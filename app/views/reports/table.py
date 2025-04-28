@@ -545,7 +545,7 @@ def salesBonusAgent(request, company_id, start_date=None, end_date=None):
         date_range = [start, end]
     
     # Definir las consultas para cada tipo de producto
-    excluded_obama_ids = CustomerRedFlag.objects.values('obamacare')
+    excluded_obama_ids = CustomerRedFlag.objects.filter(date_completed__isnull=False).values('obamacare')
     
     queries = [
         # Consulta para ObamaCare
