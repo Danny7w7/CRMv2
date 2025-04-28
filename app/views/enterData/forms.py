@@ -451,9 +451,6 @@ def formCreatePlanAssure(request ,client_id):
 def formAddObama(request, client_id):
 
     type_sales = request.session.get('type_sales')
-
-    print(type_sales)
-
     client = Clients.objects.get(id=client_id)
 
     if request.method == 'POST':
@@ -483,9 +480,6 @@ def formAddObama(request, client_id):
 def formAddSupp(request,client_id):
 
     type_sales = request.session.get('type_sales')
-
-    print(type_sales)
-
     client = Clients.objects.get(id=client_id)    
 
     if request.method == 'POST':
