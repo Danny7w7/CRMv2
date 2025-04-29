@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const phoneNumber = document.getElementById('phone_number').value;
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     
-        fetch('/validate-phone/', {
+        fetch('/validatePhone/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (result.isConfirmed) {
                         const clave = result.value;
                         if (clave) {
-                            fetch('/validate-key/', {
+                            fetch('/validateKey/', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
