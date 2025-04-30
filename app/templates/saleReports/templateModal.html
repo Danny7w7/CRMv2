@@ -1,9 +1,7 @@
 {% if obamacare or supp or medicare or assure or life %}
   <ul class="list-group">
     {% for item in obamacare %}
-      <li class="list-group-item"><strong>ObamaCare:</strong> {{ item.client.first_name }} {{item.client.last_name}} / <strong>Company:</strong> {{item.carrier}} / <strong>Status:</strong> {{item.status}} / <strong>Date:</strong> ({{ item.created_at|date:"Y-m-d" }})
-        {% endfor %}
-      </li>      
+      <li class="list-group-item"><strong>ObamaCare:</strong> {{ item.client.first_name }} {{item.client.last_name}} / <strong>Company:</strong> {{item.carrier}} / <strong>Status:</strong> {{item.status}} / <strong>Date:</strong> ({{ item.created_at|date:"Y-m-d" }}) </li>      
     {% endfor %}
     {% for item in supp %}
       <li class="list-group-item"><strong>Supp:</strong> {{ item.client.first_name }} {{item.client.last_name}} / <strong>Company:</strong> {{item.carrier}}-{{item.policy_type}} / <strong>Status:</strong> {{item.status}} / <strong>Date:</strong> ({{ item.created_at|date:"Y-m-d" }})</li>
