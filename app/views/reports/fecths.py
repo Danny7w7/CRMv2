@@ -55,12 +55,8 @@ def detalleAgente(request):
     filtro_fecha = Q(created_at__range=(start_date, end_date))
     filtro_agente = Q(agent=agente)
 
-    obama = ObamaCare.objects.select_related('client').filter(filtro_agente & filtro_fecha, **company_filter)
-
-
     context = {
-        'obamacare': obama,
-        'customerRed' : CustomerRedFlag.objects.filter(obamacare__in=obama),
+        'obamacare': ObamaCare.objects.select_related('client').filter(filtro_agente & filtro_fecha, **company_filter),
         'supp': Supp.objects.select_related('client').filter(filtro_agente & filtro_fecha, **company_filter),
         'medicare': Medicare.objects.filter(filtro_agente & filtro_fecha, **company_filter),
         'assure': ClientsAssure.objects.filter(filtro_agente & filtro_fecha, **company_filter),

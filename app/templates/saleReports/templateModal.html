@@ -2,12 +2,6 @@
   <ul class="list-group">
     {% for item in obamacare %}
       <li class="list-group-item"><strong>ObamaCare:</strong> {{ item.client.first_name }} {{item.client.last_name}} / <strong>Company:</strong> {{item.carrier}} / <strong>Status:</strong> {{item.status}} / <strong>Date:</strong> ({{ item.created_at|date:"Y-m-d" }})
-        {% for i in customerRed %}
-          {% if i.agent_completed %}
-            <span class="badge bg-warning" >  Pendiente {{ i.obamacare}} {{ i.id}}</span>
-          {% else %}
-            <span class="badge bg-success">Completado</span>
-          {% endif %} 
         {% endfor %}
       </li>      
     {% endfor %}
