@@ -252,23 +252,44 @@
 					<table id="tableBonus" class="table table-striped table-bordered">
 						<thead>
 							<tr>
-								<th>Agent</th>
-								<th>No Profiled</th>
-								<th>Profiled</th>
-								<th>No Pay</th>
-								<th>Pay</th>
-								<th>Total</th>
+								<th>Agente</th>
+								<th>ObamaCare P</th>
+								<th>ObamaCare Ok</th>
+								<th>Supp p</th>
+								<th>Supp OK</th>
+								<th>Medicare P</th>
+								<th>Medicare OK</th>
+								<th>Assure P</th>
+								<th>Assure OK</th>
+								<th>Life Insurance P</th>
+								<th>Life Insurance OK</th>
 							</tr>
 						</thead>
 						<tbody>
-							{% for agent_id, data in sales_data.items %}
+							{% for row in ventasAgentes %}
 							<tr>
-							  <td class="ver-detalles" data-id="{{ data.id }}" style="cursor: pointer;">{{ data.full_name }}</td>
-							  <td>{{ data.status_color_1_2_obama }}</td>
-							  <td>{{ data.status_color_3_obama }}</td>
-							  <td>{{ data.status_color_1_2_supp }}</td>
-							  <td>{{ data.status_color_3_supp }}</td>
-							  <td>{{ data.total_sales }}</td>
+								<td>
+									<a href="#" 
+										class="open-agent-modal" 
+										data-agent-id="{{ row.id }}"
+										data-agent-name="{{ row.nombre }}">
+										{{ row.nombre }}
+									</a>
+								  </td>
+								<td>{{ row.obamacarePendiente }}</td>
+								<td>{{ row.obamacare }}</td>
+								<td>{{ row.suppPendiente }}</td>
+								<td>{{ row.supp }}</td>
+								<td>{{ row.medicarePendiente }}</td>
+								<td>{{ row.medicare }}</td>
+								<td>{{ row.assurePendiente }}</td>
+								<td>{{ row.assure }}</td>
+								<td>{{ row.life_insurancePendiente }}</td>
+								<td>{{ row.life_insurance }}</td>
+							</tr>
+							{% empty %}
+							<tr>
+								<td colspan="6" class="text-center">No hay ventas registradas en este rango.</td>
 							</tr>
 							{% endfor %}
 						  </tbody>
@@ -696,47 +717,34 @@
 		</div>
 	</div>
 
-	<!-- Primer Modal -->
-	<div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
-		<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-			<h5 class="modal-title" id="infoModalLabel">Customer details:</h5>
-			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			</div>
-			<div class="modal-body">
-			<div class="d-flex justify-content-center">
-				<button id="openObamaCare" class="btn btn-primary me-2">View client ObamaCare</button>
-				<button id="openSupp" class="btn btn-secondary">View client Supp</button>
-			</div>
-			</div>
-			<div class="modal-footer">
-			<button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
-			</div>
+	<!-- Modal -->
+	<!-- Modal -->
+		<!-- Modal -->
+<!-- Modal Bootstrap -->
+<div class="modal fade" id="agentModal" tabindex="-1" aria-labelledby="agentModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-scrollable">
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h5 class="modal-title" id="agentModalLabel">Ventas del agente</h5>
+		  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
 		</div>
+		<div class="modal-body" id="modalAgentBody">
+		  <p class="text-muted">Cargando...</p>
 		</div>
+	  </div>
 	</div>
-	
-	<!-- Segundo Modal de bonus -->
-	<div class="modal fade" id="tableModal" tabindex="-1" aria-labelledby="tableModalLabel" aria-hidden="true">
-		<div class="modal-dialog modal-lg">
-		<div class="modal-content">
-			<div class="modal-header">
-			<h5 class="modal-title" id="tableModalLabel"></h5>
-			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			</div>
-			<div class="modal-body">
-			<div id="tableContainer" class="table-responsive">
-				<!-- Aquí se generará dinámicamente la tabla -->
-			</div>
-			</div>
-			<div class="modal-footer">
-			<button id="backToInfoModal" class="btn btn-secondary">Back</button>
-			<button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
-			</div>
-		</div>
-		</div>
-	</div>	
+  </div>
+
+  <div id="agent-data"
+     data-start-date="{{ start_date|default:'' }}"
+     data-end-date="{{ end_date|default:'' }}">
+</div>
+  
+
+  
+  
+
+
 
 </div>
 
@@ -770,6 +778,12 @@
 	<!--app JS-->
 	<script src="{% static "assets/js/app.js" %}"></script>
 	<script src="{% static "assets/js/modals/modalSale.js" %}"></script>
+
+	
+	  
+	  
+	  
+	  
 	
 
 {% endblock %}

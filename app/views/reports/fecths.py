@@ -2,8 +2,11 @@
 import datetime
 
 # Django utilities
-from django.http import JsonResponse
-from django.db.models import Subquery
+from django.http import HttpResponse, JsonResponse
+from django.db.models import Subquery, Q
+from django.utils.timezone import make_aware
+from datetime import datetime, timedelta
+from django.shortcuts import render, get_object_or_404
 
 # Application-specific imports
 from app.models import *
@@ -30,83 +33,40 @@ def get_observation_detail(request, observation_id):
         return JsonResponse({'error': 'Registro no encontrado'}, status=404)
 
 @company_ownership_required_sinURL
-def SaleModal(request, agent_id):
+def detalleAgente(request):
 
     company_id = request.company_id  # Obtener company_id desde request
     company_filter = {'company': company_id} if not request.user.is_superuser else {}
-    # Obtener los IDs de ObamaCare que están en CustomerRedFlag
-    excluded_obama_ids = CustomerRedFlag.objects.values('obamacare_id')
 
-    start_date = request.POST.get('start_date')  # Obtiene start_date desde la URL
-    end_date = request.POST.get('end_date')      # Obtiene end_date desde la URL
+    agent_id = request.GET.get('agent_id')
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
 
-    if not start_date and not end_date:
+    agente = get_object_or_404(Users, id=agent_id)
+
+    if not start_date or not end_date:
         today = timezone.now()
         start_date = today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-
-        if today.month == 12:
-            end_date = today.replace(day=31, hour=23, minute=59, second=59, microsecond=999999)
-        else:
-            end_date = (start_date.replace(month=start_date.month + 1) - timezone.timedelta(seconds=1))
-
+        end_date = (start_date.replace(month=start_date.month + 1) - timedelta(seconds=1)) if start_date.month < 12 else today.replace(month=12, day=31, hour=23, minute=59)
     else:
-        start_date = timezone.make_aware(
-            datetime.datetime.strptime(start_date, '%Y-%m-%d').replace(hour=0, minute=0, second=0, microsecond=0)
-        )
-        end_date = timezone.make_aware(
-            datetime.datetime.strptime(end_date, '%Y-%m-%d').replace(hour=23, minute=59, second=59, microsecond=999999)
-        )
+        start_date = make_aware(datetime.strptime(start_date, '%Y-%m-%d').replace(hour=0, minute=0))
+        end_date = make_aware(datetime.strptime(end_date, '%Y-%m-%d').replace(hour=23, minute=59))
 
-    saleModalObama = ObamaCare.objects.select_related('agent', 'client').filter(
-        agent_id=agent_id, created_at__range=[start_date, end_date], is_active = True, **company_filter
-    ).exclude( id__in=Subquery(excluded_obama_ids))
+    filtro_fecha = Q(created_at__range=(start_date, end_date))
+    filtro_agente = Q(agent=agente)
 
-    saleModalSupp = Supp.objects.select_related('agent', 'client').filter(
-        agent_id=agent_id, created_at__range=[start_date, end_date], is_active = True, **company_filter )
-    
-    saleModalAssure = ClientsAssure.objects.select_related('agent').filter(
-        agent_id=agent_id, created_at__range=[start_date, end_date], is_active = True, **company_filter )
-    
-    saleModalLife = ClientsLifeInsurance.objects.select_related('agent').filter(
-        agent_id=agent_id, created_at__range=[start_date, end_date], is_active = True, **company_filter )
+    obama = ObamaCare.objects.select_related('client').filter(filtro_agente & filtro_fecha, **company_filter)
 
 
-    # Preparar los datos en formato JSON
-    data = {
-        'obama_sales': [
-            {
-                'client_name': f'{sale.client.first_name} {sale.client.last_name}', 
-                'created_at': sale.created_at.strftime('%Y-%m-%d'),
-                'details': sale.profiling,  # Asegúrate de tener este campo en tu modelo
-                'carrier':sale.carrier
-            }
-            for sale in saleModalObama
-        ],
-        'supp_sales': [
-            {
-                'client_name':  f'{sale.client.first_name} {sale.client.last_name}',
-                'created_at': sale.created_at.strftime('%Y-%m-%d'),
-                'details': sale.status,  # Asegúrate de tener este campo en tu modelo
-                'carrier':  f'{sale.carrier} - {sale.policy_type}'
-            }
-            for sale in saleModalSupp
-        ] + [
-            {
-                'client_name': f'{sale.first_name} {sale.last_name}',  # Ajusta si el campo se llama distinto
-                'created_at': sale.created_at.strftime('%Y-%m-%d'),
-                'details': sale.status,        # Ejemplo: tipo de plan funerario
-                'carrier': 'ASSURE - FUNERAL MENBRESIA'     # Nombre de la empresa o aseguradora
-            }
-            for sale in saleModalAssure
-        ] + [
-            {
-                'client_name': f'{sale.full_name}',  # Ajusta si el campo se llama distinto
-                'created_at': sale.created_at.strftime('%Y-%m-%d'),
-                'details': sale.status,        # Ejemplo: tipo de plan funerario
-                'carrier': 'LIFE INSURANCE'     # Nombre de la empresa o aseguradora
-            }
-            for sale in saleModalLife
-        ],
+    context = {
+        'obamacare': obama,
+        'customerRed' : CustomerRedFlag.objects.filter(obamacare__in=obama),
+        'supp': Supp.objects.select_related('client').filter(filtro_agente & filtro_fecha, **company_filter),
+        'medicare': Medicare.objects.filter(filtro_agente & filtro_fecha, **company_filter),
+        'assure': ClientsAssure.objects.filter(filtro_agente & filtro_fecha, **company_filter),
+        'life': ClientsLifeInsurance.objects.filter(filtro_agente & filtro_fecha, **company_filter),
     }
 
-    return JsonResponse({'success': True, 'data': data})
+    return render(request, 'saleReports/templateModal.html', context)
+
+

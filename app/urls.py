@@ -155,7 +155,7 @@ urlpatterns = [
     path('sale/', tableReports.sale, name='sale'),
 
     path('sale6Week/', tableReports.sales6WeekReport, name='sale6Week'),  
-    path('detalleAgente/<agent_id>/', fetchsReports.SaleModal, name='detalleAgente'),  
+    path('sale/detalleAgente/', fetchsReports.detalleAgente, name='detalleAgente'),  
 
     path('weekSalesWiew/',tableReports.weekSalesWiew, name='weekSalesWiew'),
     path('descargarPdf/<int:week_number>/', download.downloadPdf, name='downloadPdf'),
