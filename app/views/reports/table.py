@@ -549,7 +549,13 @@ def salesBonusAgent(request, company_id, start_date=None, end_date=None):
             'life_insurancePendiente': ClientsLifeInsurance.objects.filter(Q(agent=agente), Q(status_color__in = [1,2]), filtro_fecha, filtro_company).count(),
         }
 
-        if any([row['obamacare'], row['supp'], row['medicare'], row['assure'], row['life_insurance']]):
+        if any([
+            row['obamacare'], row['obamacarePendiente'],
+            row['supp'], row['suppPendiente'],
+            row['medicare'], row['medicarePendiente'],
+            row['assure'], row['assurePendiente'],
+            row['life_insurance'], row['life_insurancePendiente']
+        ]):
             ventasAgentes.append(row)
 
     return ventasAgentes
