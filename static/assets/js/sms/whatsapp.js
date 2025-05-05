@@ -281,14 +281,33 @@ document.addEventListener('DOMContentLoaded', function() {
     const buttonStartChat = document.getElementById('buttonStartChat');
     
     if (buttonCreateSecretKey) {
-        buttonCreateSecretKey.addEventListener('click', () => SecretKey('Create'));
-    }
-    
-    if (buttonSendSecretKey) {
-        buttonSendSecretKey.addEventListener('click', () => SecretKey('Send'));
+        buttonCreateSecretKey.addEventListener('click', () => SecretKey());
     }
 
 });
+
+function SecretKey() {
+    fetch(`/sendPlantilla/${contact_id}/`, {
+        method: 'POST'
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Server error ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(() => {
+        addMessage('Template successfully submitted', 'Agent', 'SMS');        
+    })
+    .catch((error) => {
+        Swal.fire({
+            title: "Error",
+            text: `Error sending the secret Key, contact your system administrator. ${error.message}`,
+            icon: "error"
+        });
+    });
+}
+
 
 
 

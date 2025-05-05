@@ -500,6 +500,29 @@ def comprobate_company(company):
         paymend_recording(company)
         return False
     
+@csrf_exempt   
+def sendPlantilla(request, contact_id):
+    try:
+        contact = Contacts.objects.get(id=contact_id)
 
+        from_number = request.user.assigned_phone.phone_number
+        to_number = contact.phone_number
+
+        client = Client(settings.ACCOUNT_SID, settings.AUTH_TOKEN)
+
+        message = client.messages.create(
+            from_=f"whatsapp:+{from_number}",
+            to=f"whatsapp:+{to_number}",
+            content_sid="HX1070fc7e6dec1ce38634619b21f75d80",  # Reemplaza con tu SID real
+            content_variables=json.dumps({
+                "1": 'PRUEBA' # o cualquier valor que necesites reemplazar en la plantilla
+            })
+        )
+
+        return JsonResponse({'message': 'ok'}, status=200)
+
+    except Exception as e:
+        print(f"Error al enviar plantilla: {e}")
+        return JsonResponse({'message': 'error', 'details': str(e)}, status=500)
 
 

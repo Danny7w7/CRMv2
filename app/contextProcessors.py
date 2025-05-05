@@ -20,11 +20,15 @@ def validateSms(request):
     if request.user.is_authenticated:
         companyId = request.user.company.id
         subscripcions = Subscriptions.objects.select_related('service').filter(company_id=companyId, is_active=True)
+        subscripcionss = Subscriptions.objects.select_related('service').filter(company_id=companyId, is_active=True).count()
+        
         for subscripcion in subscripcions:
-            if subscripcion.service.name in ['SMS', 'WHATSAPP']:
-                return {'smsIsActive':True, 'whatsAppIsActive': True}
+            if subscripcionss > 1:
+                if subscripcion.service.name in ['SMS', 'WHATSAPP']:
+                    return {'smsIsActive':True, 'whatsAppIsActive': True}
             if subscripcion.service.name == 'SMS':
                 return {'smsIsActive':True, 'whatsAppIsActive': False}
             if subscripcion.service.name == 'WHATSAPP':
                 return {'smsIsActive':False, 'whatsAppIsActive': True}
+            
     return {'smsIsActive':False, 'whatsAppIsActive': False}
