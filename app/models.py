@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from storages.backends.s3boto3 import S3Boto3Storage
+from .managers import VisibilityManager
 
 # Create your models here.
 
@@ -112,7 +113,6 @@ class Numbers_whatsapp(models.Model):
     class Meta:
         db_table = 'numbers_whatsapp' 
 
-
 class Users(AbstractUser):
 
     ROLES_CHOICES = (
@@ -135,6 +135,7 @@ class Users(AbstractUser):
     assigned_phone_whatsapp = models.ForeignKey(Numbers_whatsapp, on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey(Companies, on_delete=models.CASCADE)
     usaAgents = models.ManyToManyField(USAgent)
+    agent_seguro = models.ManyToManyField(USAgent, related_name='agent_seguro_users', blank=True)
     
     class Meta:
         db_table = 'users'
@@ -216,6 +217,7 @@ class Medicare(models.Model):
     status_color = models.IntegerField(null = True)    
     is_active = models.BooleanField(default=True)  
     company = models.ForeignKey(Companies, on_delete=models.CASCADE)
+    objects = VisibilityManager()
 
     class Meta:
         db_table = 'medicare'
@@ -245,6 +247,7 @@ class ClientsLifeInsurance(models.Model):
     payment_type = models.CharField(max_length=50,null=True)
     is_active = models.BooleanField(default=True)  
     company = models.ForeignKey(Companies, on_delete=models.CASCADE)
+    objects = VisibilityManager()
 
     class Meta:
         db_table = 'clients_life_insurance'
@@ -319,6 +322,7 @@ class ObamaCare(models.Model):
     observation = models.TextField(null=True)
     is_active = models.BooleanField(default=True)
     company = models.ForeignKey(Companies, on_delete=models.CASCADE)
+    objects = VisibilityManager()
 
     class Meta:
         db_table = 'obamacare'
@@ -359,6 +363,7 @@ class Supp(models.Model):
     is_active = models.BooleanField(default=True)
     dependents = models.ManyToManyField(Dependents, related_name='SuppDependents')
     company = models.ForeignKey(Companies, on_delete=models.CASCADE)
+    objects = VisibilityManager()
 
     class Meta:
         db_table = 'supp'
@@ -389,7 +394,7 @@ class ClientsAssure(models.Model):
     payment_type = models.CharField(max_length=50,null=True)
     is_active = models.BooleanField(default=True)  
     company = models.ForeignKey(Companies, on_delete=models.CASCADE)
-
+    objects = VisibilityManager()
 
     class Meta:
         db_table = 'Clients_assure'

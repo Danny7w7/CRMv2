@@ -50,7 +50,7 @@ def company_ownership_required_sinURL(view_func):
 
     return _wrapped_view
 
-def company_ownership_required(model_name, id_field, company_field="company_id"):
+def company_ownership_required(model_name, id_field, company_field="company_id",  agent_field="agent_usa"):
     def decorator(view_func):
         @wraps(view_func)
         def _wrapped_view(request, *args, **kwargs):
@@ -77,11 +77,14 @@ def company_ownership_required(model_name, id_field, company_field="company_id")
             # Obtener la empresa del usuario
             user_company_id = getattr(request.user, "company_id", None)
 
-            # Verificar si el usuario pertenece a la misma compañía
-            if obj_company_id != user_company_id:
-                return render(request, "auth/404.html", {"message": "No tienes permiso para acceder a este recurso."})
+            # ⚠️ Nueva lógica: permitir si está en agent_seguro aunque sea otra compañía
+            agent_usa = getattr(obj, agent_field, "")
+            related_agents = list(request.user.agent_seguro.values_list("name", flat=True))
 
-            return view_func(request, *args, **kwargs)
+            if obj_company_id == user_company_id or agent_usa in related_agents:
+                return view_func(request, *args, **kwargs)
+
+            return render(request, "auth/404.html", {"message": "No tienes permiso para acceder a este recurso."})
 
         return _wrapped_view
 

@@ -484,6 +484,9 @@ def editObama(request ,obamacare_id, way):
     # Obtener los mensajes de texto del Cliente.
     if request.user.is_superuser:
         contact = Contacts.objects.filter(phone_number=obamacare.client.phone_number, company=obamacare.company.id).first()
+    elif obamacare.agent_usa in request.user.agent_seguro.values_list('name', flat=True):
+    # Tiene relación con el agente aunque no sea de su compañía
+        contact = Contacts.objects.filter(phone_number=obamacare.client.phone_number, company_id=obamacare.company.id).first()
     else:
         contact = Contacts.objects.filter(phone_number=obamacare.client.phone_number, company=company_id).first()
 
@@ -705,6 +708,9 @@ def editSupp(request, supp_id):
     # Obtener los mensajes de texto del Cliente.
     if request.user.is_superuser:
         contact = Contacts.objects.filter(phone_number=supp.client.phone_number, company_id=supp.company.id).first()
+    elif supp.agent_usa in request.user.agent_seguro.values_list('name', flat=True):
+    # Tiene relación con el agente aunque no sea de su compañía
+        contact = Contacts.objects.filter(phone_number=supp.client.phone_number, company_id=supp.company.id).first()
     else:
         contact = Contacts.objects.filter(phone_number=supp.client.phone_number, company_id=company_id).first()
 
@@ -879,6 +885,9 @@ def editAssure(request, assure_id):
     # Obtener los mensajes de texto del Cliente.
     if request.user.is_superuser:
         contact = Contacts.objects.filter(phone_number=assure.phone_number, company_id=assure.company.id).first()
+    elif assure.agent_usa in request.user.agent_seguro.values_list('name', flat=True):
+    # Tiene relación con el agente aunque no sea de su compañía
+        contact = Contacts.objects.filter(phone_number=assure.phone_number, company_id=assure.company.id).first()
     else:
         contact = Contacts.objects.filter(phone_number=assure.phone_number, company_id=company_id).first()
 
@@ -1034,6 +1043,9 @@ def editLife(request, client_id):
 
     # Obtener los mensajes de texto del Cliente.
     if request.user.is_superuser:
+        contact = Contacts.objects.filter(phone_number=client.phone_number, company_id=client.company.id).first()
+    elif client.agent_usa in request.user.agent_seguro.values_list('name', flat=True):
+        # Tiene relación con el agente aunque no sea de su compañía
         contact = Contacts.objects.filter(phone_number=client.phone_number, company_id=client.company.id).first()
     else:
         contact = Contacts.objects.filter(phone_number=client.phone_number, company_id=company_id).first()

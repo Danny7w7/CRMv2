@@ -49,7 +49,7 @@
                 <tbody>
                     {% for obamacare in obamacares %}
                     <tr>
-                        <td>{{ obamacare.truncated_agent_usa }}</td>
+                        <td>{{ obamacare.agent_usa }}</td>
                         <td>{{obamacare.agent.first_name}} {{obamacare.agent.last_name}}</td>
                         <td>{{obamacare.client.first_name}} {{obamacare.client.last_name}}</td>
                         <td>{{obamacare.client.phone_number|formatUsaPhone}}</td>

@@ -11,9 +11,6 @@ from ..decoratorsCompany import *
 @login_required(login_url='/login')
 @company_ownership_required_sinURL
 def clientObamacare(request):
-    
-    zohira = 'ZOHIRA RAQUEL DUARTE AGUILAR - NPN 19582295'
-    vladimir = 'VLADIMIR DE LA HOZ FONTALVO - NPN 19915005'
 
     company_id = request.company_id  # Obtener company_id desde request
 
@@ -22,21 +19,10 @@ def clientObamacare(request):
             truncated_agent_usa=Substr('agent_usa', 1, 8)).exclude(
                 id__in=CustomerRedFlag.objects.filter(date_completed__isnull=True).values_list(
                     'obamacare_id', flat=True)).order_by('-created_at')       
-    elif request.user.role == 'Admin':       
-        obamaCare = ObamaCare.objects.select_related('agent','client').annotate(
-            truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(company = company_id).exclude(
+    elif request.user.role == 'Admin':         
+        obamaCare = ObamaCare.objects.visible_for_user(request.user).select_related('agent','client').exclude(
                 id__in=CustomerRedFlag.objects.filter(date_completed__isnull=True).values_list(
                     'obamacare_id', flat=True)).order_by('-created_at')    
-    elif request.user.username == 'zohiraDuarte':
-       obamaCare = ObamaCare.objects.select_related('agent','client').annotate(
-            truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(is_active = True, agent_usa = zohira).exclude(
-                id__in=CustomerRedFlag.objects.filter(date_completed__isnull=True).values_list(
-                    'obamacare_id', flat=True)).order_by('-created_at') 
-    elif request.user.username == 'vladimirDeLaHoz':
-        obamaCare = ObamaCare.objects.select_related('agent','client').annotate(
-            truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(is_active = True, agent_usa = vladimir).exclude(
-                id__in=CustomerRedFlag.objects.filter(date_completed__isnull=True).values_list(
-                    'obamacare_id', flat=True)).order_by('-created_at')
     else:
         obamaCare = ObamaCare.objects.select_related('agent', 'client').annotate(
             truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(is_active = True, company = company_id).exclude(
@@ -64,11 +50,11 @@ def clientAccionRequired(request):
                         date_completed__isnull=True ).values_list('obamacare_id', flat=True) ).order_by('-created_at')
     
     elif request.user.role == 'Admin':       
-        obamaCare = ObamaCare.objects.select_related('agent', 'client').annotate(
+        obamaCare = ObamaCare.objects.visible_for_user(request.user).select_related('agent', 'client').annotate(
             truncated_agent_usa=Substr('agent_usa', 1, 8),customer_red_flag_clave=Subquery(
                 CustomerRedFlag.objects.filter(obamacare=OuterRef('id'), date_completed__isnull=True
                     ).values('clave')[:1] )).filter( id__in=CustomerRedFlag.objects.filter(
-                        date_completed__isnull=True ).values_list('obamacare', flat=True), company = company_id ).order_by('-created_at')
+                        date_completed__isnull=True ).values_list('obamacare', flat=True)).order_by('-created_at')  
         
     elif request.user.role == 'S' :   
 
@@ -97,12 +83,12 @@ def clientSupp(request):
     company_id = request.company_id  # Se asume que el decorador lo agrega a request
 
     if request.user.is_superuser:
-        supp = Supp.objects.select_related('agent','client').annotate(
+        supp = Supp.objects.visible_for_user(request.user).select_related('agent','client').annotate(
             truncated_agent_usa=Substr('agent_usa', 1, 8)).order_by('-created_at')
         suppPay = False
 
     elif request.user.role in roleAuditar:
-        supp = Supp.objects.select_related('agent','client').filter(is_active = True, company = company_id).exclude(status_color = 1).annotate(
+        supp = Supp.objects.visible_for_user(request.user).select_related('agent','client').filter(is_active = True, company = company_id).exclude(status_color = 1).annotate(
             truncated_agent_usa=Substr('agent_usa', 1, 8)).order_by('-created_at')
         suppPay = Supp.objects.select_related('agent','client').filter(is_active = True, status_color = 1 )
 
@@ -111,14 +97,15 @@ def clientSupp(request):
             item.short_name = client_name.split()[0] + " ..." if " " in client_name else client_name
 
     elif request.user.role == 'Admin':
-        supp = Supp.objects.select_related('agent','client').filter(company = company_id).annotate(
-            truncated_agent_usa=Substr('agent_usa', 1, 8)).order_by('-created_at')
+        supp = Supp.objects.visible_for_user(request.user).select_related('agent','client').order_by('-created_at')
         suppPay = False
 
     elif request.user.role in ['A', 'C']:
-        supp = Supp.objects.select_related('agent','client').annotate(
+        supp = Supp.objects.visible_for_user(request.user).select_related('agent','client').annotate(
             truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(is_active = True, company = company_id).order_by('-created_at')
         suppPay = False
+
+    print("QUERYSET FINAL:", supp)
 
     return render(request, 'informationClient/clientSupp.html', {'supps':supp,'suppPay':suppPay})
 
@@ -133,8 +120,7 @@ def clientMedicare(request):
         medicare = Medicare.objects.select_related('agent').annotate(
             truncated_agent_usa=Substr('agent_usa', 1, 8)).order_by('-created_at')    
     elif request.user.role == 'Admin':       
-        medicare = Medicare.objects.select_related('agent').annotate(
-            truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(company = company_id).order_by('-created_at')
+        medicare = Medicare.objects.visible_for_user(request.user).select_related('agent').order_by('-created_at')
     elif request.user.role in roleAuditor:
         medicare = Medicare.objects.select_related('agent').annotate(
             truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(is_active = True,company = company_id).order_by('-created_at')   
@@ -216,7 +202,7 @@ def clientAssure(request):
         assure = ClientsAssure.objects.select_related('agent').filter(
             company = company_id, is_active = True)
     elif request.user.role == 'Admin':
-        assure = ClientsAssure.objects.select_related('agent').filter(company = company_id)
+        assure = ClientsAssure.objects.visible_for_user(request.user).select_related('agent').order_by('-created_at')
     elif request.user.role == 'A':
         assure = ClientsAssure.objects.select_related('agent').filter(
             agent = request.user.id, company = company_id, is_active = True)
@@ -236,7 +222,7 @@ def clientLifeInsurance(request):
         life = ClientsLifeInsurance.objects.select_related('agent').filter(
             company = company_id, is_active = True)
     elif request.user.role == 'Admin':
-        life = ClientsLifeInsurance.objects.select_related('agent').filter(company = company_id)
+        life = ClientsLifeInsurance.objects.visible_for_user(request.user).select_related('agent').order_by('-created_at')
     elif request.user.role == 'A':
         life = ClientsLifeInsurance.objects.select_related('agent').filter(
             agent = request.user.id, company = company_id, is_active = True)

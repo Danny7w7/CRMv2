@@ -88,10 +88,14 @@
 					</div>
 					<div class="col-12 col-lg-5">
 						<label for="agent_usa" class="form-label font-weight-bold">Agente USA</label>
-						<select class="form-select" id="agent_usa" aria-label="Default select example" name="agent_usa" required >
-							<option {% if client.agent_usa == 'GINA PAOLA LAPEIRA - NPN 19944280' %}selected{% endif %} value="GINA PAOLA LAPEIRA - NPN 19944280">GINA PAOLA LAPEIRA - NPN 19944280</option>
-							<option {% if client.agent_usa == 'LUIS EDUARDO LAPEIRA - NPN 20556081' %}selected{% endif %} value="LUIS EDUARDO LAPEIRA - NPN 20556081">LUIS EDUARDO LAPEIRA - NPN 20556081</option>
-						</select>
+						{% if request.user.company != client.company %}
+							<input readonly type="text" class="form-control" value="{{ client.agent_usa }}" >
+						{% else %}
+							<select class="form-select" id="agent_usa" aria-label="Default select example" name="agent_usa" required >
+								<option {% if client.agent_usa == 'GINA PAOLA LAPEIRA - NPN 19944280' %}selected{% endif %} value="GINA PAOLA LAPEIRA - NPN 19944280">GINA PAOLA LAPEIRA - NPN 19944280</option>
+								<option {% if client.agent_usa == 'LUIS EDUARDO LAPEIRA - NPN 20556081' %}selected{% endif %} value="LUIS EDUARDO LAPEIRA - NPN 20556081">LUIS EDUARDO LAPEIRA - NPN 20556081</option>
+							</select>
+						{% endif %}
 					</div>
 					<div class="col-12 col-lg-4">
 						<label for="social_security" class="form-label">Social Security</label>

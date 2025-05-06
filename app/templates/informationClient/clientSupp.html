@@ -91,7 +91,7 @@
                 <tbody>
                     {% for supp in supps %}
                     <tr>
-                        <td>{{supp.truncated_agent_usa}}</td>
+                        <td>{{supp.agent_usa}}</td>
                         <td>{{supp.agent.first_name}} {{supp.agent.last_name}}</td>
                         <td>{{supp.client.first_name}} {{supp.client.last_name}}</td>
                         <td>{{supp.client.phone_number|formatUsaPhone}}</td>
