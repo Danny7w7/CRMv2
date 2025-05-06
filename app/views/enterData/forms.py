@@ -109,20 +109,25 @@ def formCreateAssure(request):
 
     user = Users.objects.select_related('company').filter(company = company_id).first()
 
-    url = "https://restcountries.com/v3.1/all"
- 
-    with urllib.request.urlopen(url) as response:
-        data = json.loads(response.read().decode())
 
-        paises = []
+    paises = []  # Inicializa la lista por si hay error
 
-        for country in sorted(data, key=lambda x: x.get('name', {}).get('common', '')):
-            nombre = country.get('name', {}).get('common', 'N/A')
-            gentilicio = country.get('demonyms', {}).get('eng', {}).get('m', 'N/A')
-            paises.append({
-                "nombre": nombre,
-                "gentilicio": gentilicio
-            })  
+    try:
+        url = "https://raw.githubusercontent.com/Dinuks/country-nationality-list/master/countries.json"
+        with urllib.request.urlopen(url, timeout=10) as response:
+            data = json.loads(response.read().decode())
+
+            for country in sorted(data, key=lambda x: x.get('en_short_name', '')):
+                nombre = country.get('en_short_name', 'N/A')
+                gentilicio = country.get('nationality', 'N/A')
+                paises.append({
+                    "nombre": nombre,
+                    "gentilicio": gentilicio
+                })
+
+    except Exception as e:
+        print(f"[ERROR] No se pudo obtener la lista de países: {e}")
+        paises = []  # O podrías cargar valores por defecto si lo prefieres   
 
     if company_id == 1:
         companies = Companies.objects.filter(is_active = True)

@@ -768,20 +768,24 @@ def editAssure(request, assure_id):
     hoy = timezone.now().date()
     old = hoy.year - assure.date_birth.year - ((hoy.month, hoy.day) < (assure.date_birth.month, assure.date_birth.day)) 
 
-    url = "https://restcountries.com/v3.1/all"
- 
-    with urllib.request.urlopen(url) as response:
-        data = json.loads(response.read().decode())
+    paises = []  # Inicializa la lista por si hay error
 
-        paises = []
+    try:
+        url = "https://raw.githubusercontent.com/Dinuks/country-nationality-list/master/countries.json"
+        with urllib.request.urlopen(url, timeout=10) as response:
+            data = json.loads(response.read().decode())
 
-        for country in sorted(data, key=lambda x: x.get('name', {}).get('common', '')):
-            nombre = country.get('name', {}).get('common', 'N/A')
-            gentilicio = country.get('demonyms', {}).get('eng', {}).get('m', 'N/A')
-            paises.append({
-                "nombre": nombre,
-                "gentilicio": gentilicio
-            }) 
+            for country in sorted(data, key=lambda x: x.get('en_short_name', '')):
+                nombre = country.get('en_short_name', 'N/A')
+                gentilicio = country.get('nationality', 'N/A')
+                paises.append({
+                    "nombre": nombre,
+                    "gentilicio": gentilicio
+                })
+
+    except Exception as e:
+        print(f"[ERROR] No se pudo obtener la lista de países: {e}")
+        paises = []  # O podrías cargar valores por defecto si lo prefieres   
 
 
     if request.method == 'POST':
@@ -895,7 +899,6 @@ def editAssure(request, assure_id):
     messages = Messages.objects.filter(chat_id=chats[0].id)
     secretKey = SecretKey.objects.filter(contact_id=contact.id).first()
     chat = get_last_message_for_chats(chats)[0]
-
 
     context = {
         'assure': assure,
