@@ -201,9 +201,6 @@ function activateTextArea(msg) {
     if (upperMsg == "YES" || upperMsg == "SI" || upperMsg == "START") {
         inputMessage.disabled = false; // Habilita el textarea
     }
-    if (upperMsg == "STOP") {
-        inputMessage.disabled = true; // Habilita el textarea
-    }
 }
 
 function scrollToBottom() {
@@ -276,18 +273,22 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    const buttonCreateSecretKey = document.getElementById('buttonCreateSecretKey');
-    const buttonSendSecretKey = document.getElementById('buttonSendSecretKey');
+    const buttonAutorizacionChat = document.getElementById('buttonAutorizacionChat');
+    const buttonActivaChat = document.getElementById('buttonActivaChat');
     const buttonStartChat = document.getElementById('buttonStartChat');
+
+    if (buttonAutorizacionChat) {
+        buttonAutorizacionChat.addEventListener('click', () => SecretKey('authorization'));
+    }
     
-    if (buttonCreateSecretKey) {
-        buttonCreateSecretKey.addEventListener('click', () => SecretKey());
+    if (buttonActivaChat) {
+        buttonActivaChat.addEventListener('click', () => SecretKey('activation'));
     }
 
 });
 
-function SecretKey() {
-    fetch(`/sendPlantilla/${contact_id}/`, {
+function SecretKey(type) {
+    fetch(`/${type.toLowerCase()}/${contact_id}/`, {
         method: 'POST'
     })
     .then(response => {
@@ -297,7 +298,11 @@ function SecretKey() {
         return response.json();
     })
     .then(() => {
-        addMessage('Template successfully submitted', 'Agent', 'SMS');        
+        if (type == 'Create'){
+            addMessage('Secret key creation link sent successfully', 'Agent', 'SMS');
+        }else{
+            addMessage('Secret key link successfully sent', 'Agent', 'SMS');
+        }     
     })
     .catch((error) => {
         Swal.fire({

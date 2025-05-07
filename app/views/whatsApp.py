@@ -55,8 +55,6 @@ def index(request):
     else:
         chats = Chat_whatsapp.objects.select_related('contact').filter(agent_id=request.user.id).order_by('-last_message')
 
-    print(chats)
-
     chats = get_last_message_for_chats(chats)
 
     if request.method == 'POST':
@@ -64,18 +62,6 @@ def index(request):
         name = request.POST.get('name', None)
         contact, created = createOrUpdatecontact(phoneNumber, request.user.company, name)
         chat = createOrUpdateChat(contact, request.user.company, request.user)
-        if created:
-            if request.POST.get('language') == 'english':
-                message = "Reply YES to receive updates and information about your policy from Lapeira & Associates LLC. Msg & data rates may apply. Up to 5 msgs/month. Reply STOP to opt-out at any time."
-            else: 
-                message = "Favor de responder SI para recibir actualizaciones e información sobre su póliza de Lapeira & Associates LLC. Pueden aplicarse tarifas estándar de mensaje y datos. Hasta 5 mensajes/mes. Responder STOP para cancelar en cualquier momento."
-            sendWhatsapp(
-                request.user.assigned_phone_whatsapp.phone_number,
-                phoneNumber,
-                request.user,
-                request.user.company,
-                message
-            )
         return redirect('chatWatsapp', chat.id)
     return render(request, 'whatsapp/indexWhatsapp.html', {'chats': chats})
 
@@ -159,6 +145,7 @@ def createOrUpdateChat(contact, company, agent=None):
 
     return chat
 
+#verificar si se puede borrar
 def verificationTemplate(chat):
     last_message = Messages_whatsapp.objects.filter(
         chat=chat,
@@ -170,6 +157,7 @@ def verificationTemplate(chat):
 
     return last_message.created_at < datetime.datetime.now(timezone.utc) - timedelta(hours=24)
 
+#verificar si esto se puede borrar
 def sendTemplateWhatsapp(from_number, to_number):
     client = Client(settings.ACCOUNT_SID, settings.AUTH_TOKEN)
 
@@ -194,31 +182,16 @@ def sendWhatsapp(from_number, to_number, user, company, messageContent):
 
     chat = Chat_whatsapp.objects.filter(contact__phone_number=to_number, company=company).first()
 
-    if  verificationTemplate(chat):
-        success = sendTemplateWhatsapp(from_number, to_number) 
+    # Enviar el mensaje
+    message = client.messages.create(
+        body=messageContent,
+        from_=f"whatsapp:+{from_number}", #numero de what del client
+        to=f"whatsapp:+{to_number}" #numero de what mio 320788
+    )
 
-        if not success:
-            print("❌ No se pudo enviar plantilla")
-            return False
-
-        # Crear o actualizar contacto/chat después de enviar plantilla
-        contact, created = createOrUpdatecontact(to_number, company)
-        chat = createOrUpdateChat(contact, company)
-        saveMessageInDb('Agent', f"[PLANTILLA]", chat, user)
-
-    else:
-
-        print('no cogi plantilla')
-        # Enviar el mensaje
-        message = client.messages.create(
-            body=messageContent,
-            from_=f"whatsapp:+{from_number}", #numero de what del client
-            to=f"whatsapp:+{to_number}" #numero de what mio 320788
-        )
-
-        contact, created = createOrUpdatecontact(to_number, company)
-        chat = createOrUpdateChat(contact, company)
-        saveMessageInDb('Agent', messageContent, chat, user)
+    contact, created = createOrUpdatecontact(to_number, company)
+    chat = createOrUpdateChat(contact, company)
+    saveMessageInDb('Agent', messageContent, chat, user)
 
     if company.id not in [1,2]: #No descuenta el saldo a Lapeira
         discountRemainingBalance(company, '0.4')
@@ -255,18 +228,6 @@ def chat(request, chatId):
         name = request.POST.get('name', None)
         contact, created = createOrUpdatecontact(phoneNumber, request.user.company, name)
         chat = createOrUpdateChat(contact, request.user.company, request.user)
-        if created:
-            if request.POST.get('language') == 'english':
-                message = "Reply YES to receive updates and information about your policy from Lapeira & Associates LLC. Msg & data rates may apply. Up to 5 msgs/month. Reply STOP to opt-out at any time."
-            else: 
-                message = "Favor de responder SI para recibir actualizaciones e información sobre su póliza de Lapeira & Associates LLC. Pueden aplicarse tarifas estándar de mensaje y datos. Hasta 5 mensajes/mes. Responder STOP para cancelar en cualquier momento."
-            sendWhatsapp(
-                request.user.assigned_phone_whatsapp.phone_number,
-                phoneNumber,
-                request.user,
-                request.user.company,
-                message
-            )
         return redirect('chatWatsapp', chat.id)
             
     if request.user.is_superuser:
@@ -276,6 +237,13 @@ def chat(request, chatId):
         
     # Usamos select_related para optimizar las consultas
     messages = Messages_whatsapp.objects.filter(chat=chat.id).select_related('files_whatsapp')
+
+    authorization = Messages_whatsapp.objects.filter(chat=chat, message_content__in=['AUTHORIZATION'])
+
+    #validar si el chat lleva mas de 24h para usar plantilla o no 
+    limite = timezone.now() - timedelta(hours=23, minutes=59)
+    validationSMS = Messages_whatsapp.objects.filter(chat=chat.id, sender__isnull=False).order_by('-created_at').first()
+    result = True if not validationSMS else validationSMS.created_at < limite
     
     # Creamos una lista para almacenar los mensajes con sus archivos
     messages_with_files = []
@@ -311,7 +279,9 @@ def chat(request, chatId):
         "whatsapp_url": f"/chatWatsapp/{chatId}/",
         'contact': chat.contact,
         'chats': chats,
-        'messages': messages_with_files
+        'messages': messages_with_files,
+        'authorization':authorization,
+        'resultValidationTemplate':result
     }
     return render(request, 'whatsapp/chat.html', context)
 
@@ -501,11 +471,40 @@ def comprobate_company(company):
         return False
     
 @csrf_exempt   
-def sendPlantilla(request, contact_id):
+def authorization(request, contact_id):
     try:
-        contact = Contacts.objects.get(id=contact_id)
+        contact = Contacts_whatsapp.objects.get(id=contact_id)
+        chat = Chat_whatsapp.objects.get(contact = contact)
 
-        from_number = request.user.assigned_phone.phone_number
+        from_number = request.user.assigned_phone_whatsapp.phone_number
+        to_number = contact.phone_number
+
+        client = Client(settings.ACCOUNT_SID, settings.AUTH_TOKEN)
+
+        message = client.messages.create(
+            from_=f"whatsapp:+{from_number}",
+            to=f"whatsapp:+{to_number}",
+            content_sid="HXa5ed05a7b7c4381b722bc82ebdf1c0ae",  # Reemplaza con tu SID real
+            content_variables=json.dumps({
+                "1": contact.name # o cualquier valor que necesites reemplazar en la plantilla
+            })
+        )
+
+        saveMessageInDb('Agent', f"AUTHORIZATION", chat, request.user) 
+
+        return JsonResponse({'message': 'ok'}, status=200)
+
+    except Exception as e:
+        print(f"Error al enviar plantilla: {e}")
+        return JsonResponse({'message': 'error', 'details': str(e)}, status=500)
+
+@csrf_exempt   
+def activation(request, contact_id):
+    try:
+        contact = Contacts_whatsapp.objects.get(id=contact_id)
+        chat = Chat_whatsapp.objects.get(contact = contact)
+
+        from_number = request.user.assigned_phone_whatsapp.phone_number
         to_number = contact.phone_number
 
         client = Client(settings.ACCOUNT_SID, settings.AUTH_TOKEN)
@@ -515,9 +514,13 @@ def sendPlantilla(request, contact_id):
             to=f"whatsapp:+{to_number}",
             content_sid="HX1070fc7e6dec1ce38634619b21f75d80",  # Reemplaza con tu SID real
             content_variables=json.dumps({
-                "1": 'PRUEBA' # o cualquier valor que necesites reemplazar en la plantilla
+                "1": contact.name, # o cualquier valor que necesites reemplazar en la plantilla
+                "2": 'Lapeira & Associates LLC',
+                "3": 'Menos de 24 horas'
             })
         )
+
+        saveMessageInDb('Agent', f"ACTIVATION", chat, request.user)
 
         return JsonResponse({'message': 'ok'}, status=200)
 

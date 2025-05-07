@@ -235,6 +235,8 @@ urlpatterns = [
     path('chatWatsapp/<chatId>/', whatsApp.chat, name='chatWatsapp'),
     path('startChatWhasapp/<phoneNumber>/', whatsApp.startChat, name='startChatWhasapp'),
     path('sendWhatsappConversation/', whatsApp.sendWhatsappConversation, name='sendWhatsappConversation'),
-    path('sendPlantilla/<contact_id>/', whatsApp.sendPlantilla, name='sendPlantilla'),
+
+    path('activation/<contact_id>/', whatsApp.activation, name='activation'),
+    path('authorization/<contact_id>/', whatsApp.authorization, name='authorization'),
 
 ]
