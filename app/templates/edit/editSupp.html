@@ -183,7 +183,7 @@
 							</div>
 							<div class="col-12 col-lg-3">
 								<label for="kinship" class="form-label">Relationship</label>
-								<select class="form-select" id="kinship" name="kinship_{{ dependent.id }}" aria-label="Default select example">
+								<select class="form-select" id="kinship" name="kinship_{{ dependent.id }}" aria-label="Default select example" required>
 									<option value="" disabled selected>Please Select</option>
 									<option value="DAD" {% if dependent.kinship == 'DAD' %}selected{% endif %}>DAD</option>
 									<option value="MOM" {% if dependent.kinship == 'MOM' %}selected{% endif %}>MOM</option>
@@ -191,11 +191,12 @@
 									<option value="GRANDPARENT" {% if dependent.kinship == 'GRANDPARENT' %}selected{% endif %}>GRANDPARENT</option>
 									<option value="GRANDMOTHER" {% if dependent.kinship == 'GRANDMOTHER' %}selected{% endif %}>GRANDMOTHER</option>
 									<option value="COUPLE" {% if dependent.kinship == 'COUPLE' %}selected{% endif %}>COUPLE</option>
+									<option value="UNKNOWN" {% if dependent.kinship == 'UNKNOWN' %}selected{% endif %}>UNKNOWN</option>
 								</select>
 							</div>
 							<div class="col-12 col-lg-3">
 								<label class="form-label">Date Birth</label>
-								<input type="text" class="form-control" id="dateBirthDependent"  name="dateBirthDependent_{{ dependent.id }}"  value="{{ dependent.date_birth|date:'m/d/Y' }}" >
+								<input type="text" class="form-control" id="dateBirthDependent"  name="dateBirthDependent_{{ dependent.id }}"  value="{{ dependent.date_birth|date:'m/d/Y' }}" required>
 							</div>
 							<div class="col-12 col-lg-6">
 								<label class="form-label">Migration Status</label>

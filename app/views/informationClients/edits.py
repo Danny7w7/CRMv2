@@ -1131,7 +1131,7 @@ def editDepentsSupp(request, supp_id):
         for dependent in dependents:
 
             date_birth = request.POST.get(f'dateBirthDependent_{dependent.id}')
-            dateNew = datetime.datetime.strptime(date_birth, '%m/%d/%Y').date()
+            dateNew = datetime.datetime.strptime(date_birth, '%m/%d/%Y').date() if date_birth not in [None, ''] else None
 
             # Aquí obtenemos los datos enviados a través del formulario para cada dependiente
             dependent_id = request.POST.get(f'dependentId_{dependent.id}')  # Cambiar a 'dependentId_{dependent.id}'
