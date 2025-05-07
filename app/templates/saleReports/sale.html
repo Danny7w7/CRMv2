@@ -263,6 +263,7 @@
 								<th>Assure OK</th>
 								<th>Life Insurance P</th>
 								<th>Life Insurance OK</th>
+								<th>Total</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -286,13 +287,14 @@
 								<td>{{ row.assure }}</td>
 								<td>{{ row.life_insurancePendiente }}</td>
 								<td>{{ row.life_insurance }}</td>
+								<td>{{ row.total }}</td>
 							</tr>
 							{% empty %}
 							<tr>
 								<td colspan="11" class="text-center">No hay ventas registradas en este rango.</td>
 							</tr>
 							{% endfor %}
-						  </tbody>
+						</tbody>
 					</table>
 				</div>
 			</div>

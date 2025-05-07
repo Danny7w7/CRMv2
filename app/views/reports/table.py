@@ -410,9 +410,7 @@ def saleSuppAgentUsa(request, company_id, start_date=None, end_date=None):
     return agents_sales
 
 def salesBonusAgent(request, company_id, start_date=None, end_date=None):
-    from datetime import date, timedelta
-    from django.db.models import Q
-
+    
     if not start_date and not end_date:
         today = timezone.now()
         first_day_of_month = today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
@@ -428,6 +426,7 @@ def salesBonusAgent(request, company_id, start_date=None, end_date=None):
         end_date = timezone.make_aware(
             datetime.datetime.strptime(end_date, '%Y-%m-%d').replace(hour=23, minute=59, second=59, microsecond=999999)
         )
+
         first_day_of_month = start_date
         last_day_of_month = end_date
 
@@ -452,6 +451,15 @@ def salesBonusAgent(request, company_id, start_date=None, end_date=None):
             'life_insurance': ClientsLifeInsurance.objects.filter(Q(agent=agente), Q(status_color=3), filtro_fecha, filtro_company).count(),
             'life_insurancePendiente': ClientsLifeInsurance.objects.filter(Q(agent=agente), Q(status_color__in = [1,2]), filtro_fecha, filtro_company).count(),
         }
+
+        # Calcular el total horizontal por agente
+        row['total'] = sum([
+            row['obamacare'], row['obamacarePendiente'],
+            row['supp'], row['suppPendiente'],
+            row['medicare'], row['medicarePendiente'],
+            row['assure'], row['assurePendiente'],
+            row['life_insurance'], row['life_insurancePendiente']
+        ])
 
         if any([
             row['obamacare'], row['obamacarePendiente'],
