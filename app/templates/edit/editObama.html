@@ -343,6 +343,7 @@
 								<option value="GRANDPARENT" {% if dependent.kinship == 'GRANDPARENT' %}selected{% endif %}>GRANDPARENT</option>
 								<option value="GRANDMOTHER" {% if dependent.kinship == 'GRANDMOTHER' %}selected{% endif %}>GRANDMOTHER</option>
 								<option value="COUPLE" {% if dependent.kinship == 'COUPLE' %}selected{% endif %}>COUPLE</option>
+								<option value="UNKNOWN" {% if dependent.kinship == 'UNKNOWN' %}selected{% endif %}>UNKNOWN</option>
 							</select>
 						</div>
 						<div class="col-12 col-lg-3">
@@ -365,6 +366,7 @@
 								<option value="US CITIZEN" {% if  dependent.migration_status == "US CITIZEN" %}selected{% endif %} >US Citizen (Driver's License)</option>
 								<option value="STUDENT VISA" {% if  dependent.migration_status == "STUDENT VISA" %}selected{% endif %} >Student Visa (I-20)</option>
 								<option value="CURRENTLY IN PROCESS" {% if  dependent.migration_status == "CURRENTLY IN PROCESS" %}selected{% endif %} >Currently In Process (this means the client received an i-797)</option>
+								<option value="UNKNOWN" {% if dependent.migration_status  == "UNKNOWN" %}selected{% endif %} >UNKNOWN</option>
 							</select>
 						</div>
 					<hr>
