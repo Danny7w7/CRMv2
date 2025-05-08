@@ -621,7 +621,7 @@ def customerPerformance(request):
     company_filter2 = {'obamacare__company': company_id} if not request.user.is_superuser else {}
 
     # Obtener los IDs de ObamaCare que están en CustomerRedFlag
-    excluded_obama_ids = CustomerRedFlag.objects.filter(date_completed__isnull=False).values('obamacare')
+    excluded_obama_ids = CustomerRedFlag.objects.filter(date_completed__isnull=True).values('obamacare')
 
     if request.method == 'POST':
         # Convertir fechas a objetos datetime con zona horaria
