@@ -621,7 +621,7 @@ def customerPerformance(request):
     company_filter2 = {'obamacare__company': company_id} if not request.user.is_superuser else {}
 
     # Obtener los IDs de ObamaCare que están en CustomerRedFlag
-    excluded_obama_ids = CustomerRedFlag.objects.values('obamacare')
+    excluded_obama_ids = CustomerRedFlag.objects.filter(date_completed__isnull=False).values('obamacare')
 
     if request.method == 'POST':
         # Convertir fechas a objetos datetime con zona horaria
@@ -641,7 +641,15 @@ def customerPerformance(request):
         next_month = now.replace(day=28) + timedelta(days=4)  # Garantiza que pasamos al siguiente mes
         end_date = next_month.replace(day=1, hour=23, minute=59, second=59, microsecond=999999) - timedelta(days=1)
 
-    obamacare = ObamaCare.objects.filter(created_at__range=(start_date, end_date), is_active=1, **company_filter).exclude( id__in=Subquery(excluded_obama_ids), status='NO CALL')
+    obamacare = ObamaCare.objects.filter(
+        created_at__range=(start_date, end_date),
+        is_active=1,
+        **company_filter
+    ).exclude(
+        status='NO CALL'
+    ).exclude(
+        id__in=Subquery(excluded_obama_ids)
+    )
     totalEnroled = obamacare.exclude(profiling='NO')
     totalNoEnroled = obamacare.filter(profiling='NO').count()
     totalOtherParty = obamacare.filter(status='OTHER PARTY').count()
@@ -666,10 +674,10 @@ def customerPerformance(request):
 
         full_name = f"{agent.first_name} {agent.last_name}".strip()
         matchingObamacare = obamacare.filter(agent_usa__in=usaAgentNames)
-        enroledActiveCmsPerAgent = matchingObamacare.filter(Q(status='ACTIVE') | Q(status='SELF-ENROLMENT')).count()
-        enroledNoActiveCmsPerAgent = matchingObamacare.exclude(Q(status='ACTIVE') | Q(status='SELF-ENROLMENT')).count()
+        enroledActiveCmsPerAgent = matchingObamacare.filter(Q(status='ACTIVE') | Q(status='SELF-ENROLMENT'))
+        enroledNoActiveCmsPerAgent = matchingObamacare.exclude(Q(status='ACTIVE') | Q(status='SELF-ENROLMENT'))
         percentageEnroledActiveCms = format_decimal(
-            (enroledActiveCmsPerAgent / matchingObamacare.count()) * 100
+            (enroledActiveCmsPerAgent.count() / matchingObamacare.count()) * 100
         ) if matchingObamacare.count() else 0
 
         # Inicializar la clave si no existe
@@ -698,13 +706,13 @@ def customerPerformance(request):
         agent_performance[full_name]['percentageEnroledActiveCms'] = percentageEnroledActiveCms
         agent_performance[full_name]['enroledNoActiveCms'] = enroledNoActiveCmsPerAgent
         agent_performance[full_name]['percentageEnroledNoActiveCms'] = format_decimal(
-            (enroledNoActiveCmsPerAgent / matchingObamacare.count()) * 100
+            (enroledNoActiveCmsPerAgent.count() / matchingObamacare.count()) * 100
         ) if matchingObamacare.count() else 0
         agent_performance[full_name]['percentageTotalActiveCms'] = format_decimal(
-            (enroledActiveCmsPerAgent / obamacare.count()) * 100
+            (enroledActiveCmsPerAgent.count() / obamacare.count()) * 100
         ) if obamacare.count() else 0
         agent_performance[full_name]['percentageTotalNoActiveCms'] = format_decimal(
-            (enroledNoActiveCmsPerAgent / obamacare.count()) * 100
+            (enroledNoActiveCmsPerAgent.count() / obamacare.count()) * 100
         ) if obamacare.count() else 0
 
         agent_performance[full_name]['documents'] = documents.filter(agent_create=agent).count()

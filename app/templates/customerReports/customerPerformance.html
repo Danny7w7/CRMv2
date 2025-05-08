@@ -102,7 +102,7 @@
     {% for name, details in agentPerformance.items %}
     <div class="col-6 mb-3">
         <div class="report">
-            <h2>📊 {{name}}'s PERFORMANCE</h2>
+            <h2 data-bs-toggle='modal' data-bs-target='#modalActiveCms{{name|slugify}}'>📊 {{name}}'s PERFORMANCE</h2>
 
             <div class="section">
                 <h3>📌 Enrolment</h3>
@@ -114,10 +114,10 @@
             <div class="section">
                 <h3>📌 Activation in CMS</h3>
                 <ul>
-                    <li><strong>Active CMS customers:</strong> {{details.enroledActiveCms}} de {{details.totalEnroled}} ({{details.percentageEnroledActiveCms}}%)</li>
-                    <li><strong>Customers not activated at Carrier:</strong> {{details.enroledNoActiveCms}} de {{details.totalEnroled}} ({{details.percentageEnroledNoActiveCms}}%)</li>
-                    <li><strong>Active clients in CMS with respect to total profiled:</strong> {{details.enroledActiveCms}} de {{totalObamacare}} ({{details.percentageTotalActiveCms}}%)</li>
-                    <li><strong>Customers not activated in Carrier compared to the total profiled:</strong> {{details.enroledNoActiveCms}} de {{totalObamacare}} ({{details.percentageTotalNoActiveCms}}%)</li>
+                    <li><strong>Active CMS customers:</strong> {{details.enroledActiveCms.count}} de {{details.totalEnroled}} ({{details.percentageEnroledActiveCms}}%)</li>
+                    <li><strong>Customers not activated at Carrier:</strong> {{details.enroledNoActiveCms.count}} de {{details.totalEnroled}} ({{details.percentageEnroledNoActiveCms}}%)</li>
+                    <li><strong>Active clients in CMS with respect to total profiled:</strong> {{details.enroledActiveCms.count}} de {{totalObamacare}} ({{details.percentageTotalActiveCms}}%)</li>
+                    <li><strong>Customers not activated in Carrier compared to the total profiled:</strong> {{details.enroledNoActiveCms.count}} de {{totalObamacare}} ({{details.percentageTotalNoActiveCms}}%)</li>
                 </ul>
             </div>
 
@@ -147,6 +147,70 @@
                     ❌ <strong>Nota:</strong> Low performance, requires review. The agent has not reached <strong>80% effectiveness</strong>. It is necessary to analyze the causes and take corrective actions, either with training or adjustment of strategies.
                 </div>
             {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+    
+    {% for name, details in agentPerformance.items %}
+    
+    <!-- Modal -->
+    <div class="modal fade" id="modalActiveCms{{name|slugify}}" tabindex="-1" role="dialog" aria-labelledby="modalTittleActiveCms{{name|slugify}}" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTittleActiveCms{{name|slugify}}">{{name}}'s performance details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <h6>Clients Actives in CMS</h6>
+                        <div class="table-responsive mb-5" >
+                            <table class="table table-striped table-hover table-borderless align-middle" >
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Client Name</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="table-group-divider">
+                                    {% for client in details.enroledActiveCms %}
+                                    <tr class="" >
+                                        <td scope="row">{{client.client.first_name}} {{client.client.last_name}}</td>
+                                        <td scope="row">{{client.status}}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <h6>Clients not active in CMS</h6>
+                        <div class="table-responsive mb-5" >
+                            <table class="table table-striped table-hover table-borderless align-middle" >
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Client Name</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="table-group-divider">
+                                    {% for client in details.enroledNoActiveCms %}
+                                    <tr class="" >
+                                        <td scope="row">{{client.client.first_name}} {{client.client.last_name}}</td>
+                                        <td scope="row">{{client.status}}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
         </div>
     </div>
     {% endfor %}
