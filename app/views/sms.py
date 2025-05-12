@@ -755,7 +755,6 @@ def discountRemainingBalance(companyObject, discount):
 
 def disableAllUserCompany(companyObject):
     usersCompany = Users.objects.filter(company=companyObject)
-    print(companyObject.company_email)
     send_email(
         subject=f"Tu cuenta ha sido desactivada por saldo insuficiente",
         receiver_email=companyObject.company_email,

@@ -414,6 +414,45 @@ class DependentsAssure(models.Model):
     class Meta:
         db_table = 'dependents_assure'
 
+class PaymentsSuplementals(models.Model):
+    supp = models.ForeignKey(Supp, on_delete=models.CASCADE)
+    coverageMonth = models.DateField()
+    create_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField()
+
+    class Meta:
+        db_table = 'payments_suplementals'
+
+class PaymentsOneil(models.Model):
+    obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
+    agency = models.CharField(max_length=50)
+    coverageMonth = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    payday = models.DateField()
+    payable = models.DecimalField(max_digits=6, decimal_places=2)
+
+    class Meta:
+        db_table = 'payments_oneil'
+
+class PaymentsCarriers(models.Model):
+    obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
+    carrier = models.CharField(max_length=50)
+    coverageMonth = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=False) #Esto es si el cliente esta activo o no
+
+    class Meta:
+        db_table = 'payments_carriers'
+
+class PaymentsSherpa(models.Model):
+    obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
+    coverageMonth = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=False) #Esto es si el cliente esta activo o no
+
+    class Meta:
+        db_table = 'payments_sherpa'
+
 class Payments(models.Model):
     obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
     agent = models.ForeignKey(Users, on_delete=models.CASCADE)
@@ -620,9 +659,6 @@ class TemporaryToken(models.Model):
 
     def is_expired(self):
         return timezone.now() > self.expiration
-
-    def __str__(self):
-        return f"Temporary URL for {self.client.first_name} (Active: {self.is_active})"
 
     class Meta:
         db_table = 'temporary_token'

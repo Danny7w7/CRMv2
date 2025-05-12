@@ -173,7 +173,6 @@ def sendTemplateWhatsapp(from_number, to_number):
         return True
 
     except Exception as e:
-        print(f"Error al enviar plantilla: {e}")
         return False
 
 def sendWhatsapp(from_number, to_number, user, company, messageContent):
@@ -305,8 +304,6 @@ def startChat(request, phoneNumber):
     except Exception as e:
         error_response = {"error": "An error occurred while sending the message"}
 
-        print(e)
-
         return JsonResponse(error_response, status=500)
 
 @csrf_exempt
@@ -315,8 +312,6 @@ def whatsappReply(request, company_id):
         from_number = request.POST.get('From', '')
         messageBody = request.POST.get('Body', '').strip()
         numMedia = int(request.POST.get('NumMedia', 0))
-
-        print(f"📩 Mensaje recibido de {from_number}: {messageBody}")
 
         try:
             company = Companies.objects.get(id=company_id)
@@ -350,8 +345,6 @@ def whatsappReply(request, company_id):
                         )
                         media_file.save()
 
-                        print(f"✅ Imagen guardada en S3 con ID: {media_file.id}")
-
                         # Enviar el mensaje al WebSocket como imagen
                         enviar_por_websocket(
                             tipo_mensaje='imagen',
@@ -361,10 +354,6 @@ def whatsappReply(request, company_id):
                             url_media = media_file.file.url,
                             sender="client" 
                         )
-                        print(f"✅ Imagen guardada en S3 con URL: {media_file.file.url}")
-
-                    else:
-                        print(f"❌ Error descargando la imagen, código de respuesta: {response.status_code}")
 
             else:
                 # Si es un mensaje de texto, guardamos el mensaje
@@ -397,7 +386,6 @@ def whatsappReply(request, company_id):
             return HttpResponse("ERES EL MEJOR", status=200)
 
         except Exception as e:
-            print(f"❌ Error procesando mensaje: {e}")
             return HttpResponse("❌ Error interno del servidor", status=500)
 
     elif request.method == 'GET':
@@ -408,9 +396,6 @@ def whatsappReply(request, company_id):
 def enviar_por_websocket(tipo_mensaje, datos, contacto, empresa_id, url_media=None, sender='Agent'):
     capa_canal = get_channel_layer()
     nombre_sala = f"whatsapp_{contacto.phone_number}_empresa_{empresa_id}"
-
-    print(f"🌐 Enviando mensaje al WebSocket en el grupo {nombre_sala}")
-    print(url_media,'********tipo de mensajesssssssssa de la foto')
 
     if tipo_mensaje == 'imagen':
         async_to_sync(capa_canal.group_send)(
@@ -434,8 +419,6 @@ def enviar_por_websocket(tipo_mensaje, datos, contacto, empresa_id, url_media=No
                 'sender': sender  # Ahora por defecto será "agent"
             }
         )
-
-    print(f"✅ Mensaje enviado al WebSocket: {datos.get('texto')}")
 
 @csrf_exempt
 def sendWhatsappConversation(request):
@@ -495,7 +478,6 @@ def authorization(request, contact_id):
         return JsonResponse({'message': 'ok'}, status=200)
 
     except Exception as e:
-        print(f"Error al enviar plantilla: {e}")
         return JsonResponse({'message': 'error', 'details': str(e)}, status=500)
 
 @csrf_exempt   
@@ -525,7 +507,6 @@ def activation(request, contact_id):
         return JsonResponse({'message': 'ok'}, status=200)
 
     except Exception as e:
-        print(f"Error al enviar plantilla: {e}")
         return JsonResponse({'message': 'error', 'details': str(e)}, status=500)
 
 

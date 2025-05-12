@@ -222,7 +222,7 @@ async function sendFirstMessage(message) {
             icon: "error"
         });
         throw error;
-    });    
+    });
 }
 
 // Obtener el formulario cuando el DOM esté cargado

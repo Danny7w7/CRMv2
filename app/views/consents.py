@@ -406,7 +406,6 @@ def ConsentLifeInsurance(request, client_id):
         for answer in answers:
             answers_dict[f'q{answer.ask.id}'] = answer.answer
 
-    print(answers_dict,'*********holis como estas')
     temporalyURL = None
     typeToken = 'lifeInsurance'
    
@@ -440,11 +439,7 @@ def ConsentLifeInsurance(request, client_id):
                     )    
             else:
                 for ask in asks:
-                    answer = request.POST.get(str(ask.id)) 
-                    print(ask,'********ask')
-                    print(ask.id,'********id')
-                
-                    print(answer,'********answer')
+                    answer = request.POST.get(str(ask.id))
                     AnswerLifeInsurance.objects.create(
                         client=client,
                         agent=request.user,
@@ -459,8 +454,6 @@ def ConsentLifeInsurance(request, client_id):
         else:
 
             language = request.GET.get('lenguaje', 'es')  # Idioma predeterminado si no se pasa
-            print('AQUI EMPIEZA A ACTUALIZAR ********************************')
-            print(answers)
             for answer in answers:
                 # Usa el ID de la pregunta (ask.id) como clave
                 key = str(answer.ask.id)
@@ -469,31 +462,7 @@ def ConsentLifeInsurance(request, client_id):
                 # Crea un mini diccionario que tenga el nombre correcto del campo
                 post_data = {'answer': value}
                 
-                print('La instancia es de answer:', answer)
-                print('Antes de actualizar:', answer.answer, '***********')
-                
                 updated = save_data_from_request(AnswerLifeInsurance, post_data, ['signature'], answer)
-                
-                if updated:
-                    print("Después:", updated.answer)
-                else:
-                    print("❌ Error al actualizar.")
-
-
-            print('TERMINE DE ACTUALIZAR **********************')
-            
-            #websocketAlertGeneric(
-            #    request,
-            #    'send_alert',
-            #    'signedConsent',
-            #    'success',
-            #    'Signed consent',
-            #    f'The client {client.first_name} {obamacare.client.last_name} successfully signed the consent form.',
-            #    'Go to client information',
-            #    f'/editObama/{obamacare.id}/{obamacare.company.id}',
-            #    obamacare.agent.id,
-            #    obamacare.agent.username
-            #)
             
             generateConsentPdfLifeInsurance(request, client, language)  
             deactivateTemporaryToken(request)

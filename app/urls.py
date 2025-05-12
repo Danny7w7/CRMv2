@@ -25,7 +25,7 @@ from .views.reports import fecths as fetchsReports
 from .views.reports import table as tableReports
 from .views.reports import charts, download
 from .views.users import users, companies
-from .views import dbExcel, quality, consents, sms, utils, supervisorPanel, whatsApp
+from .views import dbExcel, quality, consents, sms, utils, supervisorPanel, whatsApp, comparativeReports
 
 
 urlpatterns = [
@@ -87,6 +87,9 @@ urlpatterns = [
     path('saveAccionRequired/', modals.saveAccionRequired, name='saveAccionRequired'),
     path('fetchPaymentsMonth/', fetchInformations.fetchPaymentsMonth, name='fetchPaymentsMonth'),
     path('fetchActionRequired/', fetchInformations.fetchActionRequired, name='fetchActionRequired'),
+    path('fetchPaymentOneil/<obamacareId>/', fetchInformations.fetchPaymentOneil, name='fetchPaymentOneil'),
+    path('fetchPaymentCarrier/<obamacareId>/', fetchInformations.fetchPaymentCarrier, name='fetchPaymentCarrier'),
+    path('fetchPaymentSherpa/<obamacareId>/', fetchInformations.fetchPaymentSherpa, name='fetchPaymentSherpa'),
     path('validarCita/', modals.validarCita, name='validarCita'),
     path('paymentDateObama/<obama_id>/', modals.paymentDateObama, name='paymentDateObama'),
 
@@ -224,7 +227,14 @@ urlpatterns = [
     path('addNumbers/', companies.addNumbers, name='addNumbers'),
     path('toggleNumberCompany/<number_id>/', companies.toggleNumberCompany, name='toggleNumberCompany'),
     path('addNumbersUsers/', companies.addNumbersUsers, name='addNumbersUsers'),
-    
+
+
+    #<---------------------------Comparative Report---------------------------> 
+    path('uploadReports/', comparativeReports.uploadReports, name='uploadReports'),
+    path('processExcel/', comparativeReports.processExcel, name='processExcel'),
+    path('headerProcessor/', comparativeReports.headerProcessor, name='headerProcessor'),
+
+
     #<---------------------------Utils---------------------------> 
     path('toggleDarkMode/', utils.toggleDarkMode, name='toggleDarkMode'),
 

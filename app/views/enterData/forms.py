@@ -126,7 +126,6 @@ def formCreateAssure(request):
                 })
 
     except Exception as e:
-        print(f"[ERROR] No se pudo obtener la lista de países: {e}")
         paises = []  # O podrías cargar valores por defecto si lo prefieres   
 
     if company_id == 1:
@@ -509,7 +508,6 @@ def formAddSupp(request,client_id):
             supp.company = company_id
             supp.save()
 
-            print(type_sales)
             client = get_object_or_404(Clients, id=client_id)
             client.type_sales = type_sales
             client.save()          

@@ -113,8 +113,6 @@ class GenericAlertConsumer(AsyncWebsocketConsumer):
         safe_host = re.sub(r'[^a-zA-Z0-9_.-]', '_', host)
         self.group_name = f'genericAlert_{safe_host}'
 
-        print(f"Conectando WebSocket al grupo: {self.group_name}")
-
         # Unirse al grupo
         await self.channel_layer.group_add(
             self.group_name,

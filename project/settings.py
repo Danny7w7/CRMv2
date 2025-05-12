@@ -29,8 +29,8 @@ SECRET_KEY = 'django-insecure-wxwjr&9_la5a&fe9i@=fwe(gjze$wsz$lwac&=5mmy&557vyzg
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-CSRF_TRUSTED_ORIGINS = ['https://crm.lapeira.com', 'https://www.crm.lapeira.com']
-ALLOWED_HOSTS = ['crm.lapeira.com', 'www.crm.lapeira.com']
+# CSRF_TRUSTED_ORIGINS = ['https://9320-179-33-189-146.ngrok-free.app']
+ALLOWED_HOSTS = ['*']
 
 TELNYX_API_KEY = os.getenv('TELNYX_API_KEY')
 
@@ -111,12 +111,15 @@ CHANNEL_LAYERS = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASS'),
+        'NAME': 'crm_2025',
+        'USER': 'root',
+        'PASSWORD': '',
         'HOST': os.getenv('DB_HOST'),
         'PORT': os.getenv('DB_PORT'),
-        'OPTIONS': {'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"},
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'; SET NAMES 'utf8mb4'",
+            'charset': 'utf8mb4',
+        }
     }
 }
 

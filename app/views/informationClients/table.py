@@ -105,8 +105,6 @@ def clientSupp(request):
             truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(is_active = True, company = company_id).order_by('-created_at')
         suppPay = False
 
-    print("QUERYSET FINAL:", supp)
-
     return render(request, 'informationClient/clientSupp.html', {'supps':supp,'suppPay':suppPay})
 
 @login_required(login_url='/login')

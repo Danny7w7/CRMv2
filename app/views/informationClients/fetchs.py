@@ -1,18 +1,22 @@
 # Standard Python libraries
 import json
-import re
+from calendar import monthrange
+from datetime import datetime, date
+from typing import Optional
 
 # Django utilities
 from django.http import JsonResponse
 
 # Django core libraries
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from django.urls import reverse
 
 # Application-specific imports
 from app.models import *
 from ...forms import *
 from ...alertWebsocket import websocketAlertGeneric
+from ..consents import getCompanyPerAgent
 
 @csrf_exempt
 def blockSocialSecurity(request):
@@ -142,6 +146,129 @@ def blockSocialSecurityLife(request):
 
     return JsonResponse({'status': 'error', 'message': 'Solicitud no válida.'}, status=400)
 
+
+@csrf_exempt
+@require_POST
+def fetchPaymentOneil(request, obamacareId):
+    insuranceCompany = request.POST.get('insuranceCompany')  # Puede ser None
+    coverageMonthInput = request.POST.get('coverageMonth')
+    payable = request.POST.get('payable')
+
+    # Parsear fechas
+    rangeCoverageMonth = parseMonthInputToDate(coverageMonthInput)
+    firstDay = rangeCoverageMonth.replace(day=1)
+    lastDay = rangeCoverageMonth.replace(day=monthrange(rangeCoverageMonth.year, rangeCoverageMonth.month)[1])
+
+    # Filtros dinámicos
+    filters = {
+        'obamacare_id': obamacareId,
+        'coverageMonth__range': (firstDay, lastDay),
+        'payable': payable,
+    }
+
+    # Agregar agencia solo si viene válida
+    if insuranceCompany:
+        filters['agency'] = insuranceCompany.strip()
+
+    payment = PaymentsOneil.objects.filter(**filters)
+
+
+    if payment.exists():
+        return JsonResponse({
+            'success': False,
+            'message': 'There is already a registration for this ObamaCare and this month'
+        })
+    
+    try:
+        obamacare = ObamaCare.objects.get(id=obamacareId)
+        payment = PaymentsOneil()
+        payment.obamacare = obamacare
+        if insuranceCompany:
+            payment.agency = insuranceCompany
+        else:
+            payment.agency = getCompanyPerAgent(obamacare.agent_usa)
+        payment.coverageMonth = parseMonthInputToDate(request.POST.get('coverageMonth'))
+        payment.payday = request.POST.get('payday')
+        payment.payable = request.POST.get('payable')
+        payment.save()
+
+    except ObamaCare.DoesNotExist:
+        return JsonResponse({'success': False,'message': 'ObamaCare not found'})
+    except:
+        return JsonResponse({'success': False,'message': 'Error creating payment, please contact an administrator.'})
+
+    return JsonResponse({'success': True,'message': 'Payment successfully created'})
+
+@csrf_exempt
+@require_POST
+def fetchPaymentCarrier(request, obamacareId):
+    
+    # Parsear fechas
+    rangeCoverageMonth = parseMonthInputToDate(request.POST.get('coverageMonth'))
+    firstDay = rangeCoverageMonth.replace(day=1)
+    lastDay = rangeCoverageMonth.replace(day=monthrange(rangeCoverageMonth.year, rangeCoverageMonth.month)[1])
+
+    payment = PaymentsCarriers.objects.filter(
+        obamacare_id=obamacareId,
+        coverageMonth__range=(firstDay, lastDay)
+    )
+
+    if payment.exists():
+        return JsonResponse({
+            'success': False,
+            'message': 'There is already a registration for this ObamaCare and this month'
+        })
+    
+    try:
+        obamacare = ObamaCare.objects.get(id=obamacareId)
+        payment = PaymentsCarriers()
+        payment.obamacare = obamacare
+        payment.carrier = obamacare.carrier
+        payment.coverageMonth = parseMonthInputToDate(request.POST.get('coverageMonth'))
+        payment.is_active = True if request.POST.get('status') == 'Active' else False
+        payment.save()
+
+    except ObamaCare.DoesNotExist:
+        return JsonResponse({'success': False,'message': 'ObamaCare not found'})
+    except:
+        return JsonResponse({'success': False,'message': 'Error creating payment, please contact an administrator.'})
+
+    return JsonResponse({'success': True,'message': 'Payment successfully created'})
+
+@csrf_exempt
+@require_POST
+def fetchPaymentSherpa(request, obamacareId):
+    
+    # Parsear fechas
+    rangeCoverageMonth = parseMonthInputToDate(request.POST.get('coverageMonth'))
+    firstDay = rangeCoverageMonth.replace(day=1)
+    lastDay = rangeCoverageMonth.replace(day=monthrange(rangeCoverageMonth.year, rangeCoverageMonth.month)[1])
+
+    payment = PaymentsSherpa.objects.filter(
+        obamacare_id=obamacareId,
+        coverageMonth__range=(firstDay, lastDay)
+    )
+
+    if payment.exists():
+        return JsonResponse({
+            'success': False,
+            'message': 'There is already a registration for this ObamaCare and this month'
+        })
+    
+    try:
+        obamacare = ObamaCare.objects.get(id=obamacareId)
+        payment = PaymentsSherpa()
+        payment.obamacare = obamacare
+        payment.coverageMonth = parseMonthInputToDate(request.POST.get('coverageMonth'))
+        payment.is_active = True if request.POST.get('status') == 'Active' else False
+        payment.save()
+
+    except ObamaCare.DoesNotExist:
+        return JsonResponse({'success': False,'message': 'ObamaCare not found'})
+    except:
+        return JsonResponse({'success': False,'message': 'Error creating payment, please contact an administrator.'})
+
+    return JsonResponse({'success': True,'message': 'Payment successfully created'})
 
 @csrf_exempt
 def fetchPaymentsMonth(request):
@@ -329,4 +456,18 @@ def validateKey(request):
         return JsonResponse({'allowed': allowed})
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
+def parseMonthInputToDate(monthStr: str) -> Optional[date]:
+    """
+    Converts a 'YYYY-MM' string from an <input type="month"> to a date object
+    using the first day of the month.
 
+    Args:
+        monthStr (str): A string in the format 'YYYY-MM'.
+
+    Returns:
+        date: A date object with day=1, or None if the input is invalid.
+    """
+    try:
+        return datetime.datetime.strptime(monthStr + "-01", "%Y-%m-%d").date()
+    except ValueError:
+        return None

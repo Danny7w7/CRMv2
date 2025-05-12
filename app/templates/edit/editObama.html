@@ -31,58 +31,10 @@
 
 	<!-- Custom styles -->
 	<style>
-		.completed {
-			background-color: rgb(0, 140, 255) !important;
-			color: white !important;
+		.centerAllExceptFirst td:not(:first-child),
+		.centerAllExceptFirst th:not(:first-child) {
+			text-align: center;
 		}
-		.loader-overlay {
-			position: fixed;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			background: rgba(0, 0, 0, 0.5);
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			flex-direction: column;
-			color: white;
-			font-size: 18px;
-			z-index: 9999;
-			display: none; /* Se oculta hasta que se haga submit */
-		}
-
-		.loader {
-			border: 6px solid #f3f3f3;
-			border-top: 6px solid #3498db;
-			border-radius: 50%;
-			width: 50px;
-			height: 50px;
-			animation: spin 1s linear infinite;
-		}
-
-		@keyframes spin {
-			0% { transform: rotate(0deg); }
-			100% { transform: rotate(360deg); }
-		}
-
-		.modal-content {
-			border-radius: 10px;
-			box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-		}
-
-		.table td {
-			font-weight: 450;
-			color: #333;
-		}
-
-		/* Centrar la columna Option y moverla un poco a la derecha */
-		.table th:nth-child(2), 
-		.table td:nth-child(2) {
-			text-align: center; /* Centra el texto y el switch */
-			padding-left: 20px; /* Ajusta según lo necesario */
-		}
-
 	</style>
 	<link rel="stylesheet" href="{% static 'assets/css/floatingSms.css' %}">
 	
@@ -1112,64 +1064,165 @@
 								</div>
 								<div class="modal-body">
 									<div class="table-responsive" >
-										<table id="paymentsTable" class="table table-striped table-hover table-bordered shadow-sm">
-											<thead class="table-light">
-											  <tr>
-												<th scope="col" class="align-middle">Month</th>
-												<th scope="col" class="text-center align-middle">Pay</th>
-												<th scope="col" class="text-center align-middle">Discount</th>
-											  </tr>
+										<table id="paymentsTable" class="table table-striped table-hover table-bordered shadow-sm centerAllExceptFirst">
+											<thead>
+												<tr>
+													<th>Month</th>
+													<th>Oneil</th>
+													{% if companyInsurance != 'LAPEIRA & ASSOCIATES LLC' and user.role in 'Admin,Supervisor'%}
+													<th>Lapeira</th>
+													{% endif %}
+													<th>Carrier</th>
+													<th>Sherpa</th>
+												</tr>
 											</thead>
 											<tbody>
-											  {% for month in monthInEnglish %}
+												{% for month, values in paymentsSummary.items %}
 												<tr>
-												  <td scope="row" class="fw-semibold align-middle">{{month}}</td>
-												  <td class="text-center">
-													<div class="form-check form-switch d-flex justify-content-center">
-													  <input 
-														class="form-check-input" 
-														type="checkbox" 
-														role="switch"
-														value="{{month}}"
-														id="paySwitch{{forloop.counter}}" 
-														name="type_pay_{{month}}"  
-														{% for payMonth in monthsPaid %} 
-														  {% if month == payMonth.month and payMonth.typePayment == 'pay' %}checked{% endif %}
-														{% endfor %}
-														{% if request.user.role != 'Admin' %} 
-														  {% for payMonth in monthsPaid %}
-															{% if month == payMonth.month and payMonth.typePayment == 'pay' %}disabled{% endif %}
-														  {% endfor %}
+													<td>{{ month }}</td>
+													<td>
+														{% if values.oneil == 0 %}❌
+														{% elif values.oneil > 0 %}✅
+														{% elif values.oneil < 0 %} <img src="{% static 'assets/images/icons/minus.png' %}" width="25px">
+														{% else %}{{ values.oneil }}
 														{% endif %}
-													  >
-													</div>
-												  </td>
-												  <td class="text-center">
-													<div class="form-check form-switch d-flex justify-content-center">
-													  <input 
-														class="form-check-input bg-danger border-danger" 
-														type="checkbox" 
-														role="switch"
-														value="{{month}}" 
-														id="discountSwitch{{forloop.counter}}"
-														name="type_discount_{{month}}"  
-														{% for payMonth in monthsPaid %} 
-														  {% if month == payMonth.month and payMonth.typePayment == 'discount' %}checked{% endif %}
-														{% endfor %}
-														{% if request.user.role != 'Admin' %} 
-														  {% for payMonth in monthsPaid %}
-															{% if month == payMonth.month and payMonth.typePayment == 'discount' %}disabled{% endif %}
-														  {% endfor %}
+													</td>
+													{% if companyInsurance != 'LAPEIRA & ASSOCIATES LLC' and user.role in 'Admin,Supervisor' %}
+														<td>
+															{% if values.lapeira == 0 %}❌
+															{% elif values.lapeira > 0 %}✅
+															{% elif values.lapeira < 0 %} <img src="{% static 'assets/images/icons/minus.png' %}" width="25px">
+															{% endif %}
+														</td>
+													{% endif %}
+													<td>
+														{% if values.carrier%}✅
+														{% else %}❌
 														{% endif %}
-													  >
-													</div>
-												  </td>
+													</td>
+													<td>
+														{% if values.sherpa%}✅
+														{% else %}❌
+														{% endif %}
+													</td>
 												</tr>
-											  {% endfor %}
+												{% endfor %}
 											</tbody>
-										</table>									  
+										</table>
 									</div>
 									
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-primery" data-bs-toggle="modal" data-bs-target="#modalChildEnterPaymentsOneil">
+										Enter Payments Oneil
+									</button>
+									<button type="button" class="btn btn-primery" data-bs-toggle="modal" data-bs-target="#modalChildEnterPaymentsCarrier">
+										Enter Payments Carrier
+									</button>
+									<button type="button" class="btn btn-primery" data-bs-toggle="modal" data-bs-target="#modalChildEnterPaymentsSherpa">
+										Enter Payments Sherpa
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Modal para ingresar payments Oneil -->
+					<div class="modal fade" id="modalChildEnterPaymentsOneil" tabindex="-1" aria-labelledby="modalChildEnterPaymentsOneil" aria-hidden="true">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title">Enter Payments Oneil</h5>
+									<button type="button" class="btn-primary" data-bs-dismiss="modal" aria-label="Close"></button>
+								</div>
+								<div class="modal-body">
+									<form id="formPaymentsOneil">
+										<div class="mb-3">
+											<label for="" class="form-label">Month</label>
+											<input type="month" class="form-control" name="coverageMonth" required>
+										</div>
+										<div class="mb-3">
+											<label for="" class="form-label">PayDay</label>
+											<input type="date" class="form-control" name="payday" required>
+										</div>
+										{% if companyInsurance != 'LAPEIRA & ASSOCIATES LLC' and user.role in 'Admin,Supervisor' %}	
+										<div class="mb-3">
+											<label for="" class="form-label">Insurance Company</label>
+											<select class="form-select" name="insuranceCompany" required>
+												<option value='' disabled selected>Select one</option>
+												<option value="{{companyInsurance}}">{{companyInsurance}}</option>
+												<option value="LAPEIRA & ASSOCIATES LLC">LAPEIRA & ASSOCIATES LLC</option>
+											</select>
+										</div>
+										{% endif %}
+										<div class="mb-3">
+											<label for="" class="form-label">Payable</label>
+											<select class="form-select" name="payable" required>
+												<option value='' disabled selected>Select one</option>
+												<option value="1">Paid</option>
+												<option value="-1">Not Pay</option>
+											</select>
+										</div>
+										<button type="submit" class="btn btn-primary">Save</button>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Modal para ingresar payments Carrier -->
+					<div class="modal fade" id="modalChildEnterPaymentsCarrier" tabindex="-1" aria-labelledby="modalChildEnterPaymentsCarrier" aria-hidden="true">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title">Enter Payments Carrier</h5>
+									<button type="button" class="btn-primary" data-bs-dismiss="modal" aria-label="Close"></button>
+								</div>
+								<div class="modal-body">
+									<form id="formPaymentsCarrier">
+										<div class="mb-3">
+											<label for="" class="form-label">Month</label>
+											<input type="month" class="form-control" name="coverageMonth" required>
+										</div>
+										<div class="mb-3">
+											<label for="" class="form-label">Status</label>
+											<select class="form-select" name="status" required>
+												<option value='' disabled selected>Select one</option>
+												<option value="Active">Active</option>
+												<option value="Inactive">Inactive</option>
+											</select>
+										</div>
+										<button type="submit" class="btn btn-primary">Save</button>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Modal para ingresar payments Sherpa -->
+					<div class="modal fade" id="modalChildEnterPaymentsSherpa" tabindex="-1" aria-labelledby="modalChildEnterPaymentsSherpa" aria-hidden="true">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title">Enter Payments Sherpa</h5>
+									<button type="button" class="btn-primary" data-bs-dismiss="modal" aria-label="Close"></button>
+								</div>
+								<div class="modal-body">
+									<form id="formPaymentsSherpa">
+										<div class="mb-3">
+											<label for="" class="form-label">Month</label>
+											<input type="month" class="form-control" name="coverageMonth" required>
+										</div>
+										<div class="mb-3">
+											<label for="" class="form-label">Status</label>
+											<select class="form-select" name="status" required>
+												<option value='' disabled selected>Select one</option>
+												<option value="Active">Active</option>
+												<option value="Inactive">Inactive</option>
+											</select>
+										</div>
+										<button type="submit" class="btn btn-primary">Save</button>
+									</form>
 								</div>
 							</div>
 						</div>

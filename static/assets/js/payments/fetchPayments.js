@@ -1,104 +1,58 @@
-function listenAllCheckInput() {
-    let paymentsTable = document.getElementById('paymentsTable');
-    let checkboxes = paymentsTable.querySelectorAll('input[type="checkbox"]');
+document.addEventListener('DOMContentLoaded', function() {
+    const formPaymentsOneil = document.getElementById('formPaymentsOneil');
+    const formPaymentsCarrier = document.getElementById('formPaymentsCarrier');
+    const formPaymentsSherpa = document.getElementById('formPaymentsSherpa');
 
-    let actionRequiredTable = document.getElementById('actionRequiredTable');
-    let checkboxesActionRequired = actionRequiredTable.querySelectorAll('input[type="checkbox"]');
-
-    checkboxes.forEach(function(checkbox) {
-        checkbox.addEventListener('change', function(event) {            
-            toggleUserStatus(checkbox);
+    if (formPaymentsOneil) {
+        formPaymentsOneil.addEventListener('submit', function(event) {
+            fetchPayments(event, 'Oneil');
         });
-    });
-
-    checkboxesActionRequired.forEach(function(checkbox) {
-        // Elimina el evento anterior solo si ya existe
-        checkbox.removeEventListener('change', toogleActionRequired);
-
-        checkbox.addEventListener('change', function(event) {  
-            toogleActionRequired(checkbox);
+    }
+    if (formPaymentsCarrier){
+        formPaymentsCarrier.addEventListener('submit', function(event) {
+            fetchPayments(event, 'Carrier');
         });
-    });
-}
-
-function toggleUserStatus(checkbox) {
-
-    const userRole = document.body.getAttribute("data-user-role");
-
-    if (!['Admin', 'S'].includes(userRole)){
-        checkbox.disabled = true;
     }
-
-    const month = checkbox.value;
-
-    // Determinar si es 'pay' o 'discount'
-    let type = '';
-    if (checkbox.id.includes('paySwitch')) {
-        type = 'pay';
-    } else if (checkbox.id.includes('discountSwitch')) {
-        type = 'discount';
+    if (formPaymentsSherpa){
+        formPaymentsSherpa.addEventListener('submit', function(event) {
+            fetchPayments(event, 'Sherpa');
+        });
     }
+    
+});
 
-    const dataToSend = {
-        obamacare: obamacare_id,  // Asegúrate de que esta variable esté definida globalmente
-        month: month,
-        type: type  // Solo un campo
-    };
+function fetchPayments(event, type) {
+    event.preventDefault();
 
-    //console.log("Enviando:", dataToSend);
-
-    const method = checkbox.checked ? 'POST' : 'DELETE';
-
-    fetch(`/fetchPaymentsMonth/`, {
-        method: method,
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(dataToSend)
-    })
-    .then(response => response.json())
-    .then(data => {
-        //console.log("Datos recibidos:", data);
-        if (data.success) {
-            //console.log(checkbox.checked ? "Pago creado" : "Pago eliminado");
-        } else {
-            //console.error("Error:", data.message || data.errors);
-        }
-    })
-    .catch(error => {
-        //console.error('Error al procesar la respuesta:', error);
-    });
-}
- 
-// fetch para Action Required
-let isRequestPending = false;
-
-function toogleActionRequired(checkbox) {
-    if (isRequestPending) return; // Evita enviar otra petición si ya hay una en curso
-    isRequestPending = true;
-
-    const checkboxId = checkbox.value;
-    const formData = new FormData();
-    formData.append('id', checkboxId);
-
-    fetch('/fetchActionRequired/', {
+    const formData = new FormData(event.target);
+    
+    fetch(`/fetchPayment${type}/${obamacare_id}/`, {
         method: 'POST',
-        body: formData,
+        body: formData
     })
     .then(response => {
+        if (!response.ok) {
+            throw new Error(`Server error ${response.status}: ${response.statusText}`);
+        }
         return response.json();
     })
     .then(data => {
-        checkbox.disabled = true;
+        Swal.fire({
+            title: data.success ? 'Successfully' : 'Error',
+            text: data.message,
+            icon: data.success ? 'success' : 'error',
+            showConfirmButton: true,
+        }).then(() => {
+            // Cerrar el modal de Bootstrap
+            const modal = bootstrap.Modal.getInstance(document.getElementById(`modalChildEnterPayments${type}`));
+            if (modal && data.success ) {
+                modal.hide();
+            }
+        });
     })
-    .catch(error => {
+    .catch((error) => {
         console.error('Error:', error);
-    })
-    .finally(() => {
-        isRequestPending = false; // Habilita de nuevo las peticiones
+        
     });
+    
 }
-
-
-
-document.addEventListener('DOMContentLoaded', listenAllCheckInput);

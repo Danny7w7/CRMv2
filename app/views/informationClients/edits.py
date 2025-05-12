@@ -8,7 +8,9 @@ import urllib.request
 from django.shortcuts import render
 
 # Django utilities
+from django.db.models import Sum, Count
 from django.http import JsonResponse
+from collections import defaultdict
 
 # Django core libraries
 from django.contrib.auth.decorators import login_required
@@ -20,6 +22,7 @@ from app.modelsSMS import *
 from ...forms import *
 from ..sms import get_last_message_for_chats
 from ..decoratorsCompany import *
+from ..consents import getCompanyPerAgent
 
 @login_required(login_url='/login') 
 def formEditClient(request, client_id):
@@ -195,7 +198,6 @@ def editClient(request,client_id):
         agent_usa=cleaned_client_data['agent_usa'],
         first_name=cleaned_client_data['first_name'],
         last_name=cleaned_client_data['last_name'],
-        phone_number=cleaned_client_data['phone_number'],
         email=cleaned_client_data['email'],
         address=cleaned_client_data['address'],
         zipcode=cleaned_client_data['zipcode'],
@@ -239,8 +241,6 @@ def editObama(request ,obamacare_id, way):
     else: 
         banderaCard = False
 
-    #Obtener todos los registros de meses pagados de la poliza
-    monthsPaid = Payments.objects.filter(obamacare=obamacare.id)
 
     #calculo de documente
     obamaDocumente = True if obamacare.doc_migration and obamacare.doc_income else False 
@@ -514,8 +514,6 @@ def editObama(request ,obamacare_id, way):
         'apppointment' : apppointment,
         'userCarrier': userCarrier,
         'c':c,
-        'monthInEnglish':monthInEnglish,
-        'monthsPaid':monthsPaid,
         'accionRequired': accionRequired,
         'way': way,
         'description' : description,
@@ -526,10 +524,73 @@ def editObama(request ,obamacare_id, way):
         'contact':contact,
         'chat':chat,
         'messages':messages,
-        'secretKey':secretKey
+        'secretKey':secretKey,
+        'companyInsurance':getCompanyPerAgent(obamacare.agent_usa),
+        'paymentsSummary': getPaymentsSummary()
     }
 
     return render(request, 'edit/editObama.html', context)
+
+def getPaymentsSummary():
+    summary = defaultdict(lambda: {
+        "oneil": 0,
+        "lapeira": 0,
+        "carrier": False,
+        "sherpa": False
+    })
+
+    # Inicializar todos los meses con ceros
+    for i in range(1, 13):
+        month = calendar.month_abbr[i].lower()
+        summary[month]  # Esto ejecuta el lambda y deja el mes listo con todos ceros
+
+    # Oneil y Lapeira
+    oneilPayments = PaymentsOneil.objects.all().order_by("coverageMonth", "-created_at")
+
+    seenLapeiraMonths = set()
+    seenOneilMonths = set()
+
+    for payment in oneilPayments:
+        month = calendar.month_abbr[payment.coverageMonth.month].lower()
+        if payment.agency.lower() == "lapeira & associates llc":
+            if month not in seenLapeiraMonths:
+                summary[month]["lapeira"] = float(payment.payable)
+                seenLapeiraMonths.add(month)
+        else:
+            if month not in seenOneilMonths:
+                summary[month]["oneil"] = float(payment.payable)
+                seenOneilMonths.add(month)
+
+    # Carrier
+    carrierPayments = PaymentsCarriers.objects.filter(is_active=True).order_by("coverageMonth", "-created_at")
+    seenCarrierMonths = set()
+
+    for payment in carrierPayments:
+        month = calendar.month_abbr[payment.coverageMonth.month].lower()
+        if month not in seenCarrierMonths:
+            summary[month]["carrier"] = payment.is_active
+            seenCarrierMonths.add(month)
+
+    # Sherpa
+    sherpaPayments = PaymentsSherpa.objects.filter(is_active=True).order_by("coverageMonth", "-created_at")
+    seenSherpaMonths = set()
+
+    for payment in sherpaPayments:
+        month = calendar.month_abbr[payment.coverageMonth.month].lower()
+        if month not in seenSherpaMonths:
+            summary[month]["sherpa"] = payment.is_active
+            seenSherpaMonths.add(month)
+
+    # Retornar los meses en orden (enero a diciembre)
+    orderedSummary = {
+        calendar.month_abbr[i].lower(): summary[calendar.month_abbr[i].lower()]
+        for i in range(1, 13)
+    }
+
+    return orderedSummary
+
+
+
 
 def usernameCarrier(request, obamacare):
 
@@ -784,7 +845,6 @@ def editAssure(request, assure_id):
                 })
 
     except Exception as e:
-        print(f"[ERROR] No se pudo obtener la lista de países: {e}")
         paises = []  # O podrías cargar valores por defecto si lo prefieres   
 
 

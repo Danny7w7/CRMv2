@@ -2,7 +2,7 @@
 import re
 
 # Django utilities
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 
 # Django core libraries
 from django.contrib.auth.decorators import login_required

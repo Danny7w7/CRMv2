@@ -1,0 +1,952 @@
+{% extends "dashboard/index.html" %}
+{% load static %}
+{% block head %}
+    <title>Upload BD</title>
+	<!--plugins-->
+	<link href="{% static "assets/plugins/simplebar/css/simplebar.css" %}" rel="stylesheet" />
+	<link href="{% static "assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" %}" rel="stylesheet" />
+	<link href="{% static "assets/plugins/metismenu/css/metisMenu.min.css" %}" rel="stylesheet" />
+	<link href="{% static "assets/plugins/datatable/css/dataTables.bootstrap5.min.css" %}" rel="stylesheet" />
+	<!-- loader-->
+	<link href="{% static "assets/css/pace.min.css" %}" rel="stylesheet" />
+	<script src="{% static "assets/js/pace.min.js" %}"></script>
+	<!-- Bootstrap CSS -->
+	<link href="{% static "assets/css/bootstrap.min.css" %}" rel="stylesheet">
+	<link href="{% static "assets/css/bootstrap-extended.css" %}" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&amp;display=swap" rel="stylesheet">
+	<link href="{% static "assets/css/app.css" %}" rel="stylesheet">
+	<link href="{% static "assets/css/icons.css" %}" rel="stylesheet">
+	<!-- Theme Style CSS -->
+	<link rel="stylesheet" href="{% static "assets/css/dark-theme.css" %}" />
+	<link rel="stylesheet" href="{% static "assets/css/semi-dark.css" %}" />
+	<link rel="stylesheet" href="{% static "assets/css/header-colors.css" %}" />
+	<style>
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.report-btn {
+  background-color: #f0f4ff;
+  color: #1a73e8;
+  border: 2px solid #cbdcf7;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.report-btn:hover {
+  background-color: #e0ebff;
+  border-color: #a9c4f5;
+}
+
+.report-btn.selected {
+  background-color: #1a73e8;
+  color: #fff;
+  border-color: #1a73e8;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* NUEVO: Igualar altura de las cards */
+.equal-height-card {
+  min-height: 260px; /* Ajusta este valor según lo que necesites */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+	</style>
+{% endblock %}
+{% block page_content %}
+<h6 class="mb-0 text-uppercase">upload excel</h6>
+<hr/>
+<div class="row align-items-stretch">
+	<div class="col-xl-10 mx-auto">
+		<div class="row mb-3">
+			<div class="col-md-4">
+				<div class="card h-100">
+					<div class="card-body">
+						<h5 class="text-center">Carrier's Reports</h5>
+						<div class="button-row">
+							<button id='aetna' class="report-btn reportingType">Aetna</button>
+							<button id='ambetter' class="report-btn reportingType">Ambetter</button>
+							<button id='amerihealth' class="report-btn reportingType">AmeriHealth</button>
+							<button id='anthem' class="report-btn reportingType">Anthem</button>
+							<button id='bluecross' class="report-btn reportingType">Blue Cross</button>
+							<button id='bluecrossaz' class="report-btn reportingType">Blue Cross Arizona</button>
+							<button id='caresource' class="report-btn reportingType">Caresource</button>
+							<button id='cigna' class="report-btn reportingType">Cigna</button>
+							<button id='medica' class="report-btn reportingType">Medica</button>
+							<button id='molina' class="report-btn reportingType">Molina</button>
+							<button id='oscar' class="report-btn reportingType">Oscar</button>
+							<button id='united' class="report-btn reportingType">United</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="card h-100">
+					<div class="card-body">
+						<h5 class="text-center">Oneil and Sherpa</h5>
+						<div class="button-row">
+							<button id='oneil' class="report-btn reportingType">Oneil</button>
+							<button id='sherpa' class="report-btn reportingType">Sherpa</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="card h-100">
+					<div class="card-body">
+						<h5 class="text-center">Suplementals</h5>
+						<div class="button-row">
+							<button id='supCigna' class="report-btn reportingType">Cigna</button>
+							<button id='supMetlife' class="report-btn reportingType">Metlife</button>
+							<button id='supUnited' class="report-btn reportingType">United</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="card">
+			<div class="card-body p-4">
+				<form id="uploadForm" method="POST" class='row' enctype="multipart/form-data">
+					{% csrf_token %}
+					<div class="col-md-12">
+						<div class="mb-3">
+							<input class="form-control" id="file" type="file" name="file" accept=".csv, .xls, .xlsx">
+						</div>
+					</div>
+					<input type="hidden" id="reportingType" name="reportingType">
+					<button id="buttonSubmit" class="btn btn-primary px-4" type="submit" disabled>Subir Archivo</button>
+				</form>				
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal Table Generic -->
+<div class="modal fade" id="modalTable" tabindex="-1" role="dialog" aria-labelledby="modalTable" aria-hidden="true">
+	<div class="modal-dialog modal-xl" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="modalTable">Errors</h5>
+			</div>
+			<div class="modal-body">
+				<div class="table-responsive" id="tableContainer">
+
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<!-- Modal comparative Aetna -->
+<div class="modal fade" id="modalaetna" tabindex="-1" role="dialog" aria-labelledby="modalaetna" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<form method="POST" id="aetnaForm" enctype="multipart/form-data">
+				{% csrf_token %}
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalTitleId">Select Headers</h5>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid" id="aetnaSelectHeader">
+						<div class="mb-3">
+							<label class="form-label">Issuer Assigned ID</label>
+							<select class="form-select form-select" name="policyNumber" id="policyNumber">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Subscriber Status</label>
+							<select class="form-select form-select" name="policyStatus" id="policyStatus">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Effective Date</label>
+							<select class="form-select form-select" name="effectiveDate" id="effectiveDate">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<input type="hidden" name="reportingTypeFinally">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+<!-- Modal comparative Ambetter -->
+<div class="modal fade" id="modalambetter" tabindex="-1" role="dialog" aria-labelledby="modalambetter" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<form method="POST" id="ambetterForm" enctype="multipart/form-data">
+				{% csrf_token %}
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalTitleId">Select Headers</h5>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid" id="ambetterSelectHeader">
+						<div class="mb-3">
+							<label class="form-label">Policy Number</label>
+							<select class="form-select form-select" name="policyNumber" id="policyNumber">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Eligible for Commission</label>
+							<select class="form-select form-select" name="eligibleForCommission" id="eligibleForCommission">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Policy Effective Date</label>
+							<select class="form-select form-select" name="policyEffectiveDate" id="policyEffectiveDate">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<input type="hidden" name="reportingTypeFinally">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+<!-- Modal comparative AmeriHealth Caritas -->
+<div class="modal fade" id="modalamerihealth" tabindex="-1" role="dialog" aria-labelledby="modalamerihealth" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<form method="POST" id="amerihealthForm" enctype="multipart/form-data">
+				{% csrf_token %}
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalTitleId">Select Headers</h5>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid" id="amerihealthSelectHeader">
+						<div class="mb-3">
+							<label class="form-label">Issuer Assigned ID</label>
+							<select class="form-select form-select" name="policyNumber" id="policyNumber">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Effective Date</label>
+							<select class="form-select form-select" name="effectiveDate" id="effectiveDate">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Subscriber Status</label>
+							<select class="form-select form-select" name="policyStatus" id="policyStatus">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						
+						<input type="hidden" name="reportingTypeFinally">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+<!-- Modal comparative Anthem -->
+<div class="modal fade" id="modalanthem" tabindex="-1" role="dialog" aria-labelledby="modalanthem" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<form method="POST" id="anthemForm" enctype="multipart/form-data">
+				{% csrf_token %}
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalTitleId">Select Headers</h5>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid" id="anthemSelectHeader">
+						<div class="mb-3">
+							<label class="form-label">Client ID</label>
+							<select class="form-select form-select" name="policyNumber" id="policyNumber">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Effective Date</label>
+							<select class="form-select form-select" name="effectiveDate" id="effectiveDate">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Policy Status</label>
+							<select class="form-select form-select" name="policyStatus" id="policyStatus">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						
+						<input type="hidden" name="reportingTypeFinally">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+<!-- Modal comparative Blue Cross -->
+<div class="modal fade" id="modalbluecross" tabindex="-1" role="dialog" aria-labelledby="modalbluecross" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<form method="POST" id="bluecrossForm" enctype="multipart/form-data">
+				{% csrf_token %}
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalTitleId">Select Headers</h5>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid" id="bluecrossSelectHeader">
+						<div class="mb-3">
+							<label class="form-label">Exchange ID</label>
+							<select class="form-select form-select" name="policyNumber" id="policyNumber">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Effective Date</label>
+							<select class="form-select form-select" name="effectiveDate" id="effectiveDate">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Policy Status</label>
+							<select class="form-select form-select" name="policyStatus" id="policyStatus">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						
+						<input type="hidden" name="reportingTypeFinally">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+<!-- Modal comparative Blue Cross Arizona -->
+<div class="modal fade" id="modalbluecrossaz" tabindex="-1" role="dialog" aria-labelledby="modalbluecrossaz" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<form method="POST" id="bluecrossazForm" enctype="multipart/form-data">
+				{% csrf_token %}
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalTitleId">Select Headers</h5>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid" id="bluecrossazSelectHeader">
+						<div class="mb-3">
+							<label class="form-label">Sub ID</label>
+							<select class="form-select form-select" name="policyNumber" id="policyNumber">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Effective Date</label>
+							<select class="form-select form-select" name="effectiveDate" id="effectiveDate">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3" data-group="policyStatusBlueCrossArizona">
+							<label class="form-label">Policy Status</label>
+							<div class="form-check">
+								<input class="form-check-input" type="checkbox" name="policyStatus" value="Active" id="policyStatusActive" checked />
+								<label class="form-check-label" for="policyStatusActive">Active</label>
+							</div>
+							<div class="form-check">
+								<input class="form-check-input" type="checkbox" name="policyStatus" value="Terminated" id="policyStatusTerminated" />
+								<label class="form-check-label" for="policyStatusTerminated">Terminated</label>
+							</div>							
+						</div>
+						
+						<input type="hidden" name="reportingTypeFinally">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+<!-- Modal comparative Caresource -->
+<div class="modal fade" id="modalcaresource" tabindex="-1" role="dialog" aria-labelledby="modalcaresource" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<form method="POST" id="caresourceForm" enctype="multipart/form-data">
+				{% csrf_token %}
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalTitleId">Select Headers</h5>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid" id="caresourceSelectHeader">
+						<div class="mb-3">
+							<label class="form-label">Member ID</label>
+							<select class="form-select form-select" name="policyNumber" id="policyNumber">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Effective Date</label>
+							<select class="form-select form-select" name="effectiveDate" id="effectiveDate">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Policy Status</label>
+							<select class="form-select form-select" name="policyStatus" id="policyStatus">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						
+						<input type="hidden" name="reportingTypeFinally">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+<!-- Modal comparative Cigna -->
+<div class="modal fade" id="modalcigna" tabindex="-1" role="dialog" aria-labelledby="modalcigna" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<form method="POST" id="cignaForm" enctype="multipart/form-data">
+				{% csrf_token %}
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalTitleId">Select Headers</h5>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid" id="cignaSelectHeader">
+						<div class="mb-3">
+							<label class="form-label">Customer Number</label>
+							<select class="form-select form-select" name="policyNumber" id="policyNumber">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Policy Status</label>
+							<select class="form-select form-select" name="policyStatus" id="policyStatus">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Effective Date</label>
+							<select class="form-select form-select" name="effectiveDate" id="effectiveDate">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<input type="hidden" name="reportingTypeFinally">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+<!-- Modal comparative Oneil -->
+<div class="modal fade" id="modaloneil" tabindex="-1" role="dialog" aria-labelledby="modalTitleId" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<form method="POST" id="oneilForm" enctype="multipart/form-data">
+				{% csrf_token %}
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalTitleId">Select Headers</h5>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid" id="oneilSelectHeader">
+						<div class="mb-3">
+							<label class="form-label">Policy Number</label>
+							<select class="form-select form-select" name="policyNumber" id="policyNumber">
+								<!-- <option disabled selected>Select one</option> -->
+								<option value="PolicyNumber" selected>policyNumber</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Coverage Month</label>
+							<select class="form-select form-select" name="coverageMonth" id="coverageMonth">
+								<!-- <option disabled selected>Select one</option> -->
+								<option value="CoverageMonth" selected>coverageMonth</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Carrier Name</label>
+							<select class="form-select form-select" name="carrierName" id="carrierName">
+								<!-- <option disabled selected>Select one</option> -->
+								<option value="CarrierName" selected>carrierName</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Agency</label>
+							<select class="form-select form-select" name="agency" id="agency">
+								<!-- <option disabled selected>Select one</option> -->
+								<option value="PayeeName" selected>agency</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Payable</label>
+							<select class="form-select form-select" name="payable" id="payable">
+								<!-- <option disabled selected>Select one</option> -->
+								<option value="Payable" selected>payable</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Statement Date</label>
+							<select class="form-select form-select" name="statementDate" id="statementDate">
+								<!-- <option disabled selected>Select one</option> -->
+								<option value="StatementDate" selected>statementDate</option>
+							</select>
+						</div>
+						<input type="hidden" name="reportingTypeFinally">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+<!-- Modal comparative Oscar -->
+<div class="modal fade" id="modaloscar" tabindex="-1" role="dialog" aria-labelledby="modaloscar" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<form method="POST" id="oscarForm" enctype="multipart/form-data">
+				{% csrf_token %}
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalTitleId">Select Headers</h5>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid" id="oscarSelectHeader">
+						<div class="mb-3">
+							<label class="form-label">Member ID</label>
+							<select class="form-select form-select" name="policyNumber" id="policyNumber">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Policy Status</label>
+							<select class="form-select form-select" name="policyStatus" id="policyStatus">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Coverage start date</label>
+							<select class="form-select form-select" name="effectiveDate" id="effectiveDate">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<input type="hidden" name="reportingTypeFinally">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+<!-- Modal comparative Molina -->
+<div class="modal fade" id="modalmolina" tabindex="-1" role="dialog" aria-labelledby="modalmolina" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<form method="POST" id="molinaForm" enctype="multipart/form-data">
+				{% csrf_token %}
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalTitleId">Select Headers</h5>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid" id="molinaSelectHeader">
+						<div class="mb-3">
+							<label class="form-label">Subscribe ID</label>
+							<select class="form-select form-select" name="policyNumber" id="policyNumber">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">HIX ID</label>
+							<select class="form-select form-select" name="hixId" id="hixId">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Policy Status</label>
+							<select class="form-select form-select" name="policyStatus" id="policyStatus">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Effective Date</label>
+							<select class="form-select form-select" name="effectiveDate" id="effectiveDate">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<input type="hidden" name="reportingTypeFinally">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+<!-- Modal comparative Medica -->
+<div class="modal fade" id="modalmedica" tabindex="-1" role="dialog" aria-labelledby="modalmedica" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<form method="POST" id="medicaForm" enctype="multipart/form-data">
+				{% csrf_token %}
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalTitleId">Select Headers</h5>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid" id="medicaSelectHeader">
+						<div class="mb-3">
+							<label class="form-label">Member ID</label>
+							<select class="form-select form-select" name="policyNumber" id="policyNumber">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Policy Status</label>
+							<select class="form-select form-select" name="policyStatus" id="policyStatus">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Effective Date</label>
+							<select class="form-select form-select" name="effectiveDate" id="effectiveDate">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<input type="hidden" name="reportingTypeFinally">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+<!-- Modal comparative United -->
+<div class="modal fade" id="modalunited" tabindex="-1" role="dialog" aria-labelledby="modalmunited" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<form method="POST" id="unitedForm" enctype="multipart/form-data">
+				{% csrf_token %}
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalTitleId">Select Headers</h5>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid" id="unitedSelectHeader">
+						<div class="mb-3">
+							<label class="form-label">Member Number</label>
+							<select class="form-select form-select" name="policyNumber" id="policyNumber">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Effective Date</label>
+							<select class="form-select form-select" name="effectiveDate" id="effectiveDate">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3" data-group="policyStatusUnited">
+							<label class="form-label">Policy Status</label>
+							<div class="form-check">
+								<input class="form-check-input" type="checkbox" name="policyStatus" value="Active" id="policyStatusActive" checked />
+								<label class="form-check-label" for="policyStatusActive">Active</label>
+							</div>
+							<div class="form-check">
+								<input class="form-check-input" type="checkbox" name="policyStatus" value="Terminated" id="policyStatusTerminated" />
+								<label class="form-check-label" for="policyStatusTerminated">Terminated</label>
+							</div>							
+						</div>
+						
+						<input type="hidden" name="reportingTypeFinally">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+<!-- Modal comparative Sherpa -->
+<div class="modal fade" id="modalsherpa" tabindex="-1" role="dialog" aria-labelledby="modalsherpa" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<form method="POST" id="sherpaForm" enctype="multipart/form-data">
+				{% csrf_token %}
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalTitleId">Select Headers</h5>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid" id="sherpaSelectHeader">
+						<div class="mb-3">
+							<label class="form-label">Issuer (Carrier)</label>
+							<select class="form-select form-select" name="carrier" id="carrier">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">State</label>
+							<select class="form-select form-select" name="state" id="state">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Issuer Assigned Policy ID</label>
+							<select class="form-select form-select" name="policyNumber" id="policyNumber">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Issuer Assigned Subscriber ID</label>
+							<select class="form-select form-select" name="subscriberId" id="subscriberId">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">FFM App ID</label>
+							<select class="form-select form-select" name="ffm" id="ffm">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Effective Date</label>
+							<select class="form-select form-select" name="effectiveDate" id="effectiveDate">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Policy Status</label>
+							<select class="form-select form-select" name="policyStatus" id="policyStatus">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						
+						<input type="hidden" name="reportingTypeFinally">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+<!-- Modal comparative Metlife Suplementario -->
+<div class="modal fade" id="modalsupMetlife" tabindex="-1" role="dialog" aria-labelledby="modalsupMetlife" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<form method="POST" id="supMetlifeForm" enctype="multipart/form-data">
+				{% csrf_token %}
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalTittlesupMetlife">Select Headers</h5>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid" id="supMetlifeSelectHeader">
+						<div class="mb-3">
+							<label class="form-label">Member Id</label>
+							<select class="form-select form-select" name="policyNumber" id="policyNumber">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Last Transaction Status</label>
+							<select class="form-select form-select" name="policyStatus" id="policyStatus">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Product Label</label>
+							<select class="form-select form-select" name="policyType" id="policyType">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						
+						<input type="hidden" name="reportingTypeFinally">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+<!-- Modal comparative Cigna Suplementario -->
+<div class="modal fade" id="modalsupCigna" tabindex="-1" role="dialog" aria-labelledby="modalsupCigna" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<form method="POST" id="supCignaForm" enctype="multipart/form-data">
+				{% csrf_token %}
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalTittlesupCigna">Select Headers</h5>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid" id="supCignaSelectHeader">
+						<div class="mb-3">
+							<label class="form-label">Policy Number</label>
+							<select class="form-select form-select" name="policyNumber" id="policyNumber">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Desc</label>
+							<select class="form-select form-select" name="policyStatus" id="policyStatus">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>						
+						<input type="hidden" name="reportingTypeFinally">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+<!-- Modal comparative United Suplementario -->
+<div class="modal fade" id="modalsupUnited" tabindex="-1" role="dialog" aria-labelledby="modalsupUnited" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<form method="POST" id="supUnitedForm" enctype="multipart/form-data">
+				{% csrf_token %}
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalTittlesupUnited">Select Headers</h5>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid" id="supUnitedSelectHeader">
+						<div class="mb-3">
+							<label class="form-label">ID</label>
+							<select class="form-select form-select" name="policyNumber" id="policyNumber">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Relation to Primary</label>
+							<select class="form-select form-select" name="holder" id="holder">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Policy Status</label>
+							<select class="form-select form-select" name="policyStatus" id="policyStatus">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>						
+						<input type="hidden" name="reportingTypeFinally">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+{% endblock %}
+{% block end_js %}
+	<!-- Bootstrap JS -->
+	<script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+	<!--plugins-->
+	<script src="{% static 'assets/js/jquery.min.js' %}"></script>
+	<script src="{% static 'assets/plugins/simplebar/js/simplebar.min.js' %}"></script>
+	<script src="{% static 'assets/plugins/metismenu/js/metisMenu.min.js' %}"></script>
+	<script src="{% static 'assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js' %}"></script>
+	<script src="{% static 'assets/plugins/datatable/js/jquery.dataTables.min.js' %}"></script>
+	<script src="{% static 'assets/plugins/datatable/js/dataTables.bootstrap5.min.js' %}"></script>
+
+	<!--app JS-->
+	<script src="{% static 'assets/js/app.js' %}"></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+	
+	<script src="{% static 'assets/js/comparative/uploadExcels.js' %}"></script>
+
+{% endblock %}

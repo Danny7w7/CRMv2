@@ -93,3 +93,32 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+
+// fetch para Action Required
+let isRequestPending = false;
+
+function toogleActionRequired(checkbox) {
+    if (isRequestPending) return; // Evita enviar otra petición si ya hay una en curso
+    isRequestPending = true;
+
+    const checkboxId = checkbox.value;
+    const formData = new FormData();
+    formData.append('id', checkboxId);
+
+    fetch('/fetchActionRequired/', {
+        method: 'POST',
+        body: formData,
+    })
+    .then(response => {
+        return response.json();
+    })
+    .then(data => {
+        checkbox.disabled = true;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    })
+    .finally(() => {
+        isRequestPending = false; // Habilita de nuevo las peticiones
+    });
+}
