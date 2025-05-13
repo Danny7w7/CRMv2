@@ -584,7 +584,7 @@ def getDetailReportOneil(request, dataFrame):
                 agency=agency,
                 coverageMonth=parseMonthYear(coverageMonth),
                 created_at=datetime.now(),
-                payday=parseDateDMY(statementDate),
+                payday=parseDateMDY(statementDate),
                 payable=payable
             )
             # Agregar el registro asociado al DataFrame
