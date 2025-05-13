@@ -286,6 +286,7 @@ def getDetailReportBluecrossArizona(request, dataFrame):
     for index, row in dataFrame.iterrows():
         policyNumber = row[request.POST.get('policyNumber')]
         effectiveDate = row[request.POST.get('effectiveDate')]
+        policyStatus = request.POST.get('policyStatus')
 
         if parseDateMDY(effectiveDate) > date(2024, 12, 31):
             try:
