@@ -531,7 +531,7 @@ def editObama(request ,obamacare_id, way):
 
     return render(request, 'edit/editObama.html', context)
 
-def getPaymentsSummary(obamacare_id):
+def getPaymentsSummary(obamacareId):
     summary = defaultdict(lambda: {
         "oneil": 0,
         "lapeira": 0,
@@ -545,7 +545,7 @@ def getPaymentsSummary(obamacare_id):
         summary[month]  # Esto ejecuta el lambda y deja el mes listo con todos ceros
 
     # Oneil y Lapeira
-    oneilPayments = PaymentsOneil.objects.filter(obamacare_id=obamacare_id).order_by("coverageMonth", "-created_at")
+    oneilPayments = PaymentsOneil.objects.filter(obamacare_id=obamacareId).order_by("coverageMonth", "-created_at")
 
     seenLapeiraMonths = set()
     seenOneilMonths = set()
@@ -562,7 +562,7 @@ def getPaymentsSummary(obamacare_id):
                 seenOneilMonths.add(month)
 
     # Carrier
-    carrierPayments = PaymentsCarriers.objects.filter(obamacare_id=obamacare_id).order_by("coverageMonth", "-created_at")
+    carrierPayments = PaymentsCarriers.objects.filter(obamacare_id=obamacareId).order_by("coverageMonth", "-created_at")
     seenCarrierMonths = set()
 
     for payment in carrierPayments:
@@ -572,7 +572,7 @@ def getPaymentsSummary(obamacare_id):
             seenCarrierMonths.add(month)
 
     # Sherpa
-    sherpaPayments = PaymentsSherpa.objects.filter(obamacare_id=obamacare_id).order_by("coverageMonth", "-created_at")
+    sherpaPayments = PaymentsSherpa.objects.filter(obamacare_id=obamacareId).order_by("coverageMonth", "-created_at")
     seenSherpaMonths = set()
 
     for payment in sherpaPayments:

@@ -640,6 +640,11 @@ def getDetailReportSherpa(request, dataFrame):
                 # Agregar el registro asociado al DataFrame
                 matchedRecords.loc[len(matchedRecords)] = row
 
+            except ValueError as ve:
+                rowWithError = pd.Series(row)
+                rowWithError['Error Reason'] = str(ve)
+                unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
+
             except ObamaCare.DoesNotExist:
                 rowWithError = pd.Series(row)
                 rowWithError['Error Reason'] = 'Obamacare not found'
@@ -797,13 +802,19 @@ def formatNumberPolicyMolina(subscriberId: str, state: str):
     return f'{state}-{policyNumer}'
 
 def formatNumberPolicyOscar(subscriberId: str):
-    return subscriberId[:11]
+    if pd.isna(subscriberId):
+        raise ValueError("subscriberId is empty or NaN")
+    return str(subscriberId)[:11]
 
 def formatNumberPolicyCaresource(subscriberId: str):
-    return subscriberId[:9]
+    if pd.isna(subscriberId):
+        raise ValueError("subscriberId is empty or NaN")
+    return str(subscriberId)[:9]
 
 def formatNumberPolicyUnited(subscriberId: str) -> str:
-    return subscriberId[:9]
+    if pd.isna(subscriberId):
+        raise ValueError("subscriberId is empty or NaN")
+    return str(subscriberId)[:9]
 
 
 def formatPolicyNumberByCarrier(policyNumber: str, subscriberId: str, carrier: str, state: str) -> str:
