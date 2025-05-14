@@ -285,28 +285,6 @@ def chat(request, chatId):
     return render(request, 'whatsapp/chat.html', context)
 
 @csrf_exempt
-def startChat(request, phoneNumber):
-    try:
-        if request.POST.get('language') == 'english':
-            message = "Reply YES to receive updates and information about your policy from Lapeira & Associates LLC. Msg & data rates may apply. Up to 5 msgs/month. Reply STOP to opt-out at any time."
-        else: 
-            message = "Favor de responder SI para recibir actualizaciones e información sobre su póliza de Lapeira & Associates LLC. Pueden aplicarse tarifas estándar de mensaje y datos. Hasta 5 mensajes/mes. Responder STOP para cancelar en cualquier momento."
-
-        sendWhatsapp(
-            request.user.assigned_phone_whatsapp.phone_number,
-            phoneNumber,
-            request.user,
-            request.user.company,
-            message
-        )
-        return JsonResponse({'message': message})
-    
-    except Exception as e:
-        error_response = {"error": "An error occurred while sending the message"}
-
-        return JsonResponse(error_response, status=500)
-
-@csrf_exempt
 def whatsappReply(request, company_id):
     if request.method == 'POST':
         from_number = request.POST.get('From', '')
@@ -454,7 +432,7 @@ def comprobate_company(company):
         return False
     
 @csrf_exempt   
-def authorization(request, contact_id):
+def template(request, contact_id):
     try:
         contact = Contacts_whatsapp.objects.get(id=contact_id)
         chat = Chat_whatsapp.objects.get(contact = contact)
@@ -464,49 +442,50 @@ def authorization(request, contact_id):
 
         client = Client(settings.ACCOUNT_SID, settings.AUTH_TOKEN)
 
-        message = client.messages.create(
-            from_=f"whatsapp:+{from_number}",
-            to=f"whatsapp:+{to_number}",
-            content_sid="HXa5ed05a7b7c4381b722bc82ebdf1c0ae",  # Reemplaza con tu SID real
-            content_variables=json.dumps({
-                "1": contact.name # o cualquier valor que necesites reemplazar en la plantilla
-            })
-        )
+        data = json.loads(request.body)
+        type_param = data.get('type')  # Obtienes el valor de 'type'
 
-        saveMessageInDb('Agent', f"AUTHORIZATION", chat, request.user) 
+        try:
+            variables_dict = None
+            content_sid = None
+            
+            if type_param == 'authorization':
+                variables_dict = {
+                    "1": contact.name,
+                    "2": "Lapeira & Associates LLC",
+                    "3": "Menos de 24 horas"
+                }
+                content_sid = settings.AUTHORIZATION
 
-        return JsonResponse({'message': 'ok'}, status=200)
+            elif type_param == 'activation':
+                variables_dict = {
+                    "1": contact.name
+                }
+                content_sid = settings.CUSTOMER
+
+            if variables_dict and content_sid:
+                message = client.messages.create(
+                    from_=f"whatsapp:+{from_number}",
+                    to=f"whatsapp:+{to_number}",
+                    content_sid=content_sid,
+                    content_variables=json.dumps(variables_dict)
+                )
+
+                saveMessageInDb('Agent', f"template-{type_param}", chat, request.user)
+
+                return JsonResponse({'message': 'ok'}, status=200)
+
+            return JsonResponse({'error': 'Datos insuficientes para enviar el mensaje.'}, status=400)
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
 
     except Exception as e:
         return JsonResponse({'message': 'error', 'details': str(e)}, status=500)
 
-@csrf_exempt   
-def activation(request, contact_id):
-    try:
-        contact = Contacts_whatsapp.objects.get(id=contact_id)
-        chat = Chat_whatsapp.objects.get(contact = contact)
-
-        from_number = request.user.assigned_phone_whatsapp.phone_number
-        to_number = contact.phone_number
-
-        client = Client(settings.ACCOUNT_SID, settings.AUTH_TOKEN)
-
-        message = client.messages.create(
-            from_=f"whatsapp:+{from_number}",
-            to=f"whatsapp:+{to_number}",
-            content_sid="HX1070fc7e6dec1ce38634619b21f75d80",  # Reemplaza con tu SID real
-            content_variables=json.dumps({
-                "1": contact.name, # o cualquier valor que necesites reemplazar en la plantilla
-                "2": 'Lapeira & Associates LLC',
-                "3": 'Menos de 24 horas'
-            })
-        )
-
-        saveMessageInDb('Agent', f"ACTIVATION", chat, request.user)
-
-        return JsonResponse({'message': 'ok'}, status=200)
-
-    except Exception as e:
-        return JsonResponse({'message': 'error', 'details': str(e)}, status=500)
-
-
+def deleteContactWhatsApp(request, id):
+    if request.user.is_superuser or request.user.role == 'Admin':
+        contact = Contacts_whatsapp.objects.get(id=id)
+        contact.delete()
+    return redirect(index)

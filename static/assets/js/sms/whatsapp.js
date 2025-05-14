@@ -288,8 +288,12 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function SecretKey(type) {
-    fetch(`/${type.toLowerCase()}/${contact_id}/`, {
-        method: 'POST'
+    fetch(`/template/${contact_id}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ type: type.toLowerCase() }), // Envías el type en el body
     })
     .then(response => {
         if (!response.ok) {
@@ -298,11 +302,7 @@ function SecretKey(type) {
         return response.json();
     })
     .then(() => {
-        if (type == 'Create'){
-            addMessage('Secret key creation link sent successfully', 'Agent', 'SMS');
-        }else{
-            addMessage('Secret key link successfully sent', 'Agent', 'SMS');
-        }     
+        addMessage(`template-${type}`, 'Agent', 'SMS');        
     })
     .catch((error) => {
         Swal.fire({
@@ -313,46 +313,6 @@ function SecretKey(type) {
     });
 }
 
-
-
-
-function setLanguage(lenguaje) {
-    StartChat(lenguaje)
-}
-
-function StartChat(lenguaje) {
-    const formData = new FormData();
-    formData.append('language', lenguaje);
-
-    fetch(`/startChatWhasapp/${chat_id}/`, {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(err => { throw err });
-        }
-        return response.json();
-    })
-    .then(data => {
-        addMessage(data.message, 'Agent', 'SMS');
-        toggleClass('chat-content', 'chat-content-center')
-        hideObject('languageDropdown')
-    })
-    .catch(error => {
-        let errorMessage = "Error when trying to create a chat, contact your system administrator.";
-        
-        if (error.error_detail) {
-            errorMessage = `${error.error_title}: ${error.error_detail}`;
-        }
-
-        Swal.fire({
-            title: "Error",
-            text: errorMessage,
-            icon: "error"
-        });
-    });
-}
 
 function toggleClass(id, className) {
     const element = document.getElementById(id);

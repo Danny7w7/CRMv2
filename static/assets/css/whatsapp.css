@@ -1,6 +1,3 @@
-#buttonSendSecretKey,#buttonSendSecretKey{
-    cursor: pointer;
-}
 
 .chat-content-center {
     display: flex;
@@ -41,22 +38,87 @@
     }
 }
 
-/* Espaciado y estilos de los elementos */
-.dropdown-item {
-    font-size: 16px;
-    padding: 10px 20px;
-    transition: all 0.2s ease-in-out;
-}
-
-.dropdown-item:hover {
-    background-color: #007bff;
-    color: white;
-    transform: scale(1.05);
-}
-
-.chat-right-msg {
+.chat-content-rightside .chat-right-msg {
     white-space: pre-wrap;
     word-break: break-word;
     overflow-wrap: break-word;
-    max-width: 100%; /* Asegura que no se extienda fuera del contenedor */
+    max-width: 50%; /* Asegura que no se extienda fuera del contenedor */
+    background-color: #40dc6c75  /* verde */
 }
+
+/* Botón personalizado sin borde ni efecto azul */
+.custom-btn {
+    border: none;  /* Elimina el borde del botón */
+    padding: 1px 12px;  /* Establece el padding interno del botón, lo que ajusta el tamaño */
+    background-color: transparent;  /* Establece el fondo del botón como transparente */
+    box-shadow: none;  /* Elimina cualquier sombra del botón */
+}
+  
+/* Cuando el botón tiene el hover, el foco o es activado */
+  .custom-btn:hover,
+  .custom-btn:focus,
+  .custom-btn:active {
+    background-color: transparent; /* Mantiene el fondo transparente cuando se pasa el mouse o se enfoca el botón */
+    box-shadow: none; /* Mantiene sin sombra */
+    border: none; /* Mantiene sin borde */
+    outline: none; /* Elimina el contorno que aparece en algunos navegadores al hacer foco en el botón */
+}  
+
+/* Hover verde para los ítems del dropdown */
+  .dropdown-menu .dropdown-item:hover,
+  .dropdown-menu .dropdown-item:focus {
+    background-color: #28a745; /* verde */
+    color: white;
+}
+  
+/* Colores de WhatsApp */
+:root {
+    --whatsapp-green: #3ad86e;
+    --whatsapp-dark-green: #3ad86e;
+    --whatsapp-light-green: #3ad86e;
+    --chat-bg: #e5ddd5;
+    --received-msg: #ffffff;
+    --sent-msg: #DCF8C6;
+}
+
+/* Barra lateral */
+.chat-sidebar {
+    background-color: var(--whatsapp-green);
+    color: white;
+}
+
+.chat-sidebar-header {
+    background-color: var(--whatsapp-dark-green);
+}
+
+/* Encabezado del chat */
+.chat-header {
+    background-color: var(--whatsapp-dark-green);
+    color: white;
+}
+
+/* Área de mensajes */
+.chat-content {
+    background-color: var(--chat-bg);
+    background-image: url('https://web.whatsapp.com/img/bg-chat-tile-light_a4be512e7195b6b733d9110b408f075d.png');
+}
+
+/* Burbujas de mensajes */
+.message.received {
+    background-color: var(--received-msg);
+    border-radius: 8px;
+    max-width: 70%;
+}
+
+.message.sent {
+    background-color: var(--sent-msg);
+    border-radius: 8px;
+    max-width: 70%;
+}
+
+/* Pie del chat */
+ .chat-footer {
+    background-color: #f0f0f0;
+    border-top: 1px solid #ccc;
+}
+  

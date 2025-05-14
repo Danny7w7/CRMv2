@@ -243,10 +243,8 @@ urlpatterns = [
     path('whatsappReply/<company_id>/', whatsApp.whatsappReply, name='whatsappReply'),
     path('whatsappBlue/', whatsApp.index, name='whatsappBlue'),
     path('chatWatsapp/<chatId>/', whatsApp.chat, name='chatWatsapp'),
-    path('startChatWhasapp/<phoneNumber>/', whatsApp.startChat, name='startChatWhasapp'),
     path('sendWhatsappConversation/', whatsApp.sendWhatsappConversation, name='sendWhatsappConversation'),
-
-    path('activation/<contact_id>/', whatsApp.activation, name='activation'),
-    path('authorization/<contact_id>/', whatsApp.authorization, name='authorization'),
+    path('deleteContactWhatsApp/<id>/', whatsApp.deleteContactWhatsApp, name='deleteContactWhatsApp'),
+    path('template/<contact_id>/', whatsApp.template, name='template'),
 
 ]

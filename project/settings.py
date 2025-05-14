@@ -213,3 +213,6 @@ STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET')
 #Twilio
 ACCOUNT_SID = os.getenv('ACCOUNT_SID')
 AUTH_TOKEN = os.getenv('AUTH_TOKEN')
+#content_sid de mensajes
+AUTHORIZATION = os.getenv('AUTHORIZATION')
+CUSTOMER = os.getenv('CUSTOMER')
