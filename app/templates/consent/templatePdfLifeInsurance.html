@@ -185,136 +185,231 @@
                 <div class="form-section">
                     <h4 class="section-title">En los últimos 10 años alguna vez fue diagnosticado o tratado por un miembro licenciado de la profesión médica o ha tomado medicamentos para:</h4>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q3 == 'on' %}checked{% endif %} id="enfCorazon">
-                            <label for="enfCorazon">Alguna enfermedad o condición anormal del corazón, sistema circulatorio, presión alta, colesterol alto, latidos del corazón irregulares, murmullo, fiebre reumática, enfermedad de la arteria coronaria, dolor de pecho, angina de pecho, ataque isquémico transitorio o accidente cerebrovascular</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>Alguna enfermedad o condición anormal del corazón, sistema circulatorio, presión alta, colesterol alto, latidos del corazón irregulares, murmullo, fiebre reumática, enfermedad de la arteria coronaria, dolor de pecho, angina de pecho, ataque isquémico transitorio o accidente cerebrovascular</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q3 == 'on' %}checked{% endif %} id='enfCorazonSi'>
+                            <label for='enfCorazonSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q3 != 'on' %}checked{% endif %} id='enfCorazonNo'>
+                            <label for='enfCorazonNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q4 == 'on' %}checked{% endif %}  id="enfPulmonar">
-                            <label for="enfPulmonar">Alguna enfermedad de los pulmones o del sistema respiratorio, sleep apnea, enfisema pulmonar, asma, bronquitis, tuberculosis, dificultad para respirar, alergias o trastorno de la nariz o garganta</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>Alguna enfermedad de los pulmones o del sistema respiratorio, sleep apnea, enfisema pulmonar, asma, bronquitis, tuberculosis, dificultad para respirar, alergias o trastorno de la nariz o garganta</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q4 == 'on' %}checked{% endif %} id='enfPulmonarSi'>
+                            <label for='enfPulmonarSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q4 != 'on' %}checked{% endif %} id='enfPulmonarNo'>
+                            <label for='enfPulmonarNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q5 == 'on' %}checked{% endif %}  id="enfDigestivo">
-                            <label for="enfDigestivo">Alguna enfermedad del sistema digestivo, incluido ulceras, indigestiones crónicas, problemas en el hígado, estómago, intestinos o trastornos en el páncreas, hepatitis, cirrosis, ictericia, trastorno en el esófago, trastorno en la vesícula o trastorno en el colon</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>Alguna enfermedad del sistema digestivo, incluido ulceras, indigestiones crónicas, problemas en el hígado, estómago, intestinos o trastornos en el páncreas, hepatitis, cirrosis, ictericia, trastorno en el esófago, trastorno en la vesícula o trastorno en el colon</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q5 == 'on' %}checked{% endif %} id='enfDigestivoSi'>
+                            <label for='enfDigestivoSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q5 != 'on' %}checked{% endif %} id='enfDigestivoNo'>
+                            <label for='enfDigestivoNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q6 == 'on' %}checked{% endif %}  id="trastornoNervioso">
-                            <label for="trastornoNervioso">Algún trastorno en el sistema nervioso, mareo, epilepsia, convulsiones, parálisis, perdida de conciencia, trastorno en los ojos o cerebro, dolores de cabeza</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>Algún trastorno en el sistema nervioso, mareo, epilepsia, convulsiones, parálisis, perdida de conciencia, trastorno en los ojos o cerebro, dolores de cabeza</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q6 == 'on' %}checked{% endif %} id='trastornoNerviosoSi'>
+                            <label for='trastornoNerviosoSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q6 != 'on' %}checked{% endif %} id='trastornoNerviosoNo'>
+                            <label for='trastornoNerviosoNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q7 == 'on' %}checked{% endif %}  id="trastornoColumna">
-                            <label for="trastornoColumna">Algún trastorno de la columna, cadera, rodilla, hombro, espalda, huesos, músculos, artritis, reumatismo, articulaciones, piel, tiroides, gota u otro trastorno de las glándulas</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>Algún trastorno de la columna, cadera, rodilla, hombro, espalda, huesos, músculos, artritis, reumatismo, articulaciones, piel, tiroides, gota u otro trastorno de las glándulas</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q7 == 'on' %}checked{% endif %} id='trastornoColumnaSi'>
+                            <label for='trastornoColumnaSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q7 != 'on' %}checked{% endif %} id='trastornoColumnaNo'>
+                            <label for='trastornoColumnaNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q8 == 'on' %}checked{% endif %}  id="enfUrinario">
-                            <label for="enfUrinario">Alguna enfermedad del sistema urinario, incluidas proteínas, azúcar o sangre en la orina, infección renal o cálculos, trastorno o enfermedad de la mama, la próstata o la vejiga o los órganos pélvicos</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>Alguna enfermedad del sistema urinario, incluidas proteínas, azúcar o sangre en la orina, infección renal o cálculos, trastorno o enfermedad de la mama, la próstata o la vejiga o los órganos pélvicos</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q8 == 'on' %}checked{% endif %} id='enfUrinarioSi'>
+                            <label for='enfUrinarioSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q8 != 'on' %}checked{% endif %} id='enfUrinarioNo'>
+                            <label for='enfUrinarioNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q9 == 'on' %}checked{% endif %}  id="trastornoPiel">
-                            <label for="trastornoPiel">Algún trastorno o condición anormal de la piel, incluyendo psoriasis, eczema, heridas que no sanan, melanoma, nevos o lunares</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>Algún trastorno o condición anormal de la piel, incluyendo psoriasis, eczema, heridas que no sanan, melanoma, nevos o lunares</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q9 == 'on' %}checked{% endif %} id='trastornoPielSi'>
+                            <label for='trastornoPielSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q9 != 'on' %}checked{% endif %} id='trastornoPielNo'>
+                            <label for='trastornoPielNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q10 == 'on' %}checked{% endif %}  id="anemia">
-                            <label for="anemia">Cualquier anemia, hemofilia o trastorno de la sangre que no sea el Síndrome de Inmunodeficiencia Adquirida (AIDS), Virus de Inmunodeficiencia Humana (HIV)</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>Cualquier anemia, hemofilia o trastorno de la sangre que no sea el Síndrome de Inmunodeficiencia Adquirida (AIDS), Virus de Inmunodeficiencia Humana (HIV)</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q10 == 'on' %}checked{% endif %} id='anemiaSi'>
+                            <label for='anemiaSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q10 != 'on' %}checked{% endif %} id='anemiaNo'>
+                            <label for='anemiaNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q11 == 'on' %}checked{% endif %}  id="sida">
-                            <label for="sida">Síndrome de Inmunodeficiencia Adquirida (SIDA) o Complejo Relacionado con el SIDA (ARC)</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>Síndrome de Inmunodeficiencia Adquirida (SIDA) o Complejo Relacionado con el SIDA (ARC)</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q11 == 'on' %}checked{% endif %} id='sidaSi'>
+                            <label for='sidaSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q11 != 'on' %}checked{% endif %} id='sidaNo'>
+                            <label for='sidaNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q12 == 'on' %}checked{% endif %}  id="cancer">
-                            <label for="cancer">Algún cáncer, tumor, pólipo, bulto, nódulo, quiste, linfoma o cualquier trastorno de los ganglios linfáticos</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>Algún cáncer, tumor, pólipo, bulto, nódulo, quiste, linfoma o cualquier trastorno de los ganglios linfáticos</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q12 == 'on' %}checked{% endif %} id='cancerSi'>
+                            <label for='cancerSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q12 != 'on' %}checked{% endif %} id='cancerNo'>
+                            <label for='cancerNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q13 == 'on' %}checked{% endif %}  id="diabetes">
-                            <label for="diabetes">Diabetes, hiperglucemia, prediabetes, tolerancia a la glucosa alterada, glucosa en ayunas alterada, deficiencia de insulina, hiperglucemia o diabetes asociada con el embarazo</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>Diabetes, hiperglucemia, prediabetes, tolerancia a la glucosa alterada, glucosa en ayunas alterada, deficiencia de insulina, hiperglucemia o diabetes asociada con el embarazo</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q13 == 'on' %}checked{% endif %} id='diabetesSi'>
+                            <label for='diabetesSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q13 != 'on' %}checked{% endif %} id='diabetesNo'>
+                            <label for='diabetesNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q14 == 'on' %}checked{% endif %}  id="depresion">
-                            <label for="depresion">Alguna depresión, ansiedad, trastorno bipolar, esquizofrenia, Trastorno por Déficit de Atención (TDA), autismo, síndrome de Down o cualquier otra condición de desarrollo o psicológica, incluyendo Alzheimer, demencia o Trastorno de Estrés Postraumático (TEPT)</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>Alguna depresión, ansiedad, trastorno bipolar, esquizofrenia, Trastorno por Déficit de Atención (TDA), autismo, síndrome de Down o cualquier otra condición de desarrollo o psicológica, incluyendo Alzheimer, demencia o Trastorno de Estrés Postraumático (TEPT)</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q14 == 'on' %}checked{% endif %} id='depresionSi'>
+                            <label for='depresionSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q14 != 'on' %}checked{% endif %} id='depresionNo'>
+                            <label for='depresionNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q15 == 'on' %}checked{% endif %}  id="amputacion">
-                            <label for="amputacion">En los últimos 10 años algún miembro licenciado de profesión médica le ha diagnosticado o tratado por alguna enfermedad o alguna otra condición medica que ha resultado en una amputación</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>En los últimos 10 años algún miembro licenciado de profesión médica le ha diagnosticado o tratado por alguna enfermedad o alguna otra condición medica que ha resultado en una amputación</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q15 == 'on' %}checked{% endif %} id='amputacionSi'>
+                            <label for='amputacionSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q15 != 'on' %}checked{% endif %} id='amputacionNo'>
+                            <label for='amputacionNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q16 == 'on' %}checked{% endif %}  id="ataxia">
-                            <label for="ataxia">En los últimos 10 años algún miembro licenciado de profesión médica le ha diagnosticado o tratado por ataxia, mielitis transversa, miastenia grave, trastorno autoinmune como lupus, ceguera o síndrome pospoliomielítico</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>En los últimos 10 años algún miembro licenciado de profesión médica le ha diagnosticado o tratado por ataxia, mielitis transversa, miastenia grave, trastorno autoinmune como lupus, ceguera o síndrome pospoliomielítico</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q16 == 'on' %}checked{% endif %} id='ataxiaSi'>
+                            <label for='ataxiaSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q16 != 'on' %}checked{% endif %} id='ataxiaNo'>
+                            <label for='ataxiaNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q17 == 'on' %}checked{% endif %}  id="parkinson">
-                            <label for="parkinson">En los últimos 10 años algún miembro licenciado de profesión médica le ha diagnosticado o tratado por enfermedad de Parkinson, distrofia muscular, Huntington, enfermedad de las neuronas motoras, enfermedad de Lou Gehrig (ALS) o esclerosis múltiple</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>En los últimos 10 años algún miembro licenciado de profesión médica le ha diagnosticado o tratado por enfermedad de Parkinson, distrofia muscular, Huntington, enfermedad de las neuronas motoras, enfermedad de Lou Gehrig (ALS) o esclerosis múltiple</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q17 == 'on' %}checked{% endif %} id='parkinsonSi'>
+                            <label for='parkinsonSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q17 != 'on' %}checked{% endif %} id='parkinsonNo'>
+                            <label for='parkinsonNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q18 == 'on' %}checked{% endif %}  id="drogas">
-                            <label for="drogas">En los últimos 10 años ha usado marijuana, cocaína, heroína o cualquier otra droga ilícita o sustancia controlada. Ha sido alertado por un profesional medico de que necesita discontinuar o reducir el uso del alcohol o la ingesta de drogas, medicamentos no prescritos por su doctor o ha sido miembro de algún grupo de soporte como NA o AA</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>En los últimos 10 años ha usado marijuana, cocaína, heroína o cualquier otra droga ilícita o sustancia controlada. Ha sido alertado por un profesional medico de que necesita discontinuar o reducir el uso del alcohol o la ingesta de drogas, medicamentos no prescritos por su doctor o ha sido miembro de algún grupo de soporte como NA o AA</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q18 == 'on' %}checked{% endif %} id='drogasSi'>
+                            <label for='drogasSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q18 != 'on' %}checked{% endif %} id='drogasNo'>
+                            <label for='drogasNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q19 == 'on' %}checked{% endif %}  id="hiv">
-                            <label for="hiv">Alguna vez ha sido positivo por exposición a la infección de HIV o ha sido diagnosticado teniendo ARC o AIDS causado por el HIV. Se ha sentido enfermo o alguna otra condición derivada de esta infección</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>Alguna vez ha sido positivo por exposición a la infección de HIV o ha sido diagnosticado teniendo ARC o AIDS causado por el HIV. Se ha sentido enfermo o alguna otra condición derivada de esta infección</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q19 == 'on' %}checked{% endif %} id='hivSi'>
+                            <label for='hivSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q19 != 'on' %}checked{% endif %} id='hivNo'>
+                            <label for='hivNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q20 == 'on' %}checked{% endif %}  id="familiar">
-                            <label for="familiar">En el mejor de sus conocimientos usted tiene algún padre o hermano que haya sido diagnosticado o tratado por un médico profesional debido a cáncer, alguna condición o enfermedad del corazón, enfermedad de Huntington o enfermedad poliquística de los riñones</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>En el mejor de sus conocimientos usted tiene algún padre o hermano que haya sido diagnosticado o tratado por un médico profesional debido a cáncer, alguna condición o enfermedad del corazón, enfermedad de Huntington o enfermedad poliquística de los riñones</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q20 == 'on' %}checked{% endif %} id='familiarSi'>
+                            <label for='familiarSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q20 != 'on' %}checked{% endif %} id='familiarNo'>
+                            <label for='familiarNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q21 == 'on' %}checked{% endif %}  id="citaPendiente">
-                            <label for="citaPendiente">Tiene alguna cita médica pendiente que ya haya realizado antes de esta aplicación con algún medico profesional o especialista</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>Tiene alguna cita médica pendiente que ya haya realizado antes de esta aplicación con algún medico profesional o especialista</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q21 == 'on' %}checked{% endif %} id='citaPendienteSi'>
+                            <label for='citaPendienteSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q21 != 'on' %}checked{% endif %} id='citaPendienteNo'>
+                            <label for='citaPendienteNo'>No</label>
                         </div>
                     </div>
                 </div>
@@ -322,17 +417,27 @@
                 <!-- En los últimos 5 años -->
                 <div class="form-section">
                     <h4 class="section-title">En los últimos 5 años:</h4>
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q22 == 'on' %}checked{% endif %}  id="consulta">
-                            <label for="consulta">Consultó a un médico que no sea su médico de cabecera o tuvo radiografías, electrocardiogramas, cateterismo cardíaco, mamografías, ecografías, biopsias o cualquier otra prueba y/o procedimiento médico, excepto aquellos relacionados con el Virus de Inmunodeficiencia Humana (Virus del SIDA)</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>Consultó a un médico que no sea su médico de cabecera o tuvo radiografías, electrocardiogramas, cateterismo cardíaco, mamografías, ecografías, biopsias o cualquier otra prueba y/o procedimiento médico, excepto aquellos relacionados con el Virus de Inmunodeficiencia Humana (Virus del SIDA)</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q22 == 'on' %}checked{% endif %} id='consultaSi'>
+                            <label for='consultaSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q22 != 'on' %}checked{% endif %} id='consultaNo'>
+                            <label for='consultaNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q23 == 'on' %}checked{% endif %}  id="hospital">
-                            <label for="hospital">Ha sido admitido en un hospital o planea entrar a un hospital en los próximos 30 días; o ha sido aconsejado por un miembro licenciado de la profesión médica que debe entrar a algún hospital para alguna observación, operación o tratamiento de algún tipo</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>Ha sido admitido en un hospital o planea entrar a un hospital en los próximos 30 días; o ha sido aconsejado por un miembro licenciado de la profesión médica que debe entrar a algún hospital para alguna observación, operación o tratamiento de algún tipo</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q23 == 'on' %}checked{% endif %} id='hospitalSi'>
+                            <label for='hospitalSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q23 != 'on' %}checked{% endif %} id='hospitalNo'>
+                            <label for='hospitalNo'>No</label>
                         </div>
                     </div>
                 </div>
@@ -340,108 +445,183 @@
                 <!-- Actualmente -->
                 <div class="form-section">
                     <h4 class="section-title">Actualmente:</h4>
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q24 == 'on' %}checked{% endif %} id="dispositivo">
-                            <label for="dispositivo">Usa o requiere el uso de cualquier dispositivo mecánico o médico como: silla de ruedas, andador, bastón de varias puntas, cama de hospital, máquina de diálisis, respirador de oxígeno, carro motorizado o subidor de escaleras</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>Usa o requiere el uso de cualquier dispositivo mecánico o médico como: silla de ruedas, andador, bastón de varias puntas, cama de hospital, máquina de diálisis, respirador de oxígeno, carro motorizado o subidor de escaleras</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q24 == 'on' %}checked{% endif %} id='dispositivoSi'>
+                            <label for='dispositivoSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q24 != 'on' %}checked{% endif %} id='dispositivoNo'>
+                            <label for='dispositivoNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q25 == 'on' %}checked{% endif %} id="ayudaBasica">
-                            <label for="ayudaBasica">Necesita ayuda, asistencia o supervisión para: bañarse, comer, vestirse, ir al baño, caminar, trasladarse o mantener la continencia</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>Necesita ayuda, asistencia o supervisión para: bañarse, comer, vestirse, ir al baño, caminar, trasladarse o mantener la continencia</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q25 == 'on' %}checked{% endif %} id='ayudaBasicaSi'>
+                            <label for='ayudaBasicaSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q25 != 'on' %}checked{% endif %} id='ayudaBasicaNo'>
+                            <label for='ayudaBasicaNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q26 == 'on' %}checked{% endif %} id="ayudaCotidiana">
-                            <label for="ayudaCotidiana">Necesita ayuda, asistencia o supervisión para: tomar medicamentos, hacer las tareas de la casa, lavar, ir de compras o preparar alguna comida</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>Necesita ayuda, asistencia o supervisión para: tomar medicamentos, hacer las tareas de la casa, lavar, ir de compras o preparar alguna comida</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q26 == 'on' %}checked{% endif %} id='ayudaCotidianaSi'>
+                            <label for='ayudaCotidianaSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q26 != 'on' %}checked{% endif %} id='ayudaCotidianaNo'>
+                            <label for='ayudaCotidianaNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q27 == 'on' %}checked{% endif %} id="infracciones">
-                            <label for="infracciones">Durante los últimos 5 años se ha declarado culpable o ha sido condenado por alguna infracción de vehículo en movimiento o DUI o tiene la licencia suspendida</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>Durante los últimos 5 años se ha declarado culpable o ha sido condenado por alguna infracción de vehículo en movimiento o DUI o tiene la licencia suspendida</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q27 == 'on' %}checked{% endif %} id='infraccionesSi'>
+                            <label for='infraccionesSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q27 != 'on' %}checked{% endif %} id='infraccionesNo'>
+                            <label for='infraccionesNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q28 == 'on' %}checked{% endif %} id="discapacidad">
-                            <label for="discapacidad">En los últimos 5 años, ¿ha trabajado menos de tiempo completo, recibido o solicitado beneficios por discapacidad o compensación laboral?</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>En los últimos 5 años, ¿ha trabajado menos de tiempo completo, recibido o solicitado beneficios por discapacidad o compensación laboral?</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q28 == 'on' %}checked{% endif %} id='discapacidadSi'>
+                            <label for='discapacidadSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q28 != 'on' %}checked{% endif %} id='discapacidadNo'>
+                            <label for='discapacidadNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q29 == 'on' %}checked{% endif %} id="trafico">
-                            <label for="trafico">En los últimos 5 años, ¿ha declarado culpable o ha sido condenado por alguna infracción de tránsito o DUI, o ha tenido una licencia suspendida?</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>En los últimos 5 años, ¿ha declarado culpable o ha sido condenado por alguna infracción de tránsito o DUI, o ha tenido una licencia suspendida?</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q29 == 'on' %}checked{% endif %} id='traficoSi'>
+                            <label for='traficoSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q29 != 'on' %}checked{% endif %} id='traficoNo'>
+                            <label for='traficoNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q30 == 'on' %}checked{% endif %} id="delito">
-                            <label for="delito">Alguna vez ha sido condenado por un delito menor o mayor</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>Alguna vez ha sido condenado por un delito menor o mayor</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q30 == 'on' %}checked{% endif %} id='delitoSi'>
+                            <label for='delitoSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q30 != 'on' %}checked{% endif %} id='delitoNo'>
+                            <label for='delitoNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q31 == 'on' %}checked{% endif %} id="bancarrota">
-                            <label for="bancarrota">Ha estado alguna vez envuelto en bancarrota o actualmente que no ha sido finalizada</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>Ha estado alguna vez envuelto en bancarrota o actualmente que no ha sido finalizada</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q31 == 'on' %}checked{% endif %} id='bancarrotaSi'>
+                            <label for='bancarrotaSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q31 != 'on' %}checked{% endif %} id='bancarrotaNo'>
+                            <label for='bancarrotaNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q32 == 'on' %}checked{% endif %} id="deporteRiesgo">
-                            <label for="deporteRiesgo">Participa en algún deporte de alto riesgo</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>Participa en algún deporte de alto riesgo</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q32 == 'on' %}checked{% endif %} id='deporteRiesgoSi'>
+                            <label for='deporteRiesgoSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q32 != 'on' %}checked{% endif %} id='deporteRiesgoNo'>
+                            <label for='deporteRiesgoNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q33 == 'on' %}checked{% endif %} id="aviacion">
-                            <label for="aviacion">Participa en otras actividades de aviación que no sea como pasajero</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>Participa en otras actividades de aviación que no sea como pasajero</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q33 == 'on' %}checked{% endif %} id='aviacionSi'>
+                            <label for='aviacionSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q33 != 'on' %}checked{% endif %} id='aviacionNo'>
+                            <label for='aviacionNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q34 == 'on' %}checked{% endif %} id="aplicacionPendiente">
-                            <label for="aplicacionPendiente">En los últimos 12 meses ha aplicado o tiene alguna aplicación pendiente de seguro de vida o seguro por discapacidad</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>En los últimos 12 meses ha aplicado o tiene alguna aplicación pendiente de seguro de vida o seguro por discapacidad</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q34 == 'on' %}checked{% endif %} id='aplicacionPendienteSi'>
+                            <label for='aplicacionPendienteSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q34 != 'on' %}checked{% endif %} id='aplicacionPendienteNo'>
+                            <label for='aplicacionPendienteNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q35 == 'on' %}checked{% endif %} id="seguroDeclinado">
-                            <label for="seguroDeclinado">Ha aplicado alguna vez para una póliza de seguro de vida, salud o discapacidad que resulto declinada, pospuesta, calificada o modificada en alguna forma</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>Ha aplicado alguna vez para una póliza de seguro de vida, salud o discapacidad que resultó declinada, pospuesta, calificada o modificada en alguna forma</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q35 == 'on' %}checked{% endif %} id='seguroDeclinadoSi'>
+                            <label for='seguroDeclinadoSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q35 != 'on' %}checked{% endif %} id='seguroDeclinadoNo'>
+                            <label for='seguroDeclinadoNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q36 == 'on' %}checked{% endif %} id="incentivo">
-                            <label for="incentivo">Le han ofrecido algún dinero o incentivo bajo este seguro de vida</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>Le han ofrecido algún dinero o incentivo bajo este seguro de vida</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q36 == 'on' %}checked{% endif %} id='incentivoSi'>
+                            <label for='incentivoSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q36 != 'on' %}checked{% endif %} id='incentivoNo'>
+                            <label for='incentivoNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q37 == 'on' %}checked{% endif %} id="transferencia">
-                            <label for="transferencia">Ha estado envuelto en alguna discusión sobre la venta o transferencia de una póliza de seguro de vida</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>Ha estado envuelto en alguna discusión sobre la venta o transferencia de una póliza de seguro de vida</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q37 == 'on' %}checked{% endif %} id='transferenciaSi'>
+                            <label for='transferenciaSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q37 != 'on' %}checked{% endif %} id='transferenciaNo'>
+                            <label for='transferenciaNo'>No</label>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" {% if answers.q38 == 'on' %}checked{% endif %} id="extranjero">
-                            <label for="extranjero">Durante los próximos 2 años, ¿tiene la intención de vivir fuera de los Estados Unidos?</label>
+                    <div class='mb-3'>
+                        <label class='form-label fw-bold'>Durante los próximos 2 años, ¿tiene la intención de vivir fuera de los Estados Unidos?</label>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q38 == 'on' %}checked{% endif %} id='extranjeroSi'>
+                            <label for='extranjeroSi'>Sí</label>
+                        </div>
+                        <div class='form-check'>
+                            <input type='checkbox' {% if answers.q38 != 'on' %}checked{% endif %} id='extranjeroNo'>
+                            <label for='extranjeroNo'>No</label>
                         </div>
                     </div>
                 </div>
