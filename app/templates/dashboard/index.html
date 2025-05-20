@@ -246,8 +246,9 @@
 						</li>
 					</ul>
 				</li>
-				{% if request.user.role == 'Admin'  %}
+				{% if request.user.role == 'Admin' or request.user.is_staff %}
 				<li class="menu-label">Admin</li>
+					{% if request.user.is_staff %}
 					<li>
 						<a class="has-arrow" href="javascript:;">
 							<div class="parent-icon"> <i class="lni lni-files"></i> </div>
@@ -259,6 +260,8 @@
 							</li>
 						</ul>
 					</li>
+					{% endif %}
+					{% if request.user.role == 'Admin' %}
 					<li>
 						<a class="has-arrow" href="javascript:;">
 							<div class="parent-icon"> <i class="lni lni-network"></i> </div>
@@ -273,6 +276,7 @@
 							</li>
 						</ul>
 					</li>
+					{% endif %}
 				{% endif %}		
 				{% if request.user.is_superuser %}
 					<li class="menu-label">Company</li>
