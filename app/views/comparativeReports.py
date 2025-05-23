@@ -589,7 +589,7 @@ def getDetailReportOneil(request, dataFrame):
                     obamacare = dependent.obamacare
                 except Dependents.DoesNotExist:
                     rowWithError = pd.Series(row)
-                    rowWithError['Error Reason'] = 'No ObamaCare or Dependent found'
+                    rowWithError['Error Reason'] = 'No ObamaCare policy found for holder or dependent.'
                     unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
                     continue  # saltar a la siguiente fila
 
