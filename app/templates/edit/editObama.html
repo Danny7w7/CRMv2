@@ -269,7 +269,7 @@
 							<input type="hidden" name="dependentId_{{ dependent.id }}" value="{{ dependent.id }}">
 							<input type="text" class="form-control" name="nameDependent_{{ dependent.id }}" value="{{ dependent.name }}" required >
 						</div>
-						<div class="col-12 col-lg-2">
+						<div class="col-12 col-lg-1">
 							<label class="form-label">Apply</label>
 							<select class="form-select" name="applyDependent_{{ dependent.id }}" required>
 								<option value="" disabled selected>Please Select</option>
@@ -277,13 +277,17 @@
 								<option value="NO" {% if dependent.apply == "NO" %}selected{% endif %}>NO</option>
 							</select>
 						</div>
-						<div class="col-12 col-lg-4">
+						<div class="col-12 col-lg-2">
 							<label class="form-label">Sex</label>
 							<select class="form-select" name="sexDependent_{{ dependent.id }}" required>
 								<option value="" disabled selected>Please Select</option>
 								<option value="M" {% if dependent.sex == "M" %}selected{% endif %}>MALE</option>
 								<option value="F" {% if dependent.sex == "F" %}selected{% endif %}>FEMALE</option>
 							</select>
+						</div>
+						<div class="col-12 col-lg-3">
+							<label class="form-label">Policy Number</label>
+							<input type="text" class="form-control" id="policyNumber"  name="policyNumberDependent_{{ dependent.id }}"  value="{{ dependent.policyNumber|default_if_none:'' }}" >
 						</div>
 						<div class="col-12 col-lg-3">
 							<label for="kinship" class="form-label">Relationship</label>
@@ -430,7 +434,7 @@
 						</div>
 						<div class="col-12 col-lg-3">
 							<label for="policyNumber" class="form-label">Police Number</label>
-							<input type="text" class="form-control" id="policyNumber" name="policyNumber" value="{{ obamacare.policyNumber }}" >
+							<input type="text" class="form-control" id="policyNumber" name="policyNumber" value="{{ obamacare.policyNumber|default_if_none:'' }}" >
 						</div>
 						<div class="col-12 col-lg-3">
 							<label for="profiling" class="form-label">Enrolled by</label>

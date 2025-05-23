@@ -333,6 +333,7 @@ class Dependents(models.Model):
     name = models.CharField(max_length=200)
     apply = models.CharField(max_length=200)
     sex = models.CharField(max_length=1)
+    policyNumber = models.CharField(max_length=50, null=True)
     kinship = models.CharField(max_length=100,null=True)
     date_birth = models.DateField(null=True)
     migration_status = models.CharField(max_length=50)

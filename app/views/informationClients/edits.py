@@ -1161,6 +1161,7 @@ def editDepentsObama(request, obamacare_id):
             kinship = request.POST.get(f'kinship_{dependent.id}')
             migration_status = request.POST.get(f'migrationStatusDependent_{dependent.id}')
             sex = request.POST.get(f'sexDependent_{dependent.id}')
+            policyNumber = request.POST.get(f'policyNumberDependent_{dependent.id}')
             
             # Verificar si el ID coincide
             if dependent.id == int(dependent_id):  # Verificamos si el ID coincide
@@ -1173,6 +1174,7 @@ def editDepentsObama(request, obamacare_id):
                     dependent.date_birth = date_birth_new
                     dependent.migration_status = migration_status
                     dependent.sex = sex
+                    dependent.policyNumber = policyNumber
 
                     dependent.save()
 
