@@ -844,8 +844,10 @@ def formatPolicyNumberByCarrier(policyNumber: str, subscriberId: str, carrier: s
     return subscriberId
 
 def parseMonthYear(monthYearStr: str) -> date:
-    # monthYearStr esperado en formato "3/2025"
-    parsed = datetime.strptime(monthYearStr, "%m/%Y")
+    try:
+        parsed = datetime.strptime(monthYearStr, "%m/%Y")
+    except ValueError:
+        parsed = datetime.strptime(monthYearStr, "%b-%y")
     return date(parsed.year, parsed.month, 1)
 
 def parseDateDMY(dateStr: str) -> date:
