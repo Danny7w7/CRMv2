@@ -562,11 +562,9 @@ def getDetailReportUnited(request, dataFrame):
     return matchedRecords, unmatchedRecords
 
 def getDetailReportOneil(request, dataFrame):
-    # Crear un DataFrame vacío para almacenar los registros no asociados
     unmatchedRecords = pd.DataFrame(columns=[*dataFrame.columns, 'Error Reason'])
     matchedRecords = pd.DataFrame(columns=dataFrame.columns)
-    
-    # Iterate over rows
+
     for index, row in dataFrame.iterrows():
         policyNumber = row[request.POST.get('policyNumber')]
         coverageMonth = row[request.POST.get('coverageMonth')]
@@ -579,7 +577,23 @@ def getDetailReportOneil(request, dataFrame):
             policyNumber = policyNumber.split('-')[0]
 
         try:
-            obamacare = ObamaCare.objects.get(policyNumber=policyNumber)
+            obamacare = None
+
+            # Intentar obtener ObamaCare
+            try:
+                obamacare = ObamaCare.objects.get(policyNumber=policyNumber)
+            except ObamaCare.DoesNotExist:
+                # Si no existe ObamaCare, intentar con Dependent
+                try:
+                    dependent = Dependents.objects.get(policyNumber=policyNumber)
+                    obamacare = dependent.obamacare
+                except Dependents.DoesNotExist:
+                    rowWithError = pd.Series(row)
+                    rowWithError['Error Reason'] = 'No ObamaCare or Dependent found'
+                    unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
+                    continue  # saltar a la siguiente fila
+
+            # Crear el pago si se obtuvo obamacare
             PaymentsOneil.objects.create(
                 obamacare=obamacare,
                 agency=agency,
@@ -588,13 +602,7 @@ def getDetailReportOneil(request, dataFrame):
                 payday=parseDateMDY(statementDate),
                 payable=payable
             )
-            # Agregar el registro asociado al DataFrame
             matchedRecords.loc[len(matchedRecords)] = row
-            
-        except ObamaCare.DoesNotExist:
-            rowWithError = pd.Series(row)
-            rowWithError['Error Reason'] = 'Obamacare not found'
-            unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
 
         except ObamaCare.MultipleObjectsReturned:
             rowWithError = pd.Series(row)
@@ -607,6 +615,7 @@ def getDetailReportOneil(request, dataFrame):
             unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
 
     return matchedRecords, unmatchedRecords
+
 
 def getDetailReportSherpa(request, dataFrame):
     # Crear un DataFrame vacío para almacenar los registros no asociados
