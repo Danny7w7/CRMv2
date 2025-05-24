@@ -248,9 +248,6 @@ def editObama(request ,obamacare_id, way):
     #calculo de status
     obamaStatus = True if obamacare.status_color == 3 else False
 
-    #Obtener todo los meses en ingles
-    monthInEnglish = [calendar.month_name[i] for i in range(1, 13)]
-
     newApppointment = True if apppointment else False
     
     RoleAuditar = [
@@ -491,10 +488,14 @@ def editObama(request ,obamacare_id, way):
         contact = Contacts.objects.filter(phone_number=obamacare.client.phone_number, company=company_id).first()
 
 
-    chats = Chat.objects.filter(contact=contact)
-    messages = Messages.objects.filter(chat=chats[0].id)
-    secretKey = SecretKey.objects.filter(contact=contact.id).first()
-    chat = get_last_message_for_chats(chats)[0]
+    chat = Chat.objects.filter(contact=contact)
+    if chat:
+        messages = Messages.objects.filter(chat=chat[0].id)
+        secretKey = SecretKey.objects.filter(contact=contact.id).first()
+        chat = get_last_message_for_chats(chat)[0]
+    else:
+        messages = None
+        secretKey = None
     
     context = {
         'obamacare': obamacare,
