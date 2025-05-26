@@ -71,8 +71,7 @@ def smsPayment():
 
 @shared_task
 def reportBoos():
-    # date = datetime.today() - timedelta(days=3)
-    date = datetime(datetime.today().year, datetime.today().month, 21)
+    date = datetime.today() - timedelta(days=5)
 
     obama = ObamaCare.objects.select_related('agent').filter(created_at = date)
     supp = Supp.objects.select_related('agent').filter(created_at = date)
