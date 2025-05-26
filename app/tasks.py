@@ -90,24 +90,45 @@ def reportBoos():
     print(supp)
     logger.info(supp)
 
-    mensageObama = []
-    mensageSupp = []
     mensageMedicare = []
     mensageAssure = []
     mensageLife = []
+
+    telnyx.api_key = settings.TELNYX_API_KEY
     
 
     if obama.exists():
-        for index, policy in enumerate(obama): # Usamos enumerate para el contador y un nombre más claro para la variable
-            mensageObama.append(f'Póliza #{index + 1} es de {policy.agent.first_name} y su estado es {policy.status}')
-    else:
-        mensageObama.append('no hay poliza obama')
+        mensageObama = '📄 ObamaCare\n'
+        for index, policy in enumerate(obama, start=1):
+            mensageObama += (
+                f'Póliza #{index}:\n'
+                f'Cliente: {policy.agent.first_name}\n'
+                f'Estado: {policy.status}\n'
+                f'Fecha: {policy.created_at.strftime("%d de %B")}\n\n'
+            )      
+        
+        telnyx.Message.create(
+            from_=f'+17869848427', # Your Telnyx number
+            to=f'+17863034781', # numero del jefe
+            text= mensageObama
+        )
+
 
     if supp.exists():
-        for index, policy in enumerate(supp): # Usamos enumerate para el contador y un nombre más claro para la variable
-            mensageSupp.append(f'Póliza #{index + 1} es de {policy.agent.first_name} y su estado es {policy.status}')
-    else:
-        mensageSupp.append('no hay poliza supp')
+        mensageSupp = '📄 Supp\n'
+        for index, policy in enumerate(supp, start=1):
+            mensageSupp += (
+                f'Póliza #{index}:\n'
+                f'Cliente: {policy.agent.first_name}\n'
+                f'Estado: {policy.status}\n'
+                f'Fecha: {policy.created_at.strftime("%d de %B")}\n\n'
+            )      
+        
+        telnyx.Message.create(
+            from_=f'+17869848427', # Your Telnyx number
+            to=f'+17863034781', # numero del jefe
+            text= mensageSupp
+        )
 
     if medicare.exists():
         for index, policy in enumerate(medicare): # Usamos enumerate para el contador y un nombre más claro para la variable
@@ -144,12 +165,6 @@ def reportBoos():
 
     print(mensage)
 
-    telnyx.api_key = settings.TELNYX_API_KEY
-    telnyx.Message.create(
-        from_=f'+17869848427', # Your Telnyx number
-        to=f'+17863034781', # numero del jefe
-        text= mensage
-    )
 
     
 
