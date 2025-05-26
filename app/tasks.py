@@ -72,6 +72,8 @@ def smsPayment():
 @shared_task
 def reportBoos():
 
+    logger.info("Tarea reportBoos iniciada")
+
     now = timezone.now()
     yesterday = now - timedelta(days=5)
 
@@ -86,6 +88,7 @@ def reportBoos():
     lifeInsurance = ClientsLifeInsurance.objects.filter(created_at__range=(start_date, end_date))
 
     print(supp)
+    logger.info(supp)
 
     mensageObama = []
     mensageSupp = []
