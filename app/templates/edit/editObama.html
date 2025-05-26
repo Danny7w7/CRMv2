@@ -1086,6 +1086,7 @@
 												{% for month, values in paymentsSummary.items %}
 												<tr>
 													<td>{{ month }}</td>
+													{% if companyInsurance != 'LAPEIRA & ASSOCIATES LLC' and user.role in 'Admin,Supervisor' %}
 													<td>
 														{% if values.oneil == 0 %}❌
 														{% elif values.oneil > 0 %}✅
@@ -1093,13 +1094,19 @@
 														{% else %}{{ values.oneil }}
 														{% endif %}
 													</td>
-													{% if companyInsurance != 'LAPEIRA & ASSOCIATES LLC' and user.role in 'Admin,Supervisor' %}
-														<td>
-															{% if values.lapeira == 0 %}❌
-															{% elif values.lapeira > 0 %}✅
-															{% elif values.lapeira < 0 %} <img src="{% static 'assets/images/icons/minus.png' %}" width="25px">
-															{% endif %}
-														</td>
+													<td>
+														{% if values.lapeira == 0 %}❌
+														{% elif values.lapeira > 0 %}✅
+														{% elif values.lapeira < 0 %} <img src="{% static 'assets/images/icons/minus.png' %}" width="25px">
+														{% endif %}
+													</td>
+													{% else %}
+													<td>
+														{% if values.lapeira == 0 %}❌
+														{% elif values.lapeira > 0 %}✅
+														{% elif values.lapeira < 0 %} <img src="{% static 'assets/images/icons/minus.png' %}" width="25px">
+														{% endif %}
+													</td>
 													{% endif %}
 													<td>
 														{% if values.carrier%}✅
