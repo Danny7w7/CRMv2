@@ -1072,8 +1072,10 @@
 											<thead>
 												<tr>
 													<th>Month</th>
-													<th>Oneil</th>
 													{% if companyInsurance != 'LAPEIRA & ASSOCIATES LLC' and user.role in 'Admin,Supervisor'%}
+													<th>Oneil</th>
+													<th>Lapeira</th>
+													{% else %}
 													<th>Lapeira</th>
 													{% endif %}
 													<th>Carrier</th>
