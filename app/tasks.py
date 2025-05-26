@@ -1,7 +1,9 @@
+from django.conf import settings
+from requests import request
 import telnyx
 
 from celery import shared_task
-from datetime import datetime
+from datetime import datetime, date, timedelta
 from celery.utils.log import get_task_logger
 
 from app.models import *
@@ -66,3 +68,80 @@ def smsPayment():
                     plan.client.company,
                     message
                 )
+
+@shared_task
+def reportBoos():
+    date = datetime.today() - timedelta(days=3)
+
+    obama = ObamaCare.objects.select_related('agent').filter(created_at = date)
+    supp = Supp.objects.select_related('agent').filter(created_at = date)
+    medicare = Medicare.objects.filter(created_at = date)
+    assure = ClientsAssure.objects.filter(created_at = date)
+    lifeInsurance = ClientsLifeInsurance.objects.filter(created_at = date)
+
+    print(supp)
+    print(date)
+
+    mensageObama = []
+    mensageSupp = []
+    mensageMedicare = []
+    mensageAssure = []
+    mensageLife = []
+    
+
+    if obama.exists():
+        for index, policy in enumerate(obama): # Usamos enumerate para el contador y un nombre más claro para la variable
+            mensageObama.append(f'Póliza #{index + 1} es de {policy.agent.first_name} y su estado es {policy.status}')
+    else:
+        mensageObama.append('no hay poliza obama')
+
+    if supp.exists():
+        for index, policy in enumerate(supp): # Usamos enumerate para el contador y un nombre más claro para la variable
+            mensageSupp.append(f'Póliza #{index + 1} es de {policy.agent.first_name} y su estado es {policy.status}')
+    else:
+        mensageSupp.append('no hay poliza supp')
+
+    if medicare.exists():
+        for index, policy in enumerate(medicare): # Usamos enumerate para el contador y un nombre más claro para la variable
+            mensageMedicare.append(f'Póliza #{index + 1} es de {policy.agent.first_name} y su estado es {policy.status}')
+    else:
+        mensageMedicare.append('no hay poliza medicare')
+    
+    if assure.exists():
+        for index, policy in enumerate(assure): # Usamos enumerate para el contador y un nombre más claro para la variable
+            mensageAssure.append(f'Póliza #{index + 1} es de {policy.agent.first_name} y su estado es {policy.status}')
+    else:
+        mensageAssure.append('no hay poliza assure')
+
+    if lifeInsurance.exists():
+        for index, policy in enumerate(lifeInsurance): # Usamos enumerate para el contador y un nombre más claro para la variable
+            mensageLife.append(f'Póliza #{index + 1} es de {policy.agent.first_name} y su estado es {policy.status}')
+    else:
+        mensageLife.append('no hay poliza life')
+
+    print(mensageObama)
+    print(mensageSupp)
+    print(mensageMedicare)
+    print(mensageAssure)
+    print(mensageLife)
+
+    mensage = (
+        f"Obama: {', '.join(mensageObama)}\n"
+        f"Supp: {', '.join(mensageSupp)}\n"
+        f"Medicare: {', '.join(mensageMedicare)}\n"
+        f"Assure: {', '.join(mensageAssure)}\n"
+        f"Life: {', '.join(mensageLife)}"
+    )
+
+    print(mensage)
+
+    telnyx.api_key = settings.TELNYX_API_KEY
+    telnyx.Message.create(
+        from_=f'+17869848427', # Your Telnyx number
+        to=f'+17863034781', # numero del jefe
+        text= mensage
+    )
+
+    
+
+   
