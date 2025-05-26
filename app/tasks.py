@@ -71,7 +71,8 @@ def smsPayment():
 
 @shared_task
 def reportBoos():
-    date = datetime.today() - timedelta(days=3)
+    # date = datetime.today() - timedelta(days=3)
+    date = datetime(datetime.today().year, datetime.today().month, 21)
 
     obama = ObamaCare.objects.select_related('agent').filter(created_at = date)
     supp = Supp.objects.select_related('agent').filter(created_at = date)
@@ -126,6 +127,7 @@ def reportBoos():
     print(mensageLife)
 
     mensage = (
+        f"La polizas de la fecha {date} es:\n"
         f"Obama: {', '.join(mensageObama)}\n"
         f"Supp: {', '.join(mensageSupp)}\n"
         f"Medicare: {', '.join(mensageMedicare)}\n"
