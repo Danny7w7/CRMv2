@@ -70,102 +70,105 @@ def smsPayment():
                 )
 
 @shared_task
-def reportBoos():
-
-    logger.info("Tarea reportBoos iniciada")
+def reportBoosLapeira():
 
     now = timezone.now()
-    yesterday = now - timedelta(days=5)
+    yesterday = now - timedelta(days=1)
 
     # Establecer rangos: inicio y fin del día de ayer
     start_date = timezone.make_aware(datetime(yesterday.year, yesterday.month, yesterday.day, 0, 0, 0))
     end_date = timezone.make_aware(datetime(yesterday.year, yesterday.month, yesterday.day, 23, 59, 59, 999999))
 
-    obama = ObamaCare.objects.select_related('agent').filter(created_at__range=(start_date, end_date))
-    supp = Supp.objects.select_related('agent').filter(created_at__range=(start_date, end_date))
-    medicare = Medicare.objects.filter(created_at__range=(start_date, end_date))
-    assure = ClientsAssure.objects.filter(created_at__range=(start_date, end_date))
-    lifeInsurance = ClientsLifeInsurance.objects.filter(created_at__range=(start_date, end_date))
+    #consulta base
+    obama = ObamaCare.objects.select_related('agent').filter(created_at__range=(start_date, end_date),company = 2)
+    supp = Supp.objects.select_related('agent').filter(created_at__range=(start_date, end_date),company = 2)
+    medicare = Medicare.objects.filter(created_at__range=(start_date, end_date),company = 2)
+    assure = ClientsAssure.objects.filter(created_at__range=(start_date, end_date),company = 2)
+    lifeInsurance = ClientsLifeInsurance.objects.filter(created_at__range=(start_date, end_date),company = 2)
 
-    print(supp)
-    logger.info(supp)
-
-    mensageMedicare = []
-    mensageAssure = []
-    mensageLife = []
-
-    telnyx.api_key = settings.TELNYX_API_KEY
-    
+    telnyx.api_key = settings.TELNYX_API_KEY    
 
     if obama.exists():
         mensageObama = '📄 ObamaCare\n'
         for index, policy in enumerate(obama, start=1):
             mensageObama += (
                 f'Póliza #{index}:\n'
-                f'Cliente: {policy.agent.first_name}\n'
+                f'Agente: {policy.agent.first_name}\n'
                 f'Estado: {policy.status}\n'
                 f'Fecha: {policy.created_at.strftime("%d de %B")}\n\n'
             )      
         
         telnyx.Message.create(
             from_=f'+17869848427', # Your Telnyx number
-            to=f'+17863034781', # numero del jefe
+            to=f'+13052199932', # numero del jefe
             text= mensageObama
         )
-
 
     if supp.exists():
         mensageSupp = '📄 Supp\n'
         for index, policy in enumerate(supp, start=1):
             mensageSupp += (
                 f'Póliza #{index}:\n'
-                f'Cliente: {policy.agent.first_name}\n'
+                f'Agente: {policy.agent.first_name}\n'
                 f'Estado: {policy.status}\n'
                 f'Fecha: {policy.created_at.strftime("%d de %B")}\n\n'
             )      
         
         telnyx.Message.create(
             from_=f'+17869848427', # Your Telnyx number
-            to=f'+17863034781', # numero del jefe
+            to=f'+13052199932', # numero del jefe
             text= mensageSupp
         )
 
     if medicare.exists():
-        for index, policy in enumerate(medicare): # Usamos enumerate para el contador y un nombre más claro para la variable
-            mensageMedicare.append(f'Póliza #{index + 1} es de {policy.agent.first_name} y su estado es {policy.status}')
-    else:
-        mensageMedicare.append('no hay poliza medicare')
+
+        mensageMedicare = '📄 Medicare\n'
+        for index, policy in enumerate(supp, start=1):
+            mensageMedicare += (
+                f'Póliza #{index}:\n'
+                f'Agente: {policy.agent.first_name}\n'
+                f'Estado: {policy.status}\n'
+                f'Fecha: {policy.created_at.strftime("%d de %B")}\n\n'
+            )      
+        
+        telnyx.Message.create(
+            from_=f'+17869848427', # Your Telnyx number
+            to=f'+13052199932', # numero del jefe
+            text= mensageMedicare
+        )
     
     if assure.exists():
-        for index, policy in enumerate(assure): # Usamos enumerate para el contador y un nombre más claro para la variable
-            mensageAssure.append(f'Póliza #{index + 1} es de {policy.agent.first_name} y su estado es {policy.status}')
-    else:
-        mensageAssure.append('no hay poliza assure')
+
+        mensageAssure = '📄 Assure\n'
+        for index, policy in enumerate(supp, start=1):
+            mensageAssure += (
+                f'Póliza #{index}:\n'
+                f'Agente: {policy.agent.first_name}\n'
+                f'Estado: {policy.status}\n'
+                f'Fecha: {policy.created_at.strftime("%d de %B")}\n\n'
+            )      
+        
+        telnyx.Message.create(
+            from_=f'+17869848427', # Your Telnyx number
+            to=f'+13052199932', # numero del jefe
+            text= mensageAssure
+        )
 
     if lifeInsurance.exists():
-        for index, policy in enumerate(lifeInsurance): # Usamos enumerate para el contador y un nombre más claro para la variable
-            mensageLife.append(f'Póliza #{index + 1} es de {policy.agent.first_name} y su estado es {policy.status}')
-    else:
-        mensageLife.append('no hay poliza life')
 
-    print(mensageObama)
-    print(mensageSupp)
-    print(mensageMedicare)
-    print(mensageAssure)
-    print(mensageLife)
-
-    mensage = (
-        f"La polizas de la fecha 21 es:\n"
-        f"Obama: {', '.join(mensageObama)}\n"
-        f"Supp: {', '.join(mensageSupp)}\n"
-        f"Medicare: {', '.join(mensageMedicare)}\n"
-        f"Assure: {', '.join(mensageAssure)}\n"
-        f"Life: {', '.join(mensageLife)}"
-    )
-
-    print(mensage)
-
-
-    
+        mensageLife = '📄 Life Insurance\n'
+        for index, policy in enumerate(lifeInsurance, start=1):
+            mensageLife += (
+                f'Póliza #{index}:\n'
+                f'Agente: {policy.agent.first_name}\n'
+                f'Estado: {policy.status}\n'
+                f'Fecha: {policy.created_at.strftime("%d de %B")}\n\n'
+            )      
+        
+        telnyx.Message.create(
+            from_=f'+17869848427', # Your Telnyx number
+            to=f'+13052199932', # numero del jefe
+            text= mensageLife
+        )
 
    
