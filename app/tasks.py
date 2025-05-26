@@ -71,16 +71,21 @@ def smsPayment():
 
 @shared_task
 def reportBoos():
-    date = datetime.today() - timedelta(days=5)
 
-    obama = ObamaCare.objects.select_related('agent').filter(created_at = date)
-    supp = Supp.objects.select_related('agent').filter(created_at = date)
-    medicare = Medicare.objects.filter(created_at = date)
-    assure = ClientsAssure.objects.filter(created_at = date)
-    lifeInsurance = ClientsLifeInsurance.objects.filter(created_at = date)
+    now = timezone.now()
+    yesterday = now - timedelta(days=5)
+
+    # Establecer rangos: inicio y fin del día de ayer
+    start_date = timezone.make_aware(datetime(yesterday.year, yesterday.month, yesterday.day, 0, 0, 0))
+    end_date = timezone.make_aware(datetime(yesterday.year, yesterday.month, yesterday.day, 23, 59, 59, 999999))
+
+    obama = ObamaCare.objects.select_related('agent').filter(created_at__range=(start_date, end_date))
+    supp = Supp.objects.select_related('agent').filter(created_at__range=(start_date, end_date))
+    medicare = Medicare.objects.filter(created_at__range=(start_date, end_date))
+    assure = ClientsAssure.objects.filter(created_at__range=(start_date, end_date))
+    lifeInsurance = ClientsLifeInsurance.objects.filter(created_at__range=(start_date, end_date))
 
     print(supp)
-    print(date)
 
     mensageObama = []
     mensageSupp = []
