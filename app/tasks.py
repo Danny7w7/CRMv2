@@ -131,7 +131,7 @@ def reportBoos():
     print(mensageLife)
 
     mensage = (
-        f"La polizas de la fecha {date} es:\n"
+        f"La polizas de la fecha {start_date} - {end_date} es:\n"
         f"Obama: {', '.join(mensageObama)}\n"
         f"Supp: {', '.join(mensageSupp)}\n"
         f"Medicare: {', '.join(mensageMedicare)}\n"
