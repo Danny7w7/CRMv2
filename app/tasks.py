@@ -123,7 +123,7 @@ def reportBoosLapeira():
     if medicare.exists():
 
         mensageMedicare = '📄 Medicare\n'
-        for index, policy in enumerate(supp, start=1):
+        for index, policy in enumerate(medicare, start=1):
             mensageMedicare += (
                 f'Póliza #{index}:\n'
                 f'Agente: {policy.agent.first_name}\n'
@@ -140,7 +140,7 @@ def reportBoosLapeira():
     if assure.exists():
 
         mensageAssure = '📄 Assure\n'
-        for index, policy in enumerate(supp, start=1):
+        for index, policy in enumerate(assure, start=1):
             mensageAssure += (
                 f'Póliza #{index}:\n'
                 f'Agente: {policy.agent.first_name}\n'
