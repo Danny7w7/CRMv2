@@ -6,7 +6,7 @@ class ClientForm(forms.ModelForm):
     class Meta:
         model = Clients
         fields = '__all__'
-        exclude = ['agent','date_birth','social_security','company','created_at']
+        exclude = ['agent','date_birth','social_security','company','created_at','phone_number']
 
 class ClientLifeForm(forms.ModelForm):
     class Meta:

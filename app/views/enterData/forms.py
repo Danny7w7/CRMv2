@@ -15,7 +15,8 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
-from django.contrib.auth.models import AnonymousUser
+from django.views.decorators.csrf import csrf_exempt
+
 
 # Application-specific imports
 from app.forms import *
@@ -24,7 +25,26 @@ from app.models import *
 from ..sms import createOrUpdateChat
 from ..whatsApp import createOrUpdateChat as whatssap
 from ..decoratorsCompany import *
-from ..consents import generateTemporaryToken, validateTemporaryToken
+
+def countDigits(numero):
+  """
+  Esta función toma un valor (esperando que sea un número o una cadena numérica)
+  y devuelve la cantidad de dígitos que tiene.
+  Maneja el caso en que la entrada sea una cadena.
+  """
+  try:
+    # Intenta convertir la cadena a un entero
+    numero_entero = int(numero)
+    # Ahora podemos calcular el valor absoluto y luego la longitud de su representación en string
+    return len(str(abs(numero_entero)))
+  except (TypeError, ValueError):
+    # Si la conversión a entero falla (no es una cadena numérica válida),
+    # intentamos contar la longitud de la cadena original (si es una cadena)
+    if isinstance(numero, str):
+      return len(numero)
+    else:
+      # Si no es ni un número convertible a entero ni una cadena, devolvemos 0 o raise un error
+      return 0  # O podrías hacer raise TypeError("Se esperaba un número o una cadena numérica.")
 
 # Vista para crear cliente
 @login_required(login_url='/login') 
@@ -56,11 +76,20 @@ def formCreateClient(request):
         if social: formatSocial = social.replace('-','')
         else: formatSocial = None
 
+        phoneNumber = request.POST.get('phone_number')
+        amount = countDigits(phoneNumber)
+
+        if amount == 10:
+            newNumber = int(f'1{phoneNumber}')
+        else:
+            newNumber = phoneNumber
+
         form = ClientForm(request.POST)
         if form.is_valid():
             client = form.save(commit=False)
             client.agent = request.user
             client.is_active = 1
+            client.phone_number = newNumber
             client.date_birth = fecha_obj
             client.social_security = formatSocial
             client.company = companyInstance
