@@ -19,15 +19,19 @@ from ..decoratorsCompany import *
 
 def downloadPdf(request, week_number):
     
-    ventas_matriz, detalles_clientes, rango_fechas, dias_semana = weekSalesSummary(request, week_number)
+    ventas_matriz, detalles_clientes, rango_fechas, dias_semana, totales_por_dia, gran_total_aca, gran_total_supp = weekSalesSummary(request, week_number)
 
     html_string = render_to_string('pdf/reportWekkly.html', {
         'ventas_matriz': ventas_matriz,
         'rango_fechas': rango_fechas,
-        'detalles_clientes' :detalles_clientes,
-        'dias_semana' : dias_semana,
+        'detalles_clientes': detalles_clientes,
+        'dias_semana': dias_semana,
+        'totales_por_dia': totales_por_dia,
+        'gran_total_aca': gran_total_aca,
+        'gran_total_supp': gran_total_supp,
         'week_number': week_number
     })
+
 
     font_config = FontConfiguration()
     html = HTML(string=html_string)

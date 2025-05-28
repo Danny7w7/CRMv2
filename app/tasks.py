@@ -1,9 +1,8 @@
 from django.conf import settings
-from requests import request
 import telnyx
 
 from celery import shared_task
-from datetime import datetime, date, timedelta
+from datetime import datetime, date
 from celery.utils.log import get_task_logger
 
 from app.models import *

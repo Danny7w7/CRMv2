@@ -963,18 +963,14 @@ def weekSalesSummary(request, week_number):
     endOfWeek = make_aware(endOfWeek)
 
     excludedUsernames = ['Calidad01', 'mariluz', 'MariaCaTi', 'StephanieMkt', 'CarmenR', 'tv', 'zohiraDuarte', 'vladimirDeLaHoz']
-    userRoles = ['A', 'C', 'S', 'SUPP', 'Admin']
 
     company_id = request.user.company
     company_filter = {'company': company_id} if not request.user.is_superuser else {}
 
     excluded_obama_ids = CustomerRedFlag.objects.values('obamacare')
-    users = Users.objects.exclude(username__in=excludedUsernames).filter(role__in=userRoles, is_active=True, **company_filter)
 
     sales_data = defaultdict(lambda: defaultdict(lambda: {"ACA": 0, "SUPP": 0}))
     client_data = defaultdict(lambda: {"clientes_obama": [], "clientes_supp": []})
-
-    all_days = [startOfWeek + timedelta(days=i) for i in range(6)]  # lunes a sábado
 
     obamaSales = ObamaCare.objects.select_related('client').filter(created_at__range=[startOfWeek, endOfWeek], **company_filter).exclude(id__in=Subquery(excluded_obama_ids))
     suppSales = Supp.objects.select_related('client').filter(created_at__range=[startOfWeek, endOfWeek], **company_filter)
@@ -1006,7 +1002,7 @@ def weekSalesSummary(request, week_number):
                 'nombre': sale.client.first_name,  # Ajusta según tu modelo
                 'fecha_poliza': sale.created_at.strftime('%Y-%m-%d'),
                 'estatus': sale.status,
-                'poliza_type': sale.policy_type
+                'policy_type': sale.policy_type
             })
 
     for sale in assureSales:
@@ -1019,7 +1015,7 @@ def weekSalesSummary(request, week_number):
                 'nombre': sale.first_name,  # Ajusta según tu modelo
                 'fecha_poliza': sale.created_at.strftime('%Y-%m-%d'),
                 'estatus': sale.status,
-                'poliza_type': 'Assure'
+                'policy_type': 'ASSURE'
             })
 
     for sale in lifeSales:
@@ -1032,7 +1028,7 @@ def weekSalesSummary(request, week_number):
                 'nombre': sale.full_name,  # Ajusta según tu modelo
                 'fecha_poliza': sale.created_at.strftime('%Y-%m-%d'),
                 'estatus': sale.status,
-                'poliza_type': 'Life Insurance'
+                'policy_type': 'LIFE INSURANCE'
             })
 
     week_days_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
@@ -1040,13 +1036,22 @@ def weekSalesSummary(request, week_number):
 
     prepared_data = []
     
+    # Inicializar totales por día
+    totales_por_dia = {}
+    for day in week_days_order:
+        totales_por_dia[day] = {"ACA": 0, "SUPP": 0}
+    
+    # Variables para totales generales
+    gran_total_aca = 0
+    gran_total_supp = 0
+    
     for agent_name, days_data in sales_data.items():
         agent_row = {
             'nombre': agent_name,
             'dias': []
         }
         
-        # Variables para calcular totales
+        # Variables para calcular totales del agente
         total_aca = 0
         total_supp = 0
         
@@ -1057,15 +1062,23 @@ def weekSalesSummary(request, week_number):
                 'supp': day_sales["SUPP"]
             })
             
-            # Sumar a los totales
+            # Sumar a los totales del agente
             total_aca += day_sales["ACA"]
             total_supp += day_sales["SUPP"]
+            
+            # Sumar a los totales por día
+            totales_por_dia[day]["ACA"] += day_sales["ACA"]
+            totales_por_dia[day]["SUPP"] += day_sales["SUPP"]
         
-        # Agregar totales al final
+        # Agregar totales del agente
         agent_row['totales'] = {
             'total_aca': total_aca,
             'total_supp': total_supp
         }
+        
+        # Sumar a los grandes totales
+        gran_total_aca += total_aca
+        gran_total_supp += total_supp
         
         prepared_data.append(agent_row)
 
@@ -1079,7 +1092,7 @@ def weekSalesSummary(request, week_number):
                 'clientes_supp': client_info["clientes_supp"]
             })
     
-    return prepared_data, prepared_client_data, rango_fechas, week_days_order
+    return prepared_data, prepared_client_data, rango_fechas, week_days_order, totales_por_dia, gran_total_aca, gran_total_supp
 
 @login_required(login_url='/login')
 def weekSalesWiew(request):
@@ -1089,14 +1102,19 @@ def weekSalesWiew(request):
         week_number = int(request.POST.get('week_number'))
 
         # Llamar a la función de lógica para obtener el resumen
-        ventas_matriz, detalles_clientes, rango_fechas, dias_semana = weekSalesSummary(request, week_number)
+        ventas_matriz, detalles_clientes, rango_fechas, dias_semana, totales_por_dia, gran_total_aca, gran_total_supp = weekSalesSummary(request, week_number)
+
+        print(detalles_clientes)
 
         # Renderizar la plantilla con los resultados
         return render(request, 'saleReports/weekSalesWiew.html', {
             'ventas_matriz': ventas_matriz,
             'rango_fechas': rango_fechas,
-            'detalles_clientes' :detalles_clientes,
-            'dias_semana' : dias_semana,
+            'detalles_clientes': detalles_clientes,
+            'dias_semana': dias_semana,
+            'totales_por_dia': totales_por_dia,
+            'gran_total_aca': gran_total_aca,
+            'gran_total_supp': gran_total_supp,
             'week_number': week_number
         })
 

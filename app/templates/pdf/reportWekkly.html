@@ -60,14 +60,13 @@
     <table id="sale" class="table table-striped table-bordered">
         <thead>
             <tr>
-                <th style="text-align: center; vertical-align: middle;" >Agente</th>
+                <th style="text-align: center; vertical-align: middle;" rowspan="2" >Agente</th>
                 {% for dia in dias_semana %}
                     <th style="text-align: center; vertical-align: middle;" colspan="2">{{ dia }}</th>
                 {% endfor %}
                 <th style="text-align: center; vertical-align: middle;" colspan="2" >Total</th>
             </tr>
             <tr>
-                <th></th>
                 {% for dia in dias_semana %}
                     <th style="text-align: center; vertical-align: middle;" >ACA</th>
                     <th style="text-align: center; vertical-align: middle;" >SUPP</th>
@@ -90,6 +89,25 @@
                 </tr>
             {% endfor %}
         </tbody>
+        <tfoot>
+            <tr class="totales-dia">
+                <td style="text-align: center; vertical-align: middle;" > <strong>TOTAL</strong></td>
+                <td style="text-align: center; vertical-align: middle;" > <strong>{{ totales_por_dia.Monday.ACA }}</strong> </td>
+                <td style="text-align: center; vertical-align: middle;" > <strong>{{ totales_por_dia.Monday.SUPP }}</strong> </td>
+                <td style="text-align: center; vertical-align: middle;" > <strong>{{ totales_por_dia.Tuesday.ACA }}</strong> </td>
+                <td style="text-align: center; vertical-align: middle;" > <strong>{{ totales_por_dia.Tuesday.SUPP }}</strong> </td>
+                <td style="text-align: center; vertical-align: middle;" > <strong>{{ totales_por_dia.Wednesday.ACA }}</strong> </td>
+                <td style="text-align: center; vertical-align: middle;" > <strong>{{ totales_por_dia.Wednesday.SUPP }}</strong> </td>
+                <td style="text-align: center; vertical-align: middle;" > <strong>{{ totales_por_dia.Thursday.ACA }}</strong> </td>
+                <td style="text-align: center; vertical-align: middle;" > <strong>{{ totales_por_dia.Thursday.SUPP }}</strong> </td>
+                <td style="text-align: center; vertical-align: middle;" > <strong>{{ totales_por_dia.Friday.ACA }}</strong>  </td>
+                <td style="text-align: center; vertical-align: middle;" > <strong>{{ totales_por_dia.Friday.SUPP }}</strong> </td>
+                <td style="text-align: center; vertical-align: middle;" > <strong>{{ totales_por_dia.Saturday.ACA }}</strong> </td>
+                <td style="text-align: center; vertical-align: middle;" > <strong>{{ totales_por_dia.Saturday.SUPP }}</strong> </td>
+                <td style="text-align: center; vertical-align: middle;" > <strong>{{ gran_total_aca }}</strong> </td>
+                <td style="text-align: center; vertical-align: middle;" > <strong>{{ gran_total_supp }}</strong> </td>
+            </tr>
+        </tfoot>
     </table>
 
     <!-- Detalles de los clientes -->
