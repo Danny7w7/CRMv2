@@ -173,16 +173,6 @@ def smsPayment():
 
 @shared_task
 def reportBoosLapeira():
-
-    # Obtener el día de la semana actual
-    # weekday() retorna: 0 para lunes, 1 para martes, ..., 6 para domingo
-    dia_semana_actual = date.today().weekday()
-
-    if dia_semana_actual == 0:  # Si es lunes (0 es el índice del lunes)
-        print("Hoy es lunes. La tarea reportBoosLapeira no se ejecutará.")
-        return # Salir de la función sin ejecutar el resto del código
-
-
     week_number = date.today().isocalendar()[1]
 
     # 1. Generar PDF
