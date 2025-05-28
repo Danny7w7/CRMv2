@@ -154,9 +154,7 @@
 								<button type="submit" name="action" value="save_obamacare" id="enviar" class="btn btn-primary px-4"  >Submit</button>
 								<button type="submit" name="action" id="enviar2" value="save_observation_agent" class="btn btn-primary px-4" style="display: none;">Submits</button>
 								<a href="{% url 'clientMedicare' %}" class="btn btn-light px-4">Back</a>
-								{% if request.user.role != 'A' %}
-									<a class="btn btn-light px-4" data-bs-toggle="modal" data-bs-target="#verConsent">View Consent</a>
-								{% endif %}
+								<a class="btn btn-light px-4" data-bs-toggle="modal" data-bs-target="#verConsent">View Consent</a>
 							</div>
 						</div>
                     {% csrf_token %}	
