@@ -98,7 +98,7 @@ def weekSalesSummarySms(week_number):
                 'nombre': sale.client.first_name,
                 'fecha_poliza': sale.created_at.strftime('%Y-%m-%d'),
                 'estatus': sale.status,
-                'poliza_type': sale.policy_type
+                'policy_type': sale.policy_type
             })
 
     for sale in assureSales:
@@ -109,7 +109,7 @@ def weekSalesSummarySms(week_number):
                 'nombre': sale.first_name,
                 'fecha_poliza': sale.created_at.strftime('%Y-%m-%d'),
                 'estatus': sale.status,
-                'poliza_type': 'Assure'
+                'policy_type': 'Assure'
             })
 
     for sale in lifeSales:
@@ -120,7 +120,7 @@ def weekSalesSummarySms(week_number):
                 'nombre': sale.full_name,
                 'fecha_poliza': sale.created_at.strftime('%Y-%m-%d'),
                 'estatus': sale.status,
-                'poliza_type': 'Life Insurance'
+                'policy_type': 'Life Insurance'
             })
 
     week_days_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
