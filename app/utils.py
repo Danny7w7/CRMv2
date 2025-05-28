@@ -1,14 +1,20 @@
+#libreria necesarias
 from django.template.loader import render_to_string
 from weasyprint import HTML
 from weasyprint import HTML
 from django.conf import settings
-from datetime import date
 import boto3
 import os
 
-def generate_weekly_pdf(week_number):
+from django.utils.timezone import make_aware
+import datetime
+from collections import defaultdict
+from django.db.models import Subquery
+from app.models import CustomerRedFlag, ObamaCare, Supp, ClientsAssure, ClientsLifeInsurance  # Ajusta según tu estructura
 
-    ventas_matriz, detalles_clientes, rango_fechas, dias_semana = weekSalesSummarySms(week_number,2,False)
+def generateWeeklyPdf(week_number):
+
+    ventas_matriz, detalles_clientes, rango_fechas, dias_semana = weekSalesSummarySms(week_number)
 
     html_string = render_to_string('pdf/reportWekkly.html', {
         'ventas_matriz': ventas_matriz,
@@ -31,7 +37,7 @@ def generate_weekly_pdf(week_number):
 
     return local_path, filename
 
-def upload_and_get_temp_url(local_path, s3_filename, expires_in=1800):
+def uploadTempUrl(local_path, s3_filename, expires_in=1800):
     s3 = boto3.client(
         's3',
         aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
@@ -50,11 +56,7 @@ def upload_and_get_temp_url(local_path, s3_filename, expires_in=1800):
 
     return url
 
-def weekSalesSummarySms(week_number, company_id=None, is_superuser=False):
-    from django.utils.timezone import make_aware
-    import datetime
-    from collections import defaultdict
-    from django.db.models import Subquery
+def weekSalesSummarySms(week_number):
 
     current_year = datetime.datetime.today().year
     startOfWeek = datetime.datetime.fromisocalendar(current_year, week_number, 1)  # lunes
@@ -64,24 +66,16 @@ def weekSalesSummarySms(week_number, company_id=None, is_superuser=False):
     endOfWeek = make_aware(endOfWeek)
 
     excludedUsernames = ['Calidad01', 'mariluz', 'MariaCaTi', 'StephanieMkt', 'CarmenR', 'tv', 'zohiraDuarte', 'vladimirDeLaHoz']
-    userRoles = ['A', 'C', 'S', 'SUPP', 'Admin']
-
-    company_filter = {'company': company_id} if not is_superuser else {}
-
-    from app.models import Users, CustomerRedFlag, ObamaCare, Supp, ClientsAssure, ClientsLifeInsurance  # Ajusta según tu estructura
 
     excluded_obama_ids = CustomerRedFlag.objects.values('obamacare')
-    users = Users.objects.exclude(username__in=excludedUsernames).filter(role__in=userRoles, is_active=True, **company_filter)
 
     sales_data = defaultdict(lambda: defaultdict(lambda: {"ACA": 0, "SUPP": 0}))
     client_data = defaultdict(lambda: {"clientes_obama": [], "clientes_supp": []})
 
-    all_days = [startOfWeek + datetime.timedelta(days=i) for i in range(6)]  # lunes a sábado
-
-    obamaSales = ObamaCare.objects.select_related('client').filter(created_at__range=[startOfWeek, endOfWeek], **company_filter).exclude(id__in=Subquery(excluded_obama_ids))
-    suppSales = Supp.objects.select_related('client').filter(created_at__range=[startOfWeek, endOfWeek], **company_filter)
-    assureSales = ClientsAssure.objects.filter(created_at__range=[startOfWeek, endOfWeek], **company_filter)
-    lifeSales = ClientsLifeInsurance.objects.filter(created_at__range=[startOfWeek, endOfWeek], **company_filter)
+    obamaSales = ObamaCare.objects.select_related('client').filter(created_at__range=[startOfWeek, endOfWeek], company = 2 , is_active=True).exclude(id__in=Subquery(excluded_obama_ids))
+    suppSales = Supp.objects.select_related('client').filter(created_at__range=[startOfWeek, endOfWeek], company = 2 , is_active=True)
+    assureSales = ClientsAssure.objects.filter(created_at__range=[startOfWeek, endOfWeek], company = 2 , is_active=True)
+    lifeSales = ClientsLifeInsurance.objects.filter(created_at__range=[startOfWeek, endOfWeek], company = 2, is_active=True)
 
     def get_day_key(dt):
         return dt.strftime('%A')  # Ej: 'Monday', 'Tuesday', ...
