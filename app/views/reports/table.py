@@ -1104,8 +1104,6 @@ def weekSalesWiew(request):
         # Llamar a la función de lógica para obtener el resumen
         ventas_matriz, detalles_clientes, rango_fechas, dias_semana, totales_por_dia, gran_total_aca, gran_total_supp = weekSalesSummary(request, week_number)
 
-        print(detalles_clientes)
-
         # Renderizar la plantilla con los resultados
         return render(request, 'saleReports/weekSalesWiew.html', {
             'ventas_matriz': ventas_matriz,

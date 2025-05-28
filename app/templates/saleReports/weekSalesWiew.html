@@ -38,11 +38,11 @@
             <button type="submit" class="btn btn-primary">Filter</button>
         </form>
         {% if ventas_matriz %}
-            <!-- Botón para descargar el PDF -->
-            <a href="{% url 'downloadPdf' week_number %}" class="btn btn-success mt-3">
+            <button id="downloadPdfBtn" class="btn btn-success mt-3" data-url="{% url 'downloadPdf' week_number %}">
                 Download PDF Report
-            </a>
+            </button>
         {% endif %}
+
 
     </div>
 </div>
@@ -166,4 +166,31 @@
 	
 	<!--app JS-->
 	<script src="{% static "assets/js/app.js" %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+    <script>
+        document.getElementById('downloadPdfBtn').addEventListener('click', function(event) {
+            event.preventDefault(); // evitar acción default del botón si es necesario
+            const url = this.getAttribute('data-url');
+        
+            Swal.fire({
+                title: 'Cargando',
+                text: 'Por favor, espera mientras se genera el PDF...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                    // Redirigir para iniciar la descarga
+                    window.location.href = url;
+        
+                    // Cerrar alert después de 10 segundos (ajusta tiempo si quieres)
+                    setTimeout(() => {
+                        Swal.close();
+                    }, 20000);
+                }
+            });
+        });
+    </script>
+        
+
 {% endblock %}
