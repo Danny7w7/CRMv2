@@ -1,12 +1,17 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Sales Report - Week {{ week_number }}</title>
     <style>
+        @page {
+            size: A4 landscape;
+            margin: 1cm;
+        }
         body {
             font-family: Arial, sans-serif;
-            margin: -20px;
+            margin: 20px;
         }
         h1, h2, h3, h4, h5 {
             color: #333;
@@ -19,7 +24,7 @@
         th, td {
             border: 1px solid #ddd;
             padding: 8px;
-            text-align: left;
+            text-align: center;
         }
         th {
             background-color: #f2f2f2;
@@ -36,6 +41,12 @@
             margin-top: 20px;
             margin-bottom: 10px;
         }
+        .mb-1 {
+            margin-bottom: 10px;
+        }
+        .mb-2 {
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -45,80 +56,72 @@
 
     <!-- Tabla resumen de ventas -->
     <h3>Sales Summary</h3>
-    <table>
+     <!-- Tabla resumen de ventas -->
+    <table id="sale" class="table table-striped table-bordered">
         <thead>
             <tr>
-                <th>Name the Agent</th>
-                <th>Obama</th>
-                <th>Active Obama</th>
-                <th>Supp</th>
-                <th>Active Supp</th>
-                <th>Total General</th>
+                <th style="text-align: center; vertical-align: middle;" >Agente</th>
+                {% for dia in dias_semana %}
+                    <th style="text-align: center; vertical-align: middle;" colspan="2">{{ dia }}</th>
+                {% endfor %}
+                <th style="text-align: center; vertical-align: middle;" colspan="2" >Total</th>
             </tr>
-        </thead>          
+            <tr>
+                <th></th>
+                {% for dia in dias_semana %}
+                    <th style="text-align: center; vertical-align: middle;" >ACA</th>
+                    <th style="text-align: center; vertical-align: middle;" >SUPP</th>
+                {% endfor %}
+                <th style="text-align: center; vertical-align: middle;" >ACA</th>
+                <th style="text-align: center; vertical-align: middle;" >SUPP</th>
+            </tr>
+        </thead>
         <tbody>
-            {% for nombre, datos in resumen_semana.items %}
-                {% if nombre != "TOTAL_GENERAL" %}
-                    <tr>
-                        <td>{{ nombre }}</td>
-                        <td>{{ datos.obama }}</td>
-                        <td>{{ datos.activeObama }}</td>
-                        <td>{{ datos.supp }}</td>
-                        <td>{{ datos.activeSupp }}</td>
-                        <td>{{ datos.total }}</td>
-                    </tr>
-                {% endif %}  
+            {% for agente in ventas_matriz %}
+                <tr>
+                    <td>{{ agente.nombre }}</td>
+                    {% for dia_data in agente.dias %}
+                        <td style="text-align: center; vertical-align: middle;" >{{ dia_data.aca }}</td>
+                        <td style="text-align: center; vertical-align: middle;" >{{ dia_data.supp }}</td>
+                    {% endfor %}
+                    <td style="text-align: center; vertical-align: middle;" > {{ agente.totales.total_aca }} </td>
+                    <td style="text-align: center; vertical-align: middle;" > {{ agente.totales.total_supp }}</td>
+                    
+                </tr>
             {% endfor %}
         </tbody>
-        <!-- Fila con Totales Generales -->
-        {% if "TOTAL_GENERAL" in resumen_semana %}
-            <tfoot>
-                <tr>
-                    <th>Total General</th>
-                    <th>{{ resumen_semana.TOTAL_GENERAL.total_aca }}</th>
-                    <th>{{ resumen_semana.TOTAL_GENERAL.totalActiveAca }}</th>
-                    <th>{{ resumen_semana.TOTAL_GENERAL.total_supp }}</th>
-                    <th>{{ resumen_semana.TOTAL_GENERAL.totalActiveSupp }}</th>
-                    <th>{{ resumen_semana.TOTAL_GENERAL.total_general }}</th>
-                </tr>
-            </tfoot>
-        {% endif %}  
     </table>
 
     <!-- Detalles de los clientes -->
-    <h2 class="mt-2">Customer Details</h2>
-        <hr>
-        {% for nombre, datos in resumen_semana.items %}
-            {% if datos.clientes_obama or datos.clientes_supp %}
-                <h3 class="mt-4">{{ nombre }}:</h3>
-            {% endif %}
+    <h2 class="mb-2">Customer Details</h2>
+    <hr>
+    {% for agente_data in detalles_clientes %}
+        <h4 class="mt-4">{{ agente_data.nombre }}: </h4>
 
-            <!-- Clientes de ObamaCare -->
-            {% if datos.clientes_obama %}
-                {% for cliente in datos.clientes_obama %}
-                    {% if cliente.estatus_color != 3 %}
-                        <p> 📌 <strong>Name:</strong> {{ cliente.nombre }}, <strong>Policy Date:</strong> {{ cliente.fecha_poliza }}, <strong>Status:</strong> {{ cliente.estatus }} </p>
-                    {% endif %}
-                {% endfor %}
-            {% endif %}
+        <!-- Clientes de ObamaCare -->
+        {% if agente_data.clientes_obama %}
+            <h6>ObamaCare Clients</h6>
+            {% for cliente in agente_data.clientes_obama %}
+                <p> 📌{{ forloop.counter }} <strong>Name:</strong> {{ cliente.nombre }}, <strong>Policy Date:</strong> {{ cliente.fecha_poliza }}, <strong>Status:</strong> {{ cliente.estatus }}, <strong>Type police:</strong> {{ cliente.policy_type }} </p>
+            {% endfor %}
+        {% endif %}
 
-            {% if datos.clientes_obama or datos.clientes_supp %}
-                <br>
-            {% endif %}
+        {% if agente_data.clientes_obama or agente_data.clientes_supp %}
+            <br>
+        {% endif %}
 
-            <!-- Clientes de Supp -->            
-            {% if datos.clientes_supp %}
-                {% for cliente in datos.clientes_supp %}
-                    {% if cliente.estatus_color != 3 %}
-                        <p> 📌 <strong>Name:</strong> {{ cliente.nombre }}, <strong>Policy Date:</strong> {{ cliente.fecha_poliza }}, <strong>Status:</strong> {{ cliente.estatus }} </p>
-                    {% endif %}
-                {% endfor %}
-            {% endif %}
+        <!-- Clientes de Supp -->            
+        {% if agente_data.clientes_supp %}
+            <h5>Supp Client</h5>
+            {% for cliente in agente_data.clientes_supp %}
+                <p> 📌{{ forloop.counter }} <strong>Name:</strong> {{ cliente.nombre }}, <strong>Policy Date:</strong> {{ cliente.fecha_poliza }}, <strong>Status:</strong> {{ cliente.estatus }} </p>
+            {% endfor %}
+        {% endif %}
 
-            {% if datos.clientes_obama or datos.activeSupp %}
-                <hr>
-            {% endif %}            
-            
-        {% endfor %}
+        {% if agente_data.clientes_obama or agente_data.clientes_supp %}
+            <hr>
+        {% endif %}
+        
+    {% endfor %}
 </body>
 </html>

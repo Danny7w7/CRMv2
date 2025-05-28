@@ -4,6 +4,7 @@ from datetime import timedelta, date
 
 # Django utilities
 from django.utils.timezone import make_aware
+from collections import defaultdict
 
 # Django core libraries
 from django.contrib.auth.decorators import login_required
@@ -953,145 +954,132 @@ def sales6WeekReport(request):
     return render(request, 'saleReports/sale6Week.html', context)
 
 def weekSalesSummary(request, week_number):
-    # Obtener el año actual
+
     current_year = datetime.datetime.today().year
+    startOfWeek = datetime.datetime.fromisocalendar(current_year, week_number, 1)  # lunes
+    endOfWeek = startOfWeek + timedelta(days=5)  # sábado
 
-    # Calcular el lunes de la semana seleccionada
-    startOfWeek = datetime.datetime.fromisocalendar(current_year, week_number, 1)  # 1 = Lunes
-    # Calcular el sábado de la semana seleccionada
-    endOfWeek = startOfWeek + timedelta(days=5)  # Lunes + 5 días = Sábado
-
-    # Convertir las fechas a "offset-aware" (si es necesario)
     startOfWeek = make_aware(startOfWeek)
     endOfWeek = make_aware(endOfWeek)
 
-    # Inicializar variables de totales generales
-    total_aca = 0
-    total_supp = 0
-    totalActiveAca = 0
-    totalActiveSupp = 0
+    excludedUsernames = ['Calidad01', 'mariluz', 'MariaCaTi', 'StephanieMkt', 'CarmenR', 'tv', 'zohiraDuarte', 'vladimirDeLaHoz']
+    userRoles = ['A', 'C', 'S', 'SUPP', 'Admin']
 
-    # Inicializar diccionario de ventas para la semana seleccionada
-    excludedUsernames = ['Calidad01', 'mariluz', 'MariaCaTi', 'StephanieMkt', 'CarmenR','tv','zohiraDuarte', 'vladimirDeLaHoz']  # Excluimos a gente que no debe aparecer en la vista
-    userRoles = ['A', 'C', 'S','SUPP','Admin']
-
-    company_id = request.user.company  # Obtener company_id desde request
+    company_id = request.user.company
     company_filter = {'company': company_id} if not request.user.is_superuser else {}
 
-    # Obtener los IDs de ObamaCare que están en CustomerRedFlag
     excluded_obama_ids = CustomerRedFlag.objects.values('obamacare')
+    users = Users.objects.exclude(username__in=excludedUsernames).filter(role__in=userRoles, is_active=True, **company_filter)
 
-    users = Users.objects.exclude(username__in=excludedUsernames).filter(role__in=userRoles, is_active=True,  **company_filter)
+    sales_data = defaultdict(lambda: defaultdict(lambda: {"ACA": 0, "SUPP": 0}))
+    client_data = defaultdict(lambda: {"clientes_obama": [], "clientes_supp": []})
 
-    # Filtrar todas las ventas realizadas en la semana seleccionada
-    obamaSales = ObamaCare.objects.filter(created_at__range=[startOfWeek, endOfWeek],  **company_filter).exclude( id__in=Subquery(excluded_obama_ids))
-    suppSales = Supp.objects.filter(created_at__range=[startOfWeek, endOfWeek],  **company_filter)
-    assureSales = ClientsAssure.objects.filter(created_at__range=[startOfWeek, endOfWeek],  **company_filter)
+    all_days = [startOfWeek + timedelta(days=i) for i in range(6)]  # lunes a sábado
 
-    # Agregar el conteo de pólizas activas para la semana seleccionada
-    activeObamaPolicies = ObamaCare.objects.filter(status='Active', created_at__range=[startOfWeek, endOfWeek], is_active=True,  **company_filter).exclude( id__in=Subquery(excluded_obama_ids))
-    activeSuppPolicies = Supp.objects.filter(status='Active', created_at__range=[startOfWeek, endOfWeek], is_active=True,  **company_filter)
-    activeAssurePolicies = ClientsAssure.objects.filter(status='Active', created_at__range=[startOfWeek, endOfWeek], is_active=True,  **company_filter)
+    obamaSales = ObamaCare.objects.select_related('client').filter(created_at__range=[startOfWeek, endOfWeek], **company_filter).exclude(id__in=Subquery(excluded_obama_ids))
+    suppSales = Supp.objects.select_related('client').filter(created_at__range=[startOfWeek, endOfWeek], **company_filter)
+    assureSales = ClientsAssure.objects.filter(created_at__range=[startOfWeek, endOfWeek], **company_filter)
+    lifeSales = ClientsLifeInsurance.objects.filter(created_at__range=[startOfWeek, endOfWeek], **company_filter)
 
-    salesSummary = {
-        user.username: {
-            "obama": 0,
-            "activeObama": 0,
-            "supp": 0,
-            "activeSupp": 0,
-            "total": 0,       # Total General = totalObama + totalSupp
-            "clientes_obama": [],  # Lista de clientes de ObamaCare
-            "clientes_supp": []    # Lista de clientes de Supp
-        } for user in users
-    }
+    def get_day_key(dt):
+        return dt.strftime('%A')  # Ej: 'Monday', 'Tuesday', ...
 
-    # Procesar las ventas de Obamacare para la semana seleccionada
     for sale in obamaSales:
-        agentName = sale.agent.username
-        if sale.agent.is_active and agentName not in excludedUsernames:
-            salesSummary[agentName]["obama"] += 1
-            salesSummary[agentName]["total"] += 1
-            total_aca += 1  # Incrementar total general de ACA
+        if sale.agent.is_active and sale.agent.username not in excludedUsernames:
+            day_key = get_day_key(sale.created_at)
+            sales_data[sale.agent.get_full_name()][day_key]["ACA"] += 1
 
-            # Agregar detalles del cliente
-            cliente_info = {
-                "nombre": f"{sale.client.first_name} {sale.client.last_name}",
-                "fecha_poliza": sale.created_at.strftime('%d/%m/%Y'),
-                "estatus": sale.status,
-                "estatus_color": sale.status_color
-            }
-            salesSummary[agentName]["clientes_obama"].append(cliente_info)
+            # Agregar cliente a la lista
+            client_data[sale.agent.get_full_name()]["clientes_obama"].append({
+                'nombre': sale.client.first_name,  # Ajusta según tu modelo
+                'fecha_poliza': sale.created_at.strftime('%Y-%m-%d'),
+                'estatus': sale.status 
+            })
 
-    # Procesar las ventas de Supp para la semana seleccionada
     for sale in suppSales:
-        agentName = sale.agent.username
-        if sale.agent.is_active and agentName not in excludedUsernames:
-            salesSummary[agentName]["supp"] += 1
-            salesSummary[agentName]["total"] += 1
-            total_supp += 1  # Incrementar total general de SUPP
+        if sale.agent.is_active and sale.agent.username not in excludedUsernames:
+            day_key = get_day_key(sale.created_at)
+            sales_data[sale.agent.get_full_name()][day_key]["SUPP"] += 1
 
-            # Agregar detalles del cliente
-            cliente_info = {
-                "nombre": f"{sale.client.first_name} {sale.client.last_name}",
-                "fecha_poliza": sale.created_at.strftime('%d/%m/%Y'),
-                "estatus": sale.status,
-                "estatus_color": sale.status_color
-            }
-            salesSummary[agentName]["clientes_supp"].append(cliente_info)
+            # Agregar cliente a la lista
+            client_data[sale.agent.get_full_name()]["clientes_supp"].append({
+                'nombre': sale.client.first_name,  # Ajusta según tu modelo
+                'fecha_poliza': sale.created_at.strftime('%Y-%m-%d'),
+                'estatus': sale.status,
+                'poliza_type': sale.policy_type
+            })
 
     for sale in assureSales:
-        agentName = sale.agent.username
-        if sale.agent.is_active and agentName not in excludedUsernames:
-            salesSummary[agentName]["supp"] += 1
-            salesSummary[agentName]["total"] += 1
-            total_supp += 1  # Incrementar total general de SUPP
+        if sale.agent.is_active and sale.agent.username not in excludedUsernames:
+            day_key = get_day_key(sale.created_at)
+            sales_data[sale.agent.get_full_name()][day_key]["SUPP"] += 1
 
-            # Agregar detalles del cliente
-            cliente_info = {
-                "nombre": f"{sale.first_name} {sale.last_name}",
-                "fecha_poliza": sale.created_at.strftime('%d/%m/%Y'),
-                "estatus": sale.status,
-                "estatus_color": sale.status_color
-            }
-            salesSummary[agentName]["clientes_supp"].append(cliente_info)
+            # Agregar cliente a la lista
+            client_data[sale.agent.get_full_name()]["clientes_supp"].append({
+                'nombre': sale.first_name,  # Ajusta según tu modelo
+                'fecha_poliza': sale.created_at.strftime('%Y-%m-%d'),
+                'estatus': sale.status,
+                'poliza_type': 'Assure'
+            })
 
-    for policy in activeObamaPolicies:
-        agentName = policy.agent.username
-        if policy.agent.is_active and agentName not in excludedUsernames:
-            salesSummary[agentName]["activeObama"] += 1
-            totalActiveAca += 1  # Incrementar total general de ACA
+    for sale in lifeSales:
+        if sale.agent.is_active and sale.agent.username not in excludedUsernames:
+            day_key = get_day_key(sale.created_at)
+            sales_data[sale.agent.get_full_name()][day_key]["SUPP"] += 1
 
-    for policy in activeSuppPolicies:
-        agentName = policy.agent.username
-        if policy.agent.is_active and agentName not in excludedUsernames:
-            salesSummary[agentName]["activeSupp"] += 1
-            totalActiveSupp += 1  # Incrementar total general de SUPP
+            # Agregar cliente a la lista
+            client_data[sale.agent.get_full_name()]["clientes_supp"].append({
+                'nombre': sale.full_name,  # Ajusta según tu modelo
+                'fecha_poliza': sale.created_at.strftime('%Y-%m-%d'),
+                'estatus': sale.status,
+                'poliza_type': 'Life Insurance'
+            })
 
-    for policy in activeAssurePolicies:
-        agentName = policy.agent.username
-        if policy.agent.is_active and agentName not in excludedUsernames:
-            salesSummary[agentName]["activeSupp"] += 1
-            totalActiveSupp += 1  # Incrementar total general de SUPP
+    week_days_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    rango_fechas = f"{startOfWeek.strftime('%d/%m')} - {endOfWeek.strftime('%d/%m')}"
 
-    # Convertir el diccionario para usar "first_name last_name" como clave
-    finalSummary = {}
-    for user in users:
-        fullName = f"{user.first_name} {user.last_name}".strip()
-        finalSummary[fullName] = salesSummary[user.username]
+    prepared_data = []
+    
+    for agent_name, days_data in sales_data.items():
+        agent_row = {
+            'nombre': agent_name,
+            'dias': []
+        }
+        
+        # Variables para calcular totales
+        total_aca = 0
+        total_supp = 0
+        
+        for day in week_days_order:
+            day_sales = days_data.get(day, {"ACA": 0, "SUPP": 0})
+            agent_row['dias'].append({
+                'aca': day_sales["ACA"],
+                'supp': day_sales["SUPP"]
+            })
+            
+            # Sumar a los totales
+            total_aca += day_sales["ACA"]
+            total_supp += day_sales["SUPP"]
+        
+        # Agregar totales al final
+        agent_row['totales'] = {
+            'total_aca': total_aca,
+            'total_supp': total_supp
+        }
+        
+        prepared_data.append(agent_row)
 
-    # Agregar los totales generales al resumen
-    finalSummary["TOTAL_GENERAL"] = {
-        "total_aca": total_aca,
-        "total_supp": total_supp,
-        "totalActiveAca": totalActiveAca,
-        "totalActiveSupp": totalActiveSupp,
-        "total_general": total_aca + total_supp
-    }
+    prepared_client_data = []
 
-    # Rango de fechas de la semana seleccionada
-    weekRange = f"{startOfWeek.strftime('%d/%m')} - {endOfWeek.strftime('%d/%m')}"
-
-    return finalSummary, weekRange
+    for agent_name, client_info in client_data.items():
+        if client_info["clientes_obama"] or client_info["clientes_supp"]:
+            prepared_client_data.append({
+                'nombre': agent_name,
+                'clientes_obama': client_info["clientes_obama"],
+                'clientes_supp': client_info["clientes_supp"]
+            })
+    
+    return prepared_data, prepared_client_data, rango_fechas, week_days_order
 
 @login_required(login_url='/login')
 def weekSalesWiew(request):
@@ -1101,12 +1089,14 @@ def weekSalesWiew(request):
         week_number = int(request.POST.get('week_number'))
 
         # Llamar a la función de lógica para obtener el resumen
-        resumen_semana, rango_fechas = weekSalesSummary(request, week_number)
+        ventas_matriz, detalles_clientes, rango_fechas, dias_semana = weekSalesSummary(request, week_number)
 
         # Renderizar la plantilla con los resultados
         return render(request, 'saleReports/weekSalesWiew.html', {
-            'resumen_semana': resumen_semana,
+            'ventas_matriz': ventas_matriz,
             'rango_fechas': rango_fechas,
+            'detalles_clientes' :detalles_clientes,
+            'dias_semana' : dias_semana,
             'week_number': week_number
         })
 

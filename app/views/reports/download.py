@@ -18,24 +18,21 @@ from .table import weekSalesSummary
 from ..decoratorsCompany import *
 
 def downloadPdf(request, week_number):
-    # Obtener el resumen de la semana seleccionada
-    resumen_semana, rango_fechas = weekSalesSummary(request,week_number)
+    
+    ventas_matriz, detalles_clientes, rango_fechas, dias_semana = weekSalesSummary(request, week_number)
 
-    # Renderizar la plantilla específica para el PDF
     html_string = render_to_string('pdf/reportWekkly.html', {
-        'resumen_semana': resumen_semana,
+        'ventas_matriz': ventas_matriz,
         'rango_fechas': rango_fechas,
+        'detalles_clientes' :detalles_clientes,
+        'dias_semana' : dias_semana,
         'week_number': week_number
     })
 
-    # Crear un objeto HTML de WeasyPrint
     font_config = FontConfiguration()
     html = HTML(string=html_string)
-    
-    # Generar el PDF
     pdf = html.write_pdf(font_config=font_config)
 
-    # Crear una respuesta HTTP con el PDF
     response = HttpResponse(pdf, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="reporte_semana_{week_number}.pdf"'
     return response

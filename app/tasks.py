@@ -171,4 +171,34 @@ def reportBoosLapeira():
             text= mensageLife
         )
 
+
+from celery import shared_task
+from datetime import date
+from app.utils import generate_weekly_pdf, upload_and_get_temp_url
+import telnyx
+from django.conf import settings
+
+@shared_task
+def generate_and_send_weekly_report():
+    week_number = date.today().isocalendar()[1]
+
+    # 1. Generar PDF
+    local_path, filename = generate_weekly_pdf(week_number)
+
+    # 2. Subir a S3 y generar link temporal
+    s3_key = f'reportes/{filename}'
+    url_temporal = upload_and_get_temp_url(local_path, s3_key)
+
+    # 3. Enviar por Telnyx MMS
+    telnyx.api_key = settings.TELNYX_API_KEY
+    telnyx.Message.create(
+        from_='+17869848427',
+        to='+17863034781',
+        text='Reporte semanal generado automáticamente.',
+        subject='Reporte PDF',
+        media_urls=[url_temporal]
+    )
+
+    
+
    

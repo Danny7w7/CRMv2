@@ -37,7 +37,7 @@
 
             <button type="submit" class="btn btn-primary">Filter</button>
         </form>
-        {% if resumen_semana %}
+        {% if ventas_matriz %}
             <!-- Botón para descargar el PDF -->
             <a href="{% url 'downloadPdf' week_number %}" class="btn btn-success mt-3">
                 Download PDF Report
@@ -47,7 +47,7 @@
     </div>
 </div>
 <hr>
-{% if resumen_semana %}
+{% if ventas_matriz %}
 <div class="card">
     <div class="card-header">
         <h2 class="mt-1">Results for the Week {{ week_number }}</h2>
@@ -57,42 +57,37 @@
         <table id="sale" class="table table-striped table-bordered">
             <thead>
                 <tr>
-                    <th>Name the Agent</th>
-                    <th>Obama</th>
-                    <th>Active Obama</th>
-                    <th>Supp</th>
-                    <th>Active Supp</th>
-                    <th>Overall total</th>
+                    <th style="text-align: center; vertical-align: middle;" >Agente</th>
+                    {% for dia in dias_semana %}
+                        <th style="text-align: center; vertical-align: middle;" colspan="2">{{ dia }}</th>
+                    {% endfor %}
+                    <th style="text-align: center; vertical-align: middle;" colspan="2" >Total</th>
                 </tr>
-            </thead>                    
+                <tr>
+                    <th></th>
+                    {% for dia in dias_semana %}
+                        <th style="text-align: center; vertical-align: middle;" >ACA</th>
+                        <th style="text-align: center; vertical-align: middle;" >SUPP</th>
+                    {% endfor %}
+                    <th style="text-align: center; vertical-align: middle;" >ACA</th>
+                    <th style="text-align: center; vertical-align: middle;" >SUPP</th>
+                </tr>
+            </thead>
             <tbody>
-                {% for nombre, datos in resumen_semana.items %}
-                    {% if nombre != "TOTAL_GENERAL" %}
-                        <tr>
-                            <td>{{ nombre }}</td>
-                            <td>{{ datos.obama }}</td>
-                            <td>{{ datos.activeObama }}</td>
-                            <td>{{ datos.supp }}</td>
-                            <td>{{ datos.activeSupp }}</td>
-                            <td>{{ datos.total }}</td>
-                        </tr>
-                    {% endif %}
+                {% for agente in ventas_matriz %}
+                    <tr>
+                        <td>{{ agente.nombre }}</td>
+                        {% for dia_data in agente.dias %}
+                            <td style="text-align: center; vertical-align: middle;" >{{ dia_data.aca }}</td>
+                            <td style="text-align: center; vertical-align: middle;" >{{ dia_data.supp }}</td>
+                        {% endfor %}
+                        <td style="text-align: center; vertical-align: middle;" > {{ agente.totales.total_aca }} </td>
+                        <td style="text-align: center; vertical-align: middle;" > {{ agente.totales.total_supp }}</td>
+                        
+                    </tr>
                 {% endfor %}
             </tbody>
-            <!-- Fila con Totales Generales -->
-            {% if "TOTAL_GENERAL" in resumen_semana %}
-                <tfoot>
-                    <tr>
-                        <th>Total General</th>
-                        <th>{{ resumen_semana.TOTAL_GENERAL.total_aca }}</th>
-                        <th>{{ resumen_semana.TOTAL_GENERAL.totalActiveAca }}</th>
-                        <th>{{ resumen_semana.TOTAL_GENERAL.total_supp }}</th>
-                        <th>{{ resumen_semana.TOTAL_GENERAL.totalActiveSupp }}</th>
-                        <th>{{ resumen_semana.TOTAL_GENERAL.total_general }}</th>
-                    </tr>
-                </tfoot>
-            {% endif %}   
-        </table>   
+        </table>
 
     </div>
 </div>
@@ -102,32 +97,30 @@
     <div class="card-header">
         <h3 class="mt-2">Customer Details</h3>
         <hr>
-        {% for nombre, datos in resumen_semana.items %}
-            {% if datos.clientes_obama or datos.clientes_supp %}
-                <h4 class="mt-4">{{ nombre }}: </h4>
-            {% endif %}
+        {% for agente_data in detalles_clientes %}
+            <h4 class="mt-4">{{ agente_data.nombre }}: </h4>
 
             <!-- Clientes de ObamaCare -->
-            {% if datos.clientes_obama %}
+            {% if agente_data.clientes_obama %}
                 <h6>ObamaCare Clients</h6>
-                {% for cliente in datos.clientes_obama %}
+                {% for cliente in agente_data.clientes_obama %}
                     <p> 📌{{ forloop.counter }} <strong>Name:</strong> {{ cliente.nombre }}, <strong>Policy Date:</strong> {{ cliente.fecha_poliza }}, <strong>Status:</strong> {{ cliente.estatus }} </p>
                 {% endfor %}
             {% endif %}
 
-            {% if datos.clientes_obama or datos.clientes_supp %}
+            {% if agente_data.clientes_obama or agente_data.clientes_supp %}
                 <br>
             {% endif %}
 
             <!-- Clientes de Supp -->            
-            {% if datos.clientes_supp %}
-            <h5>Supp Client</h5>
-                {% for cliente in datos.clientes_supp %}
-                    <p> 📌{{ forloop.counter }} <strong>Name:</strong> {{ cliente.nombre }}, <strong>Policy Date:</strong> {{ cliente.fecha_poliza }}, <strong>Status:</strong> {{ cliente.estatus }} </p>
+            {% if agente_data.clientes_supp %}
+                <h5>Supp Client</h5>
+                {% for cliente in agente_data.clientes_supp %}
+                    <p> 📌{{ forloop.counter }} <strong>Name:</strong> {{ cliente.nombre }}, <strong>Policy Date:</strong> {{ cliente.fecha_poliza }}, <strong>Status:</strong> {{ cliente.estatus }},  <strong>Type police:</strong> {{ cliente.poliza_type }} </p>
                 {% endfor %}
             {% endif %}
 
-            {% if datos.clientes_obama or datos.clientes_supp %}
+            {% if agente_data.clientes_obama or agente_data.clientes_supp %}
                 <hr>
             {% endif %}
             
