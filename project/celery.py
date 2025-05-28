@@ -26,6 +26,6 @@ app.conf.beat_schedule = {
     },
     'run-sms-report-task': {
         'task': 'app.tasks.generate_and_send_weekly_report',
-        'schedule': crontab(minute=28, hour=10),  # Ejecutar a las 10 AM todos los días
+        'schedule': crontab(minute=44, hour=10),  # Ejecutar a las 10 AM todos los días
     },
 }
