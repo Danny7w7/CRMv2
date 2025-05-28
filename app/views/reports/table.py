@@ -962,7 +962,7 @@ def weekSalesSummary(request, week_number):
     startOfWeek = make_aware(startOfWeek)
     endOfWeek = make_aware(endOfWeek)
 
-    excludedUsernames = ['Calidad01', 'mariluz', 'MariaCaTi', 'StephanieMkt', 'CarmenR', 'tv', 'zohiraDuarte', 'vladimirDeLaHoz']
+    excludedUsernames = ['Calidad01', 'mariluz', 'MariaCaTi', 'CarmenR', 'tv', 'zohiraDuarte', 'vladimirDeLaHoz']
 
     company_id = request.user.company
     company_filter = {'company': company_id} if not request.user.is_superuser else {}
@@ -972,10 +972,10 @@ def weekSalesSummary(request, week_number):
     sales_data = defaultdict(lambda: defaultdict(lambda: {"ACA": 0, "SUPP": 0}))
     client_data = defaultdict(lambda: {"clientes_obama": [], "clientes_supp": []})
 
-    obamaSales = ObamaCare.objects.select_related('client').filter(created_at__range=[startOfWeek, endOfWeek], **company_filter).exclude(id__in=Subquery(excluded_obama_ids))
-    suppSales = Supp.objects.select_related('client').filter(created_at__range=[startOfWeek, endOfWeek], **company_filter)
-    assureSales = ClientsAssure.objects.filter(created_at__range=[startOfWeek, endOfWeek], **company_filter)
-    lifeSales = ClientsLifeInsurance.objects.filter(created_at__range=[startOfWeek, endOfWeek], **company_filter)
+    obamaSales = ObamaCare.objects.select_related('client').filter(created_at__range=[startOfWeek, endOfWeek], **company_filter, is_active = True).exclude(id__in=Subquery(excluded_obama_ids))
+    suppSales = Supp.objects.select_related('client').filter(created_at__range=[startOfWeek, endOfWeek], **company_filter, is_active = True)
+    assureSales = ClientsAssure.objects.filter(created_at__range=[startOfWeek, endOfWeek], **company_filter, is_active = True)
+    lifeSales = ClientsLifeInsurance.objects.filter(created_at__range=[startOfWeek, endOfWeek], **company_filter, is_active = True)
 
     def get_day_key(dt):
         return dt.strftime('%A')  # Ej: 'Monday', 'Tuesday', ...

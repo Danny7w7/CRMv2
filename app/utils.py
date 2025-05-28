@@ -68,7 +68,7 @@ def weekSalesSummarySms(week_number):
     startOfWeek = make_aware(startOfWeek)
     endOfWeek = make_aware(endOfWeek)
 
-    excludedUsernames = ['Calidad01', 'mariluz', 'MariaCaTi', 'StephanieMkt', 'CarmenR', 'tv', 'zohiraDuarte', 'vladimirDeLaHoz']
+    excludedUsernames = ['Calidad01', 'mariluz', 'MariaCaTi', 'CarmenR', 'tv', 'zohiraDuarte', 'vladimirDeLaHoz']
 
     excluded_obama_ids = CustomerRedFlag.objects.values('obamacare')
 
