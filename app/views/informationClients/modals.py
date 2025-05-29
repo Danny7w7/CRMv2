@@ -551,18 +551,12 @@ def preComplaint(request):
 
         obamacare = ObamaCare.objects.filter(id = obamacare_id).first()
 
-        while True:
-            validationUniq = random.randint(1, 999999) 
-            if not Complaint.objects.filter(validationUniq=validationUniq).exists():
-                break 
-
         npn = npnAgent if npnAgent else ''
 
-        Complaint.objects.create(
+        id = Complaint.objects.create(
             obamacare = obamacare,
             agent = nameAgent,
             npn = npn,
-            validationUniq = validationUniq
         )
         
-        return redirect('complaint',obamacare_id,validationUniq ) 
+        return redirect('complaint',obamacare_id, id.id ) 

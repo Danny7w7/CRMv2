@@ -657,7 +657,6 @@ class Complaint(models.Model):
     obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
     agent = models.TextField()
     npn = models.TextField(null= True)
-    validationUniq = models.BigIntegerField()  
     signature = models.FileField(
     upload_to='SignatureComplaint',
     storage=S3Boto3Storage(),

@@ -312,7 +312,7 @@ def generateComplaintPdf(request, obamacare,validationUniq):
 
     id_complaint = f"{obamacare.id:08d}"
     current_date = datetime.now().strftime("%A, %B %d, %Y %I:%M")    
-    complaint = Complaint.objects.get(validationUniq=validationUniq)
+    complaint = Complaint.objects.get(id=validationUniq)
 
     signature_data = request.POST.get('signature')
     format, imgstr = signature_data.split(';base64,')
