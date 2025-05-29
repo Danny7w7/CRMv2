@@ -197,19 +197,39 @@ def reportBoosLapeira():
     
 
 @shared_task
-def saveImageFromUrlTask(messageId, url):
+def saveImageFromUrlTask(messageId, payload, contactId, companyId):
+    from .models import FilesSMS, Messages, Companies, Contacts
+    from .views.sms import SendMessageWebsocketChannel, discountRemainingBalance
+    import logging
+
+    logger = logging.getLogger(__name__)
+
     try:
+        message = Messages.objects.get(id=messageId)
+        contact = Contacts.objects.get(id=contactId)
+        company = Companies.objects.get(id=companyId)
+
+        media = payload.get('media', [])
+        if not media:
+            return
+
+        url = media[0].get('url')
+        filename = url.split('/')[-1]
+
         response = requests.get(url)
         response.raise_for_status()
-
-        filename = url.split('/')[-1]
-        message = Messages.objects.get(id=messageId)
 
         file = FilesSMS()
         file.message = message
         file.file.save(filename, ContentFile(response.content), save=True)
 
-        return file.file.url
+        fileUrl = file.file.url
+
+        # Enviar por WebSocket una vez se tiene la imagen
+        SendMessageWebsocketChannel('MMS', payload, contact, companyId, fileUrl)
+
+        if companyId not in [1, 2]:
+            discountRemainingBalance(company, '0.027')
+
     except Exception as e:
-        print(f"Error saving image from URL: {e}")
-        return None
+        logger.error(f'Error saving MMS image or sending WebSocket: {e}')

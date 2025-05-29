@@ -36,7 +36,6 @@ from channels.layers import get_channel_layer
 
 # Application-specific imports
 from app.modelsSMS import *
-from app.tasks import saveImageFromUrlTask
 from ..forms import *
 from .utils import *
 from ..alertWebsocket import websocketAlertGeneric
@@ -91,14 +90,8 @@ def sms(request, company_id):
                     deactivatecontact(contact, payload.get('text'))
 
                 if payload.get('type') == 'MMS':
-                    media = payload.get('media', [])
-                    if media:
-                        media_url = media[0].get('url')
-                        fileUrl = saveImageFromUrlTask.delay(message.id, media_url)
-                        SendMessageWebsocketChannel('MMS', payload, contact, company.id, fileUrl)
-                        if company.id not in [1,2]:
-                            discountRemainingBalance(company, '0.027')
-                        
+                    from app.tasks import saveImageFromUrlTask
+                    saveImageFromUrlTask.delay(message.id, payload, contact.id, company.id)
                 else:
                     SendMessageWebsocketChannel('SMS', payload, contact, company.id)
                     if company.id not in [1,2]:
