@@ -556,7 +556,7 @@ def preComplaint(request):
         id = Complaint.objects.create(
             obamacare = obamacare,
             agent = nameAgent,
-            npn = npn,
+            npn = npn
         )
         
         return redirect('complaint',obamacare_id, id.id ) 
