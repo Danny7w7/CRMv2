@@ -1,5 +1,7 @@
 from django.conf import settings
+import requests
 import telnyx
+from django.core.files.base import ContentFile
 
 from celery import shared_task
 from datetime import datetime, date
@@ -194,4 +196,20 @@ def reportBoosLapeira():
 
     
 
-   
+@shared_task
+def saveImageFromUrlTask(messageId, url):
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+
+        filename = url.split('/')[-1]
+        message = Messages.objects.get(id=messageId)
+
+        file = FilesSMS()
+        file.message = message
+        file.file.save(filename, ContentFile(response.content), save=True)
+
+        return file.file.url
+    except Exception as e:
+        print(f"Error saving image from URL: {e}")
+        return None
