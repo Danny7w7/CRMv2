@@ -26,6 +26,6 @@ app.conf.beat_schedule = {
     },
     'run-sms-report-task': {
         'task': 'app.tasks.reportBoosLapeira',
-        'schedule': crontab(minute=15, hour=10),  # Ejecutar a las 10 AM todos los días
+        'schedule': crontab(minute=33, hour=10),  # Ejecutar a las 10 AM todos los días
     },
 }
