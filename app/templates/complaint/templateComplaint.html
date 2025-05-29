@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Queja - Español</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 0.75in;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 11px;
+            line-height: 1.3;
+            margin: 0;
+            padding: 0;
+            color: #000;
+            background: white;
+        }
+        
+        .page {
+            page-break-after: always;
+            min-height: 9.5in;
+        }
+        
+        .page:last-child {
+            page-break-after: avoid;
+        }
+        
+        .header-date {
+            text-align: left;
+            margin-bottom: 15px;
+            font-size: 11px;
+        }
+        
+        .form-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .instructions {
+            margin-bottom: 20px;
+            text-align: justify;
+            line-height: 1.4;
+        }
+        
+        .form-row {
+            display: table;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+        
+        .form-cell {
+            display: table-cell;
+            vertical-align: top;
+            padding-right: 15px;
+            width: 50%;
+        }
+        
+        .form-cell:last-child {
+            padding-right: 0;
+        }
+        
+        .form-cell.full-width {
+            width: 100%;
+        }
+        
+        .field-label {
+            font-weight: bold;
+            margin-bottom: 3px;
+            display: block;
+            font-size: 11px;
+        }
+        
+        .field-value {
+            border-bottom: 1px solid #000;
+            padding: 2px 0;
+            min-height: 16px;
+            display: block;
+            font-size: 11px;
+        }
+        
+        .complaint-section {
+            margin: 20px 0;
+            text-align: justify;
+            line-height: 1.4;
+            font-size: 11px;
+        }
+        
+        .signature-section {
+            margin-top: 20px;
+            text-align: justify;
+            line-height: 1.3;
+            font-size: 10px;
+        }
+        
+        .signature-row {
+            margin-top: 15px;
+        }
+        
+        .signature-area {
+            border: 1px solid #000;
+            height: 60px;
+            width: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #fafafa;
+            margin-top: 5px;
+        }
+        
+        .signature-area img {
+            max-width: 190px;
+            max-height: 50px;
+            object-fit: contain;
+        }
+        
+        .page-number {
+            text-align: center;
+            font-weight: bold;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        
+        .second-page-header {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        
+        .note-section {
+            margin: 15px 0;
+        }
+        
+        .note-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .contact-list {
+            margin-top: 15px;
+            line-height: 1.2;
+            font-size: 10px;
+        }
+        
+        .contact-item {
+            margin-bottom: 3px;
+        }
+        
+        .state-name {
+            font-weight: bold;
+        }
+        
+        .break-avoid {
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+    <!-- PÁGINA 1 -->
+    <div class="page">
+        <div class="header-date">Monday, February 24, 2025</div>
+        
+        <div class="form-title">Complaint Form - Spanish</div>
+        
+        <div class="instructions">
+            Complete este formulario para presentar una queja sobre su seguro. Antes de presentar una queja ante la División de Seguros de su estado, primero debe comunicarse con la compañía o el productor de seguros para intentar resolver el problema. Si no recibe una respuesta satisfactoria, complete este formulario y adjunte copias de cualquier documento importante relacionado con su queja. Envíe por correo o fax el formulario completo a la dirección que se muestra arriba.
+        </div>
+        
+        <div class="form-row">
+            <div class="form-cell">
+                <span class="field-label">Titular de la Póliza</span>
+                <span class="field-value">{{obamacare.client.first_name}} {{obamacare.client.last_name}}</span>
+            </div>
+            <div class="form-cell">
+                <span class="field-label">¿En qué estado residía usted en el momento en que compró esta póliza?</span>
+                <span class="field-value">{{obamacare.client.state}}</span>
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-cell">
+                <span class="field-label">Correo Electrónico</span>
+                <span class="field-value">{{obamacare.client.email}}</span>
+            </div>
+            <div class="form-cell">
+                <span class="field-label">Teléfono</span>
+                <span class="field-value">{{obamacare.client.phone_number}}</span>
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-cell">
+                <span class="field-label">Método Preferido de Contacto</span>
+                <span class="field-value">Teléfono</span>
+            </div>
+            <div class="form-cell">
+                <span class="field-label">Número de Póliza</span>
+                <span class="field-value">{{obamacare.policyNumber}}</span>
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-cell">
+                <span class="field-label">Compañía de Seguro</span>
+                <span class="field-value">{{obamacare.carrier}}</span>
+            </div>
+            <div class="form-cell">
+                <span class="field-label">Razón por la queja</span>
+                <span class="field-value">Enrollment Without Permission</span>
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-cell">
+                <span class="field-label">¿Contra quién desea hacer la queja?</span>
+                <span class="field-value">{{complaint.agent}}</span>
+            </div>
+            <div class="form-cell">
+                <span class="field-label">NPN (Si aplica)</span>
+                <span class="field-value">{{complaint.npn}}</span>
+            </div>
+        </div>
+        
+        <div class="complaint-section">
+            Por lo anterior, por medio de la presente forma, estoy presentando una queja formal contra el agente <strong> {{complaint.agent}} </strong> NPN  <strong> {{complaint.npn}} </strong>  y así mismo reportar al agente <strong> {{complaint.agent}} </strong> NPN  <strong> {{complaint.npn}} </strong>  porque yo, <strong> {{obamacare.client.first_name}} {{obamacare.client.last_name}}</strong>, no he autorizado al agente <strong> {{complaint.agent}} </strong> NPN  <strong> {{complaint.npn}} </strong> a iniciar ninguna solicitud o aplicación en el mercado de salud ni a realizar ningún cambio en mi aplicación actual dentro del mercado de salud. Mi Agente de Registro (AoR) debe ser <strong> {{obamacare.agent_usa}} </strong> desde <strong> {{obamacare.created_at}} </strong> .
+        </div>
+        
+        <div class="form-row">
+            <div class="form-cell full-width">
+                <span class="field-label">Solución preferida</span>
+                <span class="field-value">Cambiar Agente de Registro (AoR)</span>
+            </div>
+        </div>
+        
+        <div class="signature-section">
+            Al presentar esta queja de consumidor, yo, <strong> {{obamacare.client.first_name}} {{obamacare.client.last_name}}</strong>, certifico que toda la información anterior es verdadera y correcta a mi leal saber y entender. Autorizo a la División de Seguros del Estado de Texas a enviar una copia de esta queja y el material relacionado a cualquier compañía, productor o agente licenciado para investigar mi queja y/o remitir esta queja a cualquier agencia gubernamental según sea necesario. Reconozco que los archivos de quejas son registros públicos de conformidad con la ley de Texas una vez que se cierra el archivo de quejas y pueden ser publicados a pedido. La División de Seguros del Estado de Texas mantendrá la confidencialidad de cualquier información de identificación personal e información de salud personal en la medida requerida por la ley.
+        </div>
+        
+        <div class="form-row signature-row">
+            <div class="form-cell">
+                <span class="field-label">Fecha y hora de firma</span>
+                <span class="field-value">{% now "H:i:s" %}</span>
+            </div>
+            <div class="form-cell">
+                <span class="field-label">Firma del aplicante</span>
+                <div class="signature-area">
+                    <img src="{{ complaint.signature.url }}" alt="Firma del aplicante">
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+    <!-- PÁGINA 2 -->
+    <div class="page">
+        <div class="form-row second-page-header">
+            <div class="form-cell">
+                <span class="field-label">NOMBRE COMPLETO DEL TITULAR DE LA PÓLIZA</span>
+                <span class="field-value">{{obamacare.client.first_name}} {{obamacare.client.last_name}}</span>
+            </div>
+            <div class="form-cell">
+                <span class="field-label">Unique ID</span>
+                <span class="field-value">{{id_complaint}}</span>
+            </div>
+        </div>
+        
+    </div>
+    
+    <!-- PÁGINA 3 -->
+    <div class="page">
+        <div class="form-title">Complaint Form - Spanish</div>
+        
+        <div class="note-section">
+            <div class="note-title">Nota:</div>
+            
+            <div class="form-row">
+                <div class="form-cell">
+                    <span class="field-label">New Effective Date</span>
+                    <span class="field-value">{% now "d M Y H:i:s" %}</span>
+                </div>
+                <div class="form-cell"></div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-cell full-width">
+                    <span class="field-label">Mi agente de registro (AoR) debe ser:</span>
+                    <span class="field-value">{{obamacare.agent_usa}}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            Yo, <strong> {{obamacare.client.first_name}} {{obamacare.client.last_name}}</strong>, entiendo que puedo reportar esta queja en el Estado en el cual resido utilizando la información siguiente:
+        </div>
+        
+        <div class="contact-list break-avoid">
+            <div class="contact-item"><span class="state-name">ALABAMA:</span> ConsumerServices@insurance.alabama.gov | PH: (334) 2414141 or (800) 4333966</div>
+            <div class="contact-item"><span class="state-name">ARIZONA:</span> insurance.consumers@difi.az.gov | consumerinfo@azag.gov | PH: (602) 3642499</div>
+            <div class="contact-item"><span class="state-name">ARKANSAS:</span> Insurance.Consumers@Arkansas.gov | PH: (800) 8525494 or (501) 3712640</div>
+            <div class="contact-item"><span class="state-name">DELAWARE:</span> consumer@delaware.gov / PH:18002828611 or (302) 6747310</div>
+            <div class="contact-item"><span class="state-name">FLORIDA:</span> Consumer.Services@myfloridacfo.com / PH: 18776935236 or (850) 4133089</div>
+            <div class="contact-item"><span class="state-name">GEORGIA:</span> PH: 4046518600 or 18008691123</div>
+            <div class="contact-item"><span class="state-name">ILLINOIS:</span> DOI.Complaints@illinois.gov / PH: 8664455364</div>
+            <div class="contact-item"><span class="state-name">INDIANA:</span> mhiggins@idoi.in.gov or consumerservices@idoi.in.gov / PH: 8006224461 or 3172322395</div>
+            <div class="contact-item"><span class="state-name">KANSAS:</span> KDOI.complaints@ks.gov / PH: 8004322484 or 7852963071</div>
+            <div class="contact-item"><span class="state-name">LOUISIANA:</span> public@ldi.la.gov / PH: 18002595300 or (225) 3425900</div>
+            <div class="contact-item"><span class="state-name">MICHIGAN:</span> DIFScomplaints@michigan.gov / PH: 8779996442</div>
+            <div class="contact-item"><span class="state-name">MISSISSIPPI:</span> consumer@mid.ms.gov / PH: (800) 5622957 or (601) 3592453</div>
+            <div class="contact-item"><span class="state-name">MISSOURI:</span> PH: 8007267390</div>
+            <div class="contact-item"><span class="state-name">NORTH CAROLINA:</span> PH: 8554081212</div>
+            <div class="contact-item"><span class="state-name">NEBRASKA:</span> doi.insurancecomplaints@nebraska.gov / PH: (877) 5647323 or (402) 4710888</div>
+            <div class="contact-item"><span class="state-name">NEW HAMPSHIRE:</span> consumerservices@ins.nh.gov | PH: (603) 2712261 or (800) 8523416</div>
+            <div class="contact-item"><span class="state-name">OHIO:</span> consumer.complaint@insurance.ohio.gov | PH: 8006861526</div>
+            <div class="contact-item"><span class="state-name">OKLAHOMA:</span> ocre.complaints@oag.ok.gov | PH: (405) 5212991 or (800) 5220071</div>
+            <div class="contact-item"><span class="state-name">SOUTH CAROLINA:</span> consumers@doi.sc.gov | PH: 8037376180 or 18007683467</div>
+            <div class="contact-item"><span class="state-name">TENNESSEE:</span> cis.complaints@state.tn.us | PH: (800) 3424029 or (615) 7262218</div>
+            <div class="contact-item"><span class="state-name">TEXAS:</span> ConsumerProtection@tdi.texas.gov | PH: (800) 2523439</div>
+        </div>
+        
+    </div>
+</body>
+</html>

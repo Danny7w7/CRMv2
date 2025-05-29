@@ -649,6 +649,24 @@ class IncomeLetterFFM(models.Model):
     class Meta:
         db_table = 'incomeLetter_ffm'
 
+class Complaint(models.Model):
+    pdf = models.FileField(
+        upload_to='Complaint',
+        storage=S3Boto3Storage(),
+        null=True)
+    obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
+    agent = models.TextField()
+    npn = models.TextField(null= True)
+    validationUniq = models.BigIntegerField()  
+    signature = models.FileField(
+    upload_to='SignatureComplaint',
+    storage=S3Boto3Storage(),
+    null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'complaint'
+
 class TemporaryToken(models.Model):
     client = models.ForeignKey(Clients, on_delete=models.CASCADE, null = True)
     contact = models.ForeignKey('app.Contacts', on_delete=models.CASCADE, null = True)

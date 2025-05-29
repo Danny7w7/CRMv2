@@ -238,7 +238,7 @@
                             
                             <div class="col-6 col-lg-3">
                                 <label for="fechaCita" class="form-label">{% trans "Fecha de la cita (Medicare)" %}:</label>
-                                <label for="fechaCita" id="fechaCita" class="form-label-name">{{ medicare.dateMedicare|date:'Y-m-d\TH:i' }}</label>
+                                <label for="fechaCita" id="fechaCita" class="form-label-name">{{ medicare.dateMedicare|date:"d M Y - h:i A" }}</label>
                             </div>
                         </div>
                     </div>

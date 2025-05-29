@@ -136,6 +136,55 @@ def consent(request, obamacare_id):
     }
     return render(request, 'consent/consent1.html', context)
 
+def complaint(request, obamacare_id,validationUniq):
+
+    obamacare = ObamaCare.objects.select_related('client', 'agent').get(id=obamacare_id)
+    complaint = Complaint.objects.filter(obamacare=obamacare_id).last()
+    temporalyURL = None
+    id_complaint = f"{obamacare.id:08d}"
+    typeToken = 'obamacare'
+
+    # Validar si el usuario no está logueado y verificar el token
+    if isinstance(request.user, AnonymousUser):
+        result = validateTemporaryToken(request, typeToken)
+        is_valid_token, *note = result
+        if not is_valid_token:
+            return HttpResponse(note)
+    elif request.user.is_authenticated:
+        # Usuario autenticado
+        temporalyURL = request.build_absolute_uri(f"/complaint/{obamacare_id}/{validationUniq}/?token={generateTemporaryToken(obamacare.client, typeToken)}")
+    else:
+        # Si el usuario no está logueado y no hay token válido
+        return HttpResponse('Acceso denegado. Por favor, inicie sesión o use un enlace válido.')
+    
+
+    if request.method == 'POST':
+        
+        websocketAlertGeneric(
+            request,
+            'send_alert',
+            'signedConsent',
+            'success',
+            'Signed consent',
+            f'The client {obamacare.client.first_name} {obamacare.client.last_name} successfully signed the consent form.',
+            'Go to client information',
+            f'/editObama/{obamacare.id}/{obamacare.company.id}',
+            obamacare.agent.id,
+            obamacare.agent.username
+        )
+            
+        return generateComplaintPdf(request, obamacare, validationUniq)
+
+    context = {
+        'valid_migration_statuses': ['PERMANENT_RESIDENT', 'US_CITIZEN', 'EMPLOYMENT_AUTHORIZATION'],
+        'obamacare':obamacare,
+        'company':getCompanyPerAgent(obamacare.agent_usa),
+        'temporalyURL': temporalyURL,
+        'complaint':complaint,
+        'id_complaint' :id_complaint
+    }
+    return render(request, 'complaint/complaint.html', context)
+    
 def incomeLetter(request, obamacare_id):
 
     obamacare = ObamaCare.objects.select_related('client').get(id=obamacare_id)
@@ -258,6 +307,48 @@ def generateConsentPdf(request, obamacare, dependents, supps, language):
     url = f'{base_url}?{query_params}'
 
     return redirect(url)
+
+def generateComplaintPdf(request, obamacare,validationUniq):
+
+    id_complaint = f"{obamacare.id:08d}"
+    current_date = datetime.now().strftime("%A, %B %d, %Y %I:%M")    
+    complaint = Complaint.objects.get(validationUniq=validationUniq)
+
+    signature_data = request.POST.get('signature')
+    format, imgstr = signature_data.split(';base64,')
+    ext = format.split('/')[-1]
+    image = ContentFile(base64.b64decode(imgstr), name=f'firma.{ext}')
+
+    complaint.signature = image
+    complaint.save()
+
+    context = {
+        'obamacare':obamacare,
+        'company':getCompanyPerAgent(obamacare.agent_usa),
+        'current_date':current_date,
+        'ip':getIPClient(request),
+        'complaint':complaint,
+        'id_complaint' :id_complaint
+    }
+
+    # Renderiza la plantilla HTML a un string
+    html_content = render_to_string('complaint/templateComplaint.html', context)
+
+    # Genera el PDF
+    pdf_file = HTML(string=html_content).write_pdf()
+
+    # Usa BytesIO para convertir el PDF en un archivo
+    pdf_io = io.BytesIO(pdf_file)
+    pdf_io.seek(0)  # Asegúrate de que el cursor esté al principio del archivo
+
+    # Guarda el PDF en el modelo usando un ContentFile
+    pdf_name = f'Complaint {obamacare.client.first_name}_{obamacare.client.last_name}#{obamacare.client.phone_number} {datetime.now().strftime("%A, %B %d, %Y %I:%M")}.pdf'  # Nombre del archivo
+
+    complaint.pdf.save(pdf_name, ContentFile(pdf_io.read()), save=True)
+
+    deactivateTemporaryToken(request)
+
+    return render(request, 'consent/endView.html')
 
 def generateMedicarePdf(request, medicare ,language):
     token = request.GET.get('token')

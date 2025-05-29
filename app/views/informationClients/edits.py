@@ -266,7 +266,6 @@ def editObama(request ,obamacare_id, way):
 
     percentage = int(c/6*100)
 
-
     social_number = obamacare.client.social_security  # Campo real del modelo
     # Asegurarse de que social_number no sea None antes de formatear
     if social_number:
@@ -292,6 +291,7 @@ def editObama(request ,obamacare_id, way):
     document = DocumentsClient.objects.filter(client = obamacare.client)
     documentObama = DocumentObama.objects.filter(obamacare = obamacare_id)
     incomeffm = IncomeLetterFFM.objects.filter(obamacare = obamacare_id)
+    complaint = Complaint.objects.filter(obamacare = obamacare_id).exclude(pdf='')
 
     if request.method == 'POST':
         action = request.POST.get('action')
@@ -521,6 +521,7 @@ def editObama(request ,obamacare_id, way):
         'old' : old,
         'paymentDateObama': paymentDateObama,
         'incomeffm':incomeffm,
+        'complaint':complaint,
         #SMS Blue
         'contact':contact,
         'chat':chat,
@@ -589,9 +590,6 @@ def getPaymentsSummary(obamacareId):
     }
 
     return orderedSummary
-
-
-
 
 def usernameCarrier(request, obamacare):
 

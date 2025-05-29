@@ -1,11 +1,14 @@
 # Standard Python libraries
 import datetime
-import re
+import io
+import random
 
 # Django utilities
 from django.http import JsonResponse, HttpResponse
 from django.utils.timezone import make_aware
 from django.utils.dateparse import parse_date
+from django.core.files.base import ContentFile
+from django.template.loader import render_to_string
 
 # Django core libraries
 from django.contrib import messages
@@ -14,11 +17,11 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
 # Third-party libraries
-from asgiref.sync import async_to_sync
-from channels.layers import get_channel_layer  
+from weasyprint import HTML 
 
 # Application-specific imports
 from app.models import *
+from app.views.consents import getIPClient
 from ...alertWebsocket import websocketAlertGeneric
 
 
@@ -539,3 +542,27 @@ def paymentDateLife(request, client_id):
 
     return JsonResponse({"error": "Invalid request"}, status=400)
 
+def preComplaint(request):
+    
+    if request.method == 'POST':
+        obamacare_id = request.POST.get('obamacare_id')
+        nameAgent = request.POST.get('nameAgent')
+        npnAgent = request.POST.get('npnAgent')
+
+        obamacare = ObamaCare.objects.filter(id = obamacare_id).first()
+
+        while True:
+            validationUniq = random.randint(1, 999999) 
+            if not Complaint.objects.filter(validationUniq=validationUniq).exists():
+                break 
+
+        npn = npnAgent if npnAgent else ''
+
+        Complaint.objects.create(
+            obamacare = obamacare,
+            agent = nameAgent,
+            npn = npn,
+            validationUniq = validationUniq
+        )
+        
+        return redirect('complaint',obamacare_id,validationUniq ) 

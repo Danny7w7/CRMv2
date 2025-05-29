@@ -92,6 +92,7 @@ urlpatterns = [
     path('fetchPaymentSherpa/<obamacareId>/', fetchInformations.fetchPaymentSherpa, name='fetchPaymentSherpa'),
     path('validarCita/', modals.validarCita, name='validarCita'),
     path('paymentDateObama/<obama_id>/', modals.paymentDateObama, name='paymentDateObama'),
+    path('preComplaint/', modals.preComplaint, name='preComplaint'),
 
     path('clientAccionRequired/', table.clientAccionRequired, name='clientAccionRequired'),
 
@@ -217,6 +218,7 @@ urlpatterns = [
     path('ILFFM/<obamacare>/', consents.ILFFM, name='ILFFM'),
     path('ConsentLifeInsurance/<client_id>/', consents.ConsentLifeInsurance, name='ConsentLifeInsurance'), #Consent Life Insurance
 
+    path('complaint/<obamacare_id>/<validationUniq>/', consents.complaint, name='complaint'),
 
     #<---------------------------Company---------------------------> 
     path('formCreateCompanies/', companies.formCreateCompanies, name='formCreateCompanies'),
