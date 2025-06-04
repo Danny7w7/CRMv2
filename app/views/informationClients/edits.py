@@ -591,6 +591,34 @@ def getPaymentsSummary(obamacareId):
 
     return orderedSummary
 
+def getPaymentsSuplementalSummary(suppId):
+    summary = defaultdict(lambda: {
+        "status": False,
+        "payments": False,
+    })
+
+    # Inicializar todos los meses con ceros
+    for i in range(1, 13):
+        month = calendar.month_abbr[i].lower()
+        summary[month]  # Esto ejecuta el lambda y deja el mes listo con todos ceros
+
+    suplementalsStatuses = PaymentsSuplementals.objects.filter(supp_id=suppId).order_by("coverageMonth", "-created_at")
+    seenStatusMonths = set()
+
+    for status in suplementalsStatuses:
+        month = calendar.month_abbr[status.coverageMonth.month].lower()
+        if month not in seenStatusMonths:
+            summary[month]["status"] = status.is_active
+            seenStatusMonths.add(month)
+
+    # Retornar los meses en orden (enero a diciembre)
+    orderedSummary = {
+        calendar.month_abbr[i].lower(): summary[calendar.month_abbr[i].lower()]
+        for i in range(1, 13)
+    }
+
+    return orderedSummary
+
 def usernameCarrier(request, obamacare):
 
     obama = ObamaCare.objects.filter(id=obamacare).first()   
@@ -794,7 +822,8 @@ def editSupp(request, supp_id):
         'contact':contact,
         'chat':chat,
         'messages':messages,
-        'secretKey':secretKey
+        'secretKey':secretKey,
+        'paymentsSummary':getPaymentsSuplementalSummary(supp_id)
     }
     
     return render(request, 'edit/editSupp.html', context)

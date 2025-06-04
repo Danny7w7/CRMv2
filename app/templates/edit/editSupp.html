@@ -380,6 +380,9 @@
 						<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalIngresarTexto">
 							Enter Observation
 						</button>
+						<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalPayments">
+							Payments
+						</button>
 						<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalPaymentsDate">
 							Date Payment
 						</button>
@@ -497,6 +500,83 @@
 									{% else %}
 										<p>No hay observaciones guardadas.</p>
 									{% endif %}
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Modal para ver los pagos -->
+					<div class="modal fade" id="modalPayments" tabindex="-1" aria-labelledby="modalPayments" aria-hidden="true">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="verAppointment">Enter Payments</h5>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								</div>
+								<div class="modal-body">
+									<div class="table-responsive" >
+										<table id="paymentsTable" class="table table-striped table-hover table-bordered shadow-sm centerAllExceptFirst">
+											<thead>
+												<tr>
+													<th>Month</th>
+													<th>Status</th>
+													<th>Payments</th>
+												</tr>
+											</thead>
+											<tbody>
+												{% for month, values in paymentsSummary.items %}
+												<tr>
+													<td>{{ month }}</td>
+													<td>
+														{% if values.status%}✅
+														{% else %}❌
+														{% endif %}
+													</td>
+													<td>
+														{% if values.sherpa%}✅
+														{% else %}❌
+														{% endif %}
+													</td>
+												</tr>
+												{% endfor %}
+											</tbody>
+										</table>
+									</div>
+									
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-primery" data-bs-toggle="modal" data-bs-target="#modalChildEnterStatus">
+										Enter Status
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Modal para ingresar Status -->
+					<div class="modal fade" id="modalChildEnterStatus" tabindex="-1" aria-labelledby="modalChildEnterStatus" aria-hidden="true">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title">Enter Status</h5>
+									<button type="button" class="btn-primary" data-bs-dismiss="modal" aria-label="Close"></button>
+								</div>
+								<div class="modal-body">
+									<form id="formStatus">
+										<div class="mb-3">
+											<label for="" class="form-label">Month</label>
+											<input type="month" class="form-control" name="coverageMonth" required>
+										</div>
+										<div class="mb-3">
+											<label for="" class="form-label">Status</label>
+											<select class="form-select" name="status" required>
+												<option value='' disabled selected>Select one</option>
+												<option value="active">Active</option>
+												<option value="inactive">Inactive</option>
+											</select>
+										</div>
+										<button type="submit" class="btn btn-primary">Save</button>
+									</form>
 								</div>
 							</div>
 						</div>
@@ -684,10 +764,12 @@
 	<script src="{% static 'assets/js/validations/validationZicode.js' %}"></script>
 	<script src="{% static 'assets/js/validations/editSupp.js' %}"></script>
 	<script src="{% static 'assets/js/payments/paymentDateSupp.js' %}"></script>
+	<script src="{% static 'assets/js/payments/fetchPayments.js' %}"></script>
 
 	<!-- Scripts SMS's -->
 	<script>
 		var obamacare_id = '{{obamacare.id}}'
+		var supp_id = '{{ supps.id }}'
 		var company_id = '{{request.user.company.id}}'
 		var username = '{{request.user.username}}'
 		var contact_id = '{{contact.id}}'

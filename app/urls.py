@@ -114,6 +114,7 @@ urlpatterns = [
     path('toggleSuppStatus/<supp_id>/', toggles.toggleSuppStatus, name='toggleSuppStatus'),
     path('editSupp/<supp_id>/', edits.editSupp, name='editSupp'),
     path('saveCustomerObservationSupp/', modals.saveCustomerObservationSupp, name='saveCustomerObservationSupp'),
+    path('fetchPaymentSuplementalsstatus/<suppId>/', fetchInformations.fetchPaymentSuplementals, name='fetchPaymentSuplementals'),
     path('paymentDateSupp/<supp_id>/', modals.paymentDateSupp, name='paymentDateSupp'),
 
     path('clientMedicare/', table.clientMedicare, name='clientMedicare'),
@@ -126,7 +127,7 @@ urlpatterns = [
     path('toggleAlert/<alertClient_id>/', toggles.toggleAlert, name='toggleAlert'),
     path('editAlert/<int:alertClient_id>/', edits.editAlert, name='editAlert'),
 
-    #<---------------------------tiketc--------------------------->
+    #<---------------------------ticket--------------------------->
     path('ticketAsing/', table.ticketAsing, name='ticketAsing'),
     path('agentTicketAssignment/', modals.agentTicketAssignment, name='agentTicketAssignment'),
     path('editTicket/<ticket_id>/', edits.editTicket, name='editTicket'),
@@ -239,6 +240,7 @@ urlpatterns = [
 
     #<---------------------------Utils---------------------------> 
     path('toggleDarkMode/', utils.toggleDarkMode, name='toggleDarkMode'),
+
 
     #<---------------------------WHATSAPP--------------------------->
     path('sendWhatsapp/', whatsApp.sendWhatsapp, name='sendWhatsapp'),

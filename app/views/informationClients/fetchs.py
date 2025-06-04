@@ -271,6 +271,41 @@ def fetchPaymentSherpa(request, obamacareId):
     return JsonResponse({'success': True,'message': 'Payment successfully created'})
 
 @csrf_exempt
+@require_POST
+def fetchPaymentSuplementals(request, suppId):
+    
+    # Parsear fechas
+    rangeCoverageMonth = parseMonthInputToDate(request.POST.get('coverageMonth'))
+    firstDay = rangeCoverageMonth.replace(day=1)
+    lastDay = rangeCoverageMonth.replace(day=monthrange(rangeCoverageMonth.year, rangeCoverageMonth.month)[1])
+
+    payment = PaymentsSuplementals.objects.filter(
+        supp_id=suppId,
+        coverageMonth__range=(firstDay, lastDay)
+    )
+
+    if payment.exists():
+        return JsonResponse({
+            'success': False,
+            'message': 'There is already a registration for this Suplemental Plan and this month'
+        })
+    
+    try:
+        supp = Supp.objects.get(id=suppId)
+        payment = PaymentsSuplementals()
+        payment.supp = supp
+        payment.coverageMonth = parseMonthInputToDate(request.POST.get('coverageMonth'))
+        payment.is_active = True if request.POST.get('status') == 'active' else False
+        payment.save()
+
+    except Supp.DoesNotExist:
+        return JsonResponse({'success': False,'message': 'Suplemental Plan not found'})
+    except:
+        return JsonResponse({'success': False,'message': 'Error creating payment, please contact an administrator.'})
+
+    return JsonResponse({'success': True,'message': 'Status Suplementals successfully created'})
+
+@csrf_exempt
 def fetchPaymentsMonth(request):
     if request.method == 'POST':
         try:
