@@ -725,7 +725,7 @@ def getDetailReportSupCigna(request, dataFrame):
             PaymentsSuplementals.objects.create(
                 supp=supp,
                 coverageMonth=datetime.now(),
-                is_active=True if policyStatus == 'Earnings Paid' else False
+                is_active=True if policyStatus == 'Active' else False
             )
             # Agregar el registro asociado al DataFrame
             matchedRecords.loc[len(matchedRecords)] = row
