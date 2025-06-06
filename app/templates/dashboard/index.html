@@ -2,6 +2,7 @@
 <html lang="en" {% if userPreference.darkMode %} class='dark-theme'{% endif %}>
 
 {% load static %}
+{% load userModules %}
 
 
 <!-- Mirrored from codervent.com/syndron/demo/vertical/index2.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 29 Jul 2023 03:51:49 GMT -->
@@ -69,215 +70,294 @@
 					<ul>						
 						<li> <a href="{% url 'index'  %}"><i class='bx bx-radio-circle'></i>Home</a>
 						</li>
+
 						{% if request.user.role == 'Admin' or request.user.role == 'S' or request.user.role == 'TV' %}
-							{% if toggle %}
-								<li> <a href="{% url 'monthLiveView'  %}"><i class='bx bx-radio-circle'></i>View TV</a></li>
-							{% else %}
-								<li> <a href="{% url 'weeklyLiveView'  %}"><i class='bx bx-radio-circle'></i>View TV</a></li>
+
+							{% if request.user|has_module:"OBAMACARE" or request.user|has_module:"SUPP" or request.user|has_module:"ASSURE" or request.user|has_module:"LIFE INSURANCE" or  request.user|has_module:"MEDICARE" %}
+
+								{% if toggle %}
+									<li> <a href="{% url 'monthLiveView'  %}"><i class='bx bx-radio-circle'></i>View TV</a></li>
+								{% else %}
+									<li> <a href="{% url 'weeklyLiveView'  %}"><i class='bx bx-radio-circle'></i>View TV</a></li>
+								{% endif %}
+
 							{% endif %}
+
 						{% endif %}
+
 					</ul>
 				</li>
-				<li class="menu-label">enter data</li>
-				<li>
-					<a href="javascript:;" class="has-arrow">
-						<div class="parent-icon"><i class="fadeIn animated bx bx-user-plus"></i></div>
-						<div class="menu-title">New Sale</div>
-					</a>
-					<ul>
-						<li> <a href="{% url 'formCreateClient'  %}"><i class='bx bx-radio-circle'></i>New Client</a>
-						</li>
-						<li> <a href="{% url 'formCreateAssure'  %}"><i class='bx bx-radio-circle'></i>New Assure</a>
-						</li>
-						<li> <a href="{% url 'formCreateClientLife'  %}"><i class='bx bx-radio-circle'></i>New Life Insurance</a>
-						</li>
-						<li> <a href="{% url 'formCreateClientMedicare' %}"><i class='bx bx-radio-circle'></i>New Client Medicare</a>
-						</li>
-						<li> <a href="{% url 'select_client'  %}"><i class='bx bx-radio-circle'></i>Existing Client</a>
-						</li>
-						<li> <a href="{% url 'selectClientAssure'  %}"><i class='bx bx-radio-circle'></i>Existing Client Assure</a>
-						</li>
-						<li> <a href="{% url 'formCreateAlert' %}"><i class='bx bx-radio-circle'></i>Create Alert</a>
-						</li>
-					</ul>
-				</li>
-				<li class="menu-label">Tables</li>
-				<li>
-					<a class="has-arrow" href="javascript:;">
-						<div class="parent-icon"><i class="fadeIn animated bx bx-task"></i></div>
-						<div class="menu-title">Information Client</div>
-					</a>
-					<ul>
-						<li> <a href="{% url 'clientObamacare' %}"><i class='bx bx-radio-circle'></i>Clients Obama</a>
-						</li>
-						<li> <a href="{% url 'clientAccionRequired' %}"><i class='bx bx-radio-circle'></i>Clients Accion Required </a>
-						</li>
-						<li> <a href="{% url 'clientSupp' %}"><i class='bx bx-radio-circle'></i>Clients Supp</a>
-						</li>
-						<li> <a href="{% url 'clientAssure' %}"><i class='bx bx-radio-circle'></i>Clients Assure</a>
-						</li>
-						<li> <a href="{% url 'clientLifeInsurance' %}"><i class='bx bx-radio-circle'></i>Clients Life Insurance</a>
-						</li>
-						<li> <a href="{% url 'clientMedicare' %}"><i class='bx bx-radio-circle'></i>Clients Medicare</a>
-						</li>
-						<li> <a href="{% url 'alert' %}"><i class='bx bx-radio-circle'></i>Alert</a>
-						</li>
-						<li> <a href="{% url 'ticketAsing' %}"><i class='bx bx-radio-circle'></i>Ticket </a>
-						</li>
-					</ul>
-				</li>
+				
+				{% if request.user|has_module:"OBAMACARE" or request.user|has_module:"SUPP" or request.user|has_module:"ASSURE" or request.user|has_module:"LIFE INSURANCE" or  request.user|has_module:"MEDICARE" %}
+					<li class="menu-label">enter data</li>
+					<li>
+						<a href="javascript:;" class="has-arrow">
+							<div class="parent-icon"><i class="fadeIn animated bx bx-user-plus"></i></div>
+							<div class="menu-title">New Sale</div>
+						</a>
+						<ul>
+							{% if request.user|has_module:"OBAMACARE" or request.user|has_module:"SUPP" %}
+								<li> <a href="{% url 'formCreateClient'  %}"><i class='bx bx-radio-circle'></i>New Client</a> </li>
+							{% endif %}
+							{% if request.user|has_module:"ASSURE" %}
+								<li> <a href="{% url 'formCreateAssure'  %}"><i class='bx bx-radio-circle'></i>New Assure</a> </li>
+								{% endif %}
+							{% if request.user|has_module:"LIFE INSURANCE" %}
+								<li> <a href="{% url 'formCreateClientLife'  %}"><i class='bx bx-radio-circle'></i>New Life Insurance</a> </li>
+							{% endif %}
+							{% if request.user|has_module:"MEDICARE" %}
+								<li> <a href="{% url 'formCreateClientMedicare' %}"><i class='bx bx-radio-circle'></i>New Client Medicare</a> </li>
+							{% endif %}
+							{% if request.user|has_module:"OBAMACARE" or request.user|has_module:"SUPP" %}
+								<li> <a href="{% url 'select_client'  %}"><i class='bx bx-radio-circle'></i>Existing Client</a> </li>
+							{% endif %}
+							{% if request.user|has_module:"ASSURE" %}
+								<li> <a href="{% url 'selectClientAssure'  %}"><i class='bx bx-radio-circle'></i>Existing Client Assure</a> </li>
+							{% endif %}
+							{% if request.user|has_module:"OBAMACARE" or request.user|has_module:"SUPP" or request.user|has_module:"ASSURE" or request.user|has_module:"LIFE INSURANCE" or  request.user|has_module:"MEDICARE" %}
+								<li> <a href="{% url 'formCreateAlert' %}"><i class='bx bx-radio-circle'></i>Create Alert</a> </li>
+							{% endif %}
+						</ul>
+					</li>
+				{% endif %}
+
+				{% if request.user|has_module:"OBAMACARE" or request.user|has_module:"SUPP" or request.user|has_module:"ASSURE" or request.user|has_module:"LIFE INSURANCE" or  request.user|has_module:"MEDICARE" %}
+					<li class="menu-label">Tables</li>
+					<li>
+						<a class="has-arrow" href="javascript:;">
+							<div class="parent-icon"><i class="fadeIn animated bx bx-task"></i></div>
+							<div class="menu-title">Information Client</div>
+						</a>
+						<ul>
+							{% if request.user|has_module:"OBAMACARE" %}
+								<li> <a href="{% url 'clientObamacare' %}"><i class='bx bx-radio-circle'></i>Clients Obama</a> </li>
+							{% endif %}
+							{% if request.user|has_module:"OBAMACARE" %}
+								<li> <a href="{% url 'clientAccionRequired' %}"><i class='bx bx-radio-circle'></i>Clients Accion Required </a> </li>
+							{% endif %}
+							{% if  request.user|has_module:"SUPP" %}
+								<li> <a href="{% url 'clientSupp' %}"><i class='bx bx-radio-circle'></i>Clients Supp</a> </li>
+							{% endif %}
+							{% if request.user|has_module:"ASSURE" %}
+							<li> <a href="{% url 'clientAssure' %}"><i class='bx bx-radio-circle'></i>Clients Assure</a> </li>
+							{% endif %}
+							{% if request.user|has_module:"LIFE INSURANCE"  %}
+								<li> <a href="{% url 'clientLifeInsurance' %}"><i class='bx bx-radio-circle'></i>Clients Life Insurance</a> </li>
+							{% endif %}
+							{% if request.user|has_module:"MEDICARE" %}
+								<li> <a href="{% url 'clientMedicare' %}"><i class='bx bx-radio-circle'></i>Clients Medicare</a> </li>
+							{% endif %}
+							{% if request.user|has_module:"OBAMACARE" or request.user|has_module:"SUPP" or request.user|has_module:"ASSURE" or request.user|has_module:"LIFE INSURANCE" or  request.user|has_module:"MEDICARE" %}
+								<li> <a href="{% url 'alert' %}"><i class='bx bx-radio-circle'></i>Alert</a> </li>
+							{% endif %}
+							{% if request.user|has_module:"OBAMACARE" or request.user|has_module:"SUPP" or request.user|has_module:"ASSURE" or request.user|has_module:"LIFE INSURANCE" or  request.user|has_module:"MEDICARE" %}
+								<li> <a href="{% url 'ticketAsing' %}"><i class='bx bx-radio-circle'></i>Ticket </a> </li>
+							{% endif %}
+						</ul>
+					</li>
+				{% endif %}
+
 				{% if smsIsActive or whatsAppIsActive %}
-				<li class="menu-label">Applications</li>
-				<li {% if request.path == chat_url %}class='mm-active'{% endif %}>
-					<a class="has-arrow" href="javascript:;">
-						<div class="parent-icon"> <i class="fadeIn animated bx bx-line-chart"></i></div>
-						<div class="menu-title">Communications</div>
-					</a>
-					<ul>
-						{% if smsIsActive %}
-							<li {% if request.path == chat_url %}class='mm-active'{% endif %}> 
-								<a aria-expanded="true" href="{% url 'smsBlue' %}"><i class='bx bx-radio-circle'></i>SMS Blue</a>
-							</li>
-						{% endif %}	
-						{% if whatsAppIsActive %}						
-							<li {% if request.path == whatsapp_url %}class='mm-active'{% endif %}> 
-								<a aria-expanded="true" href="{% url 'whatsappBlue' %}"><i class='bx bx-radio-circle'></i>WHATSAPP Blue</a>
-							</li>	
-						{% endif %}							
-					</ul>
-				</li>
+
+					{% if request.user|has_module:"SMS" or request.user|has_module:"WHATSAPP" %}
+					
+						<li class="menu-label">Applications</li>
+						<li {% if request.path == chat_url %}class='mm-active'{% endif %}>
+							<a class="has-arrow" href="javascript:;">
+								<div class="parent-icon"> <i class="fadeIn animated bx bx-line-chart"></i></div>
+								<div class="menu-title">Communications</div>
+							</a>
+							<ul>
+								{% if request.user|has_module:"SMS" %}
+									{% if smsIsActive %}
+										<li {% if request.path == chat_url %}class='mm-active'{% endif %}> 
+											<a aria-expanded="true" href="{% url 'smsBlue' %}"><i class='bx bx-radio-circle'></i>SMS Blue</a>
+										</li>
+									{% endif %}	
+								{% endif %}	
+								{% if request.user|has_module:"WHATSAPP" %}
+									{% if whatsAppIsActive %}						
+										<li {% if request.path == whatsapp_url %}class='mm-active'{% endif %}> 
+											<a aria-expanded="true" href="{% url 'whatsappBlue' %}"><i class='bx bx-radio-circle'></i>WHATSAPP Blue</a>
+										</li>	
+									{% endif %}	
+								{% endif %}							
+							</ul>
+						</li>
+					{% endif %}
+
 				{% endif %}
-				
+
 				{% if request.user.role == 'Admin' or request.user.role == 'S'  %}
-				<li class="menu-label">Reports</li>
-				<li>
-					<a class="has-arrow" href="javascript:;">
-						<div class="parent-icon"> <i class="fadeIn animated bx bx-spreadsheet"></i></div>
-						<div class="menu-title">Sales Reports</div>
-					</a>
-					<ul>
-						<li> <a href="{% url 'sale' %}"><i class='bx bx-radio-circle'></i>Sale</a>
-						</li>
-						<li> <a href="{% url 'sale6Week' %}"><i class='bx bx-radio-circle'></i>Sales for the last 6 weeks</a>
-						</li>
-						<li> <a href="{% url 'weekSalesWiew' %}"><i class='bx bx-radio-circle'></i>Sales Week</a>
-						</li>
-						<li> <a href="{% url 'reports' %}"><i class='bx bx-radio-circle'></i>Report Payment / Action Required</a>
-						</li>
-					</ul>
-				</li>
-				<li>
-					<a class="has-arrow" href="javascript:;">
-						<div class="parent-icon"> <i class="fadeIn animated bx bx-user-pin"></i></div>
-						<div class="menu-title">Customer Reports</div>
-					</a>
-					<ul>
-						<li> <a href="{% url 'customerPerformance' %}"><i class='bx bx-radio-circle'></i>Customer Performance</a>
-						</li>
-						<li> <a href="{% url 'typification' %}"><i class='bx bx-radio-circle'></i>Typification</a>
-						</li>
-						<li> <a href="{% url 'customerTypification' %}"><i class='bx bx-radio-circle'></i>Typification Customer</a>
-						</li>
-					</ul>
-				</li>
-				{% if request.user.role == 'Admin' or request.user.role == 'S'  %}
-				<li class="menu-label">Supervisor Panel</li>
-				<li>
-					<a class="has-arrow" href="javascript:;">
-						<div class="parent-icon"> <i class="fadeIn animated bx bx-group"></i></div>
-						<div class="menu-title">Team Management</div>
-					</a>
-					<ul>
-						<li> <a href="{% url "customerAssginments" %}"><i class='bx bx-radio-circle'></i>Customer Assignments</a>
-						</li>
-					</ul>
-				</li>
-				{% endif %}
-				<li class="menu-label">Chart</li>
-				<li>
-					<a class="has-arrow" href="javascript:;">
-						<div class="parent-icon"> <i class="fadeIn animated bx bx-line-chart"></i></div>
-						<div class="menu-title">Graphical Reports</div>
-					</a>
-					<ul>
-						<li> <a href="{% url 'averageCustomer' %}"><i class='bx bx-radio-circle'></i>Effective Calls</a>
-						</li>
-						<li> <a href="{% url 'salesPerformance' %}"><i class='bx bx-radio-circle'></i>Sales Performance</a>
-						</li>
-						<li> <a href="{% url 'chart6Week' %}"><i class='bx bx-radio-circle'></i>Sale 6 Week</a>
-						</li>
-					</ul>
-				</li>
-				{% endif %}
-				{% if request.user.role == 'Admin' or request.user.role == 'AU' or request.user.role == 'S' %}
-				<li class="menu-label">Reports Quality</li>
-				<li>
-					<a class="has-arrow" href="javascript:;">
-						<div class="parent-icon"> <i class="lni lni-checkbox"></i> </div>
-						<div class="menu-title">Quality</div>
-					</a>
-					<ul>
-						<li> <a href="{% url 'formCreateControl' %}"><i class='bx bx-radio-circle'></i>Add Quality</a>
-						</li>
-						<li> <a href="{% url 'control' %}"><i class='bx bx-radio-circle'></i>View Quality</a>
-						</li>
-						<li> <a href="{% url 'createQuality' %}"><i class='bx bx-radio-circle'></i>Generate Pdf</a>
-						</li>
-					</ul>
-				</li>
-				{% endif %}
 				
-				<li class="menu-label">BD Excel</li>
-				<li>
-					<a class="has-arrow" href="javascript:;">
-						<div class="parent-icon"> <i class="lni lni-folder"></i> </div>
-						<div class="menu-title">Add BD</div>
-					</a>
-					<ul>
-						{% if request.user.role == 'Admin'  %}
-							<li> <a href="{% url 'uploadExcel' %}"><i class='bx bx-radio-circle'></i>Add Excel</a>
-							</li>
-							<li> <a href="{% url 'manageAgentAssignments' %}"><i class='bx bx-radio-circle'></i>Assign BD to Agents</a>
-							</li>
-							<li> <a href="{% url 'reportBd' %}"><i class='bx bx-radio-circle'></i>Report BD</a>
+					{% if request.user|has_module:"SALE REPORTS" or request.user|has_module:"CUSTOMER REPORTS" %}
+					
+						<li class="menu-label">Reports</li>
+
+						{% if request.user|has_module:"SALE REPORTS" or request.user|has_module:"CUSTOMER REPORTS" %}
+							<li>
+								<a class="has-arrow" href="javascript:;">
+									<div class="parent-icon"> <i class="fadeIn animated bx bx-spreadsheet"></i></div>
+									<div class="menu-title">Sales Reports</div>
+								</a>
+								<ul>
+									<li> <a href="{% url 'sale' %}"><i class='bx bx-radio-circle'></i>Sale</a>
+									</li>
+									<li> <a href="{% url 'sale6Week' %}"><i class='bx bx-radio-circle'></i>Sales for the last 6 weeks</a>
+									</li>
+									<li> <a href="{% url 'weekSalesWiew' %}"><i class='bx bx-radio-circle'></i>Sales Week</a>
+									</li>
+									<li> <a href="{% url 'reports' %}"><i class='bx bx-radio-circle'></i>Report Payment / Action Required</a>
+									</li>
+								</ul>
 							</li>
 						{% endif %}
-						<li> <a href="{% url "bd" %}"><i class='bx bx-radio-circle'></i>View BD</a>
-						</li>
-					</ul>
-				</li>
-				{% if request.user.role == 'Admin' or request.user.is_staff %}
-				<li class="menu-label">Admin</li>
-					{% if request.user.is_staff %}
-					<li>
-						<a class="has-arrow" href="javascript:;">
-							<div class="parent-icon"> <i class="lni lni-files"></i> </div>
-							<div class="menu-title">Comparative Excels</div>
-						</a>
-						<ul>
+
+						{% if request.user|has_module:"SALE REPORTS" or request.user|has_module:"CUSTOMER REPORTS" %}
+
 							<li>
-								<a href="{% url 'uploadReports'  %}"><i class='bx bx-radio-circle'></i>Upload Reports</a>
+								<a class="has-arrow" href="javascript:;">
+									<div class="parent-icon"> <i class="fadeIn animated bx bx-user-pin"></i></div>
+									<div class="menu-title">Customer Reports</div>
+								</a>
+								<ul>
+									<li> <a href="{% url 'customerPerformance' %}"><i class='bx bx-radio-circle'></i>Customer Performance</a>
+									</li>
+									<li> <a href="{% url 'typification' %}"><i class='bx bx-radio-circle'></i>Typification</a>
+									</li>
+									<li> <a href="{% url 'customerTypification' %}"><i class='bx bx-radio-circle'></i>Typification Customer</a>
+									</li>
+								</ul>
 							</li>
-						</ul>
-					</li>
+
+						{% endif %}
+
 					{% endif %}
-					{% if request.user.role == 'Admin' %}
+
+				{% endif %}
+
+				{% if request.user.role == 'Admin' or request.user.role == 'S'  %}
+
+					{% if request.user|has_module:"TEAM MANAGEMENT" %}
+					
+						<li class="menu-label">Supervisor Panel</li>
+						<li>
+							<a class="has-arrow" href="javascript:;">
+								<div class="parent-icon"> <i class="fadeIn animated bx bx-group"></i></div>
+								<div class="menu-title">Team Management</div>
+							</a>
+							<ul>
+								<li> <a href="{% url "customerAssginments" %}"><i class='bx bx-radio-circle'></i>Customer Assignments</a>
+								</li>
+							</ul>
+						</li>
+					{% endif %}				
+
+					{% if request.user|has_module:"GRAPHICAL REPORTS" %}
+
+						<li class="menu-label">Chart</li>
+						<li>
+							<a class="has-arrow" href="javascript:;">
+								<div class="parent-icon"> <i class="fadeIn animated bx bx-line-chart"></i></div>
+								<div class="menu-title">Graphical Reports</div>
+							</a>
+							<ul>
+								<li> <a href="{% url 'averageCustomer' %}"><i class='bx bx-radio-circle'></i>Effective Calls</a>
+								</li>
+								<li> <a href="{% url 'salesPerformance' %}"><i class='bx bx-radio-circle'></i>Sales Performance</a>
+								</li>
+								<li> <a href="{% url 'chart6Week' %}"><i class='bx bx-radio-circle'></i>Sale 6 Week</a>
+								</li>
+							</ul>
+						</li>
+
+					{% endif %}
+
+				{% endif %}
+
+				{% if request.user.role == 'Admin' or request.user.role == 'AU' or request.user.role == 'S' %}
+
+					{% if request.user|has_module:"QUALITY" %}
+					
+						<li class="menu-label">Reports Quality</li>
+						<li>
+							<a class="has-arrow" href="javascript:;">
+								<div class="parent-icon"> <i class="lni lni-checkbox"></i> </div>
+								<div class="menu-title">Quality</div>
+							</a>
+							<ul>
+								<li> <a href="{% url 'formCreateControl' %}"><i class='bx bx-radio-circle'></i>Add Quality</a>
+								</li>
+								<li> <a href="{% url 'control' %}"><i class='bx bx-radio-circle'></i>View Quality</a>
+								</li>
+								<li> <a href="{% url 'createQuality' %}"><i class='bx bx-radio-circle'></i>Generate Pdf</a>
+								</li>
+							</ul>
+						</li>
+					{% endif %}
+
+				{% endif %}
+				
+				{% if request.user|has_module:"BD" %}
+					<li class="menu-label">BD Excel</li>
 					<li>
 						<a class="has-arrow" href="javascript:;">
-							<div class="parent-icon"> <i class="lni lni-network"></i> </div>
-							<div class="menu-title">Profile</div>
+							<div class="parent-icon"> <i class="lni lni-folder"></i> </div>
+							<div class="menu-title">Add BD</div>
 						</a>
 						<ul>
-							<li> <a href="{% url 'formCreateUser'  %}"><i class='bx bx-radio-circle'></i>View User</a>
-							</li>
-							<li> <a href="{% url 'adminSms'  %}"><i class='bx bx-radio-circle'></i>Admin SMS</a>
-							</li>
-							<li> <a href="{% url 'addNumbersUsers' %}"><i class='bx bx-radio-circle'></i>Add  Numbers Users</a>
+							{% if request.user.role == 'Admin'  %}
+								<li> <a href="{% url 'uploadExcel' %}"><i class='bx bx-radio-circle'></i>Add Excel</a>
+								</li>
+								<li> <a href="{% url 'manageAgentAssignments' %}"><i class='bx bx-radio-circle'></i>Assign BD to Agents</a>
+								</li>
+								<li> <a href="{% url 'reportBd' %}"><i class='bx bx-radio-circle'></i>Report BD</a>
+								</li>
+							{% endif %}
+							<li> <a href="{% url "bd" %}"><i class='bx bx-radio-circle'></i>View BD</a>
 							</li>
 						</ul>
 					</li>
+				{% endif %}
+
+				{% if request.user.role == 'Admin' or request.user.is_staff %}
+					<li class="menu-label">Admin</li>
+
+					{% if request.user|has_module:"COMPARATIVE" %}
+						{% if request.user.is_staff %}
+							<li>
+								<a class="has-arrow" href="javascript:;">
+									<div class="parent-icon"> <i class="lni lni-files"></i> </div>
+									<div class="menu-title">Comparative Excels</div>
+								</a>
+								<ul>
+									<li>
+										<a href="{% url 'uploadReports'  %}"><i class='bx bx-radio-circle'></i>Upload Reports</a>
+									</li>
+								</ul>
+							</li>
+						{% endif %}
 					{% endif %}
+
+					{% if request.user.role == 'Admin' %}
+						<li>
+							<a class="has-arrow" href="javascript:;">
+								<div class="parent-icon"> <i class="lni lni-network"></i> </div>
+								<div class="menu-title">Profile</div>
+							</a>
+							<ul>
+								<li> <a href="{% url 'formCreateUser'  %}"><i class='bx bx-radio-circle'></i>View User</a>
+								</li>
+								<li> <a href="{% url 'adminSms'  %}"><i class='bx bx-radio-circle'></i>Admin SMS</a>
+								</li>
+								<li> <a href="{% url 'addNumbersUsers' %}"><i class='bx bx-radio-circle'></i>Add  Numbers Users</a>
+								</li>
+							</ul>
+						</li>
+					{% endif %}
+
 				{% endif %}		
+
 				{% if request.user.is_superuser %}
 					<li class="menu-label">Company</li>
 					<li>
@@ -294,9 +374,12 @@
 							</li>
 							<li> <a href="{% url 'addNumbers' %}"><i class='bx bx-radio-circle'></i>Add  Numbers</a>
 							</li>
+							<li> <a href="{% url 'userModule' %}"><i class='bx bx-radio-circle'></i>Configurar Users</a>
+							</li>
 						</ul>
 					</li>
-				{% endif %}			
+				{% endif %}	
+
 			</ul>
 
 			<!--end navigation-->
@@ -394,213 +477,227 @@
 		</header>
 		<!--end header -->
 		<!--start page wrapper -->
-		<div class="page-wrapper">
-			<div class="page-content">
-				{% block page_content %}
-			
-				<h5>Sales Obama</h5>
-				<div class="row row-cols-1 row-cols-md-2 row-cols-xl-4">					
-					<div class="col">
-						<div class="card radius-10">
-							<div class="card-body">
-								<div class="d-flex align-items-center">
-									<div>
-										<p class="mb-0">Total Sales</p>
-										<h5 class="mb-0">{{obama.all}}</h5>
+
+		{% if request.user|has_module:"OBAMACARE" or request.user|has_module:"SUPP" %}
+
+			<div class="page-wrapper">
+				<div class="page-content">
+					{% block page_content %}
+				
+					<h5>Sales Obama</h5>
+					<div class="row row-cols-1 row-cols-md-2 row-cols-xl-4">					
+						<div class="col">
+							<div class="card radius-10">
+								<div class="card-body">
+									<div class="d-flex align-items-center">
+										<div>
+											<p class="mb-0">Total Sales</p>
+											<h5 class="mb-0">{{obama.all}}</h5>
+										</div>
+										<div class="dropdown ms-auto">
+											<i class="fas fa-chart-line"></i>
+										</div>
 									</div>
-									<div class="dropdown ms-auto">
-										<i class="fas fa-chart-line"></i>
+								</div>
+							</div>
+						</div>
+						<div class="col">
+							<div class="card radius-10">
+								<div class="card-body">
+									<div class="d-flex align-items-center">
+										<div>
+											<p class="mb-0">Sales Good</p>
+											<h5 class="mb-0">{{obama.active}}</h5>
+										</div>
+										<div class="dropdown ms-auto">
+											<i class="fas fa-check-circle"></i>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col">
+							<div class="card radius-10">
+								<div class="card-body">
+									<div class="d-flex align-items-center">
+										<div>
+											<p class="mb-0">Sales Proccess</p>
+											<h5 class="mb-0">{{obama.process}}</h5>
+										</div>
+										<div class="dropdown ms-auto">
+											<i class="fas fa-hourglass-half"></i>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col">
+							<div class="card radius-10">
+								<div class="card-body">
+									<div class="d-flex align-items-center">
+										<div>
+											<p class="mb-0">Sales Cancell</p>
+											<h5 class="mb-0">{{obama.cancell}}</h5>
+										</div>
+										<div class="dropdown ms-auto">
+											<i class="fas fa-times-circle"></i> 
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-					<div class="col">
-						<div class="card radius-10">
-							<div class="card-body">
-								<div class="d-flex align-items-center">
-									<div>
-										<p class="mb-0">Sales Good</p>
-										<h5 class="mb-0">{{obama.active}}</h5>
+					<hr>
+					<h5>Sales Supp</h5>
+					{{chartSale}}
+					<div class="row row-cols-1 row-cols-md-2 row-cols-xl-4">					
+						<div class="col">
+							<div class="card radius-10">
+								<div class="card-body">
+									<div class="d-flex align-items-center">
+										<div>
+											<p class="mb-0">Total Sales</p>
+											<h5 class="mb-0">{{supp.all}}</h5>
+										</div>
+										<div class="dropdown ms-auto">
+											<i class="fas fa-chart-line"></i>
+										</div>
 									</div>
-									<div class="dropdown ms-auto">
-										<i class="fas fa-check-circle"></i>
+								</div>
+							</div>
+						</div>
+						<div class="col">
+							<div class="card radius-10">
+								<div class="card-body">
+									<div class="d-flex align-items-center">
+										<div>
+											<p class="mb-0">Sales Good</p>
+											<h5 class="mb-0">{{supp.active}}</h5>
+										</div>
+										<div class="dropdown ms-auto">
+											<i class="fas fa-check-circle"></i>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col">
+							<div class="card radius-10">
+								<div class="card-body">
+									<div class="d-flex align-items-center">
+										<div>
+											<p class="mb-0">Sales Proccess</p>
+											<h5 class="mb-0">{{supp.process}}</h5>
+										</div>
+										<div class="dropdown ms-auto">
+											<i class="fas fa-hourglass-half"></i>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col">
+							<div class="card radius-10">
+								<div class="card-body">
+									<div class="d-flex align-items-center">
+										<div>
+											<p class="mb-0">Sales Cancell</p>
+											<h5 class="mb-0">{{supp.cancell}}</h5>
+										</div>
+										<div class="dropdown ms-auto">
+											<i class="fas fa-times-circle"></i> 
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-					<div class="col">
-						<div class="card radius-10">
-							<div class="card-body">
-								<div class="d-flex align-items-center">
-									<div>
-										<p class="mb-0">Sales Proccess</p>
-										<h5 class="mb-0">{{obama.process}}</h5>
-									</div>
-									<div class="dropdown ms-auto">
-										<i class="fas fa-hourglass-half"></i>
-									</div>
+
+					<!--end row-->
+					
+					<div class="row row-cols-1 row-cols-md-2 row-cols-xl-1">
+						<div class="col">
+							<div class="card radius-10">
+								<div class="card-body">
+									<div id="chartIndex"></div>
 								</div>
 							</div>
 						</div>
 					</div>
-					<div class="col">
-						<div class="card radius-10">
-							<div class="card-body">
-								<div class="d-flex align-items-center">
-									<div>
-										<p class="mb-0">Sales Cancell</p>
-										<h5 class="mb-0">{{obama.cancell}}</h5>
-									</div>
-									<div class="dropdown ms-auto">
-										<i class="fas fa-times-circle"></i> 
+					<hr>
+
+					<!--Tablet Status -->
+					<div class="row row-cols-1 row-cols-md-1 row-cols-lg-2 row-cols-xl-2">
+
+						<div class="col">
+							<div class="card mb-3">
+								<div class="card-body">
+									<h5>Status Poliza Obama</h5>
+									<div class="table-responsive">
+										<table id="tableProfiling" class="table table-striped table-bordered">
+											<thead>
+												<tr>
+													<th>COL</th>
+													<th>Amount Client</th>
+												</tr>
+											</thead>
+											<tbody>
+												{% for result in tableStatusObama %}
+												
+												<tr>
+													<td>{{result.profiling}} </td>
+													<td>{{result.count}}</td>
+												</tr>
+												{% endfor %}
+											</tbody>
+										</table>
 									</div>
 								</div>
 							</div>
 						</div>
+
+						<div class="col">
+							<div class="card mb-3">
+								<div class="card-body">
+									<h5>Status Poliza Supp</h5>
+									<div class="table-responsive">
+										<table id="tableProfilingSupp" class="table table-striped table-bordered">
+											<thead>
+												<tr>
+													<th>COL</th>
+													<th>Amount Client</th>
+												</tr>
+											</thead>
+											<tbody>
+												{% for resultSupp in tableStatusSup %}											
+												<tr>
+													<td>{{resultSupp.status}} </td>
+													<td>{{resultSupp.count}}</td>
+												</tr>
+												{% endfor %}
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+
 					</div>
+									
+					{% endblock %}
 				</div>
-				<hr>
-				<h5>Sales Supp</h5>
-				{{chartSale}}
-				<div class="row row-cols-1 row-cols-md-2 row-cols-xl-4">					
-					<div class="col">
-						<div class="card radius-10">
-							<div class="card-body">
-								<div class="d-flex align-items-center">
-									<div>
-										<p class="mb-0">Total Sales</p>
-										<h5 class="mb-0">{{supp.all}}</h5>
-									</div>
-									<div class="dropdown ms-auto">
-										<i class="fas fa-chart-line"></i>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="col">
-						<div class="card radius-10">
-							<div class="card-body">
-								<div class="d-flex align-items-center">
-									<div>
-										<p class="mb-0">Sales Good</p>
-										<h5 class="mb-0">{{supp.active}}</h5>
-									</div>
-									<div class="dropdown ms-auto">
-										<i class="fas fa-check-circle"></i>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="col">
-						<div class="card radius-10">
-							<div class="card-body">
-								<div class="d-flex align-items-center">
-									<div>
-										<p class="mb-0">Sales Proccess</p>
-										<h5 class="mb-0">{{supp.process}}</h5>
-									</div>
-									<div class="dropdown ms-auto">
-										<i class="fas fa-hourglass-half"></i>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="col">
-						<div class="card radius-10">
-							<div class="card-body">
-								<div class="d-flex align-items-center">
-									<div>
-										<p class="mb-0">Sales Cancell</p>
-										<h5 class="mb-0">{{supp.cancell}}</h5>
-									</div>
-									<div class="dropdown ms-auto">
-										<i class="fas fa-times-circle"></i> 
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<!--end row-->
-                
-				<div class="row row-cols-1 row-cols-md-2 row-cols-xl-1">
-					<div class="col">
-						<div class="card radius-10">
-							<div class="card-body">
-								<div id="chartIndex"></div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<hr>
-
-				<!--Tablet Status -->
-				<div class="row row-cols-1 row-cols-md-1 row-cols-lg-2 row-cols-xl-2">
-
-					<div class="col">
-						<div class="card mb-3">
-							<div class="card-body">
-								<h5>Status Poliza Obama</h5>
-								<div class="table-responsive">
-									<table id="tableProfiling" class="table table-striped table-bordered">
-										<thead>
-											<tr>
-												<th>COL</th>
-												<th>Amount Client</th>
-											</tr>
-										</thead>
-										<tbody>
-											{% for result in tableStatusObama %}
-											
-											<tr>
-												<td>{{result.profiling}} </td>
-												<td>{{result.count}}</td>
-											</tr>
-											{% endfor %}
-										</tbody>
-									</table>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<div class="col">
-						<div class="card mb-3">
-							<div class="card-body">
-								<h5>Status Poliza Supp</h5>
-								<div class="table-responsive">
-									<table id="tableProfilingSupp" class="table table-striped table-bordered">
-										<thead>
-											<tr>
-												<th>COL</th>
-												<th>Amount Client</th>
-											</tr>
-										</thead>
-										<tbody>
-											{% for resultSupp in tableStatusSup %}											
-											<tr>
-												<td>{{resultSupp.status}} </td>
-												<td>{{resultSupp.count}}</td>
-											</tr>
-											{% endfor %}
-										</tbody>
-									</table>
-								</div>
-							</div>
-						</div>
-					</div>
-
-				</div>
-								
-				{% endblock %}
 			</div>
-		</div>
+
+		{% else %}
+
+			<div class="page-wrapper">
+				<div class="page-content">
+					<h2 style="text-align: center;">Modulo en Progress</h2>
+				</div>
+			</div>
+
+		{% endif %}
+
 		<!--end page wrapper -->
 		<!--start overlay-->
 		<div class="overlay toggle-icon"></div>

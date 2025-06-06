@@ -6,7 +6,7 @@ import stripe
 from django.http import JsonResponse, HttpResponse
 
 # Django core libraries
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -129,4 +129,40 @@ def toggleUser(request, user_id):
     
     # Redirigir de nuevo a la página actual con un parámetro de éxito
     return redirect('formCreateUser')
+
+def assignModulesModal(request, company_id):
+    # Obtén la compañía por el ID recibido
+    company = get_object_or_404(Companies, pk=company_id) # Usa 'Companies' aquí
+
+    all_modules = Module.objects.all()
+    selected_modules = company.modules.all() # Módulos ya asignados a esta compañía
+
+    if request.method == 'POST':
+        selected_ids = request.POST.getlist('modules')
+        
+        try:
+            modules_to_assign = Module.objects.filter(id__in=selected_ids)
+            company.modules.set(modules_to_assign) # Asigna a la compañía
+            # CAMBIO AQUÍ: usa company.company_name
+            return JsonResponse({'status': 'success', 'message': f'Módulos asignados correctamente a la compañía {company.company_name}.'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': f'Error al guardar los módulos: {str(e)}'}, status=500)
+
+    # Si es GET, renderiza el formulario
+    context = {
+        'modules': all_modules,
+        'selected_modules': selected_modules,
+        'company_id': company_id,
+        'company_obj': company # Esto sigue siendo útil para la plantilla
+    }
+    return render(request, 'auth/assignModules.html', context)
+
+@user_passes_test(lambda u: u.is_superuser or u.role == 'Admin')
+@login_required(login_url='/login') 
+@staffUserRequired
+def userModule(request):
+    
+    company = Companies.objects.all()
+
+    return render(request, 'auth/userModule.html', {'company' : company})
 

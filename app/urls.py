@@ -195,6 +195,8 @@ urlpatterns = [
     path('editUser/<user_id>', users.editUser, name='editUser'),
     path('toggleUser/<user_id>/', users.toggleUser, name='toggleUser'),
 
+    path('userModule/', users.userModule, name='userModule'),
+    path('assign-modules/<int:company_id>/', users.assignModulesModal, name='assignModulesModal'), 
 
     #<---------------------------Quality---------------------------> 
     path('formCreateControl/', quality.formCreateControl, name='formCreateControl'),

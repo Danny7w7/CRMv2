@@ -6,6 +6,15 @@ from .managers import VisibilityManager
 
 # Create your models here.
 
+class Module(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        db_table = 'module'
+
 class Companies(models.Model):
     owner = models.CharField(max_length=250)
     company_name = models.CharField(max_length=250)
@@ -17,6 +26,7 @@ class Companies(models.Model):
     county = models.CharField(max_length=100)
     is_active = models.BooleanField(default=True)
     remaining_balance = models.DecimalField(max_digits=20, decimal_places=6)
+    modules = models.ManyToManyField('Module', blank=True)
 
     class Meta:
         db_table = 'companies'

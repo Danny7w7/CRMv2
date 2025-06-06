@@ -64,6 +64,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'app.middleware.NoCacheMiddleware',  # middleware para borrar cache
+    'app.middleware.ModuleAccessMiddleware' # Middleware para manejos de modulos
 ]
 
 ROOT_URLCONF = 'project.urls'

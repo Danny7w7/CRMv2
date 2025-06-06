@@ -157,7 +157,6 @@ def saveCustomerObservationLife(request):
     else:
         return HttpResponse("Método no permitido.", status=405)
 
-
 @login_required(login_url='/login') 
 def saveCustomerObservationMedicare(request):
     if request.method == "POST":
