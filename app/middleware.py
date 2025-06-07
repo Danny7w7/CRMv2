@@ -35,7 +35,7 @@ MODULE_PATHS = {
     'TEAM MANAGEMENT': [ 'toggleDarkMode', 'customerAssginments']
 }
 
-EXCLUDED_VIEWS = ['index', 'motivationalPhrase','login','logout','viewConsent','consetMedicare','formCreateUser', 'adminSms','addNumbersUsers','incomeLetter','ConsentLifeInsurance','complaint']  # Puedes agregar más si lo necesitas
+EXCLUDED_VIEWS = ['index', 'motivationalPhrase','login','logout','viewConsent','consetMedicare','formCreateUser', 'adminSms','addNumbersUsers','incomeLetter','ConsentLifeInsurance','complaint', 'sms','whatsappReply']  # Puedes agregar más si lo necesitas
 
 class ModuleAccessMiddleware:
     def __init__(self, get_response):
