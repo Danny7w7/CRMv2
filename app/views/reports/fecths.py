@@ -56,11 +56,11 @@ def detalleAgente(request):
     filtro_agente = Q(agent=agente)
 
     context = {
-        'obamacare': ObamaCare.objects.select_related('client').filter(filtro_agente & filtro_fecha, **company_filter),
-        'supp': Supp.objects.select_related('client').filter(filtro_agente & filtro_fecha, **company_filter),
-        'medicare': Medicare.objects.filter(filtro_agente & filtro_fecha, **company_filter),
-        'assure': ClientsAssure.objects.filter(filtro_agente & filtro_fecha, **company_filter),
-        'life': ClientsLifeInsurance.objects.filter(filtro_agente & filtro_fecha, **company_filter),
+        'obamacare': ObamaCare.objects.select_related('client').filter(filtro_agente & filtro_fecha, **company_filter, is_active = True),
+        'supp': Supp.objects.select_related('client').filter(filtro_agente & filtro_fecha, **company_filter, is_active = True),
+        'medicare': Medicare.objects.filter(filtro_agente & filtro_fecha, **company_filter, is_active = True),
+        'assure': ClientsAssure.objects.filter(filtro_agente & filtro_fecha, **company_filter, is_active = True),
+        'life': ClientsLifeInsurance.objects.filter(filtro_agente & filtro_fecha, **company_filter, is_active = True),
     }
 
     return render(request, 'saleReports/templateModal.html', context)
