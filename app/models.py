@@ -425,6 +425,15 @@ class DependentsAssure(models.Model):
     class Meta:
         db_table = 'dependents_assure'
 
+class StatusSuplementals(models.Model):
+    supp = models.ForeignKey(Supp, on_delete=models.CASCADE)
+    coverageMonth = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField()
+
+    class Meta:
+        db_table = 'status_suplementals'
+
 class PaymentsSuplementals(models.Model):
     supp = models.ForeignKey(Supp, on_delete=models.CASCADE)
     coverageMonth = models.DateField()

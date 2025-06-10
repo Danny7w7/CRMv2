@@ -68,7 +68,7 @@
 <div class="row align-items-stretch">
 	<div class="col-xl-10 mx-auto">
 		<div class="row mb-3">
-			<div class="col-md-4">
+			<div class="col-md-3">
 				<div class="card h-100">
 					<div class="card-body">
 						<h5 class="text-center">Carrier's Reports</h5>
@@ -89,7 +89,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-md-4">
+			<div class="col-md-3">
 				<div class="card h-100">
 					<div class="card-body">
 						<h5 class="text-center">Oneil and Sherpa</h5>
@@ -100,14 +100,24 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-md-4">
+			<div class="col-md-3">
 				<div class="card h-100">
 					<div class="card-body">
-						<h5 class="text-center">Suplementals</h5>
+						<h5 class="text-center">Suplementals Status</h5>
 						<div class="button-row">
-							<button id='supCigna' class="report-btn reportingType">Cigna</button>
-							<button id='supMetlife' class="report-btn reportingType">Metlife</button>
-							<button id='supUnited' class="report-btn reportingType">United</button>
+							<button id='suppStatusCigna' class="report-btn reportingType">Cigna</button>
+							<button id='suppStatusMetlife' class="report-btn reportingType">Metlife</button>
+							<button id='suppStatusUnited' class="report-btn reportingType">United</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="card h-100">
+					<div class="card-body">
+						<h5 class="text-center">Suplementals Payments</h5>
+						<div class="button-row">
+							<button id='suppPaymentsCigna' class="report-btn reportingType">Cigna</button>
 						</div>
 					</div>
 				</div>
@@ -810,16 +820,16 @@
 
 
 <!-- Modal comparative Metlife Suplementario -->
-<div class="modal fade" id="modalsupMetlife" tabindex="-1" role="dialog" aria-labelledby="modalsupMetlife" aria-hidden="true">
+<div class="modal fade" id="modalsuppStatusMetlife" tabindex="-1" role="dialog" aria-labelledby="modalsuppStatusMetlife" aria-hidden="true">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
-			<form method="POST" id="supMetlifeForm" enctype="multipart/form-data">
+			<form method="POST" id="suppStatusMetlifeForm" enctype="multipart/form-data">
 				{% csrf_token %}
 				<div class="modal-header">
-					<h5 class="modal-title" id="modalTittlesupMetlife">Select Headers</h5>
+					<h5 class="modal-title" id="modalTittlesuppStatusMetlife">Select Headers</h5>
 				</div>
 				<div class="modal-body">
-					<div class="container-fluid" id="supMetlifeSelectHeader">
+					<div class="container-fluid" id="suppStatusMetlifeSelectHeader">
 						<div class="mb-3">
 							<label class="form-label">Member Id</label>
 							<select class="form-select form-select" name="policyNumber" id="policyNumber">
@@ -853,16 +863,16 @@
 
 
 <!-- Modal comparative Cigna Suplementario -->
-<div class="modal fade" id="modalsupCigna" tabindex="-1" role="dialog" aria-labelledby="modalsupCigna" aria-hidden="true">
+<div class="modal fade" id="modalsuppStatusCigna" tabindex="-1" role="dialog" aria-labelledby="modalsuppStatusCigna" aria-hidden="true">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
-			<form method="POST" id="supCignaForm" enctype="multipart/form-data">
+			<form method="POST" id="suppStatusCignaForm" enctype="multipart/form-data">
 				{% csrf_token %}
 				<div class="modal-header">
-					<h5 class="modal-title" id="modalTittlesupCigna">Select Headers</h5>
+					<h5 class="modal-title" id="modalTittlesuppStatusCigna">Select Headers</h5>
 				</div>
 				<div class="modal-body">
-					<div class="container-fluid" id="supCignaSelectHeader">
+					<div class="container-fluid" id="suppStatusCignaSelectHeader">
 						<div class="mb-3">
 							<label class="form-label">Policy Number</label>
 							<select class="form-select form-select" name="policyNumber" id="policyNumber">
@@ -889,16 +899,16 @@
 
 
 <!-- Modal comparative United Suplementario -->
-<div class="modal fade" id="modalsupUnited" tabindex="-1" role="dialog" aria-labelledby="modalsupUnited" aria-hidden="true">
+<div class="modal fade" id="modalsuppStatusUnited" tabindex="-1" role="dialog" aria-labelledby="modalsuppStatusUnited" aria-hidden="true">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
-			<form method="POST" id="supUnitedForm" enctype="multipart/form-data">
+			<form method="POST" id="suppStatusUnitedForm" enctype="multipart/form-data">
 				{% csrf_token %}
 				<div class="modal-header">
-					<h5 class="modal-title" id="modalTittlesupUnited">Select Headers</h5>
+					<h5 class="modal-title" id="modalTittlesuppStatusUnited">Select Headers</h5>
 				</div>
 				<div class="modal-body">
-					<div class="container-fluid" id="supUnitedSelectHeader">
+					<div class="container-fluid" id="suppStatusUnitedSelectHeader">
 						<div class="mb-3">
 							<label class="form-label">ID</label>
 							<select class="form-select form-select" name="policyNumber" id="policyNumber">
@@ -908,6 +918,42 @@
 						<div class="mb-3">
 							<label class="form-label">Relation to Primary</label>
 							<select class="form-select form-select" name="holder" id="holder">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Policy Status</label>
+							<select class="form-select form-select" name="policyStatus" id="policyStatus">
+								<option disabled selected>Select one</option>
+							</select>
+						</div>						
+						<input type="hidden" name="reportingTypeFinally">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+<!-- Modal comparative Cigna Suplementario -->
+<div class="modal fade" id="modalsuppPaymentsCigna" tabindex="-1" role="dialog" aria-labelledby="modalsuppPaymentsCigna" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<form method="POST" id="suppPaymentsCignaForm" enctype="multipart/form-data">
+				{% csrf_token %}
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalTittlesuppPaymentsCigna">Select Headers</h5>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid" id="suppPaymentsCignaSelectHeader">
+						<div class="mb-3">
+							<label class="form-label">Policy Number</label>
+							<select class="form-select form-select" name="policyNumber" id="policyNumber">
 								<option disabled selected>Select one</option>
 							</select>
 						</div>

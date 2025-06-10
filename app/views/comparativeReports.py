@@ -68,12 +68,15 @@ def processExcel(request):
         elif request.POST.get('reportingTypeFinally') == 'united':
             matchedRecords, unmatchedRecords = getDetailReportUnited(request, dataFrame)
 
-        elif request.POST.get('reportingTypeFinally') == 'supMetlife':
-            matchedRecords, unmatchedRecords = getDetailReportSupMetlife(request, dataFrame)
-        elif request.POST.get('reportingTypeFinally') == 'supCigna':
-            matchedRecords, unmatchedRecords = getDetailReportSupCigna(request, dataFrame)
-        elif request.POST.get('reportingTypeFinally') == 'supUnited':
-            matchedRecords, unmatchedRecords = getDetailReportSupUnited(request, dataFrame)
+        elif request.POST.get('reportingTypeFinally') == 'suppStatusMetlife':
+            matchedRecords, unmatchedRecords = getDetailReportSuppStatusMetlife(request, dataFrame)
+        elif request.POST.get('reportingTypeFinally') == 'suppStatusCigna':
+            matchedRecords, unmatchedRecords = getDetailReportSuppStatusCigna(request, dataFrame)
+        elif request.POST.get('reportingTypeFinally') == 'suppStatusUnited':
+            matchedRecords, unmatchedRecords = getDetailReportSuppStatusUnited(request, dataFrame)
+
+        elif request.POST.get('reportingTypeFinally') == 'suppPaymentsCigna':
+            matchedRecords, unmatchedRecords = getDetailReportSuppPaymentsCigna(request, dataFrame)
 
         return JsonResponse({
             'status': 'success',
@@ -671,7 +674,7 @@ def getDetailReportSherpa(request, dataFrame):
 
     return matchedRecords, unmatchedRecords
 
-def getDetailReportSupMetlife(request, dataFrame):
+def getDetailReportSuppStatusMetlife(request, dataFrame):
     # Crear un DataFrame vacío para almacenar los registros no asociados
     unmatchedRecords = pd.DataFrame(columns=[*dataFrame.columns, 'Error Reason'])
     matchedRecords = pd.DataFrame(columns=dataFrame.columns)
@@ -710,7 +713,7 @@ def getDetailReportSupMetlife(request, dataFrame):
 
     return matchedRecords, unmatchedRecords
 
-def getDetailReportSupCigna(request, dataFrame):
+def getDetailReportSuppStatusCigna(request, dataFrame):
     # Crear un DataFrame vacío para almacenar los registros no asociados
     unmatchedRecords = pd.DataFrame(columns=[*dataFrame.columns, 'Error Reason'])
     matchedRecords = pd.DataFrame(columns=dataFrame.columns)
@@ -722,7 +725,7 @@ def getDetailReportSupCigna(request, dataFrame):
 
         try:
             supp = Supp.objects.get(policyNumber=policyNumber)
-            PaymentsSuplementals.objects.create(
+            StatusSuplementals.objects.create(
                 supp=supp,
                 coverageMonth=datetime.now(),
                 is_active=True if policyStatus == 'Active' else False
@@ -747,7 +750,7 @@ def getDetailReportSupCigna(request, dataFrame):
 
     return matchedRecords, unmatchedRecords
 
-def getDetailReportSupUnited(request, dataFrame):
+def getDetailReportSuppStatusUnited(request, dataFrame):
     # Crear un DataFrame vacío para almacenar los registros no asociados
     unmatchedRecords = pd.DataFrame(columns=[*dataFrame.columns, 'Error Reason'])
     matchedRecords = pd.DataFrame(columns=dataFrame.columns)
@@ -786,16 +789,54 @@ def getDetailReportSupUnited(request, dataFrame):
 
     return matchedRecords, unmatchedRecords
 
+def getDetailReportSuppPaymentsCigna(request, dataFrame):
+    # Crear un DataFrame vacío para almacenar los registros no asociados
+    unmatchedRecords = pd.DataFrame(columns=[*dataFrame.columns, 'Error Reason'])
+    matchedRecords = pd.DataFrame(columns=dataFrame.columns)
+
+    # Iterate over rows
+    for index, row in dataFrame.iterrows():
+        policyNumber = row[request.POST.get('policyNumber')]
+        policyStatus = row[request.POST.get('policyStatus')]
+
+        try:
+            supp = Supp.objects.get(policyNumber=policyNumber)
+            StatusSuplementals.objects.create(
+                supp=supp,
+                coverageMonth=datetime.now(),
+                is_active=True if policyStatus == 'Active' else False
+            )
+            # Agregar el registro asociado al DataFrame
+            matchedRecords.loc[len(matchedRecords)] = row
+
+        except Supp.DoesNotExist:
+            rowWithError = pd.Series(row)
+            rowWithError['Error Reason'] = 'Suplemental not found'
+            unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
+
+        except Supp.MultipleObjectsReturned:
+            rowWithError = pd.Series(row)
+            rowWithError['Error Reason'] = 'Multiple Suplemental found'
+            unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
+
+        except Exception as e:
+            rowWithError = pd.Series(row)
+            rowWithError['Error Reason'] = f'Error: {str(e)}'
+            unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
+
+    return matchedRecords, unmatchedRecords
+
 def classifyLabel(label):
     label = label.strip()
-    if label.startswith("NCD") and label.endswith("VSP"):
-        return "unknown"
-    elif label.startswith("NCD"):
+    if label.startswith("NCD"):
         return "DENTAL"
     elif label.startswith("VSP"):
         return "VISUAL"
+    elif label.startswith("NCD") and label.endswith("VSP"):
+        return "unknown"
     else:
         return "unknown"
+        
 
 def formatNumberPolicyOnlyPolicyNumber(policyNumber: str) -> str:
     return policyNumber
@@ -917,15 +958,3 @@ def headerProcessor(request):
         'status': 'error',
         'message': 'No se recibió ningún archivo'
     })
-    
-def verifyExcelLock(request):
-    uploadedFile = request.FILES['file']
-    fileExtension = uploadedFile.name.split('.')[-1].lower()
-    if fileExtension in ['xlsx', 'xls']:
-        try:
-            # Intentar leer normalmente
-            read_excel(uploadedFile)
-        except Exception:
-            return False
-    else:
-        return True

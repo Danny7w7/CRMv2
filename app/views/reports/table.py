@@ -1,4 +1,5 @@
 # Standard Python libraries
+from calendar import month_abbr
 import datetime
 from datetime import timedelta, date
 
@@ -11,6 +12,8 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Count, F, Q, Subquery
 from django.db.models.functions import Substr
 from django.shortcuts import render
+from django.utils.dateformat import DateFormat
+from django.utils.formats import get_format
 from django.utils.text import Truncator
 
 # Application-specific imports
@@ -18,6 +21,7 @@ from app.models import *
 from ..utils import format_decimal
 from ..reports.charts import chart6WeekSale
 from ..decoratorsCompany import *
+
 
 @login_required(login_url='/login') 
 @company_ownership_required_sinURL
@@ -1292,3 +1296,58 @@ def typification(request):
             'end_date': end_date,
             'agents' : agent
         })
+
+def paymentReports(request):
+
+    # Rango de meses del año actual
+    currentYear = datetime.date.today().year
+    months = [datetime.date(currentYear, m, 1) for m in range(1, 13)]
+
+    # Todos los registros de ObamaCare
+    obamacareRecords = ObamaCare.objects.select_related('client').all()
+
+    # Diccionario: {clientName: {month: 'C: ✅ O: ❌ S: ✅'}}
+    reportData = defaultdict(dict)
+
+    for record in obamacareRecords:
+        client = record.client
+        clientName = f"{client.first_name} {client.last_name}"  # Ajusta según tu modelo
+
+        for monthDate in months:
+            year = monthDate.year
+            month = monthDate.month
+
+            hasCarrier = PaymentsCarriers.objects.filter(
+                obamacare=record,
+                coverageMonth__year=year,
+                coverageMonth__month=month,
+                is_active=True
+            ).exists()
+
+            hasOneil = PaymentsOneil.objects.filter(
+                obamacare=record,
+                coverageMonth__year=year,
+                coverageMonth__month=month
+            ).exists()
+
+            hasSherpa = PaymentsSherpa.objects.filter(
+                obamacare=record,
+                coverageMonth__year=year,
+                coverageMonth__month=month,
+                is_active=True
+            ).exists()
+
+            status = f"C: {'✅' if hasCarrier else '❌'} O: {'✅' if hasOneil else '❌'} S: {'✅' if hasSherpa else '❌'}"
+            reportData[clientName][month_abbr[month]] = status
+
+    # Encabezados de la tabla
+    tableHeaders = ['Client'] + [month_abbr[m.month] for m in months]
+    tableData = []
+
+    for clientName, monthStatuses in reportData.items():
+        row = [clientName]
+        for m in months:
+            row.append(monthStatuses.get(month_abbr[m.month], ''))
+        tableData.append(row)
+
+    return render(request, 'paymentsReports/paymentForMonth.html')
