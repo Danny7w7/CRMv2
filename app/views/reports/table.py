@@ -441,16 +441,16 @@ def salesBonusAgent(request, company_id, start_date=None, end_date=None):
         row = {
             'id': agente.id,  # Agregar el id del agente aquí
             'nombre': agente.get_full_name() if hasattr(agente, 'get_full_name') else agente.username,
-            'obamacare': ObamaCare.objects.filter(Q(agent=agente) & Q(status_color=3) & filtro_fecha & filtro_company).count(),
-            'obamacarePendiente': ObamaCare.objects.filter(Q(agent=agente), Q(status_color__in = [1,2]),filtro_fecha, filtro_company).count(),
-            'supp': Supp.objects.filter(Q(agent=agente), Q(status_color=3), filtro_fecha, filtro_company).count(),
-            'suppPendiente': Supp.objects.filter(Q(agent=agente), Q(status_color__in = [1,2]), filtro_fecha, filtro_company).count(),
-            'medicare': Medicare.objects.filter(Q(agent=agente), Q(status_color=3), filtro_fecha, filtro_company).count(),
-            'medicarePendiente': Medicare.objects.filter(Q(agent=agente), Q(status_color__in = [1,2]), filtro_fecha, filtro_company).count(),
-            'assure': ClientsAssure.objects.filter(Q(agent=agente), Q(status_color=3), filtro_fecha, filtro_company).count(),
-            'assurePendiente': ClientsAssure.objects.filter(Q(agent=agente), Q(status_color__in = [1,2]), filtro_fecha, filtro_company).count(),
-            'life_insurance': ClientsLifeInsurance.objects.filter(Q(agent=agente), Q(status_color=3), filtro_fecha, filtro_company).count(),
-            'life_insurancePendiente': ClientsLifeInsurance.objects.filter(Q(agent=agente), Q(status_color__in = [1,2]), filtro_fecha, filtro_company).count(),
+            'obamacare': ObamaCare.objects.filter(Q(agent=agente) & Q(status_color=3) & filtro_fecha & filtro_company & Q(is_active = True)).count(),
+            'obamacarePendiente': ObamaCare.objects.filter(Q(agent=agente), Q(status_color__in = [1,2]),filtro_fecha, filtro_company & Q(is_active=True)).count(),
+            'supp': Supp.objects.filter(Q(agent=agente), Q(status_color=3), filtro_fecha, filtro_company & Q(is_active=True)).count(),
+            'suppPendiente': Supp.objects.filter(Q(agent=agente), Q(status_color__in = [1,2]), filtro_fecha, filtro_company & Q(is_active=True)).count(),
+            'medicare': Medicare.objects.filter(Q(agent=agente), Q(status_color=3), filtro_fecha, filtro_company & Q(is_active=True)).count(),
+            'medicarePendiente': Medicare.objects.filter(Q(agent=agente), Q(status_color__in = [1,2]), filtro_fecha, filtro_company & Q(is_active=True)).count(),
+            'assure': ClientsAssure.objects.filter(Q(agent=agente), Q(status_color=3), filtro_fecha, filtro_company & Q(is_active=True)).count(),
+            'assurePendiente': ClientsAssure.objects.filter(Q(agent=agente), Q(status_color__in = [1,2]), filtro_fecha, filtro_company & Q(is_active=True)).count(),
+            'life_insurance': ClientsLifeInsurance.objects.filter(Q(agent=agente), Q(status_color=3), filtro_fecha, filtro_company & Q(is_active=True)).count(),
+            'life_insurancePendiente': ClientsLifeInsurance.objects.filter(Q(agent=agente), Q(status_color__in = [1,2]), filtro_fecha, filtro_company & Q(is_active=True)).count(),
         }
 
         # Calcular el total horizontal por agente
