@@ -84,10 +84,11 @@ def reportBoosLapeira():
     url_temporal = uploadTempUrl(local_path, s3_key)
 
     # 3. Enviar por Telnyx MMS
+    destinatarios = ['+13052199932', '+13052190572'] 
     telnyx.api_key = settings.TELNYX_API_KEY
     telnyx.Message.create(
         from_='+17869848427',
-        to='+13052199932',
+        to=destinatarios,
         text='Reporte de la semana actual generado automáticamente.',
         subject='Reporte PDF',
         media_urls=[url_temporal]
