@@ -71,7 +71,6 @@ def smsPayment():
                     message
                 )
 
-
 @shared_task
 def reportBoosLapeira():
     week_number = date.today().isocalendar()[1]
@@ -85,16 +84,16 @@ def reportBoosLapeira():
 
     # 3. Enviar por Telnyx MMS
     telnyx.api_key = settings.TELNYX_API_KEY
-    telnyx.Message.create(
-        from_='+17869848427',
-        to='+17863034781',
-        text='Reporte de la semana actual generado automáticamente.',
-        subject='Reporte PDF',
-        media_urls=[url_temporal]
-    )
-
-    
-
+    recipient = ['+17863034781','+17863034781']
+    for item in recipient:
+        telnyx.Message.create(
+            from_='+17869848427',
+            to=item,
+            text='Reporte de la semana actual generado automáticamente.',
+            subject='Reporte PDF',
+            media_urls=[url_temporal]
+        )
+   
 @shared_task
 def saveImageFromUrlTask(messageId, payload, contactId, companyId):
     from .models import FilesSMS, Messages, Companies, Contacts
