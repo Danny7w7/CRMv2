@@ -85,14 +85,15 @@ def reportBoosLapeira():
 
     # 3. Enviar por Telnyx MMS
     destinatarios = ['+13052199932', '+13052190572'] 
-    telnyx.api_key = settings.TELNYX_API_KEY
-    telnyx.Message.create(
-        from_='+17869848427',
-        to=destinatarios,
-        text='Reporte de la semana actual generado automáticamente.',
-        subject='Reporte PDF',
-        media_urls=[url_temporal]
-    )
+    for numero in destinatarios:
+        telnyx.api_key = settings.TELNYX_API_KEY
+        telnyx.Message.create(
+            from_='+17869848427',
+            to=numero,
+            text='Reporte de la semana actual generado automáticamente.',
+            subject='Reporte PDF',
+            media_urls=[url_temporal]
+        )
 
     
 
