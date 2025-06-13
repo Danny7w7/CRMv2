@@ -84,7 +84,7 @@ def reportBoosLapeira():
 
     # 3. Enviar por Telnyx MMS
     telnyx.api_key = settings.TELNYX_API_KEY
-    recipient = list(set(['+17863034781', '+17863034781']))
+    recipient = ['+17863034781','+17863034781']
     for item in recipient:
         telnyx.Message.create(
             from_='+17869848427',
