@@ -42,7 +42,7 @@ def my_daily_task():
 @shared_task
 def smsPayment():
     now = datetime.now().date()
-    payments = paymentDate.objects.select_related('obamacare__client__agent', 'supp__client__agent').filter(
+    payments = PaymentDate.objects.select_related('obamacare__client__agent', 'supp__client__agent').filter(
         payment_date__month=now.month,
         payment_date__day=now.day,
     )

@@ -224,7 +224,7 @@ def editObama(request ,obamacare_id, way):
     apppointment = AppointmentClient.objects.select_related('obamacare','agent_create').filter(obamacare = obamacare_id)
     userCarrier = UserCarrier.objects.filter(obamacare = obamacare_id).first()
     accionRequired = CustomerRedFlag.objects.filter(obamacare = obamacare)    
-    paymentDateObama = paymentDate.objects.filter(obamacare = obamacare).first()
+    paymentDateObama = PaymentDate.objects.filter(obamacare = obamacare).first()
         
     if letterCard and letterCard.letters and letterCard.card: 
         newLetterCard = True
@@ -256,7 +256,8 @@ def editObama(request ,obamacare_id, way):
         obamaStatus,         
         obamaDocumente,
         obamacare.policyNumber, 
-        newApppointment
+        newApppointment,
+        paymentDateObama
     ]
 
     c = 0
@@ -264,7 +265,7 @@ def editObama(request ,obamacare_id, way):
         if item and item != 'None' and item is not None:
             c += 1
 
-    percentage = int(c/6*100)
+    percentage = int(c/7*100)
 
     social_number = obamacare.client.social_security  # Campo real del modelo
     # Asegurarse de que social_number no sea None antes de formatear
@@ -666,7 +667,7 @@ def editSupp(request, supp_id):
     obsSupp = ObservationAgent.objects.filter(supp=supp_id)
     obsCus = ObservationCustomer.objects.select_related('agent').filter(client=supp.client.id)
     list_drow = DropDownList.objects.filter(profiling_supp__isnull=False)
-    paymentDateSupp = paymentDate.objects.filter(supp = supp).first()
+    paymentDateSupp = PaymentDate.objects.filter(supp = supp).first()
     users = Users.objects.filter(role='SUPP', company = company_id, is_active = True)
 
     # Obtener el objeto Supp que tiene el id `supp_id`
@@ -838,7 +839,7 @@ def editAssure(request, assure_id):
     obsAssure = ObservationAgent.objects.filter(assure=assure_id)
     obsCus = ObservationCustomer.objects.select_related('agent').filter(assure=assure_id)
     list_drow = DropDownList.objects.filter(profiling_supp__isnull=False)
-    paymentDateAssure = paymentDate.objects.filter(assure = assure_id).first()
+    paymentDateAssure = PaymentDate.objects.filter(assure = assure_id).first()
     users = Users.objects.filter(role='SUPP', company = company_id, is_active = True)
 
     # Obtener todos los dependientes asociados a este Supp
@@ -1017,7 +1018,7 @@ def editLife(request, client_id):
     client = ClientsLifeInsurance.objects.select_related('agent').filter(id=client_id).first()
     obsCus = ObservationCustomer.objects.select_related('agent').filter(life_insurance=client_id)
     obsLife = ObservationAgent.objects.filter(life_insurance=client_id)
-    paymentDateLife = paymentDate.objects.filter(life_insurance = client_id).first()
+    paymentDateLife = PaymentDate.objects.filter(life_insurance = client_id).first()
     list_drow = DropDownList.objects.filter(profiling_supp__isnull=False)
     consent = Consents.objects.filter(lifeInsurance = client_id )
 

@@ -47,82 +47,78 @@
 	<div class="card">
 	  	<div class="card-header">
 		  	<div class="d-lg-flex flex-lg-row align-items-lg-center justify-content-lg-between" role="tablist">
-				<div class="step" data-target="#test-l-1">
-					<div class="step-trigger">
-
-						<div class="bs-stepper-circle {% if letterCard.letters and letterCard.card %} completed {% endif %} ">
+				<div class="step {% if letterCard.letters and letterCard.card %}active{% endif %}">
+					<div class="step-trigger d-flex flex-column align-items-center">
+						<div class="bs-stepper-circle">
 							<i class="fa-solid fa-file-signature"></i>
 						</div>
-						
-						<div class="">
-							<h5 class="mb-0 steper-title">L & C</h5>
-						</div>
-							
+						<h5 class="mb-0 steper-title">L & C</h5>
 					</div>
 				</div>
 
 				<div class="bs-stepper-line"></div>
 
-				<div class="step" >
-					<div class="step-trigger" role="tab" id="stepper1trigger2" aria-controls="test-l-2">
-						<div class="bs-stepper-circle {% if userCarrier.username_carrier != Null and userCarrier.username_carrier != 'None' and userCarrier.username_carrier != '' %} completed {% endif %} ">
+				<div class="step {% if userCarrier.username_carrier != Null and userCarrier.username_carrier != 'None' and userCarrier.username_carrier != '' %}active{% endif %}" >
+					<div class="step-trigger d-flex flex-column align-items-center" role="tab">
+						<div class="bs-stepper-circle">
 							<i class="fa-solid fa-circle-user"></i>
 						</div>
-							<div class="">
-								<h5 class="mb-0 steper-title">User Carrier</h5>
-							</div>
+						<h5 class="mb-0 steper-title">User Carrier</h5>
 					</div>
 				</div>
 
 				<div class="bs-stepper-line"></div>
 
-				<div class="step" >
-				<div class="step-trigger" role="tab" id="stepper1trigger2" aria-controls="test-l-2">
-					<div class="bs-stepper-circle {% if obamacare.status == 'ACTIVE' %} completed {% endif %} " >
-						<i class="fa-solid fa-circle-check"></i>
-					</div>
-						<div class="">
-							<h5 class="mb-0 steper-title">Status</h5>
+				<div class="step {% if paymentDateObama %}active{% endif %}" >
+					<div class="step-trigger d-flex flex-column align-items-center" role="tab">
+						<div class="bs-stepper-circle">
+							<i class="fa-solid fa-circle-user"></i>
 						</div>
+						<h5 class="mb-0 steper-title">Setup premium alert</h5>
 					</div>
 				</div>
 
 				<div class="bs-stepper-line"></div>
 
-				<div class="step" data-target="#test-l-3">
-					<div class="step-trigger" role="tab" id="stepper1trigger3" aria-controls="test-l-3">
-						<div class="bs-stepper-circle {% if obamacare.doc_income and obamacare.doc_migration%} completed {% endif %}">
+				<div class="step {% if obamacare.status == 'ACTIVE' %}active{% endif %} " >
+					<div class="step-trigger d-flex flex-column align-items-center" role="tab">
+						<div class="bs-stepper-circle" >
+							<i class="fa-solid fa-circle-check"></i>
+						</div>
+						<h5 class="mb-0 steper-title">Status</h5>
+					</div>
+				</div>
+
+				<div class="bs-stepper-line"></div>
+
+				<div class="step {% if obamacare.doc_income and obamacare.doc_migration%}active{% endif %}">
+					<div class="step-trigger d-flex flex-column align-items-center" role="tab">
+						<div class="bs-stepper-circle">
 							<i class="fa-solid fa-file-invoice"></i>
 						</div>
-						<div class="">
-							<h5 class="mb-0 steper-title">Documents</h5>
-						</div>
+						<h5 class="mb-0 steper-title">Documents</h5>
 					</div>
 				</div>
 
 				<div class="bs-stepper-line"></div>
 
-				<div class="step" data-target="#test-l-4">
-					<div class="step-trigger" role="tab" id="stepper1trigger4" aria-controls="test-l-4">
-						<div class="bs-stepper-circle {% if obamacare.policyNumber != '' and obamacare.policyNumber != Null and obamacare.policyNumber != 'None' %} completed {% endif %}">
+				<div class="step  {% if obamacare.policyNumber != '' and obamacare.policyNumber != Null and obamacare.policyNumber != 'None' %}active{% endif %}">
+					<div class="step-trigger d-flex flex-column align-items-center" role="tab">
+						<div class="bs-stepper-circle">
 							<i class="bi bi-123"></i>
 						</div>
-						<div class="">
-							<h5 class="mb-0 steper-title">Policy Number</h5>
-						</div>
+						<h5 class="mb-0 steper-title">Policy Number</h5>
 					</div>
 				</div>
 
 				<div class="bs-stepper-line"></div>
 
-				<div class="step" data-target="#test-l-4">
-					<div class="step-trigger" role="tab" id="stepper1trigger4" aria-controls="test-l-4">
-						<div class="bs-stepper-circle {% if apppointment %} completed {% endif %} ">
+				<div class="step {% if apppointment %}active{% endif %}">
+					<div class="step-trigger d-flex flex-column align-items-center" role="tab">
+						<div class="bs-stepper-circle">
 							<i class="fa-solid fa-user-doctor"></i>
 						</div>
-						<div class="">
-							<h5 class="mb-0 steper-title">Appointment</h5>
-						</div>
+						<h5 class="mb-0 steper-title">Appointment</h5>
 					</div>
 				</div>
 			</div>

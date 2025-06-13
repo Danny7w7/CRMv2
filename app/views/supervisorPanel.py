@@ -26,7 +26,7 @@ def customerAssginments(request):
 
     if request.user.is_superuser:
         users = Users.objects.filter(role='C').exclude(username__in=('MariaCaTi', 'CarmenR'))
-        usAgents = USAgent.objects.select_related('company').all()
+        usAgents = usAgents = USAgent.objects.prefetch_related('company').all()
     else:
         users = Users.objects.select_related('company').filter(company_id=request.user.company.id, role='C').exclude(username__in=('MariaCaTi', 'CarmenR'))
         usAgents = USAgent.objects.filter(company__id=request.user.company.id)

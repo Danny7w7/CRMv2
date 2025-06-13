@@ -317,29 +317,22 @@ def paymentDateObama(request, obama_id):
 
         if parsed_date is None:
             return JsonResponse({"error": "Invalid date format. Expected YYYY-MM-DD."}, status=400)
-        
-        filtro = paymentDate.objects.filter(obamacare=obamacare).count()
 
-        if filtro < 2:
-            filtro = paymentDate.objects.filter(obamacare=obamacare).first()
-            if filtro:
-                paymentDate.objects.filter(id = filtro.id).update(
-                    obamacare=obamacare,  
-                    payment_date = parsed_date,
-                    agent_create = request.user)
-            else:
-                paymentDate.objects.create(
-                    obamacare=obamacare,  
-                    payment_date = parsed_date,
-                    agent_create = request.user)
-                
-            message = "Recode SMS Created!" if parsed_date else "Date of updated billing SMS!"
-            return JsonResponse({"message": message})
-        else:
-            message = "Duplicidad de fecha, contactar con Admin"
-            return JsonResponse({"error": message}, status=400)
-
-    return JsonResponse({"error": "Invalid request"}, status=400)
+        try:
+            payment = PaymentDate.objects.get(obamacare=obamacare)
+            payment.payment_date = parsed_date
+            payment.agent_create = request.user
+            payment.save()
+            return JsonResponse({"message": "Date of updated billing SMS!"})
+        except PaymentDate.DoesNotExist:
+            payment = PaymentDate.objects.create(
+                obamacare=obamacare,
+                payment_date = parsed_date,
+                agent_create = request.user
+                )
+            return JsonResponse({"message": "Recode SMS Created!"})
+        except Exception as e:
+            return JsonResponse({"error": f"An error occurred while processing the request: {e}"}, status=400)
 
 def paymentDateSupp(request, supp_id):
 
@@ -359,7 +352,7 @@ def paymentDateSupp(request, supp_id):
             return JsonResponse({"error": "Invalid date format. Expected YYYY-MM-DD."}, status=400)
 
         # Actualizar o crear el registro de PaymentDate
-        payment_record, created = paymentDate.objects.update_or_create(
+        payment_record, created = PaymentDate.objects.update_or_create(
             supp=supp,  
             defaults={"payment_date": parsed_date},
             agent_create = request.user
@@ -388,7 +381,7 @@ def paymentDateAssure(request, assure_id):
             return JsonResponse({"error": "Invalid date format. Expected YYYY-MM-DD."}, status=400)
 
         # Actualizar o crear el registro de PaymentDate
-        payment_record, created = paymentDate.objects.update_or_create(
+        payment_record, created = PaymentDate.objects.update_or_create(
             assure=assure,  
             defaults={"payment_date": parsed_date},
             agent_create = request.user
@@ -530,7 +523,7 @@ def paymentDateLife(request, client_id):
             return JsonResponse({"error": "Invalid date format. Expected YYYY-MM-DD."}, status=400)
 
         # Actualizar o crear el registro de PaymentDate
-        payment_record, created = paymentDate.objects.update_or_create(
+        payment_record, created = PaymentDate.objects.update_or_create(
             life_insurance=lifeInsurance,  
             defaults={"payment_date": parsed_date},
             agent_create = request.user

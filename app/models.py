@@ -641,7 +641,6 @@ class Consents(models.Model):
     class Meta:
         db_table = 'consents'
 
-
 class IncomeLetter(models.Model):
     pdf = models.FileField(
         upload_to='IncomeLetter',
@@ -757,7 +756,7 @@ class CustomerRedFlag(models.Model):
     class Meta:
         db_table = 'customer_red_flag'
 
-class paymentDate(models.Model):
+class PaymentDate(models.Model):
     obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null=True)
     supp = models.ForeignKey(Supp, on_delete=models.CASCADE, null= True)
     assure = models.ForeignKey(ClientsAssure, on_delete=models.CASCADE, null=True, blank=True)

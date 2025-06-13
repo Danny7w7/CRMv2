@@ -36,8 +36,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ⚡ Mostrar alerta si faltan datos
-    let limit = parseInt(document.body.getAttribute('data-limit')) || 0;
-    if (limit < 6) {
+    let limit = document.querySelectorAll('.step.active').length;
+    if (limit < 7) {
         Swal.fire({
             title: "Action required.",
             width: 500,

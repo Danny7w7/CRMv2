@@ -666,6 +666,9 @@ def customerPerformance(request):
     documents = DocumentObama.objects.select_related('agent_create').filter(created_at__range=(start_date, end_date), **company_filter2)
     appointments = AppointmentClient.objects.select_related('agent_create').filter(created_at__range=(start_date, end_date), **company_filter2)
     payments = Payments.objects.select_related('agent').filter(created_at__range=(start_date, end_date), **company_filter)
+    paymentDate = PaymentDate.objects.filter(created_at__range=(start_date, end_date), **company_filter)
+    totalClientWithUsernameAndCarrier = UserCarrier.objects.filter(dateUserCarrier__range=(start_date, end_date), **company_filter)
+    lettersAndCards = LettersCard.objects.filter(Q(dateLetters__range=(start_date, end_date)) | Q(dateCard__range=(start_date, end_date)), **company_filter)
 
     # Obtener agentes Customer, excluyendo a Maria Tinoco y Carmen Rodriguez
     agents = Users.objects.prefetch_related('usaAgents').filter(role='C', is_active=1, **company_filter).exclude(username__in=('MariaCaTi', 'CarmenR'))
@@ -699,7 +702,9 @@ def customerPerformance(request):
                 'documents': 0,
                 'appointments': 0,
                 'payments': 0,
-                'personalGoal': 0
+                'paymentDate': 0,
+                'lettersAndCards':0,
+                'clientWithUsernameAndCarrier':0
             }
 
         # Asignar valores con validación de división por cero
@@ -723,6 +728,9 @@ def customerPerformance(request):
         agent_performance[full_name]['documents'] = documents.filter(agent_create=agent).count()
         agent_performance[full_name]['appointments'] = appointments.filter(agent_create=agent).count()
         agent_performance[full_name]['payments'] = payments.filter(agent=agent).count()
+        agent_performance[full_name]['paymentDate'] = paymentDate.filter(agent_create=agent).count()
+        agent_performance[full_name]['clientWithUsernameAndCarrier'] = totalClientWithUsernameAndCarrier.filter(agent_create=agent).count()
+        agent_performance[full_name]['lettersAndCards'] = lettersAndCards.filter(agent_create=agent).count()
 
         #Meta personal
         if percentageEnroledActiveCms == 100 and percentageEnroledActiveCms == 100:
@@ -748,11 +756,6 @@ def customerPerformance(request):
     else:
         groupGoal = 3
 
-    #Diferencia entre total
-    totalAgentsPayments = 0
-    for agent, details in agent_performance.items():
-        totalAgentsPayments += details['payments']
-
     context = {
         'start_date': start_date,
         'end_date': end_date,
@@ -774,10 +777,12 @@ def customerPerformance(request):
         'appointmentsTotal':appointments.count(),
         'documentsTotal': documents.count(),
         'paymentsTotal':payments.count(),
+        'totalPaymentDate': paymentDate.count(),
+        'totalClientWithUsernameAndCarrier':totalClientWithUsernameAndCarrier.count(),
+        'totalLettersAndCards':lettersAndCards.count(),
         'agentPerformance': agent_performance,
 
         #Messages
-        'totalAgentsPayments':totalAgentsPayments,
         'groupGoal':groupGoal
     }
     return render(request, 'customerReports/customerPerformance.html', context)
