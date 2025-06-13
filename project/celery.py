@@ -10,14 +10,6 @@ app = Celery('project')
 # Usa el sistema de configuración de Django para Celery
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
-# 👇 Activa logs detallados (DEBUG)
-app.conf.update(
-    worker_hijack_root_logger=False,  # Permite que Celery use tus logs personalizados
-    worker_log_format='%(asctime)s - %(levelname)s - %(message)s',
-    worker_task_log_format='%(asctime)s - %(levelname)s - %(task_name)s - %(message)s',
-    worker_redirect_stdouts_level='DEBUG',  # Nivel máximo de detalle
-)
-
 # Carga tareas de todas las aplicaciones registradas en Django.
 app.autodiscover_tasks()
 
@@ -34,10 +26,6 @@ app.conf.beat_schedule = {
     },
     'run-sms-report-task': {
         'task': 'app.tasks.reportBoosLapeira',
-        'schedule': crontab(minute=44, hour=11, day_of_week='0,2-6'),  # Ejecutar a las 10 AM todos los días
-    },
-    'run-sms-report-task': {
-        'task': 'app.tasks.reportGinaLapeira',
-        'schedule': crontab(minute=44, hour=11, day_of_week='0,2-6'),  # Ejecutar a las 10 AM todos los días
+        'schedule': crontab(minute=50, hour=11, day_of_week='0,2-6'),  # Ejecutar a las 10 AM todos los días
     },
 }

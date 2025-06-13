@@ -73,27 +73,6 @@ def smsPayment():
 
 
 @shared_task
-def reportGinaLapeira():
-    week_number = date.today().isocalendar()[1]
-
-    # 1. Generar PDF
-    local_path, filename = generateWeeklyPdf(week_number)
-
-    # 2. Subir a S3 y generar link temporal
-    s3_key = f'reportes/{filename}'
-    url_temporal = uploadTempUrl(local_path, s3_key)
-
-    # 3. Enviar por Telnyx MMS
-    telnyx.api_key = settings.TELNYX_API_KEY
-    telnyx.Message.create(
-        from_='+17869848427',
-        to='+17863034781',
-        text='Reporte de la semana actual generado automáticamente.',
-        subject='Reporte PDF',
-        media_urls=[url_temporal]
-    )
-
-@shared_task
 def reportBoosLapeira():
     week_number = date.today().isocalendar()[1]
 
@@ -112,7 +91,7 @@ def reportBoosLapeira():
         text='Reporte de la semana actual generado automáticamente.',
         subject='Reporte PDF',
         media_urls=[url_temporal]
-    )
+    ) 
 
 @shared_task
 def saveImageFromUrlTask(messageId, payload, contactId, companyId):
