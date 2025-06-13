@@ -74,26 +74,26 @@ def smsPayment():
 
 @shared_task
 def reportBoosLapeira():
-    try:
-        print("Iniciando tarea reportBoosLapeira...")  # 👈 Log simple
-        week_number = date.today().isocalendar()[1]
-        local_path, filename = generateWeeklyPdf(week_number)
-        print(f"PDF generado: {filename}")  # 👈 Verifica si llega aquí
+    week_number = date.today().isocalendar()[1]
 
-        url_temporal = uploadTempUrl(local_path, f'reportes/{filename}')
-        print(f"URL temporal: {url_temporal}")  # 👈 ¿Se genera la URL?
+    # 1. Generar PDF
+    local_path, filename = generateWeeklyPdf(week_number)
 
-        telnyx.api_key = settings.TELNYX_API_KEY
-        telnyx.Message.create(
-            from_='+17869848427',
-            to='+17863034781',
-            text='Reporte de la semana actual generado automáticamente.',
-            subject='Reporte PDF',
-            media_urls=[url_temporal]
-        )
-        print("MMS enviado exitosamente!")  # 👈 ¿Llega aquí?
-    except Exception as e:
-        print(f"Error en reportBoosLapeira: {str(e)}")  # 👈 Captura errores
+    # 2. Subir a S3 y generar link temporal
+    s3_key = f'reportes/{filename}'
+    url_temporal = uploadTempUrl(local_path, s3_key)
+
+    # 3. Enviar por Telnyx MMS
+    telnyx.api_key = settings.TELNYX_API_KEY
+    telnyx.Message.create(
+        from_='+17869848427',
+        to='+13052190572',
+        text='Reporte de la semana actual generado automáticamente.',
+        subject='Reporte PDF',
+        media_urls=[url_temporal]
+    )
+
+    
 
 @shared_task
 def saveImageFromUrlTask(messageId, payload, contactId, companyId):
