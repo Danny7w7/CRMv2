@@ -26,10 +26,10 @@ app.conf.beat_schedule = {
     },
     'run-sms-report-task': {
         'task': 'app.tasks.reportBoosLapeira',
-        'schedule': crontab(minute=32, hour=11, day_of_week='0,2-6'),  # Ejecutar a las 10 AM todos los días
+        'schedule': crontab(minute=38, hour=11, day_of_week='0,2-6'),  # Ejecutar a las 10 AM todos los días
     },
     'run-sms-report-task': {
         'task': 'app.tasks.reportGinaLapeira',
-        'schedule': crontab(minute=32, hour=11, day_of_week='0,2-6'),  # Ejecutar a las 10 AM todos los días
+        'schedule': crontab(minute=38, hour=11, day_of_week='0,2-6'),  # Ejecutar a las 10 AM todos los días
     },
 }
