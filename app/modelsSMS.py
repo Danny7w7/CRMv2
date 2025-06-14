@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from storages.backends.s3boto3 import S3Boto3Storage
-from .models import Companies, Users
+from .models import Companies, Users, ObamaCare
 
 # Create your models here.
 
@@ -29,7 +29,6 @@ class Contacts(models.Model):
             formatted = f"+{phone_str[0]} ({phone_str[1:4]}) {phone_str[4:7]} {phone_str[7:]}"
             return formatted
         return None
-
 
 class SecretKey(models.Model):
     contact = models.OneToOneField(Contacts, on_delete=models.CASCADE)
@@ -70,7 +69,6 @@ class Messages(models.Model):
     class Meta:
         db_table = 'sms_messages'
 
-
 class FilesSMS(models.Model):
     file = models.FileField(
         upload_to='files',
@@ -80,3 +78,19 @@ class FilesSMS(models.Model):
 
     class Meta:
         db_table = 'sms_files'
+
+class ContentTemplate(models.Model):
+    contentTemplate = models.TextField()
+    identification = models.CharField(max_length=100)
+
+    class Meta:
+        db_table = 'content_template'
+
+class SmsTemplate(models.Model):
+    contentTemplate = models.ForeignKey(ContentTemplate, on_delete=models.CASCADE)
+    agent = models.ForeignKey(Users, on_delete=models.CASCADE)
+    obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE) 
+    created_at = models.DateTimeField(auto_now_add=True) 
+
+    class Meta:
+        db_table = 'sms_template'

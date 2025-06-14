@@ -152,8 +152,8 @@ urlpatterns = [
     path('webhook/', sms.stripe_webhook, name='stripe-webhook'),
     path('payment/<str:type>/<int:company_id>/', sms.payment_type, name='payment'),
 
-
     path('adminSms/', sms.adminSms, name='adminSms'),
+    path('smstemplate/', sms.smstemplate, name='smstemplate'),
 
 
     #<---------------------------Sales Reports--------------------------->

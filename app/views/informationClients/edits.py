@@ -293,6 +293,7 @@ def editObama(request ,obamacare_id, way):
     documentObama = DocumentObama.objects.filter(obamacare = obamacare_id)
     incomeffm = IncomeLetterFFM.objects.filter(obamacare = obamacare_id)
     complaint = Complaint.objects.filter(obamacare = obamacare_id).exclude(pdf='')
+    smsTemplate = SmsTemplate.objects.select_related('contentTemplate').filter(obamacare = obamacare_id)
 
     if request.method == 'POST':
         action = request.POST.get('action')
@@ -523,6 +524,7 @@ def editObama(request ,obamacare_id, way):
         'paymentDateObama': paymentDateObama,
         'incomeffm':incomeffm,
         'complaint':complaint,
+        'smsTemplate': smsTemplate,
         #SMS Blue
         'contact':contact,
         'chat':chat,

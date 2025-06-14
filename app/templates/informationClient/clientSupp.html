@@ -50,7 +50,7 @@
                         <td>{{supp.client.first_name}} {{supp.client.last_name}}</td>
                         <td>{{supp.client.phone_number|formatUsaPhone}}</td>
 						<td>{{supp.created_at|date:"m-d-Y"}}</td>
-						<td>{{supp.policy_type}}</td>
+						<td>{{supp.policy_type}} / {{supp.carrier}}</td>
 						<td><span class="badge rounded-pill bg-danger">{{supp.status}}</span></td>
                         <td>
 							<div class="d-flex order-actions">

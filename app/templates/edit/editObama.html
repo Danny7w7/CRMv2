@@ -1,5 +1,6 @@
 {% extends "dashboard/index.html" %}
 {% load static %}
+{% load userModules %}
 {% block head %}
     <title>Client Obamacare</title>
 	<!--plugins-->
@@ -553,18 +554,27 @@
 							<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalDocument">
 								Documents
 							</button>
-							<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalAppointment">
-								Appointment
-							</button>
+							{% if request.user|has_module:"SMS" %}
+								<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalAppointment">
+									Appointment
+								</button>
+							{% endif %}
 							<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalPayments">
 								Payments
 							</button>
-							<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalPaymentsDate">
-								Date Payment
-							</button>
+							{% if request.user|has_module:"SMS" %}
+								<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalPaymentsDate">
+									Date Payment
+								</button>
+							{% endif %}
 							<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalComplaint">
 								Complaint
 							</button>
+							{% if request.user|has_module:"SMS" %}
+								<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalSMS">
+									SMS Temp
+								</button>
+							{% endif %}
 						{% endif %} 
 						<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#AgentTicketAssignment">
 							Ticket
@@ -702,7 +712,7 @@
 						<div class="modal-dialog">
 							<div class="modal-content">
 								<div class="modal-header">
-									<h5 class="modal-title" id="AgentTicketAssignmentLabel">Enter Observation</h5>
+									<h5 class="modal-title" id="AgentTicketAssignmentLabel">Enter Ticket</h5>
 									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 								</div>
 								<div class="modal-body">
@@ -763,6 +773,63 @@
 											<button type="submit" class="btn btn-primary">Saved</button>
 										</div>
 									</form>
+									
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Modal para SMS TEMPLATE -->
+					<div class="modal fade" id="modalSMS" tabindex="-1" aria-labelledby="modalSMSLabel" aria-hidden="true">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="SMS"> Select a template</h5>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								</div>
+								<div class="modal-body">
+									<form id="formIngresarTexto" action="{% url 'smstemplate'  %}" method="POST">
+										{% csrf_token %}
+										<label for="nameAgent" class="form-label">Select Option:</label>
+										<input type="hidden" name="idClient" value="{{obamacare.client.id}}">
+										<input type="hidden" name="way" value="{{way}}">
+										<div class="mb-3">
+											<select class="form-select"  name="sms" id="sms" required>
+												<option value="" selecci ></OPtion>
+												<option value="1">DOCUMENT</option>
+												<option value="2">FOLLOW-UP</option>
+												<option value="3">RENOVATION</option>
+												<option value="4">CARD</option>
+												<option value="5">FOLLOW-UP 2</option>
+											</select>
+										</div>
+										<div class="d-flex justify-content-between">
+											<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-dismiss="modal"> Back </button>
+											<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalViewSMS" data-bs-dismiss="modal"> View SMS </button>
+											<button type="submit" class="btn btn-primary">SEND</button>
+										</div>
+									</form>
+									
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Modal para ver template sms send -->
+					<div class="modal fade" id="modalViewSMS" tabindex="-1" aria-labelledby="modalViewSMSLabel" aria-hidden="true">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="modalIngresarTextoLabel">View SMS</h5>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								</div>
+								<div class="modal-body">
+
+									{% for item in smsTemplate %}
+										<div class="mb-1">
+											<label class="form-label"> <strong>SMS # </strong> {{forloop.counter}}: {{item.contentTemplate.identification}} <strong>Date: </strong> {{item.created_at|date:'m/d/Y'}} </label>
+										</div>
+									{% endfor %}
 									
 								</div>
 							</div>

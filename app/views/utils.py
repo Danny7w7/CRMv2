@@ -110,3 +110,10 @@ def toggleDarkMode(request):
             darkMode = True
         )
     return JsonResponse({'message':'success'})
+
+def renderMessageTemplate(template_str, context):
+    try:
+        return template_str.format(**context)
+    except KeyError as e:
+        return f"Error: faltó la variable {e}"
+
