@@ -281,7 +281,7 @@ def editObama(request ,obamacare_id, way):
         hoy = timezone.now().date()
         old = hoy.year - obamacare.client.date_birth.year - ((hoy.month, hoy.day) < (obamacare.client.date_birth.month, obamacare.client.date_birth.day))
    
-    obsObama = ObservationAgent.objects.filter(obamaCare=obamacare_id)  
+    obsObama = ObservationAgent.objects.select_related('obamaCare__agent').filter(obamaCare=obamacare_id)  
     users = Users.objects.filter(role='C', company = company_id)
     usersActive = Users.objects.filter(role='C', company = company_id, is_active = True)
     list_drow = DropDownList.objects.filter(profiling_obama__isnull=False)
@@ -504,7 +504,7 @@ def editObama(request ,obamacare_id, way):
         'formatted_social':formatted_social,
         'users': users,
         'usersActive' : usersActive,
-        'obsObamaText': '\n'.join([obs.content for obs in obsObama]),
+        'obsObamaText': '\n'.join([f"{obs.content} - {obs.obamaCare.agent.first_name} {obs.obamaCare.agent.last_name}  - {obs.created_at.strftime('%b %d, %Y')}"for obs in obsObama]),
         'obsCustomer': obsCus,
         'list_drow': list_drow,
         'dependents' : dependents,

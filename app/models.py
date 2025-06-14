@@ -493,6 +493,7 @@ class ObservationAgent(models.Model):
     life_insurance = models.ForeignKey(ClientsLifeInsurance, on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey(Users, on_delete=models.CASCADE)
     content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'observations_agents'
