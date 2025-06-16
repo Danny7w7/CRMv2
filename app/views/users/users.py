@@ -165,4 +165,3 @@ def userModule(request):
     company = Companies.objects.all()
 
     return render(request, 'auth/userModule.html', {'company' : company})
-
