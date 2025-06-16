@@ -597,7 +597,7 @@ def getPaymentsSummary(obamacareId):
 def getPaymentsSuplementalSummary(suppId):
     summary = defaultdict(lambda: {
         "status": False,
-        "payments": False,
+        "payment": False,
     })
 
     # Inicializar todos los meses con ceros
@@ -605,14 +605,22 @@ def getPaymentsSuplementalSummary(suppId):
         month = calendar.month_abbr[i].lower()
         summary[month]  # Esto ejecuta el lambda y deja el mes listo con todos ceros
 
-    suplementalsStatuses = PaymentsSuplementals.objects.filter(supp_id=suppId).order_by("coverageMonth", "-created_at")
+    suplementalsStatuses = StatusSuplementals.objects.filter(supp_id=suppId).order_by("coverageMonth", "-created_at")
+    suplementalsPayments = PaymentsSuplementals.objects.filter(supp_id=suppId).order_by("coverageMonth", "-created_at")
     seenStatusMonths = set()
+    seePaymentsMonths = set()
 
     for status in suplementalsStatuses:
         month = calendar.month_abbr[status.coverageMonth.month].lower()
         if month not in seenStatusMonths:
             summary[month]["status"] = status.is_active
             seenStatusMonths.add(month)
+
+    for payment in suplementalsPayments:
+        month = calendar.month_abbr[payment.coverageMonth.month].lower()
+        if month not in seePaymentsMonths:
+            summary[month]["payment"] = payment.is_active
+            seePaymentsMonths.add(month)
 
     # Retornar los meses en orden (enero a diciembre)
     orderedSummary = {
