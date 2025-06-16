@@ -528,13 +528,15 @@
 												<tr>
 													<td>{{ month }}</td>
 													<td>
-														{% if values.status%}✅
-														{% else %}❌
+														{% if values.status == True%}✅
+														{% elif values.status == False %}❌
+														{% else %}❔
 														{% endif %}
 													</td>
 													<td>
-														{% if values.payment%}✅
-														{% else %}❌
+														{% if values.payment == True%}✅
+														{% elif values.payment == False %}❌
+														{% else %}❔
 														{% endif %}
 													</td>
 												</tr>

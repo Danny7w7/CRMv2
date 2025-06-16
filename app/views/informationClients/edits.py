@@ -596,8 +596,8 @@ def getPaymentsSummary(obamacareId):
 
 def getPaymentsSuplementalSummary(suppId):
     summary = defaultdict(lambda: {
-        "status": False,
-        "payment": False,
+        "status": None,
+        "payment": None,
     })
 
     # Inicializar todos los meses con ceros
