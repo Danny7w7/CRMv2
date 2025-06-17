@@ -1303,56 +1303,49 @@ def typification(request):
         })
 
 def paymentReports(request):
-
-    # Rango de meses del año actual
     currentYear = datetime.date.today().year
     months = [datetime.date(currentYear, m, 1) for m in range(1, 13)]
 
-    # Todos los registros de ObamaCare
+    # Prefetch de datos
     obamacareRecords = ObamaCare.objects.select_related('client').all()
 
-    # Diccionario: {clientName: {month: 'C: ✅ O: ❌ S: ✅'}}
+    allCarriers = PaymentsCarriers.objects.filter(
+        coverageMonth__year=currentYear,
+        is_active=True
+    ).values_list('obamacare_id', 'coverageMonth')
+
+    allOneil = PaymentsOneil.objects.filter(
+        coverageMonth__year=currentYear
+    ).values_list('obamacare_id', 'coverageMonth')
+
+    allSherpa = PaymentsSherpa.objects.filter(
+        coverageMonth__year=currentYear,
+        is_active=True
+    ).values_list('obamacare_id', 'coverageMonth')
+
+    # Sets para acceso rápido
+    carrierSet = {(o_id, cm.month) for o_id, cm in allCarriers}
+    oneilSet = {(o_id, cm.month) for o_id, cm in allOneil}
+    sherpaSet = {(o_id, cm.month) for o_id, cm in allSherpa}
+
+    # Diccionario final: { clientName: { 'Jan': {'carrier': True, ... }, ... } }
     reportData = defaultdict(dict)
 
     for record in obamacareRecords:
-        client = record.client
-        clientName = f"{client.first_name} {client.last_name}"  # Ajusta según tu modelo
+        clientName = f"{record.client.first_name} {record.client.last_name}"
+        obamacareId = record.id
 
-        for monthDate in months:
-            year = monthDate.year
-            month = monthDate.month
-
-            hasCarrier = PaymentsCarriers.objects.filter(
-                obamacare=record,
-                coverageMonth__year=year,
-                coverageMonth__month=month,
-                is_active=True
-            ).exists()
-
-            hasOneil = PaymentsOneil.objects.filter(
-                obamacare=record,
-                coverageMonth__year=year,
-                coverageMonth__month=month
-            ).exists()
-
-            hasSherpa = PaymentsSherpa.objects.filter(
-                obamacare=record,
-                coverageMonth__year=year,
-                coverageMonth__month=month,
-                is_active=True
-            ).exists()
-
-            status = f"C: {'✅' if hasCarrier else '❌'} O: {'✅' if hasOneil else '❌'} S: {'✅' if hasSherpa else '❌'}"
-            reportData[clientName][month_abbr[month]] = status
-
-    # Encabezados de la tabla
-    tableHeaders = ['Client'] + [month_abbr[m.month] for m in months]
-    tableData = []
-
-    for clientName, monthStatuses in reportData.items():
-        row = [clientName]
         for m in months:
-            row.append(monthStatuses.get(month_abbr[m.month], ''))
-        tableData.append(row)
+            monthNum = m.month
+            monthName = month_abbr[monthNum]
 
-    return render(request, 'paymentsReports/paymentForMonth.html')
+            reportData[clientName][monthName] = {
+                'carrier': (obamacareId, monthNum) in carrierSet,
+                'oneil': (obamacareId, monthNum) in oneilSet,
+                'sherpa': (obamacareId, monthNum) in sherpaSet,
+            }
+
+    return render(request, 'paymentsReports/paymentForMonth.html', {
+        'reportData': dict(reportData),
+        'months': [month_abbr[m.month] for m in months],
+    })

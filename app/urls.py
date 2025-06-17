@@ -180,6 +180,10 @@ urlpatterns = [
     path('customerTypification/', tableReports.customerTypification, name='customerTypification'),
 
 
+    #<---------------------------Payments Reports--------------------------->
+    path('paymentsReports/', tableReports.paymentReports, name='paymentReports'),
+
+
     #<---------------------------Graphical Reports--------------------------->
     path('salesPerformance/', charts.salesPerformance, name='salesPerformance'),
     path('chart6Week/', charts.chart6Week, name='chart6Week'), 
