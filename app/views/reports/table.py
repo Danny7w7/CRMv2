@@ -1302,12 +1302,12 @@ def typification(request):
             'agents' : agent
         })
 
-def paymentReports(request):
+def paymentsReports(request):
     currentYear = datetime.date.today().year
     months = [datetime.date(currentYear, m, 1) for m in range(1, 13)]
 
     # Prefetch de datos
-    obamacareRecords = ObamaCare.objects.select_related('client').all()
+    obamacareRecords = ObamaCare.objects.select_related('client').filter(is_active=True)
 
     allCarriers = PaymentsCarriers.objects.filter(
         coverageMonth__year=currentYear
@@ -1348,7 +1348,51 @@ def paymentReports(request):
                 'sherpa': sherpaStatus,
             }
 
-    return render(request, 'paymentsReports/paymentForMonth.html', {
+    return render(request, 'paymentsReports/paymentForMonthACA.html', {
+        'reportData': dict(reportData),
+        'months': [month_abbr[m.month] for m in months],
+    })
+
+def paymentsReportsSupp(request):
+    currentYear = datetime.date.today().year
+    months = [datetime.date(currentYear, m, 1) for m in range(1, 13)]
+
+    # Prefetch de datos
+    suppRecords = Supp.objects.select_related('client').filter(is_active=True)
+
+    allCarriersStatus = StatusSuplementals.objects.filter(
+        coverageMonth__year=currentYear
+    ).values_list('supp_id', 'is_active', 'coverageMonth')
+
+    allCarriersPayments = PaymentsSuplementals.objects.filter(
+        coverageMonth__year=currentYear
+    ).values_list('supp_id', 'is_active', 'coverageMonth')
+
+    # Estructuras para acceso rápido
+    statuses = {(s_id, cm.month): is_active for s_id, is_active, cm in allCarriersStatus}
+    Payments = {(s_id, cm.month): is_active for s_id, is_active, cm in allCarriersPayments}
+
+    # Diccionario final
+    reportData = defaultdict(dict)
+
+    for record in suppRecords:
+        clientName = f"{record.client.first_name} {record.client.last_name}"
+        suppId = record.id
+
+        for m in months:
+            monthNum = m.month
+            monthName = month_abbr[monthNum]
+
+            # Obtener payable si existe
+            carrierStatus = statuses.get((suppId, monthNum))
+            carrierPayment = Payments.get((suppId, monthNum))
+
+            reportData[clientName][monthName] = {
+                'carrierStatus': carrierStatus,
+                'carrierPayment': carrierPayment,
+            }
+
+    return render(request, 'paymentsReports/paymentForMonthSupp.html', {
         'reportData': dict(reportData),
         'months': [month_abbr[m.month] for m in months],
     })

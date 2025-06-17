@@ -181,7 +181,8 @@ urlpatterns = [
 
 
     #<---------------------------Payments Reports--------------------------->
-    path('paymentsReports/', tableReports.paymentReports, name='paymentReports'),
+    path('paymentsReports/', tableReports.paymentsReports, name='paymentsReports'),
+    path('paymentsReportsSupp/', tableReports.paymentsReportsSupp, name='paymentsReportsSupp'),
 
 
     #<---------------------------Graphical Reports--------------------------->
