@@ -82,11 +82,13 @@
 						<td class="text-center">
 							{% if status.carrierStatus %}✅
 							{% elif status.carrierStatus == False %}❌
+							{% else %}❔
 							{% endif %}
 						</td>
 						<td class="text-center">
 							{% if status.carrierPayment > 0 %}✅
 							{% elif status.carrierPayment == False %}❌
+							{% else %}❔
 							{% endif %}
 						</td>
 						{% endwith %}
