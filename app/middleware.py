@@ -31,7 +31,7 @@ MODULE_PATHS = {
     'GRAPHICAL REPORTS': [ 'toggleDarkMode', 'averageCustomer', 'salesPerformance','chart6Week'],
     'QUALITY': [ 'toggleDarkMode', 'formCreateControl', 'control','createQuality'],
     'BD': [ 'toggleDarkMode', 'uploadExcel', 'manageAgentAssignments','reportBd','bd','processAndSave','saveData'],
-    'COMPARATIVE': [ 'toggleDarkMode', 'uploadReports','processExcel','headerProcessor'],
+    'COMPARATIVE': [ 'toggleDarkMode', 'uploadReports','processExcel','headerProcessor', 'paymentsReports', 'paymentsReportsSupp'],
     'TEAM MANAGEMENT': [ 'toggleDarkMode', 'customerAssginments']
 }
 
