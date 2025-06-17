@@ -1310,25 +1310,23 @@ def paymentReports(request):
     obamacareRecords = ObamaCare.objects.select_related('client').all()
 
     allCarriers = PaymentsCarriers.objects.filter(
-        coverageMonth__year=currentYear,
-        is_active=True
-    ).values_list('obamacare_id', 'coverageMonth')
+        coverageMonth__year=currentYear
+    ).values_list('obamacare_id', 'is_active', 'coverageMonth')
 
     allOneil = PaymentsOneil.objects.filter(
-        coverageMonth__year=currentYear
-    ).values_list('obamacare_id', 'coverageMonth')
+        coverageMonth__year=currentYear,
+    ).values_list('obamacare_id', 'payable', 'coverageMonth')
 
     allSherpa = PaymentsSherpa.objects.filter(
-        coverageMonth__year=currentYear,
-        is_active=True
-    ).values_list('obamacare_id', 'coverageMonth')
+        coverageMonth__year=currentYear
+    ).values_list('obamacare_id', 'is_active', 'coverageMonth')
 
-    # Sets para acceso rápido
-    carrierSet = {(o_id, cm.month) for o_id, cm in allCarriers}
-    oneilSet = {(o_id, cm.month) for o_id, cm in allOneil}
-    sherpaSet = {(o_id, cm.month) for o_id, cm in allSherpa}
+    # Estructuras para acceso rápido
+    carrierMap = {(o_id, cm.month): status for o_id, status, cm in allCarriers}
+    oneilMap = {(o_id, cm.month): payable for o_id, payable, cm in allOneil}
+    sherpaMap = {(o_id, cm.month): status for o_id, status, cm in allSherpa}
 
-    # Diccionario final: { clientName: { 'Jan': {'carrier': True, ... }, ... } }
+    # Diccionario final
     reportData = defaultdict(dict)
 
     for record in obamacareRecords:
@@ -1339,10 +1337,15 @@ def paymentReports(request):
             monthNum = m.month
             monthName = month_abbr[monthNum]
 
+            # Obtener payable si existe
+            carrierStatus = carrierMap.get((obamacareId, monthNum))
+            payable = oneilMap.get((obamacareId, monthNum))
+            sherpaStatus = sherpaMap.get((obamacareId, monthNum))
+
             reportData[clientName][monthName] = {
-                'carrier': (obamacareId, monthNum) in carrierSet,
-                'oneil': (obamacareId, monthNum) in oneilSet,
-                'sherpa': (obamacareId, monthNum) in sherpaSet,
+                'carrier': carrierStatus,
+                'oneil': payable,
+                'sherpa': sherpaStatus,
             }
 
     return render(request, 'paymentsReports/paymentForMonth.html', {

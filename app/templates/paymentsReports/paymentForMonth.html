@@ -2,7 +2,7 @@
 {% load static %}
 {% load customFilter %}
 {% block head %}
-    <title>Customer Performance Report</title>
+    <title>Payments Reports</title>
 	<!--plugins-->
 	<link href="{% static 'assets/plugins/simplebar/css/simplebar.css' %}" rel="stylesheet" />
 	<link href="{% static 'assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css' %}" rel="stylesheet" />
@@ -25,7 +25,7 @@
         
 {% endblock %}
 {% block page_content %}
-<h4 class="mb-0 text-uppercase">Payments Reports</h4>
+<h4 class="mb-0 text-uppercase">Payments Reports for Month ACA</h4>
 <hr/>
 <style>
 	.table-bordered {
@@ -80,9 +80,24 @@
 					<td>{{ clientName }}</td>
 					{% for month in months %}
 						{% with status=monthData|dict_get:month %}
-						<td class="text-center">{{ status.carrier|yesno:"✅,❌" }}</td>
-						<td class="text-center">{{ status.oneil|yesno:"✅,❌" }}</td>
-						<td class="text-center">{{ status.sherpa|yesno:"✅,❌" }}</td>
+						<td class="text-center">
+							{% if status.carrier %}✅
+							{% elif status.carrier == False %}❌
+							{% else %}❔
+							{% endif %}
+						</td>
+						<td class="text-center">
+							{% if status.oneil > 0 %}✅
+							{% elif status.oneil < 0 %}➖
+							{% else %}❔
+							{% endif %}
+						</td>
+						<td class="text-center">
+							{% if status.sherpa %}✅
+							{% elif status.sherpa == False %}❌
+							{% else %}❔
+							{% endif %}
+						</td>
 						{% endwith %}
 					{% endfor %}
 					</tr>
