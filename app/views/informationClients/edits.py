@@ -425,7 +425,9 @@ def editObama(request ,obamacare_id, way):
                 letters = json.loads(request.POST.get('letters', 'false').lower())
 
             if not banderaCard or banderaLetters:
-                idPost = request.POST.get('letterCardID')  
+                idPost = request.POST.get('letterCardID')
+            else:
+                idPost = None
 
             if not newLetterCard:      
 
