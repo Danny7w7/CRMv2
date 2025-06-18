@@ -1,6 +1,5 @@
 # Standard Python libraries
-from datetime import datetime, timedelta, time
-from decimal import Decimal
+import time
 import json
 import requests
 import re
@@ -24,6 +23,8 @@ from django.views.decorators.http import require_POST
 from django.core.files.storage import FileSystemStorage
 from PIL import Image
 from threading import Timer
+from datetime import datetime, timedelta
+from decimal import Decimal
 
 # Django core libraries
 from django.utils import timezone
@@ -850,104 +851,121 @@ def smstemplate(request):
     idClient = request.POST.get('idClient')
     sms = request.POST.get('sms')
     way = request.POST.get('way')
+    validation = int(sms)
 
-    from_number = request.user.assigned_phone
-    client = Clients.objects.filter(id = idClient).first()
     obama = ObamaCare.objects.select_related('company').filter(client = idClient).first()
-    template = ContentTemplate.objects.filter(id = sms).first()
+    client = Clients.objects.filter(id = idClient).first()
 
-    lines = obama.agent_usa.split("\n")
-    agentFirstName = lines[0].split()[0] 
+    if validation != 6:
+        print(sms)
+        print('NO BEVI ENTRAR')
+        from_number = request.user.assigned_phone
+        template = ContentTemplate.objects.filter(id = sms).first()
 
-    context = {
-        "name_client": client.first_name,
-        "company": getCompanyPerAgent(agentFirstName),
-        "agent": obama.agent_usa,
-    }
+        lines = obama.agent_usa.split("\n")
+        agentFirstName = lines[0].split()[0] 
 
-    messageContent = renderMessageTemplate(template.contentTemplate, context)
+        context = {
+            "name_client": client.first_name,
+            "company": getCompanyPerAgent(agentFirstName),
+            "agent": obama.agent_usa,
+        }
 
-    # Verificamos si ocurrió un error al renderizar
-    if not messageContent.startswith("Error:"):       
+        messageContent = renderMessageTemplate(template.contentTemplate, context)
 
-        telnyx.api_key = settings.TELNYX_API_KEY
-        telnyx.Message.create(
-            from_=f"+{from_number}", # Your Telnyx number
-            to=f'+{client.phone_number}',
-            text= messageContent
-        )
+        # Verificamos si ocurrió un error al renderizar
+        if not messageContent.startswith("Error:"):       
 
-        SmsTemplate.objects.create(
-            contentTemplate = template,
-            agent = request.user,
-            obamacare = obama
-        )
+            # telnyx.api_key = settings.TELNYX_API_KEY
+            # telnyx.Message.create(
+            #     from_=f"+{from_number}", # Your Telnyx number
+            #     to=f'+{client.phone_number}',
+            #     text= messageContent
+            # )
 
-        if obama.company.id not in [1,2]: #No descuenta el saldo a Lapeira
-            discountRemainingBalance(obama.company, '0.035')
+            # SmsTemplate.objects.create(
+            #     contentTemplate = template,
+            #     agent = request.user,
+            #     obamacare = obama
+            #)
+
+            if obama.company.id not in [1,2]: #No descuenta el saldo a Lapeira
+                discountRemainingBalance(obama.company, '0.035')
+    else:
+        print('LO ESTAMOS HACIENDO SUPER BIEN')
+        sendTemplate(request,client.phone_number)
 
     return redirect('editObama', obamacare_id=obama.id, way=way)
 
 #Funcion para enviar template de bienvenida por sms
-# def sendTemplate(request):
-#     imagen_url = None
+def sendTemplate(request,to_number):
+    imagen_url = None
+    company = request.user.company
 
-#     if request.method == 'POST' and request.FILES.get('imagen_usuario'):
+    print("Método:", request.method)
+    print("Archivos enviados:", request.FILES)
+    print("¿filepond existe?:", 'filepond' in request.FILES)
+
+
+    if request.method == 'POST' and request.FILES.get('filepond'):
         
-#         imagen_usuario = request.FILES['imagen_usuario']
+        imagen_usuario = request.FILES['filepond']
 
-#         # 1. Guardar temporalmente la imagen del usuario
-#         fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'temp'))
-#         nombre_archivo = fs.save(imagen_usuario.name, imagen_usuario)
-#         path_imagen_usuario = fs.path(nombre_archivo)
+        print('AQUI ANDAMOS')
 
-#         # 2. Cargar imagen base
-#         imagen_base_path = os.path.join(
-#             settings.BASE_DIR, 'static', 'assets', 'images', 'template-images', 'luisLapeira.jpg'
-#         )
-#         base = Image.open(imagen_base_path).convert("RGBA")
+        # 1. Guardar temporalmente la imagen del usuario
+        fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'temp'))
+        nombre_archivo = fs.save(imagen_usuario.name, imagen_usuario)
+        path_imagen_usuario = fs.path(nombre_archivo)
 
-#         # 3. Redimensionar y pegar imagen del usuario
-#         imagen = Image.open(path_imagen_usuario).convert("RGBA")
-#         imagen = imagen.resize((2000, 1000))
-#         base.paste(imagen, (80, 800), imagen)
+        # 2. Cargar imagen base
+        imagen_base_path = os.path.join(
+            settings.BASE_DIR, 'static', 'assets', 'images', 'template-images', 'luisLapeira.jpg'
+        )
+        base = Image.open(imagen_base_path).convert("RGBA")
 
-#         # 4. Guardar imagen combinada en carpeta temp-template
-#         timestamp = int(time.time())
-#         filename = f'combinado_{timestamp}.png'
-#         resultado_path = os.path.join(
-#             settings.BASE_DIR, 'static', 'assets', 'images', 'temp-template', filename
-#         )
-#         base.save(resultado_path)
+        # 3. Redimensionar y pegar imagen del usuario
+        imagen = Image.open(path_imagen_usuario).convert("RGBA")
+        imagen = imagen.resize((2000, 1000))
+        base.paste(imagen, (80, 800), imagen)
 
-#         # 5. Generar URL pública de la imagen
-#         imagen_url = request.build_absolute_uri(f'/static/assets/images/temp-template/{filename}')
+        # 4. Guardar imagen combinada en carpeta temp-template
+        timestamp = int(time.time())
+        filename = f'combinado_{timestamp}.png'
+        resultado_path = os.path.join(
+            settings.BASE_DIR, 'static', 'assets', 'images', 'temp-template', filename
+        )
+        base.save(resultado_path)
 
-#         # 6. Enviar SMS usando SDK oficial de Telnyx
-#         telnyx.api_key = settings.TELNYX_API_KEY  # ✅ Debes definirlo en settings.py
-#         from_number = settings.TELNYX_PHONE_NUMBER  # ✅ También definir en settings
-#         to_number = '17865551234'  # ⚠️ Cambia esto por el destinatario real
-#         messageContent = '¡Bienvenido a TruInsurance! Aquí está tu información personalizada.'
+        # 5. Generar URL pública de la imagen
+        imagen_url = request.build_absolute_uri(f'/static/assets/images/temp-template/{filename}')
 
-#         telnyx.Message.create(
-#             from_=f"+{from_number}",
-#             to=f"+{to_number}",
-#             text=messageContent,
-#             media_urls=[imagen_url]
-#         )
+        # 6. Enviar SMS usando SDK oficial de Telnyx
+        telnyx.api_key = settings.TELNYX_API_KEY  # ✅ Debes definirlo en settings.py
+        messageContent = '¡Bienvenido a TruInsurance! Aquí está tu información personalizada.'
 
-#         # 7. Programar eliminación de la imagen en 2 minutos
-#         def eliminarImagen(path):
-#             if os.path.exists(path):
-#                 os.remove(path)
+        print("URL de imagen que se enviará:", imagen_url)
+        
 
-#         Timer(240.0, eliminarImagen, args=[resultado_path]).start()
+        telnyx.Message.create(
+            from_='+17869848427',
+            to='+17863034781',
+            text=messageContent,
+            media_urls=[imagen_url]
+        )
 
-#         if company.id not in [1,2]: #No descuenta el saldo a Lapeira
-#             discountRemainingBalance(company, '0.035')
+        # 7. Programar eliminación de la imagen en 2 minutos
+        def eliminarImagen(path):
+            if os.path.exists(path):
+                os.remove(path)
 
-#     return render(request, 'subir_imagen.html', {
-#         'imagen_url': imagen_url
-#     })
+        Timer(240.0, eliminarImagen, args=[resultado_path]).start()
+
+        if company.id not in [1,2]: #No descuenta el saldo a Lapeira
+            discountRemainingBalance(company, '0.035')
+
+    return True
+
+
 
 

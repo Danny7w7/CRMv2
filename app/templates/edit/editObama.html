@@ -30,6 +30,10 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 
+    <!-- Incluir FilePond plugins para imágenes -->
+	<link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
+    <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet">
+
 	<!-- Custom styles -->
 	<style>
 		.centerAllExceptFirst td:not(:first-child),
@@ -788,7 +792,7 @@
 									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 								</div>
 								<div class="modal-body">
-									<form id="formIngresarTexto" action="{% url 'smstemplate'  %}" method="POST">
+									<form id="formIngresarTexto" action="{% url 'smstemplate'  %}"  enctype="multipart/form-data" method="POST">
 										{% csrf_token %}
 										<label for="nameAgent" class="form-label">Select Option:</label>
 										<input type="hidden" name="idClient" value="{{obamacare.client.id}}">
@@ -796,12 +800,16 @@
 										<div class="mb-3">
 											<select class="form-select"  name="sms" id="sms" required>
 												<option value="" selecci ></OPtion>
+												<option value="6">WELCOME</option>
 												<option value="1">DOCUMENT</option>
 												<option value="2">FOLLOW-UP</option>
 												<option value="3">RENOVATION</option>
 												<option value="4">CARD</option>
 												<option value="5">FOLLOW-UP 2</option>
 											</select>
+										</div>
+										<div  id="welcome-fields" class="mb-3" style="display: none;">
+											<input type="file" class="filepond" name="filepond">									
 										</div>
 										<div class="d-flex justify-content-between">
 											<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-dismiss="modal"> Back </button>
@@ -1524,6 +1532,13 @@
 	<script src="{% static 'assets/plugins/bs-stepper/js/bs-stepper.min.js' %}"></script>
 	<script src="{% static 'assets/plugins/bs-stepper/js/main.js' %}"></script>
 
+	<!-- Incluir FilePond JS -->
+    <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
+    
+    <!-- Incluir plugins -->
+    <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script>
+    <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
+	<script src="{% static 'assets/js/validations/templatePhoto.js' %}"></script>
 
 	<!--app JS-->
 	<script src="{% static 'assets/js/app.js' %}"></script>
