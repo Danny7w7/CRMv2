@@ -1,0 +1,14 @@
+.table-bordered {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #dee2e6;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+
+.table-bordered th,
+.table-bordered td {
+    border: 1px solid #000000;
+    padding: 8px;
+    text-align: left;
+}

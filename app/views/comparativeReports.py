@@ -89,15 +89,27 @@ def getDetailReportAetna(request, dataFrame):
     # Crear un DataFrame vacío para almacenar los registros no asociados
     unmatchedRecords = pd.DataFrame(columns=[*dataFrame.columns, 'Error Reason'])
     matchedRecords = pd.DataFrame(columns=dataFrame.columns)
-    
+
     for index, row in dataFrame.iterrows():
         policyNumber = row[request.POST.get('policyNumber')]
         policyStatus = row[request.POST.get('policyStatus')]
         effectiveDate = row[request.POST.get('effectiveDate')]
 
         if parseDateMDY(effectiveDate) > date(2024, 12, 31):
+            # Intentar obtener ObamaCare
             try:
                 obamacare = ObamaCare.objects.get(policyNumber=policyNumber)
+            except ObamaCare.DoesNotExist:
+                # Si no existe ObamaCare, intentar con Dependent
+                try:
+                    dependent = Dependents.objects.get(policyNumber=policyNumber)
+                    obamacare = dependent.obamacare
+                except Dependents.DoesNotExist:
+                    rowWithError = pd.Series(row)
+                    rowWithError['Error Reason'] = 'No ObamaCare policy found for holder or dependent.'
+                    unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
+                    continue  # saltar a la siguiente fila
+                
                 PaymentsCarriers.objects.create(
                     obamacare=obamacare,
                     carrier='Aetna',
@@ -105,11 +117,6 @@ def getDetailReportAetna(request, dataFrame):
                     coverageMonth=datetime.now(),
                     is_active=True if policyStatus == 'Active' else False
                 )
-                    
-            except ObamaCare.DoesNotExist:
-                rowWithError = pd.Series(row)
-                rowWithError['Error Reason'] = 'Obamacare not found'
-                unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
 
             except ObamaCare.MultipleObjectsReturned:
                 rowWithError = pd.Series(row)
@@ -133,11 +140,22 @@ def getDetailReportAmbetter(request, dataFrame):
         policyNumber = row[request.POST.get('policyNumber')]
         eligibleForCommission = row[request.POST.get('eligibleForCommission')]
         policyEffectiveDate = row[request.POST.get('policyEffectiveDate')]
-
         
         if parseDateMDY(policyEffectiveDate) > date(2024, 12, 31):
+            # Intentar obtener ObamaCare
             try:
                 obamacare = ObamaCare.objects.get(policyNumber=policyNumber)
+            except ObamaCare.DoesNotExist:
+                # Si no existe ObamaCare, intentar con Dependent
+                try:
+                    dependent = Dependents.objects.get(policyNumber=policyNumber)
+                    obamacare = dependent.obamacare
+                except Dependents.DoesNotExist:
+                    rowWithError = pd.Series(row)
+                    rowWithError['Error Reason'] = 'No ObamaCare policy found for holder or dependent.'
+                    unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
+                    continue  # saltar a la siguiente fila
+
                 PaymentsCarriers.objects.create(
                     obamacare=obamacare,
                     carrier='Ambetter',
@@ -145,11 +163,6 @@ def getDetailReportAmbetter(request, dataFrame):
                     coverageMonth=datetime.now(),
                     is_active=True if eligibleForCommission == 'Yes' else False
                 )
-                
-            except ObamaCare.DoesNotExist:
-                rowWithError = pd.Series(row)
-                rowWithError['Error Reason'] = 'Obamacare not found'
-                unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
 
             except ObamaCare.MultipleObjectsReturned:
                 rowWithError = pd.Series(row)
@@ -175,8 +188,20 @@ def getDetailReportAmeriHealth(request, dataFrame):
         effectiveDate = row[request.POST.get('effectiveDate')]
 
         if parseDateMDY(effectiveDate) > date(2024, 12, 31):
+            # Intentar obtener ObamaCare
             try:
                 obamacare = ObamaCare.objects.get(policyNumber=str(policyNumber)[:-2])
+            except ObamaCare.DoesNotExist:
+                # Si no existe ObamaCare, intentar con Dependent
+                try:
+                    dependent = Dependents.objects.get(policyNumber=str(policyNumber)[:-2])
+                    obamacare = dependent.obamacare
+                except Dependents.DoesNotExist:
+                    rowWithError = pd.Series(row)
+                    rowWithError['Error Reason'] = 'No ObamaCare policy found for holder or dependent.'
+                    unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
+                    continue  # saltar a la siguiente fila
+
                 PaymentsCarriers.objects.create(
                     obamacare=obamacare,
                     carrier='AmeriHealth',
@@ -184,11 +209,6 @@ def getDetailReportAmeriHealth(request, dataFrame):
                     coverageMonth=datetime.now(),
                     is_active=True if policyStatus == 'Active' else False
                 )
-
-            except ObamaCare.DoesNotExist:
-                rowWithError = pd.Series(row)
-                rowWithError['Error Reason'] = 'Obamacare not found'
-                unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
 
             except ObamaCare.MultipleObjectsReturned:
                 rowWithError = pd.Series(row)
@@ -214,7 +234,20 @@ def getDetailReportAnthem(request, dataFrame):
         effectiveDate = row[request.POST.get('effectiveDate')]
 
         if effectiveDate.date() > date(2024, 12, 31):
+            # Intentar obtener ObamaCare
             try:
+                obamacare = ObamaCare.objects.get(policyNumber=policyNumber)
+            except ObamaCare.DoesNotExist:
+                # Si no existe ObamaCare, intentar con Dependent
+                try:
+                    dependent = Dependents.objects.get(policyNumber=policyNumber)
+                    obamacare = dependent.obamacare
+                except Dependents.DoesNotExist:
+                    rowWithError = pd.Series(row)
+                    rowWithError['Error Reason'] = 'No ObamaCare policy found for holder or dependent.'
+                    unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
+                    continue  # saltar a la siguiente fila
+                
                 obamacare = ObamaCare.objects.get(policyNumber=policyNumber)
                 PaymentsCarriers.objects.create(
                     obamacare=obamacare,
@@ -223,11 +256,6 @@ def getDetailReportAnthem(request, dataFrame):
                     coverageMonth=datetime.now(),
                     is_active=True if policyStatus == 'Active' else False
                 )
-
-            except ObamaCare.DoesNotExist:
-                rowWithError = pd.Series(row)
-                rowWithError['Error Reason'] = 'Obamacare not found'
-                unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
 
             except ObamaCare.MultipleObjectsReturned:
                 rowWithError = pd.Series(row)
@@ -253,8 +281,20 @@ def getDetailReportBluecross(request, dataFrame):
         effectiveDate = row[request.POST.get('effectiveDate')]
 
         if parseDateMDY(effectiveDate) > date(2024, 12, 31):
+            # Intentar obtener ObamaCare
             try:
                 obamacare = ObamaCare.objects.get(policyNumber=policyNumber)
+            except ObamaCare.DoesNotExist:
+                # Si no existe ObamaCare, intentar con Dependent
+                try:
+                    dependent = Dependents.objects.get(policyNumber=policyNumber)
+                    obamacare = dependent.obamacare
+                except Dependents.DoesNotExist:
+                    rowWithError = pd.Series(row)
+                    rowWithError['Error Reason'] = 'No ObamaCare policy found for holder or dependent.'
+                    unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
+                    continue  # saltar a la siguiente fila
+
                 PaymentsCarriers.objects.create(
                     obamacare=obamacare,
                     carrier='Bluecross',
@@ -262,11 +302,6 @@ def getDetailReportBluecross(request, dataFrame):
                     coverageMonth=datetime.now(),
                     is_active=True if policyStatus == 'Active' else False
                 )
-
-            except ObamaCare.DoesNotExist:
-                rowWithError = pd.Series(row)
-                rowWithError['Error Reason'] = 'Obamacare not found'
-                unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
 
             except ObamaCare.MultipleObjectsReturned:
                 rowWithError = pd.Series(row)
@@ -292,8 +327,20 @@ def getDetailReportBluecrossArizona(request, dataFrame):
         policyStatus = request.POST.get('policyStatus')
 
         if parseDateMDY(effectiveDate) > date(2024, 12, 31):
+            # Intentar obtener ObamaCare
             try:
                 obamacare = ObamaCare.objects.get(policyNumber=f'000{policyNumber}')
+            except ObamaCare.DoesNotExist:
+                # Si no existe ObamaCare, intentar con Dependent
+                try:
+                    dependent = Dependents.objects.get(policyNumber=f'000{policyNumber}')
+                    obamacare = dependent.obamacare
+                except Dependents.DoesNotExist:
+                    rowWithError = pd.Series(row)
+                    rowWithError['Error Reason'] = 'No ObamaCare policy found for holder or dependent.'
+                    unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
+                    continue  # saltar a la siguiente fila
+                
                 PaymentsCarriers.objects.create(
                     obamacare=obamacare,
                     carrier='Bluecross',
@@ -301,11 +348,6 @@ def getDetailReportBluecrossArizona(request, dataFrame):
                     coverageMonth=datetime.now(),
                     is_active=True if policyStatus == 'Active' else False
                 )
-
-            except ObamaCare.DoesNotExist:
-                rowWithError = pd.Series(row)
-                rowWithError['Error Reason'] = 'Obamacare not found'
-                unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
 
             except ObamaCare.MultipleObjectsReturned:
                 rowWithError = pd.Series(row)
@@ -331,8 +373,20 @@ def getDetailReportCaresource(request, dataFrame):
         effectiveDate = row[request.POST.get('effectiveDate')]
 
         if parseDateMDY(effectiveDate) > date(2024, 12, 31):
+            # Intentar obtener ObamaCare
             try:
                 obamacare = ObamaCare.objects.get(policyNumber=policyNumber)
+            except ObamaCare.DoesNotExist:
+                # Si no existe ObamaCare, intentar con Dependent
+                try:
+                    dependent = Dependents.objects.get(policyNumber=policyNumber)
+                    obamacare = dependent.obamacare
+                except Dependents.DoesNotExist:
+                    rowWithError = pd.Series(row)
+                    rowWithError['Error Reason'] = 'No ObamaCare policy found for holder or dependent.'
+                    unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
+                    continue  # saltar a la siguiente fila
+                
                 PaymentsCarriers.objects.create(
                     obamacare=obamacare,
                     carrier='Caresource',
@@ -340,11 +394,6 @@ def getDetailReportCaresource(request, dataFrame):
                     coverageMonth=datetime.now(),
                     is_active=True if policyStatus == 'Active' else False
                 )
-
-            except ObamaCare.DoesNotExist:
-                rowWithError = pd.Series(row)
-                rowWithError['Error Reason'] = 'Obamacare not found'
-                unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
 
             except ObamaCare.MultipleObjectsReturned:
                 rowWithError = pd.Series(row)
@@ -370,8 +419,20 @@ def getDetailReportCigna(request, dataFrame):
         effectiveDate = row[request.POST.get('effectiveDate')]
 
         if parseDateMDY(effectiveDate) > date(2024, 12, 31):
+            # Intentar obtener ObamaCare
             try:
                 obamacare = ObamaCare.objects.get(policyNumber=policyNumber)
+            except ObamaCare.DoesNotExist:
+                # Si no existe ObamaCare, intentar con Dependent
+                try:
+                    dependent = Dependents.objects.get(policyNumber=policyNumber)
+                    obamacare = dependent.obamacare
+                except Dependents.DoesNotExist:
+                    rowWithError = pd.Series(row)
+                    rowWithError['Error Reason'] = 'No ObamaCare policy found for holder or dependent.'
+                    unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
+                    continue  # saltar a la siguiente fila
+                
                 PaymentsCarriers.objects.create(
                     obamacare=obamacare,
                     carrier='Cigna',
@@ -379,11 +440,6 @@ def getDetailReportCigna(request, dataFrame):
                     coverageMonth=datetime.now(),
                     is_active=True if policyStatus == 'Active' else False
                 )
-                
-            except ObamaCare.DoesNotExist:
-                rowWithError = pd.Series(row)
-                rowWithError['Error Reason'] = 'Obamacare not found'
-                unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
 
             except ObamaCare.MultipleObjectsReturned:
                 rowWithError = pd.Series(row)
@@ -419,8 +475,20 @@ def getDetailReportMedica(request, dataFrame):
 
         # Si es la fila más reciente, procesarla
         if policyNumber == latestRow['Member ID'] and parseDateMDY(effectiveDate) > date(2024, 12, 31):
+            # Intentar obtener ObamaCare
             try:
                 obamacare = ObamaCare.objects.get(policyNumber=policyNumber)
+            except ObamaCare.DoesNotExist:
+                # Si no existe ObamaCare, intentar con Dependent
+                try:
+                    dependent = Dependents.objects.get(policyNumber=policyNumber)
+                    obamacare = dependent.obamacare
+                except Dependents.DoesNotExist:
+                    rowWithError = pd.Series(row)
+                    rowWithError['Error Reason'] = 'No ObamaCare policy found for holder or dependent.'
+                    unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
+                    continue  # saltar a la siguiente fila
+                
                 PaymentsCarriers.objects.create(
                     obamacare=obamacare,
                     carrier='Medica',
@@ -428,11 +496,6 @@ def getDetailReportMedica(request, dataFrame):
                     coverageMonth=datetime.now(),
                     is_active=True if policyStatus == 'Active' else False
                 )
-                
-            except ObamaCare.DoesNotExist:
-                rowWithError = pd.Series(row)
-                rowWithError['Error Reason'] = 'Obamacare not found'
-                unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
 
             except ObamaCare.MultipleObjectsReturned:
                 rowWithError = pd.Series(row)
@@ -459,8 +522,20 @@ def getDetailReportMolina(request, dataFrame):
         effectiveDate = row[request.POST.get('effectiveDate')]
 
         if policyNumber == hixId and parseDateMDY(effectiveDate) > date(2024, 12, 31):
+            # Intentar obtener ObamaCare
             try:
                 obamacare = ObamaCare.objects.get(policyNumber=policyNumber)
+            except ObamaCare.DoesNotExist:
+                # Si no existe ObamaCare, intentar con Dependent
+                try:
+                    dependent = Dependents.objects.get(policyNumber=policyNumber)
+                    obamacare = dependent.obamacare
+                except Dependents.DoesNotExist:
+                    rowWithError = pd.Series(row)
+                    rowWithError['Error Reason'] = 'No ObamaCare policy found for holder or dependent.'
+                    unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
+                    continue  # saltar a la siguiente fila
+                
                 PaymentsCarriers.objects.create(
                     obamacare=obamacare,
                     carrier='Molina',
@@ -468,11 +543,6 @@ def getDetailReportMolina(request, dataFrame):
                     coverageMonth=datetime.now(),
                     is_active=True if policyStatus == 'Active' else False
                 )
-
-            except ObamaCare.DoesNotExist:
-                rowWithError = pd.Series(row)
-                rowWithError['Error Reason'] = 'Obamacare not found'
-                unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
 
             except ObamaCare.MultipleObjectsReturned:
                 rowWithError = pd.Series(row)
@@ -498,8 +568,20 @@ def getDetailReportOscar(request, dataFrame):
         effectiveDate = row[request.POST.get('effectiveDate')]
 
         if parseDateMDY(effectiveDate) > date(2024, 12, 31):
+            # Intentar obtener ObamaCare
             try:
                 obamacare = ObamaCare.objects.get(policyNumber=policyNumber)
+            except ObamaCare.DoesNotExist:
+                # Si no existe ObamaCare, intentar con Dependent
+                try:
+                    dependent = Dependents.objects.get(policyNumber=policyNumber)
+                    obamacare = dependent.obamacare
+                except Dependents.DoesNotExist:
+                    rowWithError = pd.Series(row)
+                    rowWithError['Error Reason'] = 'No ObamaCare policy found for holder or dependent.'
+                    unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
+                    continue  # saltar a la siguiente fila
+                
                 PaymentsCarriers.objects.create(
                     obamacare=obamacare,
                     carrier='Oscar',
@@ -507,11 +589,6 @@ def getDetailReportOscar(request, dataFrame):
                     coverageMonth=datetime.now(),
                     is_active=True if policyStatus == 'Active' else False
                 )
-                
-            except ObamaCare.DoesNotExist:
-                rowWithError = pd.Series(row)
-                rowWithError['Error Reason'] = 'Obamacare not found'
-                unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
 
             except ObamaCare.MultipleObjectsReturned:
                 rowWithError = pd.Series(row)
@@ -537,8 +614,20 @@ def getDetailReportUnited(request, dataFrame):
         effectiveDate = row[request.POST.get('effectiveDate')]
 
         if parseDateYMD(effectiveDate) > date(2024, 12, 31):
+            # Intentar obtener ObamaCare
             try:
                 obamacare = ObamaCare.objects.get(policyNumber__startswith=policyNumber)
+            except ObamaCare.DoesNotExist:
+                # Si no existe ObamaCare, intentar con Dependent
+                try:
+                    dependent = Dependents.objects.get(policyNumber__startswith=policyNumber)
+                    obamacare = dependent.obamacare
+                except Dependents.DoesNotExist:
+                    rowWithError = pd.Series(row)
+                    rowWithError['Error Reason'] = 'No ObamaCare policy found for holder or dependent.'
+                    unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
+                    continue  # saltar a la siguiente fila
+                
                 PaymentsCarriers.objects.create(
                     obamacare=obamacare,
                     carrier='United',
@@ -546,11 +635,6 @@ def getDetailReportUnited(request, dataFrame):
                     coverageMonth=datetime.now(),
                     is_active=True if policyStatus == 'Active' else False
                 )
-                    
-            except ObamaCare.DoesNotExist:
-                rowWithError = pd.Series(row)
-                rowWithError['Error Reason'] = 'Obamacare not found'
-                unmatchedRecords.loc[len(unmatchedRecords)] = rowWithError
 
             except ObamaCare.MultipleObjectsReturned:
                 rowWithError = pd.Series(row)
