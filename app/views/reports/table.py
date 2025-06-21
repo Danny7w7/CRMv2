@@ -1302,12 +1302,31 @@ def typification(request):
             'agents' : agent
         })
 
+@login_required(login_url='/login') 
+@company_ownership_required_sinURL
 def paymentsReports(request):
+    company_id = request.company_id  # Obtener company_id desde request
+    # Definir el filtro de compañía (será un diccionario vacío si es superusuario)
+    company_filter = {'company_id': company_id} if not request.user.is_superuser else {}
+
     currentYear = datetime.date.today().year
     months = [datetime.date(currentYear, m, 1) for m in range(1, 13)]
 
+    agentsUsaContex = USAgent.objects.all()
+    agentsColContex = Users.objects.filter(role__in=('S', 'A', 'C'), is_active=True, **company_filter).exclude(is_staff=True, is_superuser=True)
+
+    agentsUsa = request.POST.getlist('agentsUsa') if request.method == 'POST' else []
+    agentsCol = request.POST.getlist('agentsCol') if request.method == 'POST' else []
+
+    filters = {
+        'is_active': True,
+        **({'company_id': company_filter} if company_filter else {}),
+        **({'agent_usa__in': agentsUsa} if agentsUsa else {}),
+        **({'agent_id__in': agentsCol} if agentsCol else {})
+    }
+
     # Prefetch de datos
-    obamacareRecords = ObamaCare.objects.select_related('client').filter(is_active=True)
+    obamacareRecords = ObamaCare.objects.select_related('client').filter(**filters)
 
     allCarriers = PaymentsCarriers.objects.filter(
         coverageMonth__year=currentYear
@@ -1351,6 +1370,10 @@ def paymentsReports(request):
     return render(request, 'paymentsReports/paymentForMonthACA.html', {
         'reportData': dict(reportData),
         'months': [month_abbr[m.month] for m in months],
+        'agentsUsaContex': agentsUsaContex,
+        'agentsUsa':agentsUsa,
+        'agentsColContex':agentsColContex,
+        'agentsCol': list(map(int, agentsCol))
     })
 
 def paymentsReportsSupp(request):

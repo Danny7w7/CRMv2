@@ -22,39 +22,46 @@
 	<link rel="stylesheet" href="{% static 'assets/css/semi-dark.css' %}" />
 	<link rel="stylesheet" href="{% static 'assets/css/header-colors.css' %}" />
     <link rel="stylesheet" href="{% static 'assets/css/customerPerformance.css' %}" />
+	<!-- Choise Style CSS -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+	<link rel="stylesheet" href="{% static 'assets/css/choiseFromEdit.css' %}" />
+	<!-- Custom CSS -->
+	<link rel="stylesheet" href="{% static 'assets/css/paymentForMonth.css' %}" />
         
 {% endblock %}
 {% block page_content %}
 <h4 class="mb-0 text-uppercase">Payments Reports for Month ACA</h4>
 <hr/>
-<style>
-	.table-bordered {
-  width: 100%;
-  border-collapse: collapse;
-  border: 1px solid #dee2e6;
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-}
-
-.table-bordered th,
-.table-bordered td {
-  border: 1px solid #000000;
-  padding: 8px;
-  text-align: left;
-}
-
-.table-bordered thead {
-  background-color: #f8f9fa;
-}
-
-.table-bordered tbody tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-
-.table-bordered tbody tr:hover {
-  background-color: #e9ecef;
-}
-</style>
+<div class="card shadow-sm rounded-4">
+    <div class="card-body">
+        <form method="POST" class="row g-3 align-items-end d-flex justify-content-center">
+            {% csrf_token %}
+            <div class="col-md-6">
+                <label for="agentsUsa" class="form-label fw-semibold">Agents USA</label>
+                <select id="agentsUsa" multiple class="form-select choicesSelects" name="agentsUsa">
+                    {% for agent in agentsUsaContex %}
+                        <option {% if agent.name in agentsUsa %}selected{% endif %} value="{{ agent.name }}">{{ agent.name }}</option>
+                    {% endfor %}
+                </select>
+                <small class="text-muted">Hold Ctrl (Cmd on Mac) to select multiple agents</small>
+            </div>
+            <div class="col-md-6">
+                <label for="agentsCol" class="form-label fw-semibold">Agents COL</label>
+                <select id="agentsCol" multiple class="form-select choicesSelects" name="agentsCol">
+                    {% for agent in agentsColContex %}
+                        <option {% if agent.id in agentsCol %}selected{% endif %} value="{{ agent.id }}">{{ agent.first_name }} {{ agent.last_name }}</option>
+                    {% endfor %}
+                </select>
+                <small class="text-muted">Hold Ctrl (Cmd on Mac) to select multiple agents</small>
+            </div>
+			<div class="col-md-4">
+				<button type="submit" class="btn btn-lg btn-outline-primary w-100 shadow-sm">
+					<i class="bi bi-funnel"></i> Submit
+				</button>
+			</div>
+        </form>
+    </div>
+</div>
 <div class="card">
 	<div class="card-body">
 		<div class="table-responsive" >
@@ -76,30 +83,30 @@
 				</thead>
 				<tbody class="table-group-divider">
 				{% for clientName, monthData in reportData.items %}
-					<tr class="table-primary">
-					<td>{{ clientName }}</td>
-					{% for month in months %}
-						{% with status=monthData|dict_get:month %}
-						<td class="text-center">
-							{% if status.carrier %}✅
-							{% elif status.carrier == False %}❌
-							{% else %}❔
-							{% endif %}
-						</td>
-						<td class="text-center">
-							{% if status.oneil > 0 %}✅
-							{% elif status.oneil < 0 %}➖
-							{% else %}❔
-							{% endif %}
-						</td>
-						<td class="text-center">
-							{% if status.sherpa %}✅
-							{% elif status.sherpa == False %}❌
-							{% else %}❔
-							{% endif %}
-						</td>
-						{% endwith %}
-					{% endfor %}
+					<tr>
+						<td>{{ clientName }}</td>
+						{% for month in months %}
+							{% with status=monthData|dict_get:month %}
+							<td class="text-center">
+								{% if status.carrier %}✅
+								{% elif status.carrier == False %}❌
+								{% else %}❔
+								{% endif %}
+							</td>
+							<td class="text-center">
+								{% if status.oneil > 0 %}✅
+								{% elif status.oneil < 0 %}➖
+								{% else %}❔
+								{% endif %}
+							</td>
+							<td class="text-center">
+								{% if status.sherpa %}✅
+								{% elif status.sherpa == False %}❌
+								{% else %}❔
+								{% endif %}
+							</td>
+							{% endwith %}
+						{% endfor %}
 					</tr>
 				{% endfor %}
 				</tbody>
@@ -127,5 +134,22 @@
 
 	<!--app JS-->
 	<script src="{% static 'assets/js/app.js' %}"></script>
+
+	<!-- Incluir JS de Choices.js -->
+	<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+	<script>
+		// ⚡ Inicializar Choices.js para los select
+		const selectElements = document.getElementsByClassName('choicesSelects');
+		selectElements.forEach(select => {
+			new Choices(select, {
+				removeItemButton: true,
+				searchEnabled: true,
+				placeholderValue: 'Seleccione una opción...',
+				itemSelectText: '',
+			});
+			
+		});
+	</script>
 
 {% endblock %}

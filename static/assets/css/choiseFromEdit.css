@@ -1,7 +1,7 @@
 
 /* Estilo general del select */
 .choices__inner {
-    background-color: #222; /* Fondo oscuro */
+    background-color: var(--primary-color); /* Fondo oscuro */
     color: #ddd; /* Texto en gris claro */
     font-family: 'Arial', sans-serif; /* Fuente moderna */
     border: 1px solid #444; /* Borde sutil */
