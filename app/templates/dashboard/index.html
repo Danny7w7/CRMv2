@@ -88,7 +88,7 @@
 					</ul>
 				</li>
 				
-				{% if request.user|has_module:"OBAMACARE" or request.user|has_module:"SUPP" or request.user|has_module:"ASSURE" or request.user|has_module:"LIFE INSURANCE" or  request.user|has_module:"MEDICARE" %}
+				{% if request.user|has_module:"OBAMACARE" or request.user|has_module:"SUPP" or request.user|has_module:"ASSURE" or request.user|has_module:"LIFE INSURANCE" or  request.user|has_module:"MEDICARE" or  request.user|has_module:"FINALL EXPENSES" %}
 					<li class="menu-label">enter data</li>
 					<li>
 						<a href="javascript:;" class="has-arrow">
@@ -108,6 +108,9 @@
 							{% if request.user|has_module:"MEDICARE" %}
 								<li> <a href="{% url 'formCreateClientMedicare' %}"><i class='bx bx-radio-circle'></i>New Client Medicare</a> </li>
 							{% endif %}
+							{% if request.user|has_module:"FINALL EXPENSES" %}
+								<li> <a href="{% url 'formCreateFinalExpenses' %}"><i class='bx bx-radio-circle'></i>New Client Finall Expenses</a> </li>
+							{% endif %}
 							{% if request.user|has_module:"OBAMACARE" or request.user|has_module:"SUPP" %}
 								<li> <a href="{% url 'select_client'  %}"><i class='bx bx-radio-circle'></i>Existing Client</a> </li>
 							{% endif %}
@@ -121,7 +124,7 @@
 					</li>
 				{% endif %}
 
-				{% if request.user|has_module:"OBAMACARE" or request.user|has_module:"SUPP" or request.user|has_module:"ASSURE" or request.user|has_module:"LIFE INSURANCE" or  request.user|has_module:"MEDICARE" %}
+				{% if request.user|has_module:"OBAMACARE" or request.user|has_module:"SUPP" or request.user|has_module:"ASSURE" or request.user|has_module:"LIFE INSURANCE" or  request.user|has_module:"MEDICARE" or  request.user|has_module:"FINALL EXPENSES" %}
 					<li class="menu-label">Tables</li>
 					<li>
 						<a class="has-arrow" href="javascript:;">
@@ -147,10 +150,13 @@
 							{% if request.user|has_module:"MEDICARE" %}
 								<li> <a href="{% url 'clientMedicare' %}"><i class='bx bx-radio-circle'></i>Clients Medicare</a> </li>
 							{% endif %}
-							{% if request.user|has_module:"OBAMACARE" or request.user|has_module:"SUPP" or request.user|has_module:"ASSURE" or request.user|has_module:"LIFE INSURANCE" or  request.user|has_module:"MEDICARE" %}
+							{% if request.user|has_module:"FINALL EXPENSES" %}
+								<li> <a href="{% url 'clientFinallExpenses' %}"><i class='bx bx-radio-circle'></i>Clients Finall Expenses</a> </li>
+							{% endif %}
+							{% if request.user|has_module:"OBAMACARE" or request.user|has_module:"SUPP" or request.user|has_module:"ASSURE" or request.user|has_module:"LIFE INSURANCE" or  request.user|has_module:"MEDICARE" or  request.user|has_module:"FINALL EXPENSES" %}
 								<li> <a href="{% url 'alert' %}"><i class='bx bx-radio-circle'></i>Alert</a> </li>
 							{% endif %}
-							{% if request.user|has_module:"OBAMACARE" or request.user|has_module:"SUPP" or request.user|has_module:"ASSURE" or request.user|has_module:"LIFE INSURANCE" or  request.user|has_module:"MEDICARE" %}
+							{% if request.user|has_module:"OBAMACARE" or request.user|has_module:"SUPP" or request.user|has_module:"ASSURE" or request.user|has_module:"LIFE INSURANCE" or  request.user|has_module:"MEDICARE" or  request.user|has_module:"FINALL EXPENSES" %}
 								<li> <a href="{% url 'ticketAsing' %}"><i class='bx bx-radio-circle'></i>Ticket </a> </li>
 							{% endif %}
 						</ul>

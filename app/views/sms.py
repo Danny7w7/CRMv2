@@ -7,9 +7,12 @@ import logging
 import pandas as pd
 import io
 import os
+import boto3
+import threading
 
 # Third-party libraries
 from weasyprint import HTML
+from io import BytesIO
 
 # Django utilities
 from django.conf import settings
@@ -856,14 +859,13 @@ def smstemplate(request):
     obama = ObamaCare.objects.select_related('company').filter(client = idClient).first()
     client = Clients.objects.filter(id = idClient).first()
 
-    if validation != 6:
-        print(sms)
-        print('NO BEVI ENTRAR')
-        from_number = request.user.assigned_phone
-        template = ContentTemplate.objects.filter(id = sms).first()
+    #tomo el nombre de agente, me sirve tambien para escoger el template
+    lines = obama.agent_usa.split("\n")
+    agentFirstName = lines[0].split()[0] 
 
-        lines = obama.agent_usa.split("\n")
-        agentFirstName = lines[0].split()[0] 
+    template = ContentTemplate.objects.filter(id = sms).first()
+
+    if validation != 6:
 
         context = {
             "name_client": client.first_name,
@@ -876,95 +878,100 @@ def smstemplate(request):
         # Verificamos si ocurrió un error al renderizar
         if not messageContent.startswith("Error:"):       
 
-            # telnyx.api_key = settings.TELNYX_API_KEY
-            # telnyx.Message.create(
-            #     from_=f"+{from_number}", # Your Telnyx number
-            #     to=f'+{client.phone_number}',
-            #     text= messageContent
-            # )
+            telnyx.api_key = settings.TELNYX_API_KEY
+            telnyx.Message.create(
+                from_='+17869848427', # Your Telnyx number
+                to=f'+{client.phone_number}',
+                text= messageContent
+            )
 
-            # SmsTemplate.objects.create(
-            #     contentTemplate = template,
-            #     agent = request.user,
-            #     obamacare = obama
-            #)
+        validationSms = True
 
-            if obama.company.id not in [1,2]: #No descuenta el saldo a Lapeira
-                discountRemainingBalance(obama.company, '0.035')
     else:
-        print('LO ESTAMOS HACIENDO SUPER BIEN')
-        sendTemplate(request,client.phone_number)
+
+        validationSms = True
+
+        sendTemplate(request, client.phone_number, agentFirstName)
+    
+    if validationSms:
+
+        SmsTemplate.objects.create(
+            contentTemplate = template,
+            agent = request.user,
+            obamacare = obama
+        )
+
+        if obama.company.id not in [1,2]: #No descuenta el saldo a Lapeira
+            discountRemainingBalance(obama.company, '0.035')
+
 
     return redirect('editObama', obamacare_id=obama.id, way=way)
 
 #Funcion para enviar template de bienvenida por sms
-def sendTemplate(request,to_number):
+def sendTemplate(request, to_number, nameTemplate):
     imagen_url = None
-    company = request.user.company
-
-    print("Método:", request.method)
-    print("Archivos enviados:", request.FILES)
-    print("¿filepond existe?:", 'filepond' in request.FILES)
-
 
     if request.method == 'POST' and request.FILES.get('filepond'):
-        
-        imagen_usuario = request.FILES['filepond']
+        imagen_usuario_file = request.FILES['filepond']
 
-        print('AQUI ANDAMOS')
+        # Leer la imagen del usuario directamente desde memoria
+        imagen_usuario = Image.open(imagen_usuario_file).convert("RGBA")
 
-        # 1. Guardar temporalmente la imagen del usuario
-        fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'temp'))
-        nombre_archivo = fs.save(imagen_usuario.name, imagen_usuario)
-        path_imagen_usuario = fs.path(nombre_archivo)
-
-        # 2. Cargar imagen base
-        imagen_base_path = os.path.join(
-            settings.BASE_DIR, 'static', 'assets', 'images', 'template-images', 'luisLapeira.jpg'
-        )
+        # Cargar imagen base
+        imagen_base_path = os.path.join(settings.BASE_DIR, 'static', 'assets', 'images', 'template-images', f'{nameTemplate}.jpg')
         base = Image.open(imagen_base_path).convert("RGBA")
 
-        # 3. Redimensionar y pegar imagen del usuario
-        imagen = Image.open(path_imagen_usuario).convert("RGBA")
-        imagen = imagen.resize((2000, 1000))
-        base.paste(imagen, (80, 800), imagen)
+        # Redimensionar y pegar la imagen del usuario
+        imagen_usuario = imagen_usuario.resize((2000, 1000))
+        base.paste(imagen_usuario, (80, 800), imagen_usuario)
 
-        # 4. Guardar imagen combinada en carpeta temp-template
-        timestamp = int(time.time())
-        filename = f'combinado_{timestamp}.png'
-        resultado_path = os.path.join(
-            settings.BASE_DIR, 'static', 'assets', 'images', 'temp-template', filename
+        # Guardar imagen combinada en memoria
+        output = BytesIO()
+        base.save(output, format='PNG')
+        output.seek(0)
+
+        # Subir imagen combinada a S3
+        s3 = boto3.client(
+            's3',
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            region_name=settings.AWS_S3_REGION_NAME
         )
-        base.save(resultado_path)
 
-        # 5. Generar URL pública de la imagen
-        imagen_url = request.build_absolute_uri(f'/static/assets/images/temp-template/{filename}')
+        bucket = settings.AWS_STORAGE_BUCKET_NAME
+        timestamp = int(time.time())
+        filename = f'temp-template/combinado_{timestamp}.png'
 
-        # 6. Enviar SMS usando SDK oficial de Telnyx
-        telnyx.api_key = settings.TELNYX_API_KEY  # ✅ Debes definirlo en settings.py
-        messageContent = '¡Bienvenido a TruInsurance! Aquí está tu información personalizada.'
+        s3.upload_fileobj(output, bucket, filename, ExtraArgs={'ContentType': 'image/png'})
 
-        print("URL de imagen que se enviará:", imagen_url)
-        
+        # Generar URL prefirmada válida por 3 minutos
+        imagen_url = s3.generate_presigned_url(
+            'get_object',
+            Params={'Bucket': bucket, 'Key': filename},
+            ExpiresIn=180
+        )
+
+        # Enviar SMS con Telnyx
+        telnyx.api_key = settings.TELNYX_API_KEY
+        nameComapny = getCompanyPerAgent(nameTemplate)
+        messageContent = f'¡Bienvenido a {nameComapny}! Aquí está tu información personalizada.'
 
         telnyx.Message.create(
             from_='+17869848427',
-            to='+17863034781',
+            to=f'+{to_number}',
             text=messageContent,
             media_urls=[imagen_url]
         )
 
-        # 7. Programar eliminación de la imagen en 2 minutos
-        def eliminarImagen(path):
-            if os.path.exists(path):
-                os.remove(path)
+        # Borrar la imagen del bucket después de 3 minutos
+        def eliminarImagenS3():
+            try:
+                s3.delete_object(Bucket=bucket, Key=filename)
+                print(f"Imagen en S3 eliminada: {filename}")
+            except Exception as e:
+                print(f"Error al eliminar imagen en S3: {e}")
 
-        Timer(240.0, eliminarImagen, args=[resultado_path]).start()
-
-        if company.id not in [1,2]: #No descuenta el saldo a Lapeira
-            discountRemainingBalance(company, '0.035')
-
-    return True
+        threading.Timer(180.0, eliminarImagenS3).start()
 
 
 

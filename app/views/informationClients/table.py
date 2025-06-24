@@ -227,4 +227,25 @@ def clientLifeInsurance(request):
 
     return render(request, 'informationClient/clientLifeInsurance.html', {'life':life})
 
+@login_required(login_url='/login')   
+@company_ownership_required_sinURL 
+def clientFinallExpenses(request):
+        
+    roleAuditar = ['S', 'C',  'AU','SUPP']
+    company_id = request.company_id
+    
+    if request.user.is_superuser:
+        finalE = FinallExpenses.objects.select_related('agent','company').all()
+    elif request.user.role in roleAuditar:
+        finalE = FinallExpenses.objects.select_related('agent').filter(
+            company = company_id, is_active = True)
+    elif request.user.role == 'Admin':
+        finalE = FinallExpenses.objects.visible_for_user(request.user).select_related('agent').order_by('-created_at')
+    elif request.user.role == 'A':
+        finalE = FinallExpenses.objects.select_related('agent').filter(
+            agent = request.user.id, company = company_id, is_active = True)
+
+    return render(request, 'informationClient/clientFinallExpenses.html', {'finalE':finalE})
+
+
 

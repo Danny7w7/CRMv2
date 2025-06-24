@@ -19,10 +19,12 @@ from django.shortcuts import get_object_or_404, redirect, render
 # Application-specific imports
 from app.models import *
 from app.modelsSMS import *
+from app.views.enterData.forms import countDigits
 from ...forms import *
 from ..sms import get_last_message_for_chats
 from ..decoratorsCompany import *
 from ..consents import getCompanyPerAgent
+  
 
 @login_required(login_url='/login') 
 def formEditClient(request, client_id):
@@ -213,7 +215,7 @@ def editClient(request,client_id):
     return client
 
 @login_required(login_url='/login')
-@company_ownership_required(model_name="obamaCare", id_field="obamacare_id")
+@company_ownership_required(model_name="ObamaCare", id_field="obamacare_id")
 def editObama(request ,obamacare_id, way):
 
     company_id = request.user.company.id
@@ -670,7 +672,7 @@ def usernameCarrier(request, obamacare):
             )
 
 @login_required(login_url='/login')
-@company_ownership_required(model_name="supp", id_field="supp_id")
+@company_ownership_required(model_name="Supp", id_field="supp_id")
 def editSupp(request, supp_id):
 
     company_id = request.user.company.id
@@ -1290,7 +1292,7 @@ def clean_fields_to_null(request, field_names):
     return cleaned_data
 
 @login_required(login_url='/login')
-@company_ownership_required(model_name="agentTicketAssignment", id_field="ticket_id")
+@company_ownership_required(model_name="AgentTicketAssignment", id_field="ticket_id")
 def editTicket(request, ticket_id):
 
     ticket = AgentTicketAssignment.objects.select_related('obamacare', 'supp', 'agent_create', 'agent_customer').filter(id = ticket_id).first()
@@ -1311,3 +1313,64 @@ def editTicket(request, ticket_id):
 
     return render(request, 'edit/editTicket.html', {'ticket':ticket})
 
+@login_required(login_url='/login')
+@company_ownership_required(model_name="FinallExpenses", id_field="finallExpenses_id")
+def editFinallExpenses(request, finallExpenses_id):
+
+    finalExpenses = FinallExpenses.objects.select_related('agent').filter(id = finallExpenses_id).first()
+
+    if request.method == 'POST':
+
+        #formateo de fecha para guardalar como se debe en BD ya que la obtengo USA
+        date_birth = request.POST.get('date_birth')  # Formato MM/DD/YYYY
+        date_birth_new = datetime.datetime.strptime(date_birth, '%m/%d/%Y').date()
+
+        phoneNumber = request.POST.get('phone_number')
+        amount = countDigits(phoneNumber)
+        if amount == 10:
+            newNumber = int(f'1{phoneNumber}')
+        else:
+            newNumber = phoneNumber
+
+        # Campos de ObamaCare
+        finallExpenses_fields = [
+            'first_name', 'last_name', 'gender', 'relationship', 'current_city', 'current_state', 'hospitalized_currently','height_ft','weight_lbs',
+            'hospitalized_10_years', 'hospitalized_5_years', 'hospitalized_3_years', 'hospitalized_6_months', 'cancer_stroke_history',
+            'cancer_free_2_years', 'cancer_free_5_years', 'cancer_free_10_years','tobacco_use','tobacco_bp_10_years','tobacco_5_years','tobacco_12_months'
+        ]
+
+        # Limpiar los campos de ObamaCare convirtiendo los vacíos en None
+        cleaned_finallExpenses_data = clean_fields_to_null(request, finallExpenses_fields)
+
+        # Actualizar ObamaCare
+        FinallExpenses.objects.filter(id=finallExpenses_id).update(
+            first_name=cleaned_finallExpenses_data['first_name'],
+            last_name=cleaned_finallExpenses_data['last_name'],
+            gender=cleaned_finallExpenses_data['gender'],
+            relationship=cleaned_finallExpenses_data['relationship'],
+            current_city=cleaned_finallExpenses_data['current_city'],
+            current_state=cleaned_finallExpenses_data['current_state'],
+            hospitalized_currently=cleaned_finallExpenses_data['hospitalized_currently'],
+            hospitalized_10_years=cleaned_finallExpenses_data['hospitalized_10_years'],
+            hospitalized_5_years=cleaned_finallExpenses_data['hospitalized_5_years'],
+            hospitalized_3_years=cleaned_finallExpenses_data['hospitalized_3_years'],
+            hospitalized_6_months=cleaned_finallExpenses_data['hospitalized_6_months'],
+            cancer_stroke_history=cleaned_finallExpenses_data['cancer_stroke_history'],
+            cancer_free_2_years=cleaned_finallExpenses_data['cancer_free_2_years'],
+            cancer_free_5_years=cleaned_finallExpenses_data['cancer_free_5_years'],
+            cancer_free_10_years=cleaned_finallExpenses_data['cancer_free_10_years'],
+            tobacco_use=cleaned_finallExpenses_data['tobacco_use'],
+            tobacco_bp_10_years=cleaned_finallExpenses_data['tobacco_bp_10_years'],
+            tobacco_5_years=cleaned_finallExpenses_data['tobacco_5_years'],
+            tobacco_12_months=cleaned_finallExpenses_data['tobacco_12_months'],
+            height_ft=cleaned_finallExpenses_data['height_ft'],
+            weight_lbs=cleaned_finallExpenses_data['weight_lbs'],
+            date_birth=date_birth_new,
+            phone_number=newNumber
+        )
+
+        return redirect('clientFinallExpenses')            
+
+
+    return render(request, 'edit/editFinallExpenses.html', {'finalExpenses':finalExpenses})
+    

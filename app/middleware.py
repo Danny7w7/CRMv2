@@ -19,23 +19,24 @@ class NoCacheMiddleware:
 #modulo para manejar el CRM por modulos, osea validar si esta asignado a algun modulo y sino no mostar parte visual
 
 MODULE_PATHS = {
-    'OBAMACARE': [ 'toggleDarkMode', 'formCreateClient', 'formEditClient', 'formCreatePlan','clientAccionRequired','clientObamacare','editObama','viewConsent','viewIncomeLetter','alert','ticketAsing','editTicket','editAlert','select_client','formAddObama','formAddDepend','formCreateAlert','validatePhone','fetchAca','fetchDependent','formCreatePlan','formCreatePlan','updateTypeSales','formAddObama','formAddSupp','formAddDepend','addDepend','validateKey','blockSocialSecurity','agentTicketAssignment','fetchActionRequired','saveCustomerObservationACA','saveDocumentClient','saveAppointment','saveAccionRequired','fetchPaymentsMonth','fetchActionRequired','fetchPaymentOneil','fetchPaymentCarrier','fetchPaymentSherpa','validarCita','paymentDateObama','preComplaint','ILFFM'],
-    'SUPP': [ 'toggleDarkMode', 'formCreateClient', 'formEditClient','formCreatePlan','clientSupp','editSupp','alert','ticketAsing','editTicket','editAlert','select_client','formAddSupp','formAddDepend','formCreateAlert','validatePhone','fetchSupp','fetchDependent','formCreatePlan','formCreatePlan','updateTypeSales','formAddObama','formAddSupp','formAddDepend','addDepend','validateKey','agentTicketAssignment','toggleSuppStatus','saveCustomerObservationSupp','fetchPaymentSuplementals','paymentDateSupp'],
-    'ASSURE': [ 'toggleDarkMode', 'formCreateAssure','formCreatePlanAssure','clientAssure','editAssure','alert','ticketAsing','editTicket','editAlert','selectClientAssure','formCreatePlanAssure','formCreateAlert','validatePhone','blockSocialSecurityAssure','agentTicketAssignment'],
-    'LIFE INSURANCE': [ 'toggleDarkMode', 'formCreateClientLife','clientLifeInsurance','editLife','alert','ticketAsing','editTicket','editAlert','formCreateAlert','ConsentLifeInsurance','validatePhone','blockSocialSecurityLife','agentTicketAssignment'],
-    'MEDICARE': [ 'toggleDarkMode', 'formCreateClientMedicare','editClientMedicare','alert','ticketAsing','editTicket','editAlert','formCreateAlert','clientMedicare','consetMedicare','validatePhone','blockSocialSecurityMedicare'],
-    'SMS': [ 'toggleDarkMode', 'smsBlue','chatSms','sendCreateSecretKey','sendSecretKey','deleteContact','sendMessage','startChat','stripe-webhook','payment','readAllMessages','smstemplate'],
-    'WHATSAPP': [ 'toggleDarkMode', 'whatsappBlue','chatWatsapp','whatsappReply','sendWhatsapp','sendWhatsappConversation','deleteContactWhatsApp','template'],
-    'SALE REPORTS': [ 'toggleDarkMode', 'sale', 'sale6Week','detalleAgente','weekSalesWiew','downloadPdf','reports','downloadAccionRequired','paymentClients'],
-    'CUSTOMER REPORTS': [ 'toggleDarkMode', 'customerPerformance', 'typification','customerTypification','toggleTypification','get_observation_detail'],
-    'GRAPHICAL REPORTS': [ 'toggleDarkMode', 'averageCustomer', 'salesPerformance','chart6Week'],
-    'QUALITY': [ 'toggleDarkMode', 'formCreateControl', 'control','createQuality'],
-    'BD': [ 'toggleDarkMode', 'uploadExcel', 'manageAgentAssignments','reportBd','bd','processAndSave','saveData'],
-    'COMPARATIVE': [ 'toggleDarkMode', 'uploadReports','processExcel','headerProcessor', 'paymentsReports', 'paymentsReportsSupp'],
-    'TEAM MANAGEMENT': [ 'toggleDarkMode', 'customerAssginments']
+    'OBAMACARE': [ 'formCreateClient', 'formEditClient', 'formCreatePlan','clientAccionRequired','clientObamacare','editObama','viewConsent','viewIncomeLetter','alert','ticketAsing','editTicket','editAlert','select_client','formAddObama','formAddDepend','formCreateAlert','validatePhone','fetchAca','fetchDependent','formCreatePlan','formCreatePlan','updateTypeSales','formAddObama','formAddSupp','formAddDepend','addDepend','validateKey','blockSocialSecurity','agentTicketAssignment','fetchActionRequired','saveCustomerObservationACA','saveDocumentClient','saveAppointment','saveAccionRequired','fetchPaymentsMonth','fetchActionRequired','fetchPaymentOneil','fetchPaymentCarrier','fetchPaymentSherpa','validarCita','paymentDateObama','preComplaint','ILFFM'],
+    'SUPP': [ 'formCreateClient', 'formEditClient','formCreatePlan','clientSupp','editSupp','alert','ticketAsing','editTicket','editAlert','select_client','formAddSupp','formAddDepend','formCreateAlert','validatePhone','fetchSupp','fetchDependent','formCreatePlan','formCreatePlan','updateTypeSales','formAddObama','formAddSupp','formAddDepend','addDepend','validateKey','agentTicketAssignment','toggleSuppStatus','saveCustomerObservationSupp','fetchPaymentSuplementals','paymentDateSupp'],
+    'ASSURE': [ 'formCreateAssure','formCreatePlanAssure','clientAssure','editAssure','alert','ticketAsing','editTicket','editAlert','selectClientAssure','formCreatePlanAssure','formCreateAlert','validatePhone','blockSocialSecurityAssure','agentTicketAssignment'],
+    'LIFE INSURANCE': [ 'formCreateClientLife','clientLifeInsurance','editLife','alert','ticketAsing','editTicket','editAlert','formCreateAlert','ConsentLifeInsurance','validatePhone','blockSocialSecurityLife','agentTicketAssignment'],
+    'MEDICARE': [ 'formCreateClientMedicare','editClientMedicare','alert','ticketAsing','editTicket','editAlert','formCreateAlert','clientMedicare','consetMedicare','validatePhone','blockSocialSecurityMedicare','agentTicketAssignment'],
+    'FINALL EXPENSES': [ 'formCreateFinalExpenses','clientFinallExpenses','alert','ticketAsing','editTicket','editAlert','formCreateAlert','agentTicketAssignment','editFinallExpenses','clientFinallExpenses','toggleFinallExpenses'],
+    'SMS': [ 'smsBlue','chatSms','sendCreateSecretKey','sendSecretKey','deleteContact','sendMessage','startChat','stripe-webhook','payment','readAllMessages','smstemplate','sendTemplate'],
+    'WHATSAPP': [ 'whatsappBlue','chatWatsapp','whatsappReply','sendWhatsapp','sendWhatsappConversation','deleteContactWhatsApp','template'],
+    'SALE REPORTS': [ 'sale', 'sale6Week','detalleAgente','weekSalesWiew','downloadPdf','reports','downloadAccionRequired','paymentClients'],
+    'CUSTOMER REPORTS': [ 'customerPerformance', 'typification','customerTypification','toggleTypification','get_observation_detail'],
+    'GRAPHICAL REPORTS': [ 'averageCustomer', 'salesPerformance','chart6Week'],
+    'QUALITY': [ 'formCreateControl', 'control','createQuality'],
+    'BD': [ 'uploadExcel', 'manageAgentAssignments','reportBd','bd','processAndSave','saveData'],
+    'COMPARATIVE': [ 'uploadReports','processExcel','headerProcessor'],
+    'TEAM MANAGEMENT': [  'customerAssginments']
 }
 
-EXCLUDED_VIEWS = ['index', 'motivationalPhrase','login','logout','viewConsent','consetMedicare','formCreateUser', 'adminSms','addNumbersUsers','incomeLetter','ConsentLifeInsurance','complaint', 'sms','whatsappReply','url_temporal']  # Puedes agregar más si lo necesitas
+EXCLUDED_VIEWS = ['index','toggleDarkMode' ,'motivationalPhrase','login','logout','viewConsent','consetMedicare','formCreateUser', 'adminSms','addNumbersUsers','incomeLetter','ConsentLifeInsurance','complaint', 'sms','whatsappReply','url_temporal']  # Puedes agregar más si lo necesitas
 
 class ModuleAccessMiddleware:
     def __init__(self, get_response):

@@ -1,0 +1,271 @@
+{% extends "dashboard/index.html" %}
+{% load static %}
+{% block head %}
+    <title>Edit Finall Expenses</title>
+	<!--plugins-->
+	<link href="{% static "assets/plugins/simplebar/css/simplebar.css" %}" rel="stylesheet" />
+	<link href="{% static "assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" %}" rel="stylesheet" />
+	<link href="{% static "assets/plugins/metismenu/css/metisMenu.min.css" %}" rel="stylesheet" />
+	<link href="{% static "assets/plugins/datatable/css/dataTables.bootstrap5.min.css" %}" rel="stylesheet" />
+	<!-- loader-->
+	<link href="{% static "assets/css/pace.min.css" %}" rel="stylesheet" />
+	<script src="{% static "assets/js/pace.min.js" %}"></script>
+	<!-- Bootstrap CSS -->
+	<link href="{% static "assets/css/bootstrap.min.css" %}" rel="stylesheet">
+	<link href="{% static "assets/css/bootstrap-extended.css" %}" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&amp;display=swap" rel="stylesheet">
+	<link href="{% static "assets/css/app.css" %}" rel="stylesheet">
+	<link href="{% static "assets/css/icons.css" %}" rel="stylesheet">
+	<!-- Theme Style CSS -->
+	<link rel="stylesheet" href="{% static "assets/css/dark-theme.css" %}" />
+	<link rel="stylesheet" href="{% static "assets/css/semi-dark.css" %}" />
+	<link rel="stylesheet" href="{% static "assets/css/header-colors.css" %}" />
+{% endblock %}
+{% block page_content %}
+<h6 class="mb-0 text-uppercase">Finall Expenses</h6>
+<hr/>
+<div class="row">
+    <div class="col-xl-10 mx-auto">
+        <div class="card">
+            <div class="card-body p-4">
+                <form class="row g-3 needs-validation" method="POST" >		
+					{% csrf_token %}	
+
+					<h4>Client</h4>				
+					<div class="col-12 col-lg-3">
+						<label for="first_name" class="form-label font-weight-bold">First Name</label>
+						<input type="text"  class="form-control" id="first_name" name="first_name" value="{{finalExpenses.first_name}}" required> 
+					</div>
+					<div class="col-12 col-lg-3">
+						<label for="last_name" class="form-label">Last Name</label>
+						<input type="text" class="form-control" id="last_name" name="last_name" value="{{finalExpenses.last_name}}" required >
+					</div>
+					<div class="col-12 col-lg-2">
+						<label for="phone_number" class="form-label">Phone Number</label>
+						<input type="number" class="form-control" name ="phone_number" id="phone_number" placeholder="Phone Number" value="{{finalExpenses.phone_number}}" required>
+					</div>
+					<div class="col-12 col-lg-2">
+						<label for="date_birth" class="form-label">Date of Birth</label>
+						<input type="text" class="form-control" id="date_birth" name="date_birth" required value="{{finalExpenses.date_birth|date:'m/d/Y'}}">
+					</div>
+					<div class="col-12 col-lg-2">	
+						<label for="gender" class="form-label font-weight-bold">Gender</label>
+						<select class="form-select"  name="gender" id="gender" required aria-label="Default select example">
+							<option value="M"  {% if finalExpenses.gender == "M" %}selected{% endif %} >MALE</option>
+							<option value="F"  {% if finalExpenses.gender == "F" %}selected{% endif %} >FEMALE</option>
+						</select>
+					</div>
+					<div class="col-12 col-lg-4">
+						<label for="relationship" class="form-label">What is the owner's relationship to the insured</label>
+						<select required class="form-select" id="relationship"  name="relationship" >						
+							<option {% if finalExpenses.relationship == "SELF" %}selected{% endif %} value="SELF" > SELF </option>
+							<option {% if finalExpenses.relationship == "AUNT" %}selected{% endif %} value="AUNT">AUNT </option>
+							<option {% if finalExpenses.relationship == "BROTHER" %}selected{% endif %} value="BROTHER">BROTHER </option>
+							<option {% if finalExpenses.relationship == "CHILD" %}selected{% endif %} value="CHILD">CHILD </option>
+							<option {% if finalExpenses.relationship == "COUSIN" %}selected{% endif %} value="COUSIN">COUSIN </option>
+							<option {% if finalExpenses.relationship == "FATHER" %}selected{% endif %} value="FATHER">FATHER </option>
+							<option {% if finalExpenses.relationship == "FIANCE" %}selected{% endif %} value="FIANCE">FIANCE </option>
+							<option {% if finalExpenses.relationship == "GRANDCHILD" %}selected{% endif %} value="GRANDC">GRANDCHILD </option>
+							<option {% if finalExpenses.relationship == "GRANDPARENT" %}selected{% endif %} value="GRANDP">GRANDPARENT </option>
+							<option {% if finalExpenses.relationship == "MOTHER" %}selected{% endif %} value="MOTHER">MOTHER </option>
+							<option {% if finalExpenses.relationship == "NEPHEW" %}selected{% endif %} value="NEPHEW">NEPHEW </option>
+							<option {% if finalExpenses.relationship == "NIECE" %}selected{% endif %} value="NIECE">NIECE </option>
+							<option {% if finalExpenses.relationship == "POWER OF ATTORNEY" %}selected{% endif %} value="POWER OF ATTORNEY">POWER OF ATTORNEY </option>
+							<option {% if finalExpenses.relationship == "SISTER" %}selected{% endif %} value="SISTER">SISTER </option>
+							<option {% if finalExpenses.relationship == "SPOUSE" %}selected{% endif %} value="SPOUSE">SPOUSE </option>
+							<option {% if finalExpenses.relationship == "UNCLE" %}selected{% endif %} value="UNCLE">UNCLE </option>     
+						</select>
+							
+					</div>								
+					<div class="col-12 col-lg-4">
+						<label for="current_city" class="form-label">What city is the owner currently in?</label>
+						<input required type="text" class="form-control" id="current_city" name="current_city" value="{{finalExpenses.current_city}}" >
+					</div>								
+					<div class="col-12 col-lg-4">
+						<label for="current_state" class="form-label">What state is the owner currently in?</label>
+						<select required class="form-select" id="current_state"  name="current_state">
+							<option {% if finalExpenses.current_state == "AL" %}selected{% endif %} value="AL">ALABAMA</option>
+							<option {% if finalExpenses.current_state == "AR" %}selected{% endif %} value="AR">ARKANSAS</option>
+							<option {% if finalExpenses.current_state == "CA" %}selected{% endif %} value="CA">CALIFORNIA</option>
+							<option {% if finalExpenses.current_state == "DC" %}selected{% endif %} value="DC">DISTRICT OF COLUMBIA</option>
+							<option {% if finalExpenses.current_state == "DE" %}selected{% endif %} value="DE">DELAWARE</option>
+							<option {% if finalExpenses.current_state == "FL" %}selected{% endif %} value="FL">FLORIDA</option>
+							<option {% if finalExpenses.current_state == "GA" %}selected{% endif %} value="GA">GEORGIA</option>
+							<option {% if finalExpenses.current_state == "ID" %}selected{% endif %} value="ID">IDAHO</option>
+							<option {% if finalExpenses.current_state == "IL" %}selected{% endif %} value="IL">ILLINOIS</option>
+							<option {% if finalExpenses.current_state == "IN" %}selected{% endif %} value="IN">INDIANA</option>
+							<option {% if finalExpenses.current_state == "KS" %}selected{% endif %} value="KS">KANSAS</option>
+							<option {% if finalExpenses.current_state == "KY" %}selected{% endif %} value="KY">KENTUCKY</option>
+							<option {% if finalExpenses.current_state == "LA" %}selected{% endif %} value="LA">LOUISIANA</option>
+							<option {% if finalExpenses.current_state == "MI" %}selected{% endif %} value="MI">MICHIGAN</option>
+							<option {% if finalExpenses.current_state == "MN" %}selected{% endif %} value="MN">MINNESOTA</option>
+							<option {% if finalExpenses.current_state == "MO" %}selected{% endif %} value="MO">MISSOURI</option>
+							<option {% if finalExpenses.current_state == "MS" %}selected{% endif %} value="MS">MISSISSIPPI</option>
+							<option {% if finalExpenses.current_state == "NC" %}selected{% endif %} value="NC">NORTH CAROLINA</option>
+							<option {% if finalExpenses.current_state == "ND" %}selected{% endif %} value="ND">NORTH DAKOTA</option>
+							<option {% if finalExpenses.current_state == "NE" %}selected{% endif %} value="NE">NEBRASKA</option>
+							<option {% if finalExpenses.current_state == "NM" %}selected{% endif %} value="NM">NEW MEXICO</option>
+							<option {% if finalExpenses.current_state == "NV" %}selected{% endif %} value="NV">NEVADA</option>
+							<option {% if finalExpenses.current_state == "OH" %}selected{% endif %} value="OH">OHIO</option>
+							<option {% if finalExpenses.current_state == "OK" %}selected{% endif %} value="OK">OKLAHOMA</option>
+							<option {% if finalExpenses.current_state == "PA" %}selected{% endif %} value="PA">PENNSYLVANIA</option>
+							<option {% if finalExpenses.current_state == "SC" %}selected{% endif %} value="SC">SOUTH CAROLINA</option>
+							<option {% if finalExpenses.current_state == "TN" %}selected{% endif %} value="TN">TENNESSEE</option>
+							<option {% if finalExpenses.current_state == "TX" %}selected{% endif %} value="TX">TEXAS</option>
+							<option {% if finalExpenses.current_state == "UT" %}selected{% endif %} value="UT">UTAH</option>
+							<option {% if finalExpenses.current_state == "VA" %}selected{% endif %} value="VA">VIRGINIA</option>
+							<option {% if finalExpenses.current_state == "WV" %}selected{% endif %} value="WV">WEST VIRGINIA</option>										                              
+						</select>
+					</div>
+
+					<hr>
+					<h4>Hospitalizations</h4>	
+
+					<div class="col-12 col-lg-6">
+						<label for="hospitalized_currently">Are you currently hospitalized or in a nursing facility?</label>
+						<select required id="hospitalized_currently" name="hospitalized_currently" class="form-control">
+							<option {% if finalExpenses.hospitalized_currently == 1 %}selected{% endif %} value=1 >YES</option>
+							<option {% if finalExpenses.hospitalized_currently == 0 %}selected{% endif %} value=0 >NO</option>
+						</select>
+					</div>
+					<div class="col-12 col-lg-6">
+						<label for="hospitalized_10_years">Have you been hospitalized two or more times in the past 10 years?</label>
+						<select required id="hospitalized_10_years" name="hospitalized_10_years" class="form-control">
+							<option {% if finalExpenses.hospitalized_10_years == 1 %}selected{% endif %} value=1 >YES</option>
+							<option {% if finalExpenses.hospitalized_10_years == 0 %}selected{% endif %} value=0  >NO</option>
+						</select>
+					</div>
+					<div class="col-12 col-lg-6">
+						<label for="hospitalized_5_years">Have you been hospitalized two or more times in the past 5 years?</label>
+						<select required id="hospitalized_5_years" name="hospitalized_5_years" class="form-control">
+							<option {% if finalExpenses.hospitalized_5_years == 1 %}selected{% endif %} value=1 >YES</option>
+							<option {% if finalExpenses.hospitalized_5_years == 0 %}selected{% endif %} value=0  >NO</option>
+						</select>
+					</div>
+					<div class="col-12 col-lg-6">
+						<label for="hospitalized_3_years">Have you been hospitalized two or more times in the past 3 years?</label>
+						<select required id="hospitalized_3_years" name="hospitalized_3_years" class="form-control">
+							<option {% if finalExpenses.hospitalized_3_years == 1 %}selected{% endif %} value=1 >YES</option>
+							<option {% if finalExpenses.hospitalized_3_years == 0 %}selected{% endif %} value=0  >NO</option>
+						</select>
+					</div>
+					<div class="col-12 col-lg-6">
+						<label for="hospitalized_6_months">Have you been hospitalized two or more times in the past 6 months?</label>
+						<select required id="hospitalized_6_months" name="hospitalized_6_months" class="form-control">
+							<option {% if finalExpenses.hospitalized_6_months == 1 %}selected{% endif %} value=1 >YES</option>
+							<option {% if finalExpenses.hospitalized_6_months == 0 %}selected{% endif %} value=0  >NO</option>
+						</select>
+					</div>		
+					
+					<hr>
+					<h4>Health</h4>	
+
+					<div class="col-12 col-lg-6">
+						<label for="cancer_stroke_history">Have you ever been diagnosed with cancer or have you had a stroke?  </label>
+						<select id="cancer_stroke_history" name="cancer_stroke_history" class="form-control" required>
+							<option {% if finalExpenses.cancer_stroke_history == 1 %}selected{% endif %} value=1 >YES</option>
+							<option {% if finalExpenses.cancer_stroke_history == 0 %}selected{% endif %} value=0  >NO</option>
+						</select>
+					</div>
+					<div class="col-12 col-lg-6">
+						<label for="cancer_free_2_years">In the past 2 years have you been cancer and stroke free?  </label>
+						<select id="cancer_free_2_years" name="cancer_free_2_years" class="form-control" required>
+							<option {% if finalExpenses.cancer_free_2_years == 1 %}selected{% endif %} value=1 >YES</option>
+							<option {% if finalExpenses.cancer_free_2_years == 0 %}selected{% endif %} value=0 >NO</option>
+						</select>
+					</div>
+					<div class="col-12 col-lg-6">
+						<label for="cancer_free_5_years">In the past 5 years have you been cancer and stroke free?  </label>
+						<select id="cancer_free_5_years" name="cancer_free_5_years" class="form-control" required>
+							<option {% if finalExpenses.cancer_free_5_years == 1 %}selected{% endif %} value=1 >YES</option>
+							<option {% if finalExpenses.cancer_free_5_years == 0 %}selected{% endif %} value=0 >NO</option>
+						</select>
+					</div>
+					<div class="col-12 col-lg-6">
+						<label for="cancer_free_10_years">In the past 10 years have you been cancer and stroke free?  </label>
+						<select id="cancer_free_10_years" name="cancer_free_10_years" class="form-control" required>
+							<option {% if finalExpenses.cancer_free_10_years == 1 %}selected{% endif %} value=1 >YES</option>
+							<option {% if finalExpenses.cancer_free_10_years == 0 %}selected{% endif %} value=0 >NO</option>
+						</select>
+					</div>
+
+					<hr>
+					<h4>Tabacco and Nicotine</h4>	
+
+					<div class="col-12 col-lg-6">
+						<label for="tobacco_use">Do you use any form of Tobacco or Nicotine?  </label>
+						<select id="tobacco_use" name="tobacco_use" class="form-control" required>
+							<option {% if finalExpenses.tobacco_use == 1 %}selected{% endif %} value=1 >YES</option>
+							<option {% if finalExpenses.tobacco_use == 0 %}selected{% endif %} value=0 >NO</option>
+						</select>
+					</div>
+					<div class="col-12 col-lg-6">
+						<label for="tobacco_bp_10_years">In the past 10 years, have you used any form of tobacco or nicotine products or had a blood pressure reading over 135/85?  </label>
+						<select id="tobacco_bp_10_years" name="tobacco_bp_10_years" class="form-control" required>
+							<option {% if finalExpenses.tobacco_bp_10_years == 1 %}selected{% endif %} value=1 >YES</option>
+							<option {% if finalExpenses.tobacco_bp_10_years == 0 %}selected{% endif %} value=0 >NO</option>
+						</select>
+					</div>
+					<div class="col-12 col-lg-6">
+						<label for="tobacco_5_years">In the past 5 years, have you used any form of tobacco or nicotine products?  </label>
+						<select id="tobacco_5_years" name="tobacco_5_years" class="form-control" required>
+							<option {% if finalExpenses.tobacco_5_years == 1 %}selected{% endif %} value=1 >YES</option>
+							<option {% if finalExpenses.tobacco_5_years == 0 %}selected{% endif %} value=0 >NO</option>
+						</select>
+					</div>
+					<div class="col-12 col-lg-6">
+						<label for="tobacco_12_months">In the past 12 months, have you used any form of tobacco or nicotine products?  </label>
+						<select id="tobacco_12_months" name="tobacco_12_months" class="form-control" required>
+							<option {% if finalExpenses.tobacco_12_months == 1 %}selected{% endif %} value=1 >YES</option>
+							<option {% if finalExpenses.tobacco_12_months == 0 %}selected{% endif %} value=0 >NO</option>
+						</select>
+					</div>	
+					
+					<hr>
+					<h4>Heigth and Weight</h4>	
+
+
+					<div class="col-12 col-lg-6">
+						<label for="height_ft">Height (Ft.) </label>
+						<input type="text" name="height_ft" class="form-control" value="{{finalExpenses.height_ft}}" required>
+					</div>
+					<div class="col-12 col-lg-6">
+						<label for="weight_lbs"> Weight (Lbs.) </label>
+						<input type="text" name="weight_lbs" class="form-control" value="{{finalExpenses.weight_lbs}}" required>
+					</div>
+					
+                    <div class="col-md-12">
+                        <div class="d-md-flex d-grid align-items-center gap-3">
+							<button type="submit" class="btn btn-primary px-4"  >Submit</button>
+							<a href="{% url 'clientFinallExpenses' %}" class="btn btn-light px-4">Back</a>
+                        </div>
+                    </div>
+                
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block end_js %}
+	<!-- Bootstrap JS -->
+	<script src="{% static "assets/js/bootstrap.bundle.min.js" %}"></script>
+	<!--plugins-->
+	<script src="{% static "assets/js/jquery.min.js" %}"></script>
+	<script src="{% static "assets/plugins/simplebar/js/simplebar.min.js" %}"></script>
+	<script src="{% static "assets/plugins/metismenu/js/metisMenu.min.js" %}"></script>
+	<script src="{% static "assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js" %}"></script>
+	<script src="{% static "assets/plugins/datatable/js/jquery.dataTables.min.js" %}"></script>
+	<script src="{% static "assets/plugins/datatable/js/dataTables.bootstrap5.min.js" %}"></script>
+
+	<!-- Agregar Flatpickr -->
+	<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+	<!--app JS-->
+	<script src="{% static "assets/js/app.js" %}"></script>
+	<SCRipt>
+	    flatpickr("#date_birth", { dateFormat: "m/d/Y" });
+	</SCRipt>
+
+{% endblock %}

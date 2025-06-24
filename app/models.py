@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from storages.backends.s3boto3 import S3Boto3Storage
 from .managers import VisibilityManager
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 # Create your models here.
 
@@ -804,6 +805,113 @@ class KeyAccessLog(models.Model):
 
     class Meta:
         db_table = 'key_access_log'
+
+class FinallExpenses(models.Model):
+
+    first_name = models.CharField(max_length=100, verbose_name="Nombre")
+    last_name = models.CharField(max_length=100, verbose_name="Apellido")
+    phone_number = models.BigIntegerField()
+    date_birth = models.DateField(verbose_name="Fecha de nacimiento")
+    
+    GENDER_CHOICES = [
+        ('M', 'Masculino'),
+        ('F', 'Femenino'),
+    ]
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, verbose_name="Género")
+    RELATIONSHIP_CHOICES = [
+        ('SELF', 'SELF'),
+        ('AUNT', 'AUNT'),
+        ('BROTHER', 'BROTHER'),
+        ('CHILD', 'CHILD'),
+        ('COUSIN', 'COUSIN'),
+        ('FATHER', 'FATHER'),
+        ('FIANCE', 'FIANCE'),
+        ('GRANDC', 'GRANDCHILD'),
+        ('GRANDP', 'GRANDPARENT'),
+        ('MOTHER', 'MOTHER'),
+        ('NEPHEW', 'NEPHEW'),
+        ('NIECE', 'NIECE'),
+        ('PWROATNY', 'POWER OF ATTORNEY'),
+        ('SISTER', 'SISTER'),
+        ('SPOUSE', 'SPOUSE'),
+        ('UNCLE', 'UNCLE'),
+    ]
+    relationship = models.CharField(max_length=10, choices=RELATIONSHIP_CHOICES, verbose_name="Relación con el asegurado")
+    current_city = models.CharField(max_length=100, verbose_name="Ciudad actual")
+    STATE_CHOICES = [
+        ('AL', 'Alabama'),
+        ('AR', 'Arkansas'),
+        ('CA', 'California'),
+        ('DC', 'District of Columbia'),
+        ('DE', 'Delaware'),
+        ('FL', 'Florida'),
+        ('GA', 'Georgia'),
+        ('ID', 'Idaho'),
+        ('IL', 'Illinois'),
+        ('IN', 'Indiana'),
+        ('KS', 'Kansas'),
+        ('KY', 'Kentucky'),
+        ('LA', 'Louisiana'),
+        ('MI', 'Michigan'),
+        ('MN', 'Minnesota'),
+        ('MO', 'Missouri'),
+        ('MS', 'Mississippi'),
+        ('NC', 'North Carolina'),
+        ('ND', 'North Dakota'),
+        ('NE', 'Nebraska'),
+        ('NM', 'New Mexico'),
+        ('NV', 'Nevada'),
+        ('OH', 'Ohio'),
+        ('OK', 'Oklahoma'),
+        ('PA', 'Pennsylvania'),
+        ('SC', 'South Carolina'),
+        ('TN', 'Tennessee'),
+        ('TX', 'Texas'),
+        ('UT', 'Utah'),
+        ('VA', 'Virginia'),
+        ('WV', 'West Virginia'),
+    ]
+    current_state = models.CharField(max_length=2, choices=STATE_CHOICES, verbose_name="Estado actual")
+    
+    # Preguntas de hospitalización (Step 2)
+    hospitalized_currently = models.BooleanField(verbose_name="¿Hospitalizado actualmente?")
+    hospitalized_10_years = models.BooleanField(verbose_name="¿Hospitalizado 2+ veces en 10 años?")
+    hospitalized_5_years = models.BooleanField(verbose_name="¿Hospitalizado 2+ veces en 5 años?")
+    hospitalized_3_years = models.BooleanField(verbose_name="¿Hospitalizado 2+ veces en 3 años?")
+    hospitalized_6_months = models.BooleanField(verbose_name="¿Hospitalizado 2+ veces en 6 meses?")
+    
+    # Preguntas sobre cáncer/derrames (Step 3)
+    cancer_stroke_history = models.BooleanField(verbose_name="¿Historial de cáncer o derrame?")
+    cancer_free_2_years = models.BooleanField(verbose_name="¿Libre de cáncer/derrame 2 años?")
+    cancer_free_5_years = models.BooleanField(verbose_name="¿Libre de cáncer/derrame 5 años?")
+    cancer_free_10_years = models.BooleanField(verbose_name="¿Libre de cáncer/derrame 10 años?")
+    
+    # Preguntas sobre tabaco (Step 4)
+    tobacco_use = models.BooleanField(verbose_name="¿Usa tabaco/nicotina?")
+    tobacco_bp_10_years = models.BooleanField(verbose_name="¿Tabaco o presión alta en 10 años?")
+    tobacco_5_years = models.BooleanField(verbose_name="¿Usó tabaco en 5 años?")
+    tobacco_12_months = models.BooleanField(verbose_name="¿Usó tabaco en 12 meses?")
+    
+    # Datos físicos (Step 5)
+    height_ft = models.DecimalField(
+        max_digits=3, 
+        decimal_places=1,
+        validators=[MinValueValidator(3.0), MaxValueValidator(8.5)],
+        verbose_name="Altura (pies)"
+    )
+    weight_lbs = models.PositiveIntegerField(
+        validators=[MinValueValidator(50), MaxValueValidator(500)],
+        verbose_name="Peso (libras)"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True) 
+    agent = models.ForeignKey(Users, on_delete=models.CASCADE)
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=True)  
+
+    class Meta:
+        db_table = 'finall_expenses'
+
 
 from .modelsSMS import *
 from .modelsWhatsapp import *

@@ -75,6 +75,8 @@ urlpatterns = [
     path('addDepend/', forms.addDepend, name='addDepend'),
 
     path('formCreateAlert/', forms.formCreateAlert, name='formCreateAlert'), # Formulario para crear las Alertas
+    
+    path('formCreateFinalExpenses/', forms.formCreateFinalExpenses, name='formCreateFinalExpenses'),
 
     #<---------------------------Information Client--------------------------->
     path('clientObamacare/', table.clientObamacare, name='clientObamacare'),
@@ -122,6 +124,10 @@ urlpatterns = [
     path('blockSocialSecurityMedicare/', fetchInformations.blockSocialSecurityMedicare, name='blockSocialSecurityMedicare'),
     path('save-customer-observation-medicare/', modals.saveCustomerObservationMedicare, name='saveCustomerObservationMedicare'),
     path('desactiveMedicare/<medicare_id>/', modals.desactiveMedicare, name='desactiveMedicare'),
+
+    path('clientFinallExpenses/', table.clientFinallExpenses, name='clientFinallExpenses'),
+    path('editFinallExpenses/<finallExpenses_id>/', edits.editFinallExpenses, name='editFinallExpenses'),
+    path('toggleFinallExpenses/<finallExpenses_id>/', toggles.toggleFinallExpenses, name='toggleFinallExpenses'),
 
     path('alert/', table.tableAlert, name='alert'),
     path('toggleAlert/<alertClient_id>/', toggles.toggleAlert, name='toggleAlert'),

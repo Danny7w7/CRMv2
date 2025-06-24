@@ -674,3 +674,82 @@ def formCreateAlert(request):
             return redirect('formCreateAlert',)  # Cambia a tu página de éxito
 
     return render(request, 'newSale/formCreateAlert.html')
+
+def formCreateFinalExpenses(request):
+
+    if request.method == 'POST':    
+
+        try:
+
+            data = request.POST
+
+            phoneNumber = request.POST.get('phone_number')
+            amount = countDigits(phoneNumber)
+
+            if amount == 10:
+                newNumber = int(f'1{phoneNumber}')
+            else:
+                newNumber = phoneNumber
+            
+            # Convertir fecha de nacimiento (asumiendo formato YYYY-MM-DD)
+            date_births = request.POST.get('date_birth')
+            date_birth = datetime.datetime.strptime(date_births, '%m/%d/%Y').date()
+            
+            # Convertir valores booleanos (para preguntas de sí/no)
+            def parse_boolean(value):
+                return value.lower() == 'yes' if value else False
+            
+            # Crear instancia del modelo con todos los campos
+            paciente = FinallExpenses(
+                agent = request.user,
+                company = request.user.company,
+                # Información personal (Step 1)
+                first_name=data.get('first_name'),
+                last_name=data.get('last_name'),
+                phone_number=newNumber,
+                date_birth=date_birth,
+                gender=data.get('gender'),
+                relationship=data.get('relationship'),
+                current_city=data.get('current_city'),
+                current_state=data.get('current_state'),
+                
+                # Preguntas de hospitalización (Step 2)
+                hospitalized_currently=parse_boolean(data.get('hospitalized_currently')),
+                hospitalized_10_years=parse_boolean(data.get('hospitalized_10_years')),
+                hospitalized_5_years=parse_boolean(data.get('hospitalized_5_years')),
+                hospitalized_3_years=parse_boolean(data.get('hospitalized_3_years')),
+                hospitalized_6_months=parse_boolean(data.get('hospitalized_6_months')),
+                
+                # Preguntas sobre cáncer/derrames (Step 3)
+                cancer_stroke_history=parse_boolean(data.get('cancer_stroke_history')),
+                cancer_free_2_years=parse_boolean(data.get('cancer_free_2_years')),
+                cancer_free_5_years=parse_boolean(data.get('cancer_free_5_years')),
+                cancer_free_10_years=parse_boolean(data.get('cancer_free_10_years')),
+                
+                # Preguntas sobre tabaco (Step 4)
+                tobacco_use=parse_boolean(data.get('tobacco_use')),
+                tobacco_bp_10_years=parse_boolean(data.get('tobacco_bp_10_years')),
+                tobacco_5_years=parse_boolean(data.get('tobacco_5_years')),
+                tobacco_12_months=parse_boolean(data.get('tobacco_12_months')),
+                
+                # Datos físicos (Step 5)
+                height_ft=float(data.get('height_ft')) if data.get('height_ft') else None,
+                weight_lbs=int(data.get('weight_lbs')) if data.get('weight_lbs') else None
+            )
+            
+            paciente.save()
+                
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Datos guardados correctamente',
+                'patient_id': paciente.id
+            })
+                
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': f'Error al guardar los datos: {str(e)}'
+            }, status=400)   
+
+    return render(request, 'forms/formFinalExpenses.html')
+

@@ -792,7 +792,7 @@
 									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 								</div>
 								<div class="modal-body">
-									<form id="formIngresarTexto" action="{% url 'smstemplate'  %}"  enctype="multipart/form-data" method="POST">
+									<form id="smsForm" action="{% url 'smstemplate'  %}"  enctype="multipart/form-data" method="POST">
 										{% csrf_token %}
 										<label for="nameAgent" class="form-label">Select Option:</label>
 										<input type="hidden" name="idClient" value="{{obamacare.client.id}}">
@@ -800,7 +800,6 @@
 										<div class="mb-3">
 											<select class="form-select"  name="sms" id="sms" required>
 												<option value="" selecci ></OPtion>
-												
 												<option value="1">DOCUMENT</option>
 												<option value="2">FOLLOW-UP</option>
 												<option value="3">RENOVATION</option>
@@ -1567,5 +1566,8 @@
 	</script>
 	<script src="{% static 'assets/js/sms/scripts.js' %}"></script>
 
+	{% comment %} Swalert para avisar cuando se envio el SMS template {% endcomment %}
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script src="{% static 'assets/js/modals/confirmationSMSAutomatic.js' %}"></script>
 	
 {% endblock %}
