@@ -101,7 +101,7 @@
 												<input type="text" class="form-control" name="kinship" value="{{ dependent.type_police|join:"," }}" disabled>
 											</div>
 											<div class="col-12 col-lg-6">
-												<label class="form-label">Type Police Add</label>
+												<label class="form-label">Type Policy Add</label>
 												<select class="form-select typePoliceSelects" name="typePoliceDependents[{{ forloop.counter0 }}][]" id="typePoliceDependents" multiple>
 													{% for lista2 in lista2 %}
 														{% if dependent.type_police|join:"," not in lista2 %}
