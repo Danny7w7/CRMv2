@@ -54,6 +54,16 @@
                 </select>
                 <small class="text-muted">Hold Ctrl (Cmd on Mac) to select multiple agents</small>
             </div>
+            <div class="col-md-6">
+				<label for="start_date">Start date:</label>
+				<input type="date" name="start_date" id="start_date" 
+					   class="form-control" value="{{ start_date|date:'Y-m-d'|default:'' }}">
+            </div>
+            <div class="col-md-6">
+                <label for="end_date">End date: </label>
+                <input type="date" name="end_date" id="end_date" 
+                       class="form-control" value="{{ end_date|date:'Y-m-d'|default:''}}">
+            </div>
 			<div class="col-md-4">
 				<button type="submit" class="btn btn-lg btn-outline-primary w-100 shadow-sm">
 					<i class="bi bi-funnel"></i> Submit

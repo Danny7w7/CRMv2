@@ -1317,12 +1317,25 @@ def paymentsReports(request):
 
     agentsUsa = request.POST.getlist('agentsUsa') if request.method == 'POST' else []
     agentsCol = request.POST.getlist('agentsCol') if request.method == 'POST' else []
+    
+    start_date = request.POST.get('start_date') if request.method == 'POST' else None
+    end_date = request.POST.get('end_date') if request.method == 'POST' else None
+
+    if start_date and end_date:
+        # Convertir fechas a objetos datetime con zona horaria
+        start_date = timezone.make_aware(
+            datetime.datetime.strptime(start_date, '%Y-%m-%d').replace(hour=0, minute=0, second=0, microsecond=0)
+        )
+        end_date = timezone.make_aware(
+            datetime.datetime.strptime(end_date, '%Y-%m-%d').replace(hour=23, minute=59, second=59, microsecond=999999)
+        )
 
     filters = {
         'is_active': True,
         **({'company_id': company_id} if company_filter else {}),
         **({'agent_usa__in': agentsUsa} if agentsUsa else {}),
-        **({'agent_id__in': agentsCol} if agentsCol else {})
+        **({'agent_id__in': agentsCol} if agentsCol else {}),
+        **({'created_at__range': [start_date, end_date]} if start_date else {})
     }
 
     # Prefetch de datos
@@ -1373,7 +1386,9 @@ def paymentsReports(request):
         'agentsUsaContex': agentsUsaContex,
         'agentsUsa':agentsUsa,
         'agentsColContex':agentsColContex,
-        'agentsCol': list(map(int, agentsCol))
+        'agentsCol': list(map(int, agentsCol)),
+        'start_date':start_date,
+        'end_date':end_date
     })
 
 def paymentsReportsSupp(request):

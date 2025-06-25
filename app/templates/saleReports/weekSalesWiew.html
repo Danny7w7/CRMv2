@@ -136,7 +136,7 @@
             {% if agente_data.clientes_supp %}
                 <h5>Supp Client</h5>
                 {% for cliente in agente_data.clientes_supp %}
-                    <p> 📌{{ forloop.counter }} <strong>Name:</strong> {{ cliente.nombre }}, <strong>Policy Date:</strong> {{ cliente.fecha_poliza }}, <strong>Status:</strong> {{ cliente.estatus }},  <strong>Type police:</strong> {{ cliente.policy_type }} </p>
+                    <p> 📌{{ forloop.counter }} <strong>Name:</strong> {{ cliente.nombre }}, <strong>Policy Date:</strong> {{ cliente.fecha_poliza }}, <strong>Status:</strong> {{ cliente.estatus }},  <strong>Type Policy:</strong> {{ cliente.policy_type }} </p>
                 {% endfor %}
             {% endif %}
 
