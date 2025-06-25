@@ -1320,7 +1320,7 @@ def paymentsReports(request):
 
     filters = {
         'is_active': True,
-        **({'company_id': company_filter} if company_filter else {}),
+        **({'company_id': company_id} if company_filter else {}),
         **({'agent_usa__in': agentsUsa} if agentsUsa else {}),
         **({'agent_id__in': agentsCol} if agentsCol else {})
     }
