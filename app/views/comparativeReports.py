@@ -881,13 +881,14 @@ def getDetailReportSuppPaymentsCigna(request, dataFrame):
     # Iterate over rows
     for index, row in dataFrame.iterrows():
         policyNumber = row[request.POST.get('policyNumber')]
+        coverageMonth = row[request.POST.get('coverageMonth')]
         commPaid = row[request.POST.get('commPaid')]
 
         try:
             supp = Supp.objects.get(policyNumber=policyNumber)
             PaymentsSuplementals.objects.create(
                 supp=supp,
-                coverageMonth=datetime.now(),
+                coverageMonth=parseDateMDY(coverageMonth),
                 is_active=True if commPaid > 0 else False
             )
             # Agregar el registro asociado al DataFrame
