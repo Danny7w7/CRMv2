@@ -40,10 +40,8 @@
                         <th>City</th>
                         <th>State</th>
                         <th>ZipCode</th>
-                        <th>Obs.</th>
-						{% if request.user.role == 'Admin' or request.user.role == 'S'%}
-                        	<th>View Obs.</th>
-						{% endif %}
+                        <th>Typification</th>
+                        <th>View Typification</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -79,13 +77,11 @@
                                 <button type="submit" class="btn btn-sm btn-secondary">Save</button>
                             </form>
                         </td>
-						{% if request.user.role == 'Admin' or request.user.role == 'S'%}
-							<td style="vertical-align: middle;">
-								<button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalVerTexto_{{item.id}}" data-id="{{ item.id }}">
-									<i class='bx bx-comment-detail me-0'></i>
-								</button>
-							</td>
-						{% endif %}
+                        <td style="vertical-align: middle;">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalVerTexto_{{item.id}}" data-id="{{ item.id }}">
+                                <i class='bx bx-comment-detail me-0'></i>
+                            </button>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -110,7 +106,7 @@
                         {% if observation.bd_excel.id == item.id %}
                             <ul class="list-group">
                                 <li class="list-group-item">
-                                    <strong>{{ observation.agent_create.username }}:</strong> {{ observation.content }} <strong>Date:</strong> {{ observation.create_at }}
+                                    <strong>{{ observation.agent_create.username }}:</strong> {{ observation.content }} <strong>Date:</strong> {{ observation.created_at }}
                                 </li>
                             </ul>						
                         {% endif %}
