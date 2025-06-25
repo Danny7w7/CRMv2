@@ -32,7 +32,7 @@ MODULE_PATHS = {
     'GRAPHICAL REPORTS': [ 'averageCustomer', 'salesPerformance','chart6Week'],
     'QUALITY': [ 'formCreateControl', 'control','createQuality'],
     'BD': [ 'uploadExcel', 'manageAgentAssignments','reportBd','bd','processAndSave','saveData'],
-    'COMPARATIVE': [ 'uploadReports','processExcel','headerProcessor'],
+    'COMPARATIVE': [ 'uploadReports','processExcel','headerProcessor', 'paymentsReports', 'paymentsReportsSupp'],
     'TEAM MANAGEMENT': [  'customerAssginments']
 }
 
