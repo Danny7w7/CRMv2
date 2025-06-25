@@ -1391,12 +1391,44 @@ def paymentsReports(request):
         'end_date':end_date
     })
 
+@login_required(login_url='/login') 
+@company_ownership_required_sinURL
 def paymentsReportsSupp(request):
+    company_id = request.company_id  # Obtener company_id desde request
+    # Definir el filtro de compañía (será un diccionario vacío si es superusuario)
+    company_filter = {'company_id': company_id} if not request.user.is_superuser else {}
+
     currentYear = datetime.date.today().year
     months = [datetime.date(currentYear, m, 1) for m in range(1, 13)]
 
+    agentsUsaContex = USAgent.objects.all()
+    agentsColContex = Users.objects.filter(role__in=('S', 'A', 'C'), is_active=True, **company_filter).exclude(is_staff=True, is_superuser=True)
+    
+    agentsUsa = request.POST.getlist('agentsUsa') if request.method == 'POST' else []
+    agentsCol = request.POST.getlist('agentsCol') if request.method == 'POST' else []
+    
+    start_date = request.POST.get('start_date') if request.method == 'POST' else None
+    end_date = request.POST.get('end_date') if request.method == 'POST' else None
+
+    if start_date and end_date:
+        # Convertir fechas a objetos datetime con zona horaria
+        start_date = timezone.make_aware(
+            datetime.datetime.strptime(start_date, '%Y-%m-%d').replace(hour=0, minute=0, second=0, microsecond=0)
+        )
+        end_date = timezone.make_aware(
+            datetime.datetime.strptime(end_date, '%Y-%m-%d').replace(hour=23, minute=59, second=59, microsecond=999999)
+        )
+
+    filters = {
+        'is_active': True,
+        **({'company_id': company_id} if company_filter else {}),
+        **({'agent_usa__in': agentsUsa} if agentsUsa else {}),
+        **({'agent_id__in': agentsCol} if agentsCol else {}),
+        **({'created_at__range': [start_date, end_date]} if start_date else {})
+    }
+
     # Prefetch de datos
-    suppRecords = Supp.objects.select_related('client').filter(is_active=True)
+    suppRecords = Supp.objects.select_related('client').filter(**filters)
 
     allCarriersStatus = StatusSuplementals.objects.filter(
         coverageMonth__year=currentYear
@@ -1433,4 +1465,10 @@ def paymentsReportsSupp(request):
     return render(request, 'paymentsReports/paymentForMonthSupp.html', {
         'reportData': dict(reportData),
         'months': [month_abbr[m.month] for m in months],
+        'agentsUsaContex': agentsUsaContex,
+        'agentsUsa':agentsUsa,
+        'agentsColContex':agentsColContex,
+        'agentsCol': list(map(int, agentsCol)),
+        'start_date':start_date,
+        'end_date':end_date
     })
