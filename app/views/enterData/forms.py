@@ -403,22 +403,6 @@ def formCreatePlan(request ,client_id):
 @login_required(login_url='/login') 
 @company_ownership_required_sinURL
 def formCreatePlanAssure(request ,client_id):   
-
-    url = "https://restcountries.com/v3.1/all"
- 
-    with urllib.request.urlopen(url) as response:
-        data = json.loads(response.read().decode())
-
-        paises = []
-
-        for country in sorted(data, key=lambda x: x.get('name', {}).get('common', '')):
-            nombre = country.get('name', {}).get('common', 'N/A')
-            gentilicio = country.get('demonyms', {}).get('eng', {}).get('m', 'N/A')
-            paises.append({
-                "nombre": nombre,
-                "gentilicio": gentilicio
-            })     
-
     if request.method == 'POST':    
         client = get_object_or_404(ClientsAssure, id=client_id)
 
@@ -476,6 +460,21 @@ def formCreatePlanAssure(request ,client_id):
             else:
                 messages.success(request, f"All dependents were added successfully.")
                 return redirect('formCreateAssure')
+
+    url = "https://www.apicountries.com/countries"
+ 
+    with urllib.request.urlopen(url) as response:
+        data = json.loads(response.read().decode())
+
+        paises = []
+
+        for country in sorted(data, key=lambda x: x.get('name', '')):
+            nombre = country.get('name', 'N/A')
+            gentilicio = country.get('demonym', 'N/A')
+            paises.append({
+                "nombre": nombre,
+                "gentilicio": gentilicio
+            })
 
     return render(request, 'forms/formCreatePlanAssure.html', {'paises': paises})
 
