@@ -1443,11 +1443,14 @@ def paymentsReportsSupp(request):
     Payments = {(s_id, cm.month): is_active for s_id, is_active, cm in allCarriersPayments}
 
     # Diccionario final
-    reportData = defaultdict(dict)
+    reportData = []
 
     for record in suppRecords:
         clientName = f"{record.client.first_name} {record.client.last_name}"
+        policy = f'{record.policy_type} / {record.carrier}'
         suppId = record.id
+
+        monthsData = {}
 
         for m in months:
             monthNum = m.month
@@ -1457,13 +1460,20 @@ def paymentsReportsSupp(request):
             carrierStatus = statuses.get((suppId, monthNum))
             carrierPayment = Payments.get((suppId, monthNum))
 
-            reportData[clientName][monthName] = {
+            monthsData[monthName] = {
                 'carrierStatus': carrierStatus,
                 'carrierPayment': carrierPayment,
             }
 
+        # Añadir la fila al reporte
+        reportData.append({
+            'clientName': clientName,
+            'policy': policy,
+            'months': monthsData
+        })
+
     return render(request, 'paymentsReports/paymentForMonthSupp.html', {
-        'reportData': dict(reportData),
+        'reportData': reportData,
         'months': [month_abbr[m.month] for m in months],
         'agentsUsaContex': agentsUsaContex,
         'agentsUsa':agentsUsa,

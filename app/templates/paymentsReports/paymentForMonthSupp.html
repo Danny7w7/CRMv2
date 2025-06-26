@@ -79,6 +79,7 @@
 				<thead>
 				<tr>
 					<th rowspan="2">Client Name</th>
+					<th rowspan="2">Policy Type</th>
 					{% for month in months %}
 					<th class="text-center" colspan="2">{{ month }}</th>
 					{% endfor %}
@@ -91,23 +92,24 @@
 				</tr>
 				</thead>
 				<tbody class="table-group-divider">
-				{% for clientName, monthData in reportData.items %}
+				{% for item in reportData %}
 					<tr class="table-primary">
-					<td>{{ clientName }}</td>
+					<td>{{ item.clientName }}</td>
+					<td>{{ item.policy }}</td>
 					{% for month in months %}
-						{% with status=monthData|dict_get:month %}
-						<td class="text-center">
-							{% if status.carrierStatus %}✅
-							{% elif status.carrierStatus == False %}❌
-							{% else %}❔
-							{% endif %}
-						</td>
-						<td class="text-center">
-							{% if status.carrierPayment > 0 %}✅
-							{% elif status.carrierPayment == False %}❌
-							{% else %}❔
-							{% endif %}
-						</td>
+						{% with data=item.months|dict_get:month %}
+							<td class="text-center">
+								{% if data.carrierStatus == True %}✅
+								{% elif data.carrierStatus == False %}❌
+								{% else %}❔
+								{% endif %}
+							</td>
+							<td class="text-center">
+								{% if data.carrierPayment == True %}✅
+								{% elif data.carrierPayment == False %}❌
+								{% else %}❔
+								{% endif %}
+							</td>
 						{% endwith %}
 					{% endfor %}
 					</tr>

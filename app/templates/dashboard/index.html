@@ -723,8 +723,9 @@
 
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-	
+	{% if not request.user.is_superuser %}
 	<script src="{% static 'assets/js/sessionTimeout.js' %}"></script>
+	{% endif %}
 	<script src="{% static "assets/js/alerts/websocketAlert.js" %}"></script>
 
 	<!--end switcher-->
