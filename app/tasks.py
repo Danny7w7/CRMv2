@@ -147,10 +147,10 @@ def enviar_pdf_por_sms_telnyx():
     mensaje = f"Hola {user.first_name}, tu reporte de ventas de 6 semanas está listo: {pdf_url}"
 
     telnyx.api_key = settings.TELNYX_API_KEY
-    recipient = ['+13052199932','+13052190572']
-    for item in recipient:
-        telnyx.Message.create(
-            from_='+17869848427',
-            to=item,
-            text=mensaje,
-        )
+    # recipient = ['+13052199932','+13052190572']
+    # for item in recipient:
+    telnyx.Message.create(
+        from_='+17869848427',
+        to='+17863034781',
+        text=mensaje,
+    )
