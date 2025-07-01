@@ -151,6 +151,35 @@ from io import BytesIO
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.conf import settings
+from playwright.sync_api import sync_playwright
+import tempfile
+import os
+
+def generar_pdf_con_graficas(html_content):
+    # Guardar HTML temporal
+    with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as html_file:
+        html_file.write(html_content.encode("utf-8"))
+        html_path = html_file.name
+
+    # Ruta del PDF temporal
+    pdf_path = html_path.replace(".html", ".pdf")
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        page = browser.new_page()
+        page.goto(f"file://{html_path}")
+        page.wait_for_timeout(3000)  # espera 3s para que los gráficos carguen
+        page.pdf(path=pdf_path, format="A4")
+        browser.close()
+
+    return pdf_path  # Devuelve el path al PDF generado
+
+from django.template.loader import render_to_string
+import boto3
+
+
+from django.template.loader import render_to_string
+import boto3
 
 def sale6Week(finalSummary, weekRanges):
     summary_transformado = transformar_summary(finalSummary)
@@ -160,9 +189,7 @@ def sale6Week(finalSummary, weekRanges):
         'weekRanges': weekRanges,
     })
 
-    buffer = BytesIO()
-    HTML(string=html).write_pdf(buffer)
-    buffer.seek(0)
+    pdf_path = generar_pdf_con_graficas(html)
 
     filename = f"reporte_ventas_{timezone.now().strftime('%Y%m%d_%H%M%S')}.pdf"
     key = f"reports/{filename}"
@@ -174,15 +201,16 @@ def sale6Week(finalSummary, weekRanges):
         region_name=settings.AWS_S3_REGION_NAME
     )
 
-    # Subimos sin ACL pública
-    s3.upload_fileobj(
-        buffer,
-        settings.AWS_STORAGE_BUCKET_NAME,
-        key,
-        ExtraArgs={'ContentType': 'application/pdf'}
-    )
+    # Subir PDF generado por navegador
+    with open(pdf_path, "rb") as f:
+        s3.upload_fileobj(
+            f,
+            settings.AWS_STORAGE_BUCKET_NAME,
+            key,
+            ExtraArgs={'ContentType': 'application/pdf'}
+        )
 
-    # Creamos URL firmada válida por 1 hora (3600 segundos)
+    # Generar URL temporal para MMS
     url_firmado = s3.generate_presigned_url(
         ClientMethod='get_object',
         Params={
@@ -191,6 +219,9 @@ def sale6Week(finalSummary, weekRanges):
         },
         ExpiresIn=3600
     )
+
+    # Limpieza
+    os.remove(pdf_path)
 
     return url_firmado
 

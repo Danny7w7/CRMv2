@@ -134,6 +134,25 @@ def saveImageFromUrlTask(messageId, payload, contactId, companyId):
     except Exception as e:
         logger.error(f'Error saving MMS image or sending WebSocket: {e}')
 
+# @shared_task
+# def enviar_pdf_por_sms_telnyx():
+#     user = Users.objects.filter(id=56).first()
+#     if not user:
+#         return
+
+#     request = crearRequest(user)
+#     finalSummary, weekRanges = table6Week(request)
+#     pdf_url = sale6Week(finalSummary, weekRanges)  # retorna URL firmada
+
+#     telnyx.api_key = settings.TELNYX_API_KEY
+
+#     telnyx.Message.create(
+#         from_='+17869848427',
+#         to='+17863034781',
+#         text=f"Hola {user.first_name}, tu reporte está adjunto como MMS.",
+#         media_urls=[pdf_url]  # esto activa el MMS
+#     )
+
 @shared_task
 def enviar_pdf_por_sms_telnyx():
     user = Users.objects.filter(id=56).first()
@@ -141,8 +160,10 @@ def enviar_pdf_por_sms_telnyx():
         return
 
     request = crearRequest(user)
+
+    # Aquí se genera el PDF real con gráficas gracias a Playwright
     finalSummary, weekRanges = table6Week(request)
-    pdf_url = sale6Week(finalSummary, weekRanges)  # retorna URL firmada
+    pdf_url = sale6Week(finalSummary, weekRanges)
 
     telnyx.api_key = settings.TELNYX_API_KEY
 
@@ -150,8 +171,6 @@ def enviar_pdf_por_sms_telnyx():
         from_='+17869848427',
         to='+17863034781',
         text=f"Hola {user.first_name}, tu reporte está adjunto como MMS.",
-        media_urls=[pdf_url]  # esto activa el MMS
+        media_urls=[pdf_url]  # ✅ PDF generado por navegador, enviado como MMS
     )
-
-
 
