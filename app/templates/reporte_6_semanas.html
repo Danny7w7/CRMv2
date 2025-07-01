@@ -1,44 +1,59 @@
-<!-- templates/reporte_6_semanas.html -->
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
     <title>Reporte 6 Semanas</title>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <style>
-        body { font-family: Arial, sans-serif; font-size: 12px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-        th { background-color: #f2f2f2; }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            padding: 20px;
+        }
+        .chart-container {
+            page-break-after: always;
+            margin-bottom: 40px;
+        }
+        .chart-container:last-child {
+            page-break-after: auto;
+        }
     </style>
 </head>
 <body>
-    <h2>Resumen de Ventas (Últimas 6 Semanas)</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Agente</th>
-                {% for week in weekRanges %}
-                    <th>{{ week }}</th>
-                {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for agente in summary %}
-                <tr>
-                    <td>{{ agente.name }}</td>
-                    {% for semana in agente.weeks %}
-                        <td>
-                            ACA: {{ semana.obama }}<br>
-                            Act ACA: {{ semana.activeObama }}<br>
-                            Supp: {{ semana.supp }}<br>
-                            Act Supp: {{ semana.activeSupp }}<br>
-                            Total: {{ semana.total }}
-                        </td>
-                    {% endfor %}
-                </tr>
-            {% endfor %}
-            
-        </tbody>
-    </table>
+    <h1>Reporte de Ventas - Últimas 6 Semanas</h1>
+
+    {% for agente in summary %}
+        <div class="chart-container">
+            <h2>{{ agente.name }}</h2>
+            <div id="chart-{{ forloop.counter }}"></div>
+            <script>
+                var options{{ forloop.counter }} = {
+                    chart: {
+                        type: 'bar',
+                        height: 300
+                    },
+                    series: [
+                        { name: 'ACA', data: {{ agente.aca|safe }} },
+                        { name: 'Act ACA', data: {{ agente.act_aca|safe }} },
+                        { name: 'Supp', data: {{ agente.supp|safe }} },
+                        { name: 'Act Supp', data: {{ agente.act_supp|safe }} },
+                        { name: 'Total', data: {{ agente.total|safe }} }
+                    ],
+                    xaxis: {
+                        categories: {{ weekRanges|safe }},
+                        title: { text: 'Semanas' }
+                    },
+                    yaxis: {
+                        title: { text: 'Ventas' }
+                    },
+                    title: {
+                        text: '{{ agente.name }} - Ventas Semanales',
+                        align: 'center'
+                    }
+                };
+                new ApexCharts(document.querySelector("#chart-{{ forloop.counter }}"), options{{ forloop.counter }}).render();
+            </script>
+        </div>
+    {% endfor %}
 </body>
 </html>
