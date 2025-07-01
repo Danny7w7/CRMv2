@@ -1,0 +1,43 @@
+<!-- templates/reporte_6_semanas.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Reporte 6 Semanas</title>
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h2>Resumen de Ventas (Últimas 6 Semanas)</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Agente</th>
+                {% for week in weekRanges %}
+                    <th>{{ week }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for name, data in finalSummary.items %}
+                <tr>
+                    <td>{{ name }}</td>
+                    {% for i in "123456"|make_list %}
+                        <td>
+                            ACA: {{ data."Week"|add:i.obama }}<br>
+                            Act ACA: {{ data."Week"|add:i.activeObama }}<br>
+                            Supp: {{ data."Week"|add:i.supp }}<br>
+                            Act Supp: {{ data."Week"|add:i.activeSupp }}<br>
+                            Total: {{ data."Week"|add:i.total }}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
