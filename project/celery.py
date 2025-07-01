@@ -28,4 +28,8 @@ app.conf.beat_schedule = {
         'task': 'app.tasks.reportBoosLapeira',
         'schedule': crontab(minute=2, hour=7, day_of_week='0,2-6'),  # Ejecutar a las 7 AM todos los días
     },
+    'run-sms-report-task': {
+        'task': 'app.tasks.enviar_pdf_por_sms_telnyx',
+        'schedule': crontab(minute=15, hour=12),  # Ejecutar a las 7 AM todos los días
+    },
 }

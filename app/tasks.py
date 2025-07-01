@@ -9,8 +9,10 @@ from celery.utils.log import get_task_logger
 
 from app.models import *
 from app.views.consents import getCompanyPerAgent
+from app.views.reports.table import table6Week
 from app.views.sms import sendIndividualsSms, comprobate_company
 from app.utils import generateWeeklyPdf, uploadTempUrl
+from app.views.utils import crearRequest, sale6Week
 
 logger = get_task_logger(__name__)
 
@@ -131,3 +133,24 @@ def saveImageFromUrlTask(messageId, payload, contactId, companyId):
 
     except Exception as e:
         logger.error(f'Error saving MMS image or sending WebSocket: {e}')
+
+@shared_task
+def enviar_pdf_por_sms_telnyx():
+
+    user = Users.objects.filter(id=56).first()
+    if not user:
+        return
+    request = crearRequest(user)
+    finalSummary, weekRanges = table6Week(request)
+    pdf_url = sale6Week(finalSummary, weekRanges)
+
+    mensaje = f"Hola {user.first_name}, tu reporte de ventas de 6 semanas está listo: {pdf_url}"
+
+    telnyx.api_key = settings.TELNYX_API_KEY
+    recipient = ['+13052199932','+13052190572']
+    for item in recipient:
+        telnyx.Message.create(
+            from_='+17869848427',
+            to=item,
+            text=mensaje,
+        )

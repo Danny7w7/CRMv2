@@ -116,4 +116,44 @@ def renderMessageTemplate(template_str, context):
         return template_str.format(**context)
     except KeyError as e:
         return f"Error: faltó la variable {e}"
+    
+
+from weasyprint import HTML
+import boto3
+from io import BytesIO
+from django.test.client import RequestFactory
+
+def crearRequest(user):
+    request = RequestFactory().get("/")
+    request.user = user
+    request.company_id = user.company.id
+    return request
+
+
+def sale6Week(finalSummary, weekRanges):
+    html = render_to_string("reporte_6_semanas.html", {
+        'finalSummary': finalSummary,
+        'weekRanges': weekRanges,
+    })
+
+    buffer = BytesIO()
+    HTML(string=html).write_pdf(buffer)
+    buffer.seek(0)
+
+    filename = f"reporte_ventas_{timezone.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+    s3 = boto3.client("s3",
+        AWS_ACCESS_KEY_ID=settings.AWS_ACCESS_KEY_ID,
+        AWS_SECRET_ACCESS_KEY=settings.AWS_SECRET_ACCESS_KEY,
+        AWS_S3_REGION_NAME=settings.AWS_S3_REGION_NAME
+    )
+
+    s3.upload_fileobj(
+        buffer,
+        settings.AWS_STORAGE_BUCKET_NAME,
+        f"reports/{filename}",
+        ExtraArgs={'ContentType': 'application/pdf', 'ACL': 'public-read'}
+    )
+
+    url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.{settings.AWS_S3_REGION_NAME}.amazonaws.com/reports/{filename}"
+    return url
 
