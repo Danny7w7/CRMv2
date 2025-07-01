@@ -169,7 +169,7 @@ def sale6Week(finalSummary, weekRanges):
         buffer,
         settings.AWS_STORAGE_BUCKET_NAME,
         f"reports/{filename}",
-        ExtraArgs={'ContentType': 'application/pdf', 'ACL': 'public-read'}
+        ExtraArgs={'ContentType': 'application/pdf'}  # <-- ACL eliminado
     )
 
     url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.{settings.AWS_S3_REGION_NAME}.amazonaws.com/reports/{filename}"
