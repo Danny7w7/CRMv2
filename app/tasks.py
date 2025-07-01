@@ -136,21 +136,22 @@ def saveImageFromUrlTask(messageId, payload, contactId, companyId):
 
 @shared_task
 def enviar_pdf_por_sms_telnyx():
-
     user = Users.objects.filter(id=56).first()
     if not user:
         return
+
     request = crearRequest(user)
     finalSummary, weekRanges = table6Week(request)
-    pdf_url = sale6Week(finalSummary, weekRanges)
-
-    mensaje = f"Hola {user.first_name}, tu reporte de ventas de 6 semanas está listo: {pdf_url}"
+    pdf_url = sale6Week(finalSummary, weekRanges)  # retorna URL firmada
 
     telnyx.api_key = settings.TELNYX_API_KEY
-    # recipient = ['+13052199932','+13052190572']
-    # for item in recipient:
+
     telnyx.Message.create(
         from_='+17869848427',
         to='+17863034781',
-        text=mensaje,
+        text=f"Hola {user.first_name}, tu reporte está adjunto como MMS.",
+        media_urls=[pdf_url]  # esto activa el MMS
     )
+
+
+
