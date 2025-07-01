@@ -145,6 +145,13 @@ def transformar_summary(finalSummary):
     return resultado
 
 
+from weasyprint import HTML
+import boto3
+from io import BytesIO
+from django.template.loader import render_to_string
+from django.utils import timezone
+from django.conf import settings
+
 def sale6Week(finalSummary, weekRanges):
     summary_transformado = transformar_summary(finalSummary)
 
@@ -158,6 +165,8 @@ def sale6Week(finalSummary, weekRanges):
     buffer.seek(0)
 
     filename = f"reporte_ventas_{timezone.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+    key = f"reports/{filename}"
+
     s3 = boto3.client(
         "s3",
         aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
@@ -165,12 +174,24 @@ def sale6Week(finalSummary, weekRanges):
         region_name=settings.AWS_S3_REGION_NAME
     )
 
+    # Subimos sin ACL pública
     s3.upload_fileobj(
         buffer,
         settings.AWS_STORAGE_BUCKET_NAME,
-        f"reports/{filename}",
-        ExtraArgs={'ContentType': 'application/pdf'}  # <-- ACL eliminado
+        key,
+        ExtraArgs={'ContentType': 'application/pdf'}
     )
 
-    url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.{settings.AWS_S3_REGION_NAME}.amazonaws.com/reports/{filename}"
-    return url
+    # Creamos URL firmada válida por 1 hora (3600 segundos)
+    url_firmado = s3.generate_presigned_url(
+        ClientMethod='get_object',
+        Params={
+            'Bucket': settings.AWS_STORAGE_BUCKET_NAME,
+            'Key': key
+        },
+        ExpiresIn=3600
+    )
+
+    return url_firmado
+
+
