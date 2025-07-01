@@ -129,10 +129,27 @@ def crearRequest(user):
     request.company_id = user.company.id
     return request
 
+def transformar_summary(finalSummary):
+    resultado = []
+
+    for name, data in finalSummary.items():
+        weeks = []
+        for i in range(1, 7):
+            key = f"Week{i}"
+            semana = data.get(key, {
+                "obama": 0, "activeObama": 0, "supp": 0, "activeSupp": 0, "total": 0
+            })
+            weeks.append(semana)
+        resultado.append({"name": name, "weeks": weeks})
+
+    return resultado
+
 
 def sale6Week(finalSummary, weekRanges):
+    summary_transformado = transformar_summary(finalSummary)
+
     html = render_to_string("reporte_6_semanas.html", {
-        'finalSummary': finalSummary,
+        'summary': summary_transformado,
         'weekRanges': weekRanges,
     })
 
@@ -156,4 +173,3 @@ def sale6Week(finalSummary, weekRanges):
 
     url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.{settings.AWS_S3_REGION_NAME}.amazonaws.com/reports/{filename}"
     return url
-

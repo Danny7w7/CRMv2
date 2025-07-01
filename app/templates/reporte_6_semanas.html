@@ -23,20 +23,21 @@
             </tr>
         </thead>
         <tbody>
-            {% for name, data in finalSummary.items %}
+            {% for agente in summary %}
                 <tr>
-                    <td>{{ name }}</td>
-                    {% for i in "123456"|make_list %}
+                    <td>{{ agente.name }}</td>
+                    {% for semana in agente.weeks %}
                         <td>
-                            ACA: {{ data."Week"|add:i.obama }}<br>
-                            Act ACA: {{ data."Week"|add:i.activeObama }}<br>
-                            Supp: {{ data."Week"|add:i.supp }}<br>
-                            Act Supp: {{ data."Week"|add:i.activeSupp }}<br>
-                            Total: {{ data."Week"|add:i.total }}
+                            ACA: {{ semana.obama }}<br>
+                            Act ACA: {{ semana.activeObama }}<br>
+                            Supp: {{ semana.supp }}<br>
+                            Act Supp: {{ semana.activeSupp }}<br>
+                            Total: {{ semana.total }}
                         </td>
                     {% endfor %}
                 </tr>
             {% endfor %}
+            
         </tbody>
     </table>
 </body>
