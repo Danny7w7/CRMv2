@@ -158,10 +158,11 @@ def sale6Week(finalSummary, weekRanges):
     buffer.seek(0)
 
     filename = f"reporte_ventas_{timezone.now().strftime('%Y%m%d_%H%M%S')}.pdf"
-    s3 = boto3.client("s3",
-        AWS_ACCESS_KEY_ID=settings.AWS_ACCESS_KEY_ID,
-        AWS_SECRET_ACCESS_KEY=settings.AWS_SECRET_ACCESS_KEY,
-        AWS_S3_REGION_NAME=settings.AWS_S3_REGION_NAME
+    s3 = boto3.client(
+        "s3",
+        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+        region_name=settings.AWS_S3_REGION_NAME
     )
 
     s3.upload_fileobj(
