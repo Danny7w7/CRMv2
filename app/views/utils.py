@@ -139,33 +139,60 @@ import matplotlib.pyplot as plt
 import base64
 import tempfile
 import os
+from weasyprint import HTML, CSS
 
 def generar_grafico_base64(nombre, semanas, data):
-    fig, ax1 = plt.subplots()
+    import matplotlib.pyplot as plt
+    import numpy as np
 
-    x = list(range(len(semanas)))  # posiciones para las barras
+    fig, ax1 = plt.subplots(figsize=(11, 6))  # Landscape
 
-    # Ancho de barra
-    bar_width = 0.2
+    x = np.arange(len(semanas))
+    bar_width = 0.18
 
-    # Dibujar las barras agrupadas
-    ax1.bar([i - 1.5*bar_width for i in x], data["ACA"], width=bar_width, label="ACA")
-    ax1.bar([i - 0.5*bar_width for i in x], data["Act ACA"], width=bar_width, label="Act ACA")
-    ax1.bar([i + 0.5*bar_width for i in x], data["Supp"], width=bar_width, label="Supp")
-    ax1.bar([i + 1.5*bar_width for i in x], data["Act Supp"], width=bar_width, label="Act Supp")
+    # Dibujar barras agrupadas
+    bars_aca = ax1.bar(x - 1.5 * bar_width, data["ACA"], width=bar_width, label="ACA", color="#3498db")
+    bars_act_aca = ax1.bar(x - 0.5 * bar_width, data["Act ACA"], width=bar_width, label="Act ACA", color="#2ecc71")
+    bars_supp = ax1.bar(x + 0.5 * bar_width, data["Supp"], width=bar_width, label="Supp", color="#f1c40f")
+    bars_act_supp = ax1.bar(x + 1.5 * bar_width, data["Act Supp"], width=bar_width, label="Act Supp", color="#e67e22")
 
-    # Línea de tendencia de Total
-    ax1.plot(x, data["Total"], color="black", marker="o", linestyle="--", linewidth=2, label="Total")
+    # Línea de Total
+    line = ax1.plot(x, data["Total"], color="black", marker="o", linestyle="--", linewidth=2, label="Total")
+
+    # Etiquetas de las barras
+    def label_bars(bars):
+        for bar in bars:
+            height = bar.get_height()
+            ax1.annotate(f'{height}',
+                         xy=(bar.get_x() + bar.get_width() / 2, height),
+                         xytext=(0, 4),
+                         textcoords="offset points",
+                         ha='center', va='bottom', fontsize=8)
+
+    for bars in [bars_aca, bars_act_aca, bars_supp, bars_act_supp]:
+        label_bars(bars)
+
+    # Etiquetas para la línea
+    for i, val in enumerate(data["Total"]):
+        ax1.annotate(f'{val}',
+                     xy=(x[i], val),
+                     xytext=(0, -12),
+                     textcoords="offset points",
+                     ha='center', va='top',
+                     fontsize=8, color='black')
 
     ax1.set_xticks(x)
     ax1.set_xticklabels(semanas)
-    ax1.set_title(f"Ventas de {nombre}")
+    ax1.set_title(f"Ventas de {nombre}", fontsize=14, weight='bold')
     ax1.set_ylabel("Cantidad")
-    ax1.legend()
+    ax1.set_xlabel("Semanas")
+    ax1.legend(loc='upper left')
+    ax1.grid(axis='y', linestyle='--', linewidth=0.5, alpha=0.7)
+
     fig.tight_layout()
 
     buffer = BytesIO()
-    plt.savefig(buffer, format="png")
+    plt.savefig(buffer, format="png", dpi=150)
     buffer.seek(0)
     img_base64 = base64.b64encode(buffer.read()).decode("utf-8")
     plt.close(fig)
@@ -207,7 +234,9 @@ def sale6Week(finalSummary, weekRanges):
     })
 
     buffer = BytesIO()
-    HTML(string=html).write_pdf(buffer)
+    HTML(string=html).write_pdf(buffer, stylesheets=[
+        CSS(string='@page { size: A4 landscape; margin: 1cm; }')
+    ])
     buffer.seek(0)
 
     filename = f"reporte_ventas_{timezone.now().strftime('%Y%m%d_%H%M%S')}.pdf"
