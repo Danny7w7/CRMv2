@@ -270,92 +270,82 @@ def sale6Week(finalSummary, weekRanges, detalles_clientes):
 from collections import defaultdict
 from app.models import ObamaCare, Supp, ClientsAssure, Medicare, ClientsLifeInsurance
 
-def obtener_detalles_clientes(company_id):
-    resultado = []
+from collections import defaultdict
+from app.models import ObamaCare, Supp, ClientsAssure, Medicare, ClientsLifeInsurance
+from datetime import datetime
+
+def obtener_detalles_clientes(company_id, weekRanges):
     agentes = defaultdict(lambda: {
-        "clientes_obama": [],
-        "clientes_supp": [],
-        "clientes_assure": [],
-        "clientes_medicare": [],
-        "clientes_life": [],
+        "semanas": [  # lista de semanas por agente
+            {
+                "rango": f"{start.strftime('%b %d')} - {end.strftime('%b %d')}",
+                "clientes_obama": [],
+                "clientes_supp": [],
+                "clientes_assure": [],
+                "clientes_medicare": [],
+                "clientes_life": [],
+            } for start, end in weekRanges
+        ]
     })
 
-    # ObamaCare
-    obamacare_qs = ObamaCare.objects.filter(
-        is_active=True,
-        company_id=company_id,
-        client__isnull=False
-    ).select_related("client", "agent")
+    # Helper para agregar cliente al agente en la semana correcta
+    def agregar(modelo, queryset, tipo, campo_fecha, parser):
+        for item in queryset:
+            fecha = getattr(item, campo_fecha)
+            if not fecha:
+                continue
+            for idx, (start, end) in enumerate(weekRanges):
+                if start <= fecha.date() <= end:
+                    nombre_agente = f"{item.agent.first_name} {item.agent.last_name}"
+                    agentes[nombre_agente]["semanas"][idx][tipo].append(parser(item))
+                    break
 
-    for record in obamacare_qs:
-        cliente = record.client
-        agentes[f"{record.agent.first_name} {record.agent.last_name}"]["clientes_obama"].append({
-            "nombre": f"{cliente.first_name} {cliente.last_name}",
-            "fecha_poliza": record.date_effective_coverage.strftime("%Y-%m-%d") if record.date_effective_coverage else "N/A",
-            "estatus": record.status or "N/A"
-        })
+    # ObamaCare
+    obamacare_qs = ObamaCare.objects.filter(is_active=True, company_id=company_id).select_related("client", "agent")
+    agregar("obama", obamacare_qs, "clientes_obama", "created_at", lambda obj: {
+        "nombre": f"{obj.client.first_name} {obj.client.last_name}",
+        "fecha_poliza": obj.date_effective_coverage.strftime("%Y-%m-%d") if obj.date_effective_coverage else "N/A",
+        "estatus": obj.status or "N/A"
+    })
 
     # Supp
-    supp_qs = Supp.objects.filter(
-        is_active=True,
-        company_id=company_id,
-        client__isnull=False
-    ).select_related("client", "agent")
-
-    for record in supp_qs:
-        cliente = record.client
-        agentes[f"{record.agent.first_name} {record.agent.last_name}"]["clientes_supp"].append({
-            "nombre": f"{cliente.first_name} {cliente.last_name}",
-            "fecha_poliza": record.effective_date.strftime("%Y-%m-%d") if record.effective_date else "N/A",
-            "estatus": record.status or "N/A",
-            "policy_type": record.policy_type or "N/A"
-        })
+    supp_qs = Supp.objects.filter(is_active=True, company_id=company_id).select_related("client", "agent")
+    agregar("supp", supp_qs, "clientes_supp", "created_at", lambda obj: {
+        "nombre": f"{obj.client.first_name} {obj.client.last_name}",
+        "fecha_poliza": obj.effective_date.strftime("%Y-%m-%d") if obj.effective_date else "N/A",
+        "estatus": obj.status or "N/A",
+        "policy_type": obj.policy_type or "N/A"
+    })
 
     # Assure
-    assure_qs = ClientsAssure.objects.filter(
-        is_active=True,
-        company_id=company_id
-    ).select_related("agent")
-
-    for record in assure_qs:
-        agentes[f"{record.agent.first_name} {record.agent.last_name}"]["clientes_assure"].append({
-            "nombre": f"{record.first_name} {record.last_name}",
-            "fecha_poliza": record.date_effective_coverage.strftime("%Y-%m-%d") if record.date_effective_coverage else "N/A",
-            "estatus": record.status or "N/A"
-        })
+    assure_qs = ClientsAssure.objects.filter(is_active=True, company_id=company_id).select_related("agent")
+    agregar("assure", assure_qs, "clientes_assure", "created_at", lambda obj: {
+        "nombre": f"{obj.first_name} {obj.last_name}",
+        "fecha_poliza": obj.date_effective_coverage.strftime("%Y-%m-%d") if obj.date_effective_coverage else "N/A",
+        "estatus": obj.status or "N/A"
+    })
 
     # Medicare
-    medicare_qs = Medicare.objects.filter(
-        is_active=True,
-        company_id=company_id
-    ).select_related("agent")
-
-    for record in medicare_qs:
-        agentes[f"{record.agent.first_name} {record.agent.last_name}"]["clientes_medicare"].append({
-            "nombre": f"{record.first_name} {record.last_name}",
-            "fecha_poliza": record.dateMedicare.strftime("%Y-%m-%d") if record.dateMedicare else "N/A",
-            "estatus": record.status or "N/A"
-        })
+    medicare_qs = Medicare.objects.filter(is_active=True, company_id=company_id).select_related("agent")
+    agregar("medicare", medicare_qs, "clientes_medicare", "created_at", lambda obj: {
+        "nombre": f"{obj.first_name} {obj.last_name}",
+        "fecha_poliza": obj.dateMedicare.strftime("%Y-%m-%d") if obj.dateMedicare else "N/A",
+        "estatus": obj.status or "N/A"
+    })
 
     # Life Insurance
-    life_qs = ClientsLifeInsurance.objects.filter(
-        is_active=True,
-        company_id=company_id
-    ).select_related("agent")
+    life_qs = ClientsLifeInsurance.objects.filter(is_active=True, company_id=company_id).select_related("agent")
+    agregar("life", life_qs, "clientes_life", "created_at", lambda obj: {
+        "nombre": obj.full_name,
+        "fecha_poliza": obj.date_effective_coverage.strftime("%Y-%m-%d") if obj.date_effective_coverage else "N/A",
+        "estatus": obj.status or "N/A"
+    })
 
-    for record in life_qs:
-        agentes[f"{record.agent.first_name} {record.agent.last_name}"]["clientes_life"].append({
-            "nombre": record.full_name,
-            "fecha_poliza": record.date_effective_coverage.strftime("%Y-%m-%d") if record.date_effective_coverage else "N/A",
-            "estatus": record.status or "N/A"
-        })
-
-    # Convertir dict → lista
-    for nombre_agente, data in agentes.items():
-        resultado.append({
+    # Convertir resultado a lista
+    return [
+        {
             "nombre": nombre_agente,
-            **data
-        })
-
-    return resultado
+            "semanas": data["semanas"]
+        } for nombre_agente, data in agentes.items()
+    ]
 

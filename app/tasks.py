@@ -163,7 +163,7 @@ def enviar_pdf_por_sms_telnyx():
 
     # Aquí se genera el PDF real con gráficas gracias a Playwright
     finalSummary, weekRanges = table6Week(request)
-    detalles_clientes = obtener_detalles_clientes(request.company_id)    
+    detalles_clientes = obtener_detalles_clientes(request.company_id, weekRanges) 
     pdf_url = sale6Week(finalSummary, weekRanges, detalles_clientes)
 
     telnyx.api_key = settings.TELNYX_API_KEY
