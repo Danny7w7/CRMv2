@@ -304,7 +304,7 @@ def obtener_detalles_clientes(company_id, weekRanges):
     obamacare_qs = ObamaCare.objects.filter(is_active=True, company_id=company_id).select_related("client", "agent")
     agregar("obama", obamacare_qs, "clientes_obama", "created_at", lambda obj: {
         "nombre": f"{obj.client.first_name} {obj.client.last_name}",
-        "fecha_poliza": obj.date_effective_coverage.strftime("%Y-%m-%d") if obj.date_effective_coverage else "N/A",
+        "fecha_poliza": obj.created_at.strftime("%Y-%m-%d") if obj.created_at else "N/A",
         "estatus": obj.status or "N/A"
     })
 
@@ -312,7 +312,7 @@ def obtener_detalles_clientes(company_id, weekRanges):
     supp_qs = Supp.objects.filter(is_active=True, company_id=company_id).select_related("client", "agent")
     agregar("supp", supp_qs, "clientes_supp", "created_at", lambda obj: {
         "nombre": f"{obj.client.first_name} {obj.client.last_name}",
-        "fecha_poliza": obj.effective_date.strftime("%Y-%m-%d") if obj.effective_date else "N/A",
+        "fecha_poliza": obj.created_at.strftime("%Y-%m-%d") if obj.created_at else "N/A",
         "estatus": obj.status or "N/A",
         "policy_type": obj.policy_type or "N/A"
     })
@@ -321,7 +321,7 @@ def obtener_detalles_clientes(company_id, weekRanges):
     assure_qs = ClientsAssure.objects.filter(is_active=True, company_id=company_id).select_related("agent")
     agregar("assure", assure_qs, "clientes_assure", "created_at", lambda obj: {
         "nombre": f"{obj.first_name} {obj.last_name}",
-        "fecha_poliza": obj.date_effective_coverage.strftime("%Y-%m-%d") if obj.date_effective_coverage else "N/A",
+        "fecha_poliza": obj.created_at.strftime("%Y-%m-%d") if obj.created_at else "N/A",
         "estatus": obj.status or "N/A"
     })
 
@@ -329,7 +329,7 @@ def obtener_detalles_clientes(company_id, weekRanges):
     medicare_qs = Medicare.objects.filter(is_active=True, company_id=company_id).select_related("agent")
     agregar("medicare", medicare_qs, "clientes_medicare", "created_at", lambda obj: {
         "nombre": f"{obj.first_name} {obj.last_name}",
-        "fecha_poliza": obj.dateMedicare.strftime("%Y-%m-%d") if obj.dateMedicare else "N/A",
+        "fecha_poliza": obj.created_at.strftime("%Y-%m-%d") if obj.created_at else "N/A",
         "estatus": obj.status or "N/A"
     })
 
@@ -337,7 +337,7 @@ def obtener_detalles_clientes(company_id, weekRanges):
     life_qs = ClientsLifeInsurance.objects.filter(is_active=True, company_id=company_id).select_related("agent")
     agregar("life", life_qs, "clientes_life", "created_at", lambda obj: {
         "nombre": obj.full_name,
-        "fecha_poliza": obj.date_effective_coverage.strftime("%Y-%m-%d") if obj.date_effective_coverage else "N/A",
+        "fecha_poliza": obj.created_at.strftime("%Y-%m-%d") if obj.created_at else "N/A",
         "estatus": obj.status or "N/A"
     })
 
@@ -349,18 +349,4 @@ def obtener_detalles_clientes(company_id, weekRanges):
         } for nombre_agente, data in agentes.items()
     ]
 
-from datetime import datetime
-
-def parse_week_ranges(weekRangesStr):
-    result = []
-    for rango in weekRangesStr:
-        try:
-            start_str, end_str = rango.split(" - ")
-            # Parseo con formato abreviado de mes y día (ej: Jun 3)
-            start = datetime.strptime(start_str.strip(), "%b %d").replace(year=datetime.now().year).date()
-            end = datetime.strptime(end_str.strip(), "%b %d").replace(year=datetime.now().year).date()
-            result.append((start, end))
-        except Exception as e:
-            print(f"❌ Error al parsear week range: {rango} -> {e}")
-    return result
 

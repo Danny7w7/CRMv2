@@ -21,10 +21,6 @@
             font-size: 11px;
             margin-top: 10px;
         }
-        .semana-titulo {
-            font-weight: bold;
-            margin-top: 10px;
-        }
         hr {
             margin-top: 10px;
             margin-bottom: 10px;
@@ -38,64 +34,59 @@
         <h2>{{ agente.name }}</h2>
         <img src="data:image/png;base64,{{ agente.grafico }}" alt="Gráfico de {{ agente.name }}">
 
+        <!-- Detalles del agente -->
         {% for detalle in detalles_clientes %}
             {% if detalle.nombre == agente.name %}
                 <div class="detalles-clientes">
-                    {% for semana in detalle.semanas %}
-                        <div class="semana-titulo">Semana: {{ semana.rango }}</div>
+                    {% if detalle.clientes_obama %}
+                        <strong>ObamaCare Clients:</strong><br>
+                        {% for cliente in detalle.clientes_obama %}
+                            📌 {{ forloop.counter }} - <strong>Name:</strong> {{ cliente.nombre }},
+                            <strong>Policy Date:</strong> {{ cliente.fecha_poliza }},
+                            <strong>Status:</strong> {{ cliente.estatus }}<br>
+                        {% endfor %}<br>
+                    {% endif %}
 
-                        {% if semana.clientes_obama %}
-                            <strong>ObamaCare Clients:</strong><br>
-                            {% for cliente in semana.clientes_obama %}
-                                📌 {{ forloop.counter }} - <strong>Name:</strong> {{ cliente.nombre }},
-                                <strong>Policy Date:</strong> {{ cliente.fecha_poliza }},
-                                <strong>Status:</strong> {{ cliente.estatus }}<br>
-                            {% endfor %}<br>
-                        {% endif %}
+                    {% if detalle.clientes_supp %}
+                        <strong>Supp Clients:</strong><br>
+                        {% for cliente in detalle.clientes_supp %}
+                            📌 {{ forloop.counter }} - <strong>Name:</strong> {{ cliente.nombre }},
+                            <strong>Policy Date:</strong> {{ cliente.fecha_poliza }},
+                            <strong>Status:</strong> {{ cliente.estatus }},
+                            <strong>Type Policy:</strong> {{ cliente.policy_type }}<br>
+                        {% endfor %}<br>
+                    {% endif %}
 
-                        {% if semana.clientes_supp %}
-                            <strong>Supp Clients:</strong><br>
-                            {% for cliente in semana.clientes_supp %}
-                                📌 {{ forloop.counter }} - <strong>Name:</strong> {{ cliente.nombre }},
-                                <strong>Policy Date:</strong> {{ cliente.fecha_poliza }},
-                                <strong>Status:</strong> {{ cliente.estatus }},
-                                <strong>Type Policy:</strong> {{ cliente.policy_type }}<br>
-                            {% endfor %}<br>
-                        {% endif %}
+                    {% if detalle.clientes_assure %}
+                        <strong>Assure Clients:</strong><br>
+                        {% for cliente in detalle.clientes_assure %}
+                            📌 {{ forloop.counter }} - <strong>Name:</strong> {{ cliente.nombre }},
+                            <strong>Policy Date:</strong> {{ cliente.fecha_poliza }},
+                            <strong>Status:</strong> {{ cliente.estatus }}<br>
+                        {% endfor %}<br>
+                    {% endif %}
 
-                        {% if semana.clientes_assure %}
-                            <strong>Assure Clients:</strong><br>
-                            {% for cliente in semana.clientes_assure %}
-                                📌 {{ forloop.counter }} - <strong>Name:</strong> {{ cliente.nombre }},
-                                <strong>Policy Date:</strong> {{ cliente.fecha_poliza }},
-                                <strong>Status:</strong> {{ cliente.estatus }}<br>
-                            {% endfor %}<br>
-                        {% endif %}
+                    {% if detalle.clientes_medicare %}
+                        <strong>Medicare Clients:</strong><br>
+                        {% for cliente in detalle.clientes_medicare %}
+                            📌 {{ forloop.counter }} - <strong>Name:</strong> {{ cliente.nombre }},
+                            <strong>Policy Date:</strong> {{ cliente.fecha_poliza }},
+                            <strong>Status:</strong> {{ cliente.estatus }}<br>
+                        {% endfor %}<br>
+                    {% endif %}
 
-                        {% if semana.clientes_medicare %}
-                            <strong>Medicare Clients:</strong><br>
-                            {% for cliente in semana.clientes_medicare %}
-                                📌 {{ forloop.counter }} - <strong>Name:</strong> {{ cliente.nombre }},
-                                <strong>Policy Date:</strong> {{ cliente.fecha_poliza }},
-                                <strong>Status:</strong> {{ cliente.estatus }}<br>
-                            {% endfor %}<br>
-                        {% endif %}
-
-                        {% if semana.clientes_life %}
-                            <strong>Life Insurance Clients:</strong><br>
-                            {% for cliente in semana.clientes_life %}
-                                📌 {{ forloop.counter }} - <strong>Name:</strong> {{ cliente.nombre }},
-                                <strong>Policy Date:</strong> {{ cliente.fecha_poliza }},
-                                <strong>Status:</strong> {{ cliente.estatus }}<br>
-                            {% endfor %}<br>
-                        {% endif %}
-
-                        <hr>
-                    {% endfor %}
+                    {% if detalle.clientes_life %}
+                        <strong>Life Insurance Clients:</strong><br>
+                        {% for cliente in detalle.clientes_life %}
+                            📌 {{ forloop.counter }} - <strong>Name:</strong> {{ cliente.nombre }},
+                            <strong>Policy Date:</strong> {{ cliente.fecha_poliza }},
+                            <strong>Status:</strong> {{ cliente.estatus }}<br>
+                        {% endfor %}<br>
+                    {% endif %}
                 </div>
+                <hr>
             {% endif %}
         {% endfor %}
-
     {% endfor %}
 </body>
 </html>
