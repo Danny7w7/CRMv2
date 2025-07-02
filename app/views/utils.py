@@ -349,3 +349,18 @@ def obtener_detalles_clientes(company_id, weekRanges):
         } for nombre_agente, data in agentes.items()
     ]
 
+from datetime import datetime
+
+def parse_week_ranges(weekRangesStr):
+    result = []
+    for rango in weekRangesStr:
+        try:
+            start_str, end_str = rango.split(" - ")
+            # Parseo con formato abreviado de mes y día (ej: Jun 3)
+            start = datetime.strptime(start_str.strip(), "%b %d").replace(year=datetime.now().year).date()
+            end = datetime.strptime(end_str.strip(), "%b %d").replace(year=datetime.now().year).date()
+            result.append((start, end))
+        except Exception as e:
+            print(f"❌ Error al parsear week range: {rango} -> {e}")
+    return result
+

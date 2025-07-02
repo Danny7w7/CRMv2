@@ -12,7 +12,7 @@ from app.views.consents import getCompanyPerAgent
 from app.views.reports.table import table6Week
 from app.views.sms import sendIndividualsSms, comprobate_company
 from app.utils import generateWeeklyPdf, uploadTempUrl
-from app.views.utils import crearRequest, sale6Week, obtener_detalles_clientes
+from app.views.utils import crearRequest, parse_week_ranges, sale6Week, obtener_detalles_clientes
 
 logger = get_task_logger(__name__)
 
@@ -162,9 +162,14 @@ def enviar_pdf_por_sms_telnyx():
     request = crearRequest(user)
 
     # Aquí se genera el PDF real con gráficas gracias a Playwright
-    finalSummary, weekRanges = table6Week(request)
+    finalSummary, weekRanges_str = table6Week(request)
+
+    # ✅ Convertir los strings en tuplas de fechas
+    weekRanges = parse_week_ranges(weekRanges_str)
+
     detalles_clientes = obtener_detalles_clientes(request.company_id, weekRanges) 
-    pdf_url = sale6Week(finalSummary, weekRanges, detalles_clientes)
+    
+    pdf_url = sale6Week(finalSummary, weekRanges_str, detalles_clientes)
 
     telnyx.api_key = settings.TELNYX_API_KEY
 
