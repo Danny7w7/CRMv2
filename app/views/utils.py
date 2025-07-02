@@ -147,7 +147,7 @@ def generar_grafico_base64(nombre, semanas, data):
     from io import BytesIO
     import base64
 
-    fig, ax1 = plt.subplots(figsize=(22, 8))  # ➕ espacio horizontal
+    fig, ax1 = plt.subplots(figsize=(22, 8))  # ➕ más ancho
 
     x = np.arange(len(semanas))
     categorias = ["ACA", "Act ACA", "Supp", "Act Supp", "Assure", "Medicare", "Life"]
@@ -162,25 +162,23 @@ def generar_grafico_base64(nombre, semanas, data):
     }
 
     total_barras = len(categorias)
-    bar_width = 0.1  # más delgado porque hay más categorías
+    bar_width = 0.1
     offset_inicio = -(total_barras - 1) / 2 * bar_width
 
-    # Dibujar las barras
     for i, categoria in enumerate(categorias):
         offset = offset_inicio + i * bar_width
         valores = data.get(categoria, [0] * len(x))
         bars = ax1.bar(x + offset, valores, width=bar_width, label=categoria, color=colores.get(categoria, "#ccc"))
-        
-        # Etiquetas
+
         for bar in bars:
             height = bar.get_height()
-            ax1.annotate(f'{height}',
-                         xy=(bar.get_x() + bar.get_width() / 2, height),
-                         xytext=(0, 4),
-                         textcoords="offset points",
-                         ha='center', va='bottom', fontsize=8)
+            if height > 0:
+                ax1.annotate(f'{height}',
+                             xy=(bar.get_x() + bar.get_width() / 2, height),
+                             xytext=(0, 4),
+                             textcoords="offset points",
+                             ha='center', va='bottom', fontsize=8)
 
-    # Línea de Total
     if "Total" in data:
         ax1.plot(x, data["Total"], color="black", marker="o", linestyle="--", linewidth=2, label="Total")
         for i, val in enumerate(data["Total"]):
@@ -191,7 +189,6 @@ def generar_grafico_base64(nombre, semanas, data):
                          ha='center', va='bottom',
                          fontsize=9, color='black', weight='bold')
 
-    # Ejes
     ax1.set_xticks(x)
     ax1.set_xticklabels(semanas)
     ax1.set_title(f"Ventas de {nombre}", fontsize=15, weight='bold')
@@ -209,20 +206,24 @@ def generar_grafico_base64(nombre, semanas, data):
     plt.close(fig)
     return img_base64
 
+
 def transformar_summary(finalSummary, weekRanges):
     resultado = []
     for name, data in finalSummary.items():
         aca, act_aca, supp, act_supp = [], [], [], []
-        assure, medicare, life = [], [], []
-        total = []
+        assure, medicare, life, total = [], [], [], []
 
         for i in range(1, 7):
-            semana = data.get(f"Week{i}", {
-                "obama": 0, "activeObama": 0,
-                "supp": 0, "activeSupp": 0,
-                "assure": 0, "medicare": 0, "life": 0,
-                "total": 0
-            })
+            semana = data.get(f"Week{i}", {})
+            semana.setdefault("obama", 0)
+            semana.setdefault("activeObama", 0)
+            semana.setdefault("supp", 0)
+            semana.setdefault("activeSupp", 0)
+            semana.setdefault("assure", 0)
+            semana.setdefault("medicare", 0)
+            semana.setdefault("life", 0)
+            semana.setdefault("total", 0)
+
             aca.append(semana["obama"])
             act_aca.append(semana["activeObama"])
             supp.append(semana["supp"])
@@ -249,6 +250,7 @@ def transformar_summary(finalSummary, weekRanges):
         })
 
     return resultado
+
 
 from app.models import ClientsAssure, Medicare, ClientsLifeInsurance
 
