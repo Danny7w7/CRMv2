@@ -144,8 +144,8 @@ def buscarPlanes(request):
             if response.status_code == 200:
                 planes = response.json()
             else:
-                planes = {"error": f"Error {response.status_code} - {response.text}"}
-                #planes = {"error": "No hay planes!"}
+                # planes = {"error": f"Error {response.status_code} - {response.text}"}
+                planes = {"error": "No hay planes!"}
 
         except Exception as e:
             planes = {"error": f"Error en los datos enviados: {str(e)}"}
