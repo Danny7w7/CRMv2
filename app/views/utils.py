@@ -270,8 +270,15 @@ def sale6Week(finalSummary, weekRanges, detalles_clientes):
 from collections import defaultdict
 from app.models import ObamaCare, Supp, ClientsAssure, Medicare, ClientsLifeInsurance
 
+from collections import defaultdict
+from datetime import timedelta
+from django.utils import timezone
+from app.models import ObamaCare, Supp, ClientsAssure, Medicare, ClientsLifeInsurance
+
 def obtener_detalles_clientes(company_id):
     resultado = []
+    fecha_corte = timezone.now() - timedelta(weeks=6)
+
     agentes = defaultdict(lambda: {
         "clientes_obama": [],
         "clientes_supp": [],
@@ -284,7 +291,8 @@ def obtener_detalles_clientes(company_id):
     obamacare_qs = ObamaCare.objects.filter(
         is_active=True,
         company_id=company_id,
-        client__isnull=False
+        client__isnull=False,
+        created_at__gte=fecha_corte
     ).select_related("client", "agent")
 
     for record in obamacare_qs:
@@ -299,7 +307,8 @@ def obtener_detalles_clientes(company_id):
     supp_qs = Supp.objects.filter(
         is_active=True,
         company_id=company_id,
-        client__isnull=False
+        client__isnull=False,
+        created_at__gte=fecha_corte
     ).select_related("client", "agent")
 
     for record in supp_qs:
@@ -314,7 +323,8 @@ def obtener_detalles_clientes(company_id):
     # Assure
     assure_qs = ClientsAssure.objects.filter(
         is_active=True,
-        company_id=company_id
+        company_id=company_id,
+        created_at__gte=fecha_corte
     ).select_related("agent")
 
     for record in assure_qs:
@@ -327,7 +337,8 @@ def obtener_detalles_clientes(company_id):
     # Medicare
     medicare_qs = Medicare.objects.filter(
         is_active=True,
-        company_id=company_id
+        company_id=company_id,
+        created_at__gte=fecha_corte
     ).select_related("agent")
 
     for record in medicare_qs:
@@ -340,7 +351,8 @@ def obtener_detalles_clientes(company_id):
     # Life Insurance
     life_qs = ClientsLifeInsurance.objects.filter(
         is_active=True,
-        company_id=company_id
+        company_id=company_id,
+        created_at__gte=fecha_corte
     ).select_related("agent")
 
     for record in life_qs:
