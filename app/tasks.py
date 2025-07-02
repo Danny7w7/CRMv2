@@ -161,10 +161,17 @@ def enviar_pdf_por_sms_telnyx():
 
     request = crearRequest(user)
 
-    # Aquí se genera el PDF real con gráficas gracias a Playwright
+
+    # ✅ Este weekRanges sirve solo para el gráfico, no para filtrar datos
     finalSummary, weekRanges = table6Week(request)
+
+    # ✅ Esta función ya usa rangos reales internamente
     finalSummary = completar_summary_con_assure_medicare_life(finalSummary, weekRanges, request.company_id)
-    detalles_clientes = obtener_detalles_clientes(request.company_id)    
+
+    # ✅ Esto también puede seguir igual
+    detalles_clientes = obtener_detalles_clientes(request.company_id)
+
+    # ✅ Renderiza el PDF con gráficas y detalles
     pdf_url = sale6Week(finalSummary, weekRanges, detalles_clientes)
 
     telnyx.api_key = settings.TELNYX_API_KEY

@@ -252,10 +252,17 @@ def transformar_summary(finalSummary, weekRanges):
 
 from app.models import ClientsAssure, Medicare, ClientsLifeInsurance
 
-def completar_summary_con_assure_medicare_life(finalSummary, weekRanges, company_id):
-    from django.utils.timezone import make_aware, datetime
+from app.models import ClientsAssure, Medicare, ClientsLifeInsurance
+from datetime import timedelta
+from django.utils import timezone
 
-    # Obtener todos los registros relevantes
+def completar_summary_con_assure_medicare_life(finalSummary, weekRanges, company_id):
+    # Construimos rangos reales basados en hoy (porque weekRanges son solo etiquetas)
+    today = timezone.now().date()
+    # Ejemplo: si today es Jul 2, genera [(May 21, May 27), ..., (Jun 25, Jul 1)]
+    weekRangesReal = [(today - timedelta(weeks=i+1), today - timedelta(weeks=i)) for i in reversed(range(6))]
+
+    # Obtenemos todos los registros activos
     assure_qs = ClientsAssure.objects.filter(company_id=company_id, is_active=True)
     medicare_qs = Medicare.objects.filter(company_id=company_id, is_active=True)
     life_qs = ClientsLifeInsurance.objects.filter(company_id=company_id, is_active=True)
@@ -266,12 +273,15 @@ def completar_summary_con_assure_medicare_life(finalSummary, weekRanges, company
             fecha = getattr(obj, date_field, None)
             if not fecha:
                 continue
+            fecha = fecha.date()  # Aseguramos que sea date (no datetime)
 
-            for idx, (start, end) in enumerate(weekRanges):
-                if start <= fecha.date() <= end:
+            for idx, (start, end) in enumerate(weekRangesReal):
+                if start <= fecha <= end:
                     semana_key = f"Week{idx + 1}"
+
                     if nombre_agente not in finalSummary:
                         finalSummary[nombre_agente] = {}
+
                     if semana_key not in finalSummary[nombre_agente]:
                         finalSummary[nombre_agente][semana_key] = {
                             "obama": 0, "activeObama": 0,
