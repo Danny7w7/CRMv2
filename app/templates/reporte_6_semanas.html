@@ -3,19 +3,19 @@
 <head>
     <meta charset="utf-8">
     <title>Reporte 6 Semanas</title>
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
             font-size: 12px;
             padding: 20px;
         }
-        .chart-container {
-            page-break-after: always;
+        img {
+            width: 100%;
+            max-width: 600px;
             margin-bottom: 40px;
         }
-        .chart-container:last-child {
-            page-break-after: auto;
+        h2 {
+            margin-top: 40px;
         }
     </style>
 </head>
@@ -23,37 +23,8 @@
     <h1>Reporte de Ventas - Últimas 6 Semanas</h1>
 
     {% for agente in summary %}
-        <div class="chart-container">
-            <h2>{{ agente.name }}</h2>
-            <div id="chart-{{ forloop.counter }}"></div>
-            <script>
-                var options{{ forloop.counter }} = {
-                    chart: {
-                        type: 'bar',
-                        height: 300
-                    },
-                    series: [
-                        { name: 'ACA', data: {{ agente.aca|safe }} },
-                        { name: 'Act ACA', data: {{ agente.act_aca|safe }} },
-                        { name: 'Supp', data: {{ agente.supp|safe }} },
-                        { name: 'Act Supp', data: {{ agente.act_supp|safe }} },
-                        { name: 'Total', data: {{ agente.total|safe }} }
-                    ],
-                    xaxis: {
-                        categories: {{ weekRanges|safe }},
-                        title: { text: 'Semanas' }
-                    },
-                    yaxis: {
-                        title: { text: 'Ventas' }
-                    },
-                    title: {
-                        text: '{{ agente.name }} - Ventas Semanales',
-                        align: 'center'
-                    }
-                };
-                new ApexCharts(document.querySelector("#chart-{{ forloop.counter }}"), options{{ forloop.counter }}).render();
-            </script>
-        </div>
+        <h2>{{ agente.name }}</h2>
+        <img src="data:image/png;base64,{{ agente.grafico }}" alt="Gráfico de {{ agente.name }}">
     {% endfor %}
 </body>
 </html>

@@ -129,67 +129,72 @@ def crearRequest(user):
     request.company_id = user.company.id
     return request
 
-def transformar_summary(finalSummary):
-    resultado = []
-
-    for name, data in finalSummary.items():
-        weeks = []
-        for i in range(1, 7):
-            key = f"Week{i}"
-            semana = data.get(key, {
-                "obama": 0, "activeObama": 0, "supp": 0, "activeSupp": 0, "total": 0
-            })
-            weeks.append(semana)
-        resultado.append({"name": name, "weeks": weeks})
-
-    return resultado
-
-
 from weasyprint import HTML
 import boto3
 from io import BytesIO
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.conf import settings
-from playwright.sync_api import sync_playwright
+import matplotlib.pyplot as plt
+import base64
 import tempfile
 import os
 
-def generar_pdf_con_graficas(html_content):
-    # Guardar HTML temporal
-    with tempfile.NamedTemporaryFile(suffix=".html", delete=False) as html_file:
-        html_file.write(html_content.encode("utf-8"))
-        html_path = html_file.name
+def generar_grafico_base64(nombre, semanas, data):
+    fig, ax = plt.subplots()
+    ax.plot(semanas, data["ACA"], label="ACA")
+    ax.plot(semanas, data["Act ACA"], label="Act ACA")
+    ax.plot(semanas, data["Supp"], label="Supp")
+    ax.plot(semanas, data["Act Supp"], label="Act Supp")
+    ax.plot(semanas, data["Total"], label="Total")
+    ax.set_title(f"Ventas de {nombre}")
+    ax.legend()
+    fig.tight_layout()
 
-    # Ruta del PDF temporal
-    pdf_path = html_path.replace(".html", ".pdf")
+    buffer = BytesIO()
+    plt.savefig(buffer, format="png")
+    buffer.seek(0)
+    img_base64 = base64.b64encode(buffer.read()).decode("utf-8")
+    plt.close(fig)
+    return img_base64
 
-    with sync_playwright() as p:
-        browser = p.chromium.launch()
-        page = browser.new_page()
-        page.goto(f"file://{html_path}")
-        page.wait_for_timeout(3000)  # espera 3s para que los gráficos carguen
-        page.pdf(path=pdf_path, format="A4")
-        browser.close()
+def transformar_summary(finalSummary, weekRanges):
+    resultado = []
+    for name, data in finalSummary.items():
+        aca, act_aca, supp, act_supp, total = [], [], [], [], []
 
-    return pdf_path  # Devuelve el path al PDF generado
+        for i in range(1, 7):
+            semana = data.get(f"Week{i}", {
+                "obama": 0, "activeObama": 0, "supp": 0, "activeSupp": 0, "total": 0
+            })
+            aca.append(semana["obama"])
+            act_aca.append(semana["activeObama"])
+            supp.append(semana["supp"])
+            act_supp.append(semana["activeSupp"])
+            total.append(semana["total"])
 
-from django.template.loader import render_to_string
-import boto3
+        img = generar_grafico_base64(name, weekRanges, {
+            "ACA": aca,
+            "Act ACA": act_aca,
+            "Supp": supp,
+            "Act Supp": act_supp,
+            "Total": total,
+        })
 
-
-from django.template.loader import render_to_string
-import boto3
+        resultado.append({"name": name, "grafico": img})
+    return resultado
 
 def sale6Week(finalSummary, weekRanges):
-    summary_transformado = transformar_summary(finalSummary)
+    summary_transformado = transformar_summary(finalSummary, weekRanges)
 
     html = render_to_string("reporte_6_semanas.html", {
         'summary': summary_transformado,
         'weekRanges': weekRanges,
     })
 
-    pdf_path = generar_pdf_con_graficas(html)
+    buffer = BytesIO()
+    HTML(string=html).write_pdf(buffer)
+    buffer.seek(0)
 
     filename = f"reporte_ventas_{timezone.now().strftime('%Y%m%d_%H%M%S')}.pdf"
     key = f"reports/{filename}"
@@ -201,28 +206,18 @@ def sale6Week(finalSummary, weekRanges):
         region_name=settings.AWS_S3_REGION_NAME
     )
 
-    # Subir PDF generado por navegador
-    with open(pdf_path, "rb") as f:
-        s3.upload_fileobj(
-            f,
-            settings.AWS_STORAGE_BUCKET_NAME,
-            key,
-            ExtraArgs={'ContentType': 'application/pdf'}
-        )
+    s3.upload_fileobj(
+        buffer,
+        settings.AWS_STORAGE_BUCKET_NAME,
+        key,
+        ExtraArgs={'ContentType': 'application/pdf'}
+    )
 
-    # Generar URL temporal para MMS
     url_firmado = s3.generate_presigned_url(
         ClientMethod='get_object',
-        Params={
-            'Bucket': settings.AWS_STORAGE_BUCKET_NAME,
-            'Key': key
-        },
+        Params={'Bucket': settings.AWS_STORAGE_BUCKET_NAME, 'Key': key},
         ExpiresIn=3600
     )
 
-    # Limpieza
-    os.remove(pdf_path)
-
     return url_firmado
-
 
