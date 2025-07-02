@@ -34,6 +34,8 @@ urlpatterns = [
     path('logout/', auth.logout_, name='logout'),
     path('motivationalPhrase/', auth.motivationalPhrase, name='motivationalPhrase'), # Vista que renderiza la frase motivacional
 
+    path('marketplace/', auth.buscarPlanes, name='marketplace'),
+
 
     #<---------------------------DashBoard--------------------------->
     path('', index.index, name='index'), #Home
@@ -213,6 +215,11 @@ urlpatterns = [
     path('formCreateControl/', quality.formCreateControl, name='formCreateControl'),
     path('control/', quality.tableControl, name='control'),
     path('createQuality/', quality.createQuality, name='createQuality'),
+
+    path('formCreateQuestionControl/', quality.formCreateQuestionControl, name='formCreateQuestionControl'),
+    path('toggleQuestionControl/<question_id>/', toggles.toggleControlQuestions, name='toggleControlQuestions'),
+
+    path('formAsignationQuestionControl/', quality.formAsignationQuestionControl, name='formAsignationQuestionControl'),
 
 
     #<---------------------------Excel---------------------------> 

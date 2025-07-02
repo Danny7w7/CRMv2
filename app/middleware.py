@@ -30,10 +30,11 @@ MODULE_PATHS = {
     'SALE REPORTS': [ 'sale', 'sale6Week','detalleAgente','weekSalesWiew','downloadPdf','reports','downloadAccionRequired','paymentClients'],
     'CUSTOMER REPORTS': [ 'customerPerformance', 'typification','customerTypification','toggleTypification','get_observation_detail'],
     'GRAPHICAL REPORTS': [ 'averageCustomer', 'salesPerformance','chart6Week'],
-    'QUALITY': [ 'formCreateControl', 'control','createQuality'],
+    'QUALITY': [ 'formCreateControl', 'control','createQuality','formCreateQuestionControl','toggleQuestionControl'],
     'BD': [ 'uploadExcel', 'manageAgentAssignments','reportBd','bd','processAndSave','saveData'],
     'COMPARATIVE': [ 'uploadReports','processExcel','headerProcessor', 'paymentsReports', 'paymentsReportsSupp'],
-    'TEAM MANAGEMENT': [  'customerAssginments']
+    'TEAM MANAGEMENT': [ 'customerAssginments'],
+    'QUOTATION': [ 'marketplace','obtenerCountyfips','obtenerLatLon']
 }
 
 EXCLUDED_VIEWS = ['index','toggleDarkMode' ,'motivationalPhrase','login','logout','viewConsent','consetMedicare','formCreateUser', 'adminSms','addNumbersUsers','incomeLetter','ConsentLifeInsurance','complaint', 'sms','whatsappReply','url_temporal']  # Puedes agregar más si lo necesitas

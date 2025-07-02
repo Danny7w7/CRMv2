@@ -96,5 +96,16 @@ def toggleFinallExpenses(request,finallExpenses_id):
     # Redirigir de nuevo a la página actual con un parámetro de éxito
     return redirect('clientFinallExpenses')
 
+def toggleControlQuestions(request,question_id):
+    
+    # Obtener el cliente por su ID
+    question = get_object_or_404(ControlQuestions, id=question_id)
+    
+    # Cambiar el estado de is_active (True a False o viceversa)
+    question.is_active = not question.is_active
+    question.save()  # Guardar los cambios en la base de datos
+    
+    # Redirigir de nuevo a la página actual con un parámetro de éxito
+    return redirect('formCreateQuestionControl')
 
 

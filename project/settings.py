@@ -217,3 +217,6 @@ AUTH_TOKEN = os.getenv('AUTH_TOKEN')
 #content_sid de mensajes
 AUTHORIZATION = os.getenv('AUTHORIZATION')
 CUSTOMER = os.getenv('CUSTOMER')
+
+#CMS
+CMS_SECRET_KEY = os.getenv('CMS_SECRET_KEY')

@@ -163,6 +163,20 @@
 					</li>
 				{% endif %}
 
+				{% if request.user|has_module:"QUOTATION" %}
+					<li class="menu-label">Quotation</li>
+					<li>
+						<a class="has-arrow" href="javascript:;">
+							<div class="parent-icon"><i class='bx bx-cart'></i></div>
+							<div class="menu-title">Quotation Plans</div>
+						</a>
+						<ul>							
+							<li> <a href="{% url 'marketplace' %}"><i class='bx bx-radio-circle'></i>CMS</a> 
+							</li>						
+						</ul>
+					</li>
+				{% endif %}
+
 				{% if smsIsActive or whatsAppIsActive %}
 
 					{% if request.user|has_module:"SMS" or request.user|has_module:"WHATSAPP" %}
@@ -194,9 +208,10 @@
 
 				{% endif %}
 
-				{% if request.user.role == 'Admin' or request.user.role == 'S'  %}
-				
-					{% if request.user|has_module:"SALE REPORTS" or request.user|has_module:"CUSTOMER REPORTS" %}
+
+				{% if request.user|has_module:"SALE REPORTS" or request.user|has_module:"CUSTOMER REPORTS" %}
+
+					{% if request.user.role == 'Admin' or request.user.role == 'S'  %}
 					
 						<li class="menu-label">Reports</li>
 
@@ -298,6 +313,10 @@
 								</li>
 								<li> <a href="{% url 'createQuality' %}"><i class='bx bx-radio-circle'></i>Generate Pdf</a>
 								</li>
+								<li> <a href="{% url 'formCreateQuestionControl' %}"><i class='bx bx-radio-circle'></i>Questions Control</a>
+								</li> 
+								<li> <a href="{% url 'formAsignationQuestionControl' %}"><i class='bx bx-radio-circle'></i>Answering Questions</a>
+								</li> 
 							</ul>
 						</li>
 					{% endif %}

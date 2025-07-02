@@ -259,12 +259,6 @@ from datetime import timedelta
 from django.utils import timezone
 
 def completar_summary_con_assure_medicare_life(finalSummary, weekRanges, company_id):
-    # Construimos rangos reales basados en hoy (porque weekRanges son solo etiquetas)
-    today = timezone.now().date()
-    # Ejemplo: si today es Jul 2, genera [(May 21, May 27), ..., (Jun 25, Jul 1)]
-    weekRangesReal = [(today - timedelta(weeks=i+1), today - timedelta(weeks=i)) for i in reversed(range(6))]
-
-    # Obtenemos todos los registros activos
     assure_qs = ClientsAssure.objects.filter(company_id=company_id, is_active=True)
     medicare_qs = Medicare.objects.filter(company_id=company_id, is_active=True)
     life_qs = ClientsLifeInsurance.objects.filter(company_id=company_id, is_active=True)
@@ -275,9 +269,9 @@ def completar_summary_con_assure_medicare_life(finalSummary, weekRanges, company
             fecha = getattr(obj, date_field, None)
             if not fecha:
                 continue
-            fecha = fecha.date()  # Aseguramos que sea date (no datetime)
+            fecha = fecha.date()  # Por si viene como datetime
 
-            for idx, (start, end) in enumerate(weekRangesReal):
+            for idx, (start, end) in enumerate(weekRanges):
                 if start <= fecha <= end:
                     semana_key = f"Week{idx + 1}"
 
@@ -295,10 +289,6 @@ def completar_summary_con_assure_medicare_life(finalSummary, weekRanges, company
                             "life": 0,
                             "total": 0
                         }
-
-                    # ✅ Asegurar también que la clave field_name existe
-                    if field_name not in finalSummary[nombre_agente][semana_key]:
-                        finalSummary[nombre_agente][semana_key][field_name] = 0
 
                     finalSummary[nombre_agente][semana_key][field_name] += 1
                     finalSummary[nombre_agente][semana_key]["total"] += 1

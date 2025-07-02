@@ -154,3 +154,75 @@ def generatePdfQuality(request, consultQuality,agentReport,start_date,end_date,d
     response = HttpResponse(pdf_file, content_type='application/pdf')
     response['Content-Disposition'] = 'inline; filename="output.pdf"'
     return response
+
+@login_required(login_url='/login')  
+@company_ownership_required_sinURL  
+def formCreateQuestionControl(request):
+
+    company_id = request.company_id
+    company = Companies.objects.filter(id=company_id).first()
+
+    if request.user.is_superuser:
+        questions = ControlQuestions.objects.select_related('company').all()
+    else:
+        questions = ControlQuestions.objects.filter(company = company_id, is_active = True)
+
+    if request.method == 'POST':
+
+        question = request.POST.get('question')
+
+        if question is not None:
+
+            ControlQuestions.objects.create(
+                user = request.user,
+                questions = question,
+                company = company
+            )
+
+            return redirect('formCreateQuestionControl')
+
+    return render(request, 'quality/formCreateQuestionControl.html',{'questions': questions})
+
+@login_required(login_url='/login')  
+@company_ownership_required_sinURL  
+def formAsignationQuestionControl(request):
+
+    company_id = request.company_id
+    company = Companies.objects.filter(id=company_id).first()
+
+    if request.user.is_superuser:
+        questions = ControlQuestions.objects.select_related('company').all()
+        user = Users.objects.all()
+        client = Clients.objects.all()
+    else:
+        questions = ControlQuestions.objects.filter(company = company_id, is_active = True)
+        user = Users.objects.filter(company = company_id, is_active = True)
+        client = Clients.objects.filter(company = company_id, is_active = True)
+
+    context = {
+        'questions': questions,
+        'users': user,
+        'client':client
+    }
+
+    if request.method == 'POST':
+
+        agentID = request.POST.get('agent')
+        agent = Users.objects.filter(id = agentID).first()
+        clientID = request.POST.get('client')
+        clients = Clients.objects.filter(id = clientID).first()
+
+        for question in questions:
+            key = f"question_{question.id}"
+            answer = request.POST.get(key)
+
+            if answer == "yes":
+                QuestionTracking.objects.create(
+                    control_agent = request.user,
+                    sales_agent = agent,
+                    client=clients,
+                    company = company,
+                    control_question = question,
+                )
+    
+    return render (request, 'quality/formAsignationQuestionControl.html', context)

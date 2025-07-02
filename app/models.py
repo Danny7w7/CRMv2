@@ -912,6 +912,32 @@ class FinallExpenses(models.Model):
     class Meta:
         db_table = 'finall_expenses'
 
+class ControlQuestions(models.Model):
+
+    user = models.ForeignKey(Users, on_delete=models.CASCADE)
+    questions = models.TextField()
+    is_active = models.BooleanField(default=True) 
+    created_at = models.DateTimeField(auto_now_add=True)
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE)
+
+    
+    class Meta:
+        db_table = 'control_questions'
+
+class QuestionTracking(models.Model):
+
+    control_question = models.ForeignKey(ControlQuestions, on_delete=models.CASCADE)
+    control_agent = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='control_agent')
+    sales_agent = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='sales_agent')
+    client = models.ForeignKey(Clients, on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=True) 
+    created_at = models.DateTimeField(auto_now_add=True)
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE)
+
+
+    class Meta:
+        db_table = 'question_tracking'
+
 
 from .modelsSMS import *
 from .modelsWhatsapp import *

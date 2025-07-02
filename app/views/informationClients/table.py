@@ -1,6 +1,6 @@
 # Django core libraries
 from django.contrib.auth.decorators import login_required
-from django.db.models import Subquery, OuterRef
+from django.db.models import Subquery, OuterRef, Exists
 from django.db.models.functions import Substr
 from django.shortcuts import render
 
@@ -14,20 +14,41 @@ def clientObamacare(request):
 
     company_id = request.company_id  # Obtener company_id desde request
 
+    # Rango de fechas del mes actual
+    now = timezone.now()
+    start_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    end_month = (start_month + timezone.timedelta(days=32)).replace(day=1)
+
+    obs = ObservationCustomer.objects.filter(
+        obamacare=OuterRef('pk'),
+        is_active=True,
+        created_at__gte=start_month,
+        created_at__lt=end_month
+    )
+
     if request.user.is_superuser:
+
         obamaCare = ObamaCare.objects.select_related('agent','client').annotate(
-            truncated_agent_usa=Substr('agent_usa', 1, 8)).exclude(
+            truncated_agent_usa=Substr('agent_usa', 1, 8),
+            has_observation=Subquery(obs.values('typification')[:1])).exclude(
                 id__in=CustomerRedFlag.objects.filter(date_completed__isnull=True).values_list(
-                    'obamacare_id', flat=True)).order_by('-created_at')       
+                    'obamacare_id', flat=True)).order_by('-created_at')           
+
     elif request.user.role == 'Admin':         
-        obamaCare = ObamaCare.objects.visible_for_user(request.user).select_related('agent','client').exclude(
-                id__in=CustomerRedFlag.objects.filter(date_completed__isnull=True).values_list(
-                    'obamacare_id', flat=True)).order_by('-created_at')    
+        obamaCare = ObamaCare.objects.visible_for_user(request.user).select_related('agent','client').only(
+            'agent_usa', 'agent__first_name', 'agent__last_name', 'client__first_name', 'client__last_name',
+                'client__phone_number', 'status', 'status_color', 'profiling','created_at', 'is_active').annotate(
+                    has_observation=Subquery(obs.values('typification')[:1])
+                        ).exclude(id__in=CustomerRedFlag.objects.filter(date_completed__isnull=True).values_list(
+                            'obamacare_id', flat=True)).order_by('-created_at')    
     else:
-        obamaCare = ObamaCare.objects.select_related('agent', 'client').annotate(
-            truncated_agent_usa=Substr('agent_usa', 1, 8)).filter(is_active = True, company = company_id).exclude(
-                id__in=CustomerRedFlag.objects.filter(date_completed__isnull=True).values_list(
-                    'obamacare_id', flat=True)).order_by('-created_at')  
+        obamaCare = ObamaCare.objects.select_related('agent', 'client').only(
+            'agent_usa', 'agent__first_name', 'agent__last_name', 'client__first_name', 'client__last_name',
+                'client__phone_number', 'status', 'status_color', 'profiling','created_at', 'is_active').annotate(
+                    truncated_agent_usa=Substr('agent_usa', 1, 8),
+                    has_observation=Subquery(obs.values('typification')[:1])).filter(is_active = True, company = company_id).exclude(
+                        id__in=CustomerRedFlag.objects.filter(date_completed__isnull=True).values_list(
+                            'obamacare_id', flat=True)).order_by('-created_at')  
 
     context = {
         'obamacares': obamaCare,

@@ -1,7 +1,7 @@
 {% extends "dashboard/index.html" %}
 {% load static %}
 {% block head %}
-    <title>BD Assignment</title>
+    <title>Creation Control Questions</title>
 	<!--plugins-->
 	<link href="{% static "assets/plugins/simplebar/css/simplebar.css" %}" rel="stylesheet" />
 	<link href="{% static "assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" %}" rel="stylesheet" />
@@ -20,57 +20,83 @@
 	<link rel="stylesheet" href="{% static "assets/css/dark-theme.css" %}" />
 	<link rel="stylesheet" href="{% static "assets/css/semi-dark.css" %}" />
 	<link rel="stylesheet" href="{% static "assets/css/header-colors.css" %}" />
-
-	<!-- jQuery (requerido para Select2) -->
-	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-
 {% endblock %}
 {% block page_content %}
-<h6 class="mb-0 text-uppercase">BD Assignment</h6>
+<h6 class="mb-0 text-uppercase">CREATION CONTROL QUESTIONS</h6>
 <hr/>
+
 <div class="row">
 	<div class="col-xl-10 mx-auto">
 		<div class="card">
+			<div class="card-header px-4 py-3">
+				<h5 class="mb-0">Enter Questions</h5>
+			</div>
 			<div class="card-body p-4">
-
-				{% if error %}
-				<div style="color: red;">
-					{{ error }}
-				</div>
-				{% endif %}
-
-				{% if success %}
-				<div style="color: green;">
-					{{ success }}
-				</div>
-				{% endif %}
-
-				<form method="post">
+				<form class="row g-3 needs-validation" method="POST" >
 					{% csrf_token %}
-
-					<label for="file_name">Selecciona un Archivo:</label>
-					<select name="file_name" class="form-select" id="file_name" required>
-						<option value="" selected disabled>-- Selecciona un Archivo --</option>
-						{% for file in files %}
-						<option value="{{ file.id }}">{{ file.file_name }}</option>
-						{% endfor %}
-					</select>
-					<br><br>
-
-					<label for="users">Selecciona Usuarios:</label>
-					<select name="users" id="users" class="form-select" multiple required>
-						{% for user in users %}
-						<option value="{{ user.id }}">{{ user.first_name }} {{ user.last_name }}</option>
-						{% endfor %}
-					</select>
-					<br><br>
-
-					<button type="submit" class="btn btn-secondary px-4" name="action" value="assign">Asignar Agentes</button>
-					<button type="submit" class="btn btn-secondary px-4" name="action" value="remove">Quitar Asignaciones</button>
+					<div class="col-md-12">
+						<label for="question" class="form-label">Question</label>
+						<textarea class="form-control" id="question" name="question" rows="3" style="resize: none"  ></textarea>
+					</div>
+					<div class="col-md-12">
+						<div class="d-md-flex d-grid align-items-center gap-3">
+							<button type="submit" class="btn btn-primary px-4">Submit</button>
+						</div>
+					</div>
 				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<HR>
+
+<div class="row">
+	<div class="col-xl-10 mx-auto">
+		<div class="card">
+			<div class="card-header px-4 py-3">
+				<h5 class="mb-0">All Questions</h5>
+			</div>
+			<div class="card-body p-6">
+				<table id="tableQuestion" class="table table-striped table-bordered">
+					<thead>
+						<tr>
+							<th>Question</th>
+							<th>Date</th>
+							{% if request.user.role == 'Admin' %}
+								<th>Active</th>
+							{% endif %}
+							{% if request.user.is_superuser %}
+								<th>Company</th>
+							{% endif %}
+							{% if request.user.role == 'Admin' %}
+								<th>Options</th>
+							{% endif %}							
+						</tr>
+					</thead>
+					<tbody>
+						{% for item in questions %}
+							<tr>
+								<td>{{ item.questions }}</td>
+								<td>{{item.created_at|date:"m-d-Y"}}</td>
+								{% if request.user.role == 'Admin' %}
+									<td> {{item.is_active}} </td>
+								{% endif  %}
+								{% if request.user.is_superuser %}
+									<td> {{item.company.company_name}} </td>
+								{% endif %}
+								{% if request.user.role == 'Admin' %}
+									<td>		
+										<a href="{% url 'toggleControlQuestions' item.id %}" class="ms-3">
+											<i class="bx bxs-trash"></i>
+										</a>
+									</td> 
+								{% endif %}								
+							</tr>
+						{% endfor %}
+					</tbody>
+           		</table>
 				
-								
 			</div>
 		</div>
 	</div>
@@ -86,47 +112,14 @@
 	<script src="{% static "assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js" %}"></script>
 	<script src="{% static "assets/plugins/datatable/js/jquery.dataTables.min.js" %}"></script>
 	<script src="{% static "assets/plugins/datatable/js/dataTables.bootstrap5.min.js" %}"></script>
-	<!-- Select2 JS -->
-	<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
 	<!--app JS-->
 	<script src="{% static "assets/js/app.js" %}"></script>
 
 	<script>
-        $(document).ready(function() {
-            $('#users').select2({
-                placeholder: "Select an option",
-                allowClear: true
-            });
-        });
-    </script>
-	<style>
-			table {
-				width: 100%;
-				border-collapse: collapse;
-				margin: 20px 0;
-			}
-			
-			td, th {
-				border: 1px solid #ddd;
-				padding: 12px;
-			}
-			
-			.center-text {
-				text-align: center;
-			}
-			
-			.center-all {
-				text-align: center;
-				vertical-align: middle;
-			}
-			
-	
-			caption {
-				font-weight: bold;
-				margin-bottom: 10px;
-				color: #333;
-			}
+        $(document).ready(function() {$('#tableQuestion').DataTable();} );
+	</script>
 
-		</style>
+	
 
 {% endblock %}

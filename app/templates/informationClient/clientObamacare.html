@@ -51,7 +51,17 @@
                     <tr>
                         <td>{{ obamacare.agent_usa }}</td>
                         <td>{{obamacare.agent.first_name}} {{obamacare.agent.last_name}}</td>
-                        <td>{{obamacare.client.first_name}} {{obamacare.client.last_name}}</td>
+                        <td>{{obamacare.client.first_name}} {{obamacare.client.last_name}}
+							{% if 'EFFECTIVE MANAGEMENT' in obamacare.has_observation %}
+								<div class="d-flex align-items-center text-success">	
+									<i class='bx bx-radio-circle-marked bx-burst bx-rotate-90 align-middle font-18 me-1'></i> 
+								</div>
+							{% elif 'NO ANSWER' in obamacare.has_observation %}
+								<div class="d-flex align-items-center text-danger">
+									<i class='bx bx-radio-circle-marked bx-burst bx-rotate-90 align-middle font-18 me-1'></i>
+								</div>
+							{% endif %}
+						</td>
                         <td>{{obamacare.client.phone_number|formatUsaPhone}}</td>
 						<td>{{obamacare.created_at|date:"m-d-Y"}}</td>
 						<td>{% if obamacare.status_color == 1 or obamacare.status_color == None  %}
