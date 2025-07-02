@@ -284,11 +284,19 @@ def completar_summary_con_assure_medicare_life(finalSummary, weekRanges, company
 
                     if semana_key not in finalSummary[nombre_agente]:
                         finalSummary[nombre_agente][semana_key] = {
-                            "obama": 0, "activeObama": 0,
-                            "supp": 0, "activeSupp": 0,
-                            "assure": 0, "medicare": 0, "life": 0,
+                            "obama": 0,
+                            "activeObama": 0,
+                            "supp": 0,
+                            "activeSupp": 0,
+                            "assure": 0,
+                            "medicare": 0,
+                            "life": 0,
                             "total": 0
                         }
+
+                    # ✅ Asegurar también que la clave field_name existe
+                    if field_name not in finalSummary[nombre_agente][semana_key]:
+                        finalSummary[nombre_agente][semana_key][field_name] = 0
 
                     finalSummary[nombre_agente][semana_key][field_name] += 1
                     finalSummary[nombre_agente][semana_key]["total"] += 1
