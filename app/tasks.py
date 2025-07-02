@@ -12,7 +12,7 @@ from app.views.consents import getCompanyPerAgent
 from app.views.reports.table import table6Week
 from app.views.sms import sendIndividualsSms, comprobate_company
 from app.utils import generateWeeklyPdf, uploadTempUrl
-from app.views.utils import crearRequest, sale6Week, obtener_detalles_clientes
+from app.views.utils import crearRequest, sale6Week, obtener_detalles_clientes, completar_summary_con_assure_medicare_life
 
 logger = get_task_logger(__name__)
 
@@ -163,6 +163,7 @@ def enviar_pdf_por_sms_telnyx():
 
     # Aquí se genera el PDF real con gráficas gracias a Playwright
     finalSummary, weekRanges = table6Week(request)
+    finalSummary = completar_summary_con_assure_medicare_life(finalSummary, weekRanges, request.company_id)
     detalles_clientes = obtener_detalles_clientes(request.company_id)    
     pdf_url = sale6Week(finalSummary, weekRanges, detalles_clientes)
 

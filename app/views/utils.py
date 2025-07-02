@@ -250,6 +250,46 @@ def transformar_summary(finalSummary, weekRanges):
 
     return resultado
 
+from app.models import ClientsAssure, Medicare, ClientsLifeInsurance
+
+def completar_summary_con_assure_medicare_life(finalSummary, weekRanges, company_id):
+    from django.utils.timezone import make_aware, datetime
+
+    # Obtener todos los registros relevantes
+    assure_qs = ClientsAssure.objects.filter(company_id=company_id, is_active=True)
+    medicare_qs = Medicare.objects.filter(company_id=company_id, is_active=True)
+    life_qs = ClientsLifeInsurance.objects.filter(company_id=company_id, is_active=True)
+
+    def agregar_categoria(qs, field_name, date_field):
+        for obj in qs:
+            nombre_agente = f"{obj.agent.first_name} {obj.agent.last_name}"
+            fecha = getattr(obj, date_field, None)
+            if not fecha:
+                continue
+
+            for idx, (start, end) in enumerate(weekRanges):
+                if start <= fecha.date() <= end:
+                    semana_key = f"Week{idx + 1}"
+                    if nombre_agente not in finalSummary:
+                        finalSummary[nombre_agente] = {}
+                    if semana_key not in finalSummary[nombre_agente]:
+                        finalSummary[nombre_agente][semana_key] = {
+                            "obama": 0, "activeObama": 0,
+                            "supp": 0, "activeSupp": 0,
+                            "assure": 0, "medicare": 0, "life": 0,
+                            "total": 0
+                        }
+
+                    finalSummary[nombre_agente][semana_key][field_name] += 1
+                    finalSummary[nombre_agente][semana_key]["total"] += 1
+                    break
+
+    agregar_categoria(assure_qs, "assure", "date_effective_coverage")
+    agregar_categoria(medicare_qs, "medicare", "dateMedicare")
+    agregar_categoria(life_qs, "life", "date_effective_coverage")
+
+    return finalSummary
+
 
 def sale6Week(finalSummary, weekRanges, detalles_clientes):
     summary_transformado = transformar_summary(finalSummary, weekRanges)
