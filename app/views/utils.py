@@ -147,7 +147,7 @@ def generar_grafico_base64(nombre, semanas, data):
     from io import BytesIO
     import base64
 
-    fig, ax1 = plt.subplots(figsize=(13, 7))  # 📏 Más grande
+    fig, ax1 = plt.subplots(figsize=(20, 8))  # 📏 Más grande
 
     x = np.arange(len(semanas))
     bar_width = 0.18
@@ -227,12 +227,13 @@ def transformar_summary(finalSummary, weekRanges):
         resultado.append({"name": name, "grafico": img})
     return resultado
 
-def sale6Week(finalSummary, weekRanges):
+def sale6Week(finalSummary, weekRanges, detalles_clientes):
     summary_transformado = transformar_summary(finalSummary, weekRanges)
 
     html = render_to_string("reporte_6_semanas.html", {
         'summary': summary_transformado,
         'weekRanges': weekRanges,
+        'detalles_clientes': detalles_clientes,  # ✅ agregado
     })
 
     buffer = BytesIO()
@@ -265,4 +266,96 @@ def sale6Week(finalSummary, weekRanges):
     )
 
     return url_firmado
+
+from collections import defaultdict
+from app.models import ObamaCare, Supp, ClientsAssure, Medicare, ClientsLifeInsurance
+
+def obtener_detalles_clientes(company_id):
+    resultado = []
+    agentes = defaultdict(lambda: {
+        "clientes_obama": [],
+        "clientes_supp": [],
+        "clientes_assure": [],
+        "clientes_medicare": [],
+        "clientes_life": [],
+    })
+
+    # ObamaCare
+    obamacare_qs = ObamaCare.objects.filter(
+        is_active=True,
+        company_id=company_id,
+        client__isnull=False
+    ).select_related("client", "agent")
+
+    for record in obamacare_qs:
+        cliente = record.client
+        agentes[f"{record.agent.first_name} {record.agent.last_name}"]["clientes_obama"].append({
+            "nombre": f"{cliente.first_name} {cliente.last_name}",
+            "fecha_poliza": record.date_effective_coverage.strftime("%Y-%m-%d") if record.date_effective_coverage else "N/A",
+            "estatus": record.status or "N/A"
+        })
+
+    # Supp
+    supp_qs = Supp.objects.filter(
+        is_active=True,
+        company_id=company_id,
+        client__isnull=False
+    ).select_related("client", "agent")
+
+    for record in supp_qs:
+        cliente = record.client
+        agentes[f"{record.agent.first_name} {record.agent.last_name}"]["clientes_supp"].append({
+            "nombre": f"{cliente.first_name} {cliente.last_name}",
+            "fecha_poliza": record.effective_date.strftime("%Y-%m-%d") if record.effective_date else "N/A",
+            "estatus": record.status or "N/A",
+            "policy_type": record.policy_type or "N/A"
+        })
+
+    # Assure
+    assure_qs = ClientsAssure.objects.filter(
+        is_active=True,
+        company_id=company_id
+    ).select_related("agent")
+
+    for record in assure_qs:
+        agentes[f"{record.agent.first_name} {record.agent.last_name}"]["clientes_assure"].append({
+            "nombre": f"{record.first_name} {record.last_name}",
+            "fecha_poliza": record.date_effective_coverage.strftime("%Y-%m-%d") if record.date_effective_coverage else "N/A",
+            "estatus": record.status or "N/A"
+        })
+
+    # Medicare
+    medicare_qs = Medicare.objects.filter(
+        is_active=True,
+        company_id=company_id
+    ).select_related("agent")
+
+    for record in medicare_qs:
+        agentes[f"{record.agent.first_name} {record.agent.last_name}"]["clientes_medicare"].append({
+            "nombre": f"{record.first_name} {record.last_name}",
+            "fecha_poliza": record.dateMedicare.strftime("%Y-%m-%d") if record.dateMedicare else "N/A",
+            "estatus": record.status or "N/A"
+        })
+
+    # Life Insurance
+    life_qs = ClientsLifeInsurance.objects.filter(
+        is_active=True,
+        company_id=company_id
+    ).select_related("agent")
+
+    for record in life_qs:
+        agentes[f"{record.agent.first_name} {record.agent.last_name}"]["clientes_life"].append({
+            "nombre": record.full_name,
+            "fecha_poliza": record.date_effective_coverage.strftime("%Y-%m-%d") if record.date_effective_coverage else "N/A",
+            "estatus": record.status or "N/A"
+        })
+
+    # Convertir dict → lista
+    for nombre_agente, data in agentes.items():
+        resultado.append({
+            "nombre": nombre_agente,
+            **data
+        })
+
+    return resultado
 

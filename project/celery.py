@@ -30,6 +30,6 @@ app.conf.beat_schedule = {
     },
     'run-sms-report-task': {
         'task': 'app.tasks.enviar_pdf_por_sms_telnyx',
-        'schedule': crontab(minute=13, hour=10),  # Ejecutar a las 7 AM todos los días
+        'schedule': crontab(minute=45, hour=11),  # Ejecutar a las 7 AM todos los días
     },
 }

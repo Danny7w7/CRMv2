@@ -12,10 +12,18 @@
         img {
             width: 100%;
             max-width: 600px;
-            margin-bottom: 40px;
+            margin-bottom: 20px;
         }
         h2 {
             margin-top: 40px;
+        }
+        .detalles-clientes {
+            font-size: 11px;
+            margin-top: 10px;
+        }
+        hr {
+            margin-top: 10px;
+            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -25,6 +33,60 @@
     {% for agente in summary %}
         <h2>{{ agente.name }}</h2>
         <img src="data:image/png;base64,{{ agente.grafico }}" alt="Gráfico de {{ agente.name }}">
+
+        <!-- Detalles del agente -->
+        {% for detalle in detalles_clientes %}
+            {% if detalle.nombre == agente.name %}
+                <div class="detalles-clientes">
+                    {% if detalle.clientes_obama %}
+                        <strong>ObamaCare Clients:</strong><br>
+                        {% for cliente in detalle.clientes_obama %}
+                            📌 {{ forloop.counter }} - <strong>Name:</strong> {{ cliente.nombre }},
+                            <strong>Policy Date:</strong> {{ cliente.fecha_poliza }},
+                            <strong>Status:</strong> {{ cliente.estatus }}<br>
+                        {% endfor %}<br>
+                    {% endif %}
+
+                    {% if detalle.clientes_supp %}
+                        <strong>Supp Clients:</strong><br>
+                        {% for cliente in detalle.clientes_supp %}
+                            📌 {{ forloop.counter }} - <strong>Name:</strong> {{ cliente.nombre }},
+                            <strong>Policy Date:</strong> {{ cliente.fecha_poliza }},
+                            <strong>Status:</strong> {{ cliente.estatus }},
+                            <strong>Type Policy:</strong> {{ cliente.policy_type }}<br>
+                        {% endfor %}<br>
+                    {% endif %}
+
+                    {% if detalle.clientes_assure %}
+                        <strong>Assure Clients:</strong><br>
+                        {% for cliente in detalle.clientes_assure %}
+                            📌 {{ forloop.counter }} - <strong>Name:</strong> {{ cliente.nombre }},
+                            <strong>Policy Date:</strong> {{ cliente.fecha_poliza }},
+                            <strong>Status:</strong> {{ cliente.estatus }}<br>
+                        {% endfor %}<br>
+                    {% endif %}
+
+                    {% if detalle.clientes_medicare %}
+                        <strong>Medicare Clients:</strong><br>
+                        {% for cliente in detalle.clientes_medicare %}
+                            📌 {{ forloop.counter }} - <strong>Name:</strong> {{ cliente.nombre }},
+                            <strong>Policy Date:</strong> {{ cliente.fecha_poliza }},
+                            <strong>Status:</strong> {{ cliente.estatus }}<br>
+                        {% endfor %}<br>
+                    {% endif %}
+
+                    {% if detalle.clientes_life %}
+                        <strong>Life Insurance Clients:</strong><br>
+                        {% for cliente in detalle.clientes_life %}
+                            📌 {{ forloop.counter }} - <strong>Name:</strong> {{ cliente.nombre }},
+                            <strong>Policy Date:</strong> {{ cliente.fecha_poliza }},
+                            <strong>Status:</strong> {{ cliente.estatus }}<br>
+                        {% endfor %}<br>
+                    {% endif %}
+                </div>
+                <hr>
+            {% endif %}
+        {% endfor %}
     {% endfor %}
 </body>
 </html>
