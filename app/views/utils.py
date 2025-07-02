@@ -141,14 +141,27 @@ import tempfile
 import os
 
 def generar_grafico_base64(nombre, semanas, data):
-    fig, ax = plt.subplots()
-    ax.plot(semanas, data["ACA"], label="ACA")
-    ax.plot(semanas, data["Act ACA"], label="Act ACA")
-    ax.plot(semanas, data["Supp"], label="Supp")
-    ax.plot(semanas, data["Act Supp"], label="Act Supp")
-    ax.plot(semanas, data["Total"], label="Total")
-    ax.set_title(f"Ventas de {nombre}")
-    ax.legend()
+    fig, ax1 = plt.subplots()
+
+    x = list(range(len(semanas)))  # posiciones para las barras
+
+    # Ancho de barra
+    bar_width = 0.2
+
+    # Dibujar las barras agrupadas
+    ax1.bar([i - 1.5*bar_width for i in x], data["ACA"], width=bar_width, label="ACA")
+    ax1.bar([i - 0.5*bar_width for i in x], data["Act ACA"], width=bar_width, label="Act ACA")
+    ax1.bar([i + 0.5*bar_width for i in x], data["Supp"], width=bar_width, label="Supp")
+    ax1.bar([i + 1.5*bar_width for i in x], data["Act Supp"], width=bar_width, label="Act Supp")
+
+    # Línea de tendencia de Total
+    ax1.plot(x, data["Total"], color="black", marker="o", linestyle="--", linewidth=2, label="Total")
+
+    ax1.set_xticks(x)
+    ax1.set_xticklabels(semanas)
+    ax1.set_title(f"Ventas de {nombre}")
+    ax1.set_ylabel("Cantidad")
+    ax1.legend()
     fig.tight_layout()
 
     buffer = BytesIO()
@@ -157,6 +170,7 @@ def generar_grafico_base64(nombre, semanas, data):
     img_base64 = base64.b64encode(buffer.read()).decode("utf-8")
     plt.close(fig)
     return img_base64
+
 
 def transformar_summary(finalSummary, weekRanges):
     resultado = []
