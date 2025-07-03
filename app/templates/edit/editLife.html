@@ -135,6 +135,18 @@
 								<option value="BANK ACCOUNT" {% if client.payment_type == 'BANK ACCOUNT' %}selected{% endif %} >BANK ACCOUNT</option>
 							</select>
 						</div>
+						<div class="col-12 col-lg-4">
+							<label for="premium" class="form-label">Premiun</label>
+							<input type="number" class="form-control" name="premium" id="premium" step="0.01" value="{{client.premium|default_if_none:''}}" required>
+						</div>
+						<div class="col-12 col-lg-4">
+							<label for="face_amount" class="form-label">Face amount</label>
+							<input type="number" class="form-control" name="face_amount" id="face_amount" value="{{client.face_amount|default_if_none:''}}" max="25000" required>
+						</div>
+						<div class="col-12 col-lg-4">
+							<label for="addicional_protector" class="form-label">Addicional protector </label>
+							<input type="number" class="form-control" name="addicional_protector" id="addicional_protector" value="{{client.addicional_protector|default_if_none:''}}" required>
+						</div>
 						<div class="col-12 col-lg-6">
 							<label for="date_effective_coverage" class="form-label">Date Effective Coverage</label>
 							<input type="text" class="form-control" name="date_effective_coverage" id="date_effective_coverage" value="{{client.date_effective_coverage|date:'m/d/Y'}}" >

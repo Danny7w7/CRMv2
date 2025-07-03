@@ -336,6 +336,8 @@
 								</li>
 								<li> <a href="{% url 'manageAgentAssignments' %}"><i class='bx bx-radio-circle'></i>Assign BD to Agents</a>
 								</li>
+							{% endif %}
+							{% if request.user.role == 'Admin' or  request.user.role == 'S' %}
 								<li> <a href="{% url 'reportBd' %}"><i class='bx bx-radio-circle'></i>Report BD</a>
 								</li>
 							{% endif %}

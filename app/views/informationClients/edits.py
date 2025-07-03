@@ -1080,7 +1080,7 @@ def editLife(request, client_id):
             # Campos de Supp
             life_fields = [
                 'agent_usa', 'full_name','phone_number','address','zipcode','city','state','county',
-                'sex','status','policyNumber','payment_type'
+                'sex','status','policyNumber','payment_type', 'face_amount', 'addicional_protector', 'premium'
             ]
             
             # Limpiar los campos de ObamaCare convirtiendo los vacíos en None
@@ -1125,6 +1125,9 @@ def editLife(request, client_id):
                 date_effective_coverage_end=date_effective_coverage_end_new,
                 policyNumber=cleaned_life_data['policyNumber'],
                 payment_type=cleaned_life_data['payment_type'],
+                face_amount=cleaned_life_data['face_amount'],
+                addicional_protector=cleaned_life_data['addicional_protector'],
+                premium=cleaned_life_data['premium'],
             )
 
             return redirect('clientLifeInsurance' )  

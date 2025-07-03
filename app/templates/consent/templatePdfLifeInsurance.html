@@ -714,9 +714,11 @@
 
                 <!-- Firma -->
                 <div class="form-section">
-                    <div class="mb-4">
+                     <div class="mb-4">
                         <label class="form-label fw-bold">Firma del Cliente</label>
-                        <div class="signature-box"> <img src="{{ consent.signature.url }}" alt="Firma del aplicante"></div>
+                        <div class="signature-box" style="width: 400px; height: 150px; border: 1px solid #ccc; overflow: hidden;">
+                            <img src="{{ consent.signature.url }}" alt="Firma del aplicante" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                        </div>
                     </div>
                     <div class="form-text mb-3">*Es necesario copia de la identificación o licencia de conducir que fue verificada del cliente para adjuntar en la aplicación.</div>
                 </div>

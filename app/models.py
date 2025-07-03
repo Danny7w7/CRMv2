@@ -259,6 +259,9 @@ class ClientsLifeInsurance(models.Model):
     is_active = models.BooleanField(default=True)  
     company = models.ForeignKey(Companies, on_delete=models.CASCADE)
     objects = VisibilityManager()
+    face_amount = models.IntegerField()
+    addicional_protector = models.IntegerField()
+    premium = models.DecimalField(max_digits=10, decimal_places=2)
 
     class Meta:
         db_table = 'clients_life_insurance'
