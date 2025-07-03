@@ -147,7 +147,7 @@ def generar_grafico_base64(nombre, semanas, data):
     from io import BytesIO
     import base64
 
-    fig, ax1 = plt.subplots(figsize=(22, 8))  # ➕ más ancho
+    fig, ax1 = plt.subplots(figsize=(30, 8))  # ➕ más ancho
 
     x = np.arange(len(semanas))
     categorias = ["ACA", "Act ACA", "Supp", "Act Supp", "Assure", "Medicare", "Life"]
