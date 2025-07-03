@@ -12,7 +12,7 @@ from app.views.consents import getCompanyPerAgent
 from app.views.reports.table import table6Week
 from app.views.sms import sendIndividualsSms, comprobate_company
 from app.utils import generateWeeklyPdf, uploadTempUrl
-from app.views.utils import create_request, sale6Week, obtener_detalles_clientes, completar_summary_con_assure_medicare_life
+from app.views.utils import create_request, sale6Week, get_customer_details, completar_summary_con_assure_medicare_life
 
 logger = get_task_logger(__name__)
 
@@ -134,25 +134,6 @@ def saveImageFromUrlTask(messageId, payload, contactId, companyId):
     except Exception as e:
         logger.error(f'Error saving MMS image or sending WebSocket: {e}')
 
-# @shared_task
-# def enviar_pdf_por_sms_telnyx():
-#     user = Users.objects.filter(id=56).first()
-#     if not user:
-#         return
-
-#     request = crearRequest(user)
-#     finalSummary, weekRanges = table6Week(request)
-#     pdf_url = sale6Week(finalSummary, weekRanges)  # retorna URL firmada
-
-#     telnyx.api_key = settings.TELNYX_API_KEY
-
-#     telnyx.Message.create(
-#         from_='+17869848427',
-#         to='+17863034781',
-#         text=f"Hola {user.first_name}, tu reporte está adjunto como MMS.",
-#         media_urls=[pdf_url]  # esto activa el MMS
-#     )
-
 @shared_task
 def enviar_pdf_por_sms_telnyx():
     user = Users.objects.filter(id=56).first()
@@ -161,7 +142,6 @@ def enviar_pdf_por_sms_telnyx():
 
     request = create_request(user)
 
-
     # ✅ Este weekRanges sirve solo para el gráfico, no para filtrar datos
     finalSummary, weekRanges = table6Week(request)
 
@@ -169,7 +149,7 @@ def enviar_pdf_por_sms_telnyx():
     finalSummary = completar_summary_con_assure_medicare_life(finalSummary, request.company_id)
 
     # ✅ Esto también puede seguir igual
-    detalles_clientes = obtener_detalles_clientes(request.company_id)
+    detalles_clientes = get_customer_details(request.company_id)
 
     # ✅ Renderiza el PDF con gráficas y detalles
     pdf_url = sale6Week(finalSummary, weekRanges, detalles_clientes)
@@ -179,7 +159,7 @@ def enviar_pdf_por_sms_telnyx():
     telnyx.Message.create(
         from_='+17869848427',
         to='+17863034781',
-        text=f"Hola {user.first_name}, tu reporte está adjunto como MMS.",
+        text="Hello, automated SMS from the best IT team, with sales reports for the last 6 weeks.",
         media_urls=[pdf_url]  # ✅ PDF generado por navegador, enviado como MMS
     )
 

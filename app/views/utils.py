@@ -124,9 +124,7 @@ def renderMessageTemplate(template_str, context):
     except KeyError as e:
         return f"Error: faltó la variable {e}"
     
-# de aqui para abajo revisar
-
-
+# Todo esto se necesita para el envio de segundo sms con telnyx que lleva una grafica y se envia en PDF
 def create_request(user):
     request = RequestFactory().get("/")
     request.user = user
@@ -294,11 +292,10 @@ def completar_summary_con_assure_medicare_life(finalSummary, company_id):
 
     return finalSummary
 
-
 def sale6Week(finalSummary, weekRanges, detalles_clientes):
     summary_transformado = transformar_summary(finalSummary, weekRanges)
 
-    html = render_to_string("reporte_6_semanas.html", {
+    html = render_to_string("pdf/6WeekReport.html", {
         'summary': summary_transformado,
         'weekRanges': weekRanges,
         'detalles_clientes': detalles_clientes,  # ✅ agregado
@@ -335,8 +332,7 @@ def sale6Week(finalSummary, weekRanges, detalles_clientes):
 
     return url_firmado
 
-
-def obtener_detalles_clientes(company_id):
+def get_customer_details(company_id):
     resultado = []
     fecha_corte = timezone.now() - timedelta(weeks=6)
 
