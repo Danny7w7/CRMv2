@@ -258,7 +258,30 @@ from app.models import ClientsAssure, Medicare, ClientsLifeInsurance
 from datetime import timedelta
 from django.utils import timezone
 
+from datetime import timedelta
+from django.utils import timezone
+from collections import defaultdict
+
 def completar_summary_con_assure_medicare_life(finalSummary, weekRanges, company_id):
+    # Calcula los rangos reales de fecha basados en weekRanges
+    # Suponemos que cada weekRange es como "Jun 3 - Jun 9"
+    weekRangesReal = []
+    for rango in weekRanges:
+        try:
+            start_str, end_str = rango.split(" - ")
+            start = timezone.datetime.strptime(start_str, "%b %d").replace(year=timezone.now().year).date()
+            end = timezone.datetime.strptime(end_str, "%b %d").replace(year=timezone.now().year).date()
+            weekRangesReal.append((start, end))
+        except ValueError:
+            # Si hay algún error al parsear, omite este rango
+            continue
+
+    # Si no lograste parsear weekRanges, usa por defecto las últimas 6 semanas desde hoy
+    if not weekRangesReal:
+        today = timezone.now().date()
+        weekRangesReal = [(today - timedelta(weeks=i+1), today - timedelta(weeks=i)) for i in reversed(range(6))]
+
+    # Obtiene todos los registros activos
     assure_qs = ClientsAssure.objects.filter(company_id=company_id, is_active=True)
     medicare_qs = Medicare.objects.filter(company_id=company_id, is_active=True)
     life_qs = ClientsLifeInsurance.objects.filter(company_id=company_id, is_active=True)
@@ -269,12 +292,13 @@ def completar_summary_con_assure_medicare_life(finalSummary, weekRanges, company
             fecha = getattr(obj, date_field, None)
             if not fecha:
                 continue
-            fecha = fecha.date()  # Por si viene como datetime
+            fecha = fecha.date() if hasattr(fecha, 'date') else fecha
 
-            for idx, (start, end) in enumerate(weekRanges):
+            for idx, (start, end) in enumerate(weekRangesReal):
                 if start <= fecha <= end:
                     semana_key = f"Week{idx + 1}"
 
+                    # Inicializa el agente y la semana si no existen
                     if nombre_agente not in finalSummary:
                         finalSummary[nombre_agente] = {}
 
@@ -290,6 +314,7 @@ def completar_summary_con_assure_medicare_life(finalSummary, weekRanges, company
                             "total": 0
                         }
 
+                    # Incrementa el campo correspondiente y el total
                     finalSummary[nombre_agente][semana_key][field_name] += 1
                     finalSummary[nombre_agente][semana_key]["total"] += 1
                     break
