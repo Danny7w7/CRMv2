@@ -4,15 +4,22 @@ import smtplib
 import ssl
 from email.message import EmailMessage
 from typing import Dict
+import boto3
+
 
 # Django core libraries
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
-
+from io import BytesIO
+from django.test.client import RequestFactory
 
 # Django utilities
 from django.http import JsonResponse
 from django.template.loader import render_to_string
+from datetime import timedelta
+from collections import defaultdict
+from django.utils import timezone
+from weasyprint import HTML, CSS
 
 # Third-party libraries
 from asgiref.sync import async_to_sync
@@ -117,37 +124,22 @@ def renderMessageTemplate(template_str, context):
     except KeyError as e:
         return f"Error: faltó la variable {e}"
     
+# de aqui para abajo revisar
 
-from weasyprint import HTML
-import boto3
-from io import BytesIO
-from django.test.client import RequestFactory
 
-def crearRequest(user):
+def create_request(user):
     request = RequestFactory().get("/")
     request.user = user
     request.company_id = user.company.id
     return request
 
-from weasyprint import HTML
-import boto3
-from io import BytesIO
-from django.template.loader import render_to_string
-from django.utils import timezone
-from django.conf import settings
-import matplotlib.pyplot as plt
-import base64
-import tempfile
-import os
-from weasyprint import HTML, CSS
-
-def generar_grafico_base64(nombre, semanas, data):
+def generate_base64_chart(nombre, semanas, data):
     import matplotlib.pyplot as plt
     import numpy as np
     from io import BytesIO
     import base64
 
-    fig, ax1 = plt.subplots(figsize=(30, 8))  # ➕ más ancho
+    fig, ax1 = plt.subplots(figsize=(22, 8))  # ➕ más ancho
 
     x = np.arange(len(semanas))
     categorias = ["ACA", "Act ACA", "Supp", "Act Supp", "Assure", "Medicare", "Life"]
@@ -206,7 +198,6 @@ def generar_grafico_base64(nombre, semanas, data):
     plt.close(fig)
     return img_base64
 
-
 def transformar_summary(finalSummary, weekRanges):
     resultado = []
     for name, data in finalSummary.items():
@@ -233,7 +224,7 @@ def transformar_summary(finalSummary, weekRanges):
             life.append(semana["life"])
             total.append(semana["total"])
 
-        img = generar_grafico_base64(name, weekRanges, {
+        img = generate_base64_chart(name, weekRanges, {
             "ACA": aca,
             "Act ACA": act_aca,
             "Supp": supp,
@@ -251,22 +242,7 @@ def transformar_summary(finalSummary, weekRanges):
 
     return resultado
 
-
-from app.models import ClientsAssure, Medicare, ClientsLifeInsurance
-
-from app.models import ClientsAssure, Medicare, ClientsLifeInsurance
-from datetime import timedelta
-from django.utils import timezone
-
-from datetime import timedelta
-from django.utils import timezone
-from collections import defaultdict
-
-from datetime import timedelta
-from django.utils import timezone
-from app.models import ClientsAssure, Medicare, ClientsLifeInsurance
-
-def completar_summary_con_assure_medicare_life(finalSummary, weekRanges, company_id):
+def completar_summary_con_assure_medicare_life(finalSummary, company_id):
     # ✅ Calculamos rangos reales de fecha basados en las últimas 6 semanas
     today = timezone.now().date()
     weekRangesReal = []
@@ -359,13 +335,6 @@ def sale6Week(finalSummary, weekRanges, detalles_clientes):
 
     return url_firmado
 
-from collections import defaultdict
-from app.models import ObamaCare, Supp, ClientsAssure, Medicare, ClientsLifeInsurance
-
-from collections import defaultdict
-from datetime import timedelta
-from django.utils import timezone
-from app.models import ObamaCare, Supp, ClientsAssure, Medicare, ClientsLifeInsurance
 
 def obtener_detalles_clientes(company_id):
     resultado = []

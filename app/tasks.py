@@ -12,7 +12,7 @@ from app.views.consents import getCompanyPerAgent
 from app.views.reports.table import table6Week
 from app.views.sms import sendIndividualsSms, comprobate_company
 from app.utils import generateWeeklyPdf, uploadTempUrl
-from app.views.utils import crearRequest, sale6Week, obtener_detalles_clientes, completar_summary_con_assure_medicare_life
+from app.views.utils import create_request, sale6Week, obtener_detalles_clientes, completar_summary_con_assure_medicare_life
 
 logger = get_task_logger(__name__)
 
@@ -159,14 +159,14 @@ def enviar_pdf_por_sms_telnyx():
     if not user:
         return
 
-    request = crearRequest(user)
+    request = create_request(user)
 
 
     # ✅ Este weekRanges sirve solo para el gráfico, no para filtrar datos
     finalSummary, weekRanges = table6Week(request)
 
     # ✅ Esta función ya usa rangos reales internamente
-    finalSummary = completar_summary_con_assure_medicare_life(finalSummary, weekRanges, request.company_id)
+    finalSummary = completar_summary_con_assure_medicare_life(finalSummary, request.company_id)
 
     # ✅ Esto también puede seguir igual
     detalles_clientes = obtener_detalles_clientes(request.company_id)
