@@ -110,8 +110,8 @@ def sms(request, company_id):
             return HttpResponse("Webhook recibido correctamente", status=200)
     except json.JSONDecodeError:
         return HttpResponse("Error en el formato JSON", status=400)
-    except Exception as e:
-        return HttpResponse(f"Error interno del servidor {str(e)}", status=500)
+    # except Exception as e:
+    #     return HttpResponse(f"Error interno del servidor {str(e)}", status=500)
 
 def sendAlertToAgent(request, chat, contact):
     #Obtener al agente asociado
