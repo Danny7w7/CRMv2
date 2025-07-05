@@ -99,8 +99,12 @@ def sms(request, company_id):
                     deactivatecontact(contact, payload.get('text'))
 
                 if payload.get('type') == 'MMS':
-                    from app.tasks import saveImageFromUrlTask
-                    saveImageFromUrlTask.delay(message.id, payload, contact.id, company.id)
+                    try:
+                        from app.tasks import saveImageFromUrlTask
+                        saveImageFromUrlTask(message.id, payload, contact.id, company.id)
+                    except:
+                        message.message_content = 'Error receiving image, contact an administrator'
+                        message.save()
                 else:
                     SendMessageWebsocketChannel('SMS', payload, contact, company.id)
                     if company.id not in [1,2]:
@@ -110,8 +114,8 @@ def sms(request, company_id):
             return HttpResponse("Webhook recibido correctamente", status=200)
     except json.JSONDecodeError:
         return HttpResponse("Error en el formato JSON", status=400)
-    # except Exception as e:
-    #     return HttpResponse(f"Error interno del servidor {str(e)}", status=500)
+    except Exception as e:
+        return HttpResponse(f"Error interno del servidor {str(e)}", status=500)
 
 def sendAlertToAgent(request, chat, contact):
     #Obtener al agente asociado

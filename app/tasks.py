@@ -1,3 +1,4 @@
+import logging
 from django.conf import settings
 import requests
 import telnyx
@@ -10,7 +11,7 @@ from celery.utils.log import get_task_logger
 from app.models import *
 from app.views.consents import getCompanyPerAgent
 from app.views.reports.table import table6Week
-from app.views.sms import sendIndividualsSms, comprobate_company
+from app.views.sms import sendIndividualsSms, comprobate_company, SendMessageWebsocketChannel, discountRemainingBalance
 from app.utils import generateWeeklyPdf, uploadTempUrl
 from app.views.utils import create_request, sale6Week, get_customer_details, completar_summary_con_assure_medicare_life
 
@@ -98,10 +99,6 @@ def reportBoosLapeira():
    
 @shared_task
 def saveImageFromUrlTask(messageId, payload, contactId, companyId):
-    from .models import FilesSMS, Messages, Companies, Contacts
-    from .views.sms import SendMessageWebsocketChannel, discountRemainingBalance
-    import logging
-
     logger = logging.getLogger(__name__)
 
     try:
