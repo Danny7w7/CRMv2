@@ -302,9 +302,12 @@ def sale6Week(finalSummary, weekRanges, detalles_clientes):
     })
 
     buffer = BytesIO()
-    HTML(string=html).write_pdf(buffer, stylesheets=[
+    doc  = HTML(string=html).write_pdf(buffer, stylesheets=[
         CSS(string='@page { size: A4 landscape; margin: 1cm; }')
     ])
+    
+    doc.metadata.title = "Reporte Ventas 6 Semanas"  # Aquí defines el título visible
+    doc.write_pdf(buffer)
     buffer.seek(0)
 
     filename = f"reporte_ventas_{timezone.now().strftime('%Y%m%d_%H%M%S')}.pdf"
