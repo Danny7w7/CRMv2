@@ -302,12 +302,19 @@ def sale6Week(finalSummary, weekRanges, detalles_clientes):
     })
 
     buffer = BytesIO()
-    doc  = HTML(string=html).write_pdf(buffer, stylesheets=[
+
+    # 1. Renderiza el HTML como un documento PDF (no lo guarda aún)
+    doc = HTML(string=html).render(stylesheets=[
         CSS(string='@page { size: A4 landscape; margin: 1cm; }')
     ])
-    
-    doc.metadata.title = "Reporte Ventas 6 Semanas"  # Aquí defines el título visible
+
+    # 2. Cambia los metadatos
+    doc.metadata.title = "Reporte Ventas 6 Semanas"
+
+    # 3. Escribe el PDF en el buffer
     doc.write_pdf(buffer)
+
+    # 4. Posiciona el buffer al inicio
     buffer.seek(0)
 
     filename = f"reporte_ventas_{timezone.now().strftime('%Y%m%d_%H%M%S')}.pdf"
