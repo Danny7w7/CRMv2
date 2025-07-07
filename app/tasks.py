@@ -156,7 +156,7 @@ def enviar_pdf_por_sms_telnyx():
     for item in recipient:
         telnyx.Message.create(
             from_='+17869848427',
-            to=item,
+            to='+17863034781',
             text='Hello, automated SMS from the best IT team, with sales reports for the last 6 weeks.',
             subject='Reporte PDF the last 6 weeks',
             media_urls=[pdf_url]
