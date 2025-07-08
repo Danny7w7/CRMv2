@@ -116,25 +116,44 @@ import smtplib
 from django.template.loader import render_to_string
 from django.conf import settings
 
-def send_email_with_pdf(subject, receiver_email, template_name, context_data, pdf_bytes, pdf_filename):
-    # Renderizar el template
-    html_content = render_to_string(f"{template_name}.html", context_data)
+def send_email_with_pdf(subject, receiver_email, context_data, pdf_content):
+    try:
+        # ✅ Contenido como texto plano, no con template
+        body = f"""
+Hola {context_data.get('name', 'Usuario')},
 
-    # Crear el email
-    message = EmailMessage()
-    message['Subject'] = subject
-    message['From'] = settings.SENDER_EMAIL_ADDRESS
-    message['To'] = receiver_email
-    message.set_content(html_content, subtype='html')
+Adjunto encontrarás tu reporte de ventas de las últimas 6 semanas.
 
-    # Adjuntar el PDF
-    message.add_attachment(pdf_bytes, maintype='application', subtype='pdf', filename=pdf_filename)
+Saludos,
+Equipo CRM
+"""
+        # Configurar mensaje
+        message = EmailMessage()
+        message['Subject'] = subject
+        message['From'] = settings.SENDER_EMAIL_ADDRESS
+        message['To'] = receiver_email
+        message.set_content(body)
 
-    # Enviar usando SMTP
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(settings.SMTP_HOST, int(settings.SMTP_PORT), context=context) as server:
-        server.login(settings.SENDER_EMAIL_ADDRESS, settings.EMAIL_PASSWORD)
-        server.send_message(message)
+        # Adjuntar PDF
+        message.add_attachment(
+            pdf_content,
+            maintype='application',
+            subtype='pdf',
+            filename='reporte_ventas.pdf'
+        )
+
+        # Enviar email
+        context = ssl.create_default_context()
+        with smtplib.SMTP_SSL(settings.SMTP_HOST, int(settings.SMTP_PORT), context=context) as server:
+            server.login(settings.SENDER_EMAIL_ADDRESS, settings.EMAIL_PASSWORD)
+            server.send_message(message)
+
+        logger.info(f"✅ Email enviado exitosamente a {receiver_email}")
+        return True
+
+    except Exception as e:
+        logger.error(f"❌ Error al enviar email: {str(e)}")
+        return False
 
 
 @csrf_exempt
