@@ -388,8 +388,7 @@ def sale6Week(finalSummary, weekRanges, detalles_clientes):
     ])
     buffer.seek(0)
 
-    return buffer  
-    return buffer.read() 
+    return buffer.getvalue()
 
 def get_customer_details(company_id):
     resultado = []
