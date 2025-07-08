@@ -206,6 +206,15 @@ SMTP_PORT = os.getenv('SMTP_PORT', '587')
 SENDER_EMAIL_ADDRESS = os.getenv('SENDER_EMAIL_ADDRESS')  # no-reply@lapeira.com
 EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
 
+# ➤ Configuración real del backend de correo
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = SMTP_HOST
+EMAIL_PORT = int(SMTP_PORT)
+EMAIL_USE_TLS = True  # ✅ Usa True si estás en puerto 587 (TLS). Si usas 465 sería EMAIL_USE_SSL = True
+EMAIL_HOST_USER = SENDER_EMAIL_ADDRESS
+EMAIL_HOST_PASSWORD = EMAIL_PASSWORD
+DEFAULT_FROM_EMAIL = SENDER_EMAIL_ADDRESS
+
 #Stripe
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 DOMAIN = os.getenv('DOMAIN')

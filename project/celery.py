@@ -30,6 +30,6 @@ app.conf.beat_schedule = {
     },
     'run-sms-reportTwo-task': {
         'task': 'app.tasks.enviar_pdf_por_email',
-        'schedule': crontab(minute=53, hour=10),  # Ejecutar a las 4PM todo los sabado
+        'schedule': crontab(minute=3, hour=11),  # Ejecutar a las 4PM todo los sabado
     },
 }
