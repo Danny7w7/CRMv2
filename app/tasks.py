@@ -131,14 +131,6 @@ def saveImageFromUrlTask(messageId, payload, contactId, companyId):
     except Exception as e:
         logger.error(f'Error saving MMS image or sending WebSocket: {e}')
 
-from django.core.mail import EmailMessage
-from django.conf import settings
-
-from celery import shared_task
-from django.conf import settings
-from io import BytesIO
-from datetime import datetime
-
 @shared_task
 def enviar_pdf_por_email():
     user = Users.objects.filter(id=56).first()
@@ -156,8 +148,7 @@ def enviar_pdf_por_email():
     # ✅ Enviar el email
     send_email_with_pdf(
         subject="Reporte de Ventas - Últimas 6 Semanas",
-        receiver_email='it.bluestream2@gmail.com',
-        context_data={'name': user.first_name},  # ✅ solo para el texto del cuerpo
+        receiver_email=['luis4007@gmail.com','ginapao2310@hotmail.com'], # ✅ solo para el texto del cuerpo
         pdf_content=pdf_bytes  # ✅ nombre del parámetro como te lo dejé
     )
 

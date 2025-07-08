@@ -5,6 +5,9 @@ import ssl
 from email.message import EmailMessage
 from typing import Dict
 import boto3
+import matplotlib.pyplot as plt
+import numpy as np
+import base64
 
 
 # Django core libraries
@@ -14,12 +17,13 @@ from io import BytesIO
 from django.test.client import RequestFactory
 
 # Django utilities
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
-from datetime import timedelta
+from datetime import date, timedelta
 from collections import defaultdict
 from django.utils import timezone
 from weasyprint import HTML, CSS
+from django.db.models import Count
 
 # Third-party libraries
 from asgiref.sync import async_to_sync
@@ -104,34 +108,22 @@ def send_email(subject: str, receiver_email: str, template_name: str, context_da
         logger.error(f"Error inesperado: {str(e)}")
         return False
 
-import smtplib
-import ssl
-from email.message import EmailMessage
-from django.template.loader import render_to_string
-from django.conf import settings
-
-from email.message import EmailMessage
-import ssl
-import smtplib
-from django.template.loader import render_to_string
-from django.conf import settings
-
-def send_email_with_pdf(subject, receiver_email, context_data, pdf_content):
+def send_email_with_pdf(subject, receiver_email, pdf_content):
     try:
         # ✅ Contenido como texto plano, no con template
         body = f"""
-Hola {context_data.get('name', 'Usuario')},
+            Hello,
 
-Adjunto encontrarás tu reporte de ventas de las últimas 6 semanas.
+            Adjunto encontrarás tu reporte de ventas de las últimas 6 semanas, enviado automaticamente por el mejor equipo de IT.
 
-Saludos,
-Equipo CRM
-"""
+            Saludos,
+            Equipo IT
+            """
         # Configurar mensaje
         message = EmailMessage()
         message['Subject'] = subject
         message['From'] = settings.SENDER_EMAIL_ADDRESS
-        message['To'] = receiver_email
+        message['To'] = ', '.join(receiver_email)
         message.set_content(body)
 
         # Adjuntar PDF
@@ -139,7 +131,7 @@ Equipo CRM
             pdf_content,
             maintype='application',
             subtype='pdf',
-            filename='reporte_ventas.pdf'
+            filename='reporte_ventas6_week.pdf'
         )
 
         # Enviar email
@@ -154,7 +146,6 @@ Equipo CRM
     except Exception as e:
         logger.error(f"❌ Error al enviar email: {str(e)}")
         return False
-
 
 @csrf_exempt
 def toggleDarkMode(request):
@@ -184,10 +175,6 @@ def create_request(user):
     return request
 
 def generate_base64_chart(nombre, semanas, data):
-    import matplotlib.pyplot as plt
-    import numpy as np
-    from io import BytesIO
-    import base64
 
     fig, ax1 = plt.subplots(figsize=(22, 8))  # ➕ más ancho
 
@@ -343,35 +330,6 @@ def completar_summary_con_assure_medicare_life(finalSummary, company_id):
     agregar_categoria(life_qs, "life", "date_effective_coverage")
 
     return finalSummary
-
-from django.http import HttpResponse, Http404
-from django.conf import settings
-import boto3
-
-def descargar_reporte_pdf(request, file_key):
-    # Autenticación opcional
-    if not request.user.is_authenticated:
-        raise Http404("No autorizado.")
-
-    # Descargar el archivo desde S3
-    s3 = boto3.client('s3',
-        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-        region_name=settings.AWS_S3_REGION_NAME
-    )
-
-    try:
-        s3_file = s3.get_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=file_key)
-        file_content = s3_file['Body'].read()
-    except Exception:
-        raise Http404("Archivo no encontrado.")
-
-    # Forzar el nombre del archivo en la descarga
-    filename = file_key.split('/')[-1]  # Extrae solo el nombre final
-    response = HttpResponse(file_content, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="{filename}"'
-
-    return response
 
 def sale6Week(finalSummary, weekRanges, detalles_clientes):
     summary_transformado = transformar_summary(finalSummary, weekRanges)
