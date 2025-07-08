@@ -292,6 +292,35 @@ def completar_summary_con_assure_medicare_life(finalSummary, company_id):
 
     return finalSummary
 
+from django.http import HttpResponse, Http404
+from django.conf import settings
+import boto3
+
+def descargar_reporte_pdf(request, file_key):
+    # Autenticación opcional
+    if not request.user.is_authenticated:
+        raise Http404("No autorizado.")
+
+    # Descargar el archivo desde S3
+    s3 = boto3.client('s3',
+        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+        region_name=settings.AWS_S3_REGION_NAME
+    )
+
+    try:
+        s3_file = s3.get_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=file_key)
+        file_content = s3_file['Body'].read()
+    except Exception:
+        raise Http404("Archivo no encontrado.")
+
+    # Forzar el nombre del archivo en la descarga
+    filename = file_key.split('/')[-1]  # Extrae solo el nombre final
+    response = HttpResponse(file_content, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+    return response
+
 def sale6Week(finalSummary, weekRanges, detalles_clientes):
     summary_transformado = transformar_summary(finalSummary, weekRanges)
 
@@ -302,19 +331,9 @@ def sale6Week(finalSummary, weekRanges, detalles_clientes):
     })
 
     buffer = BytesIO()
-
-    # 1. Renderiza el HTML como un documento PDF (no lo guarda aún)
-    doc = HTML(string=html).render(stylesheets=[
+    HTML(string=html).write_pdf(buffer, stylesheets=[
         CSS(string='@page { size: A4 landscape; margin: 1cm; }')
     ])
-
-    # 2. Cambia los metadatos
-    doc.metadata.title = "Reporte Ventas 6 Semanas"
-
-    # 3. Escribe el PDF en el buffer
-    doc.write_pdf(buffer)
-
-    # 4. Posiciona el buffer al inicio
     buffer.seek(0)
 
     filename = f"reporte_ventas_{timezone.now().strftime('%Y%m%d_%H%M%S')}.pdf"
@@ -334,13 +353,7 @@ def sale6Week(finalSummary, weekRanges, detalles_clientes):
         ExtraArgs={'ContentType': 'application/pdf'}
     )
 
-    url_firmado = s3.generate_presigned_url(
-        ClientMethod='get_object',
-        Params={'Bucket': settings.AWS_STORAGE_BUCKET_NAME, 'Key': key},
-        ExpiresIn=3600
-    )
-
-    return url_firmado
+    return key
 
 def get_customer_details(company_id):
     resultado = []

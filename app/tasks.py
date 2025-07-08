@@ -148,8 +148,11 @@ def enviar_pdf_por_sms_telnyx():
     # ✅ Esto también puede seguir igual
     detalles_clientes = get_customer_details(request.company_id)
 
-    # ✅ Renderiza el PDF con gráficas y detalles
-    pdf_url = sale6Week(finalSummary, weekRanges, detalles_clientes)
+    # ✅ Genera el PDF → devuelve solo el key en S3
+    pdf_key = sale6Week(finalSummary, weekRanges, detalles_clientes)
+
+    # ✅ Genera la URL a la vista de descarga segura
+    pdf_url = f"https://{settings.DOMAIN}/descargar-reporte/{pdf_key}/"
 
     telnyx.api_key = settings.TELNYX_API_KEY
     recipient = ['+13052199932','+13052190572']
