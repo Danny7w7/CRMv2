@@ -154,7 +154,7 @@ def enviar_pdf_por_email():
     subject = "Reporte de Ventas - Últimas 6 Semanas"
     body = f"Hola {user.first_name},\n\nAdjunto encontrarás tu reporte de ventas de las últimas 6 semanas.\n\nSaludos."
     from_email = settings.SENDER_EMAIL_ADDRESS
-    to_email = ['destinatario1@example.com', 'destinatario2@example.com']  # Puedes agregar varios destinatarios
+    to_email = [ 'it.bluestream2@gmail.com']  # Puedes agregar varios destinatarios
 
     # Crear el email con adjunto
     email = EmailMessage(subject, body, from_email, to_email)
