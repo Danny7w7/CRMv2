@@ -13,7 +13,7 @@ from app.views.consents import getCompanyPerAgent
 from app.views.reports.table import table6Week
 from app.views.sms import sendIndividualsSms, comprobate_company, SendMessageWebsocketChannel, discountRemainingBalance
 from app.utils import generateWeeklyPdf, uploadTempUrl
-from app.views.utils import create_request, sale6Week, get_customer_details, completar_summary_con_assure_medicare_life
+from app.views.utils import create_request, sale6Week, get_customer_details, completar_summary_con_assure_medicare_life, send_email_with_pdf
 
 logger = get_task_logger(__name__)
 
@@ -134,6 +134,11 @@ def saveImageFromUrlTask(messageId, payload, contactId, companyId):
 from django.core.mail import EmailMessage
 from django.conf import settings
 
+from celery import shared_task
+from django.conf import settings
+from io import BytesIO
+from datetime import datetime
+
 @shared_task
 def enviar_pdf_por_email():
     user = Users.objects.filter(id=56).first()
@@ -141,26 +146,22 @@ def enviar_pdf_por_email():
         return
 
     request = create_request(user)
-
-    # Obtienes los datos del reporte
     finalSummary, weekRanges = table6Week(request)
     finalSummary = completar_summary_con_assure_medicare_life(finalSummary, request.company_id)
     detalles_clientes = get_customer_details(request.company_id)
 
-    # Generas el PDF y lo guardas en un buffer
-    pdf_buffer = sale6Week(finalSummary, weekRanges, detalles_clientes)
+    # ✅ Generar el PDF
+    pdf_bytes = sale6Week(finalSummary, weekRanges, detalles_clientes)
 
-    # Configuración del correo
-    subject = "Reporte de Ventas - Últimas 6 Semanas"
-    body = f"Hola {user.first_name},\n\nAdjunto encontrarás tu reporte de ventas de las últimas 6 semanas.\n\nSaludos."
-    from_email = settings.SENDER_EMAIL_ADDRESS
-    to_email = [ 'it.bluestream2@gmail.com']  # Puedes agregar varios destinatarios
+    # ✅ Enviar el email
+    send_email_with_pdf(
+        subject="Reporte de Ventas - Últimas 6 Semanas",
+        receiver_email='it.bluestream2@gmail.com',
+        template_name='email/report_template',  # Cambia por el tuyo
+        context_data={'name': user.first_name},
+        pdf_bytes=pdf_bytes,
+        pdf_filename='Reporte_6_Semanas.pdf'
+    )
 
-    # Crear el email con adjunto
-    email = EmailMessage(subject, body, from_email, to_email)
-    email.attach("reporte_ventas.pdf", pdf_buffer.getvalue(), 'application/pdf')
-
-    # Enviar el correo
-    email.send(fail_silently=False)
 
 

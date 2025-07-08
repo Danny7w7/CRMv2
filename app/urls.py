@@ -260,8 +260,7 @@ urlpatterns = [
 
     #<---------------------------Utils---------------------------> 
     path('toggleDarkMode/', utils.toggleDarkMode, name='toggleDarkMode'),
-    path('descargar-reporte/<path:file_key>/', utils.descargar_reporte_pdf, name='descargar_reporte_pdf'),
-
+    
 
     #<---------------------------WHATSAPP--------------------------->
     path('sendWhatsapp/', whatsApp.sendWhatsapp, name='sendWhatsapp'),
