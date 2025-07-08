@@ -131,36 +131,36 @@ def saveImageFromUrlTask(messageId, payload, contactId, companyId):
     except Exception as e:
         logger.error(f'Error saving MMS image or sending WebSocket: {e}')
 
+from django.core.mail import EmailMessage
+from django.conf import settings
+
 @shared_task
-def enviar_pdf_por_sms_telnyx():
+def enviar_pdf_por_email():
     user = Users.objects.filter(id=56).first()
     if not user:
         return
 
     request = create_request(user)
 
-    # ✅ Este weekRanges sirve solo para el gráfico, no para filtrar datos
+    # Obtienes los datos del reporte
     finalSummary, weekRanges = table6Week(request)
-
-    # ✅ Esta función ya usa rangos reales internamente
     finalSummary = completar_summary_con_assure_medicare_life(finalSummary, request.company_id)
-
-    # ✅ Esto también puede seguir igual
     detalles_clientes = get_customer_details(request.company_id)
 
-    # ✅ Genera el PDF → devuelve solo el key en S3
-    pdf_key = sale6Week(finalSummary, weekRanges, detalles_clientes)
+    # Generas el PDF y lo guardas en un buffer
+    pdf_buffer = sale6Week(finalSummary, weekRanges, detalles_clientes)
 
-    # ✅ Genera la URL a la vista de descarga segura
-    pdf_url = f"https://{settings.DOMAIN}/descargar-reporte/{pdf_key}/"
+    # Configuración del correo
+    subject = "Reporte de Ventas - Últimas 6 Semanas"
+    body = f"Hola {user.first_name},\n\nAdjunto encontrarás tu reporte de ventas de las últimas 6 semanas.\n\nSaludos."
+    from_email = settings.SENDER_EMAIL_ADDRESS
+    to_email = ['destinatario1@example.com', 'destinatario2@example.com']  # Puedes agregar varios destinatarios
 
-    telnyx.api_key = settings.TELNYX_API_KEY
-    recipient = ['+13052199932','+13052190572']
-    #for item in recipient:
-    telnyx.Message.create(
-        from_='+17869848427',
-        to='+17863034781',
-        text=f'Hola, tu reporte de ventas está listo: {pdf_url}'  # ✅ Link en el texto
-    )
+    # Crear el email con adjunto
+    email = EmailMessage(subject, body, from_email, to_email)
+    email.attach("reporte_ventas.pdf", pdf_buffer.getvalue(), 'application/pdf')
+
+    # Enviar el correo
+    email.send(fail_silently=False)
 
 

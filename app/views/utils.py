@@ -336,24 +336,7 @@ def sale6Week(finalSummary, weekRanges, detalles_clientes):
     ])
     buffer.seek(0)
 
-    filename = f"reporte_ventas_{timezone.now().strftime('%Y%m%d_%H%M%S')}.pdf"
-    key = f"reports/{filename}"
-
-    s3 = boto3.client(
-        "s3",
-        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-        region_name=settings.AWS_S3_REGION_NAME
-    )
-
-    s3.upload_fileobj(
-        buffer,
-        settings.AWS_STORAGE_BUCKET_NAME,
-        key,
-        ExtraArgs={'ContentType': 'application/pdf'}
-    )
-
-    return key
+    return buffer  
 
 def get_customer_details(company_id):
     resultado = []
