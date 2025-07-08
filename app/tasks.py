@@ -157,10 +157,8 @@ def enviar_pdf_por_email():
     send_email_with_pdf(
         subject="Reporte de Ventas - Últimas 6 Semanas",
         receiver_email='it.bluestream2@gmail.com',
-        template_name='email/report_template',  # Cambia por el tuyo
-        context_data={'name': user.first_name},
-        pdf_bytes=pdf_bytes,
-        pdf_filename='Reporte_6_Semanas.pdf'
+        context_data={'name': user.first_name},  # ✅ solo para el texto del cuerpo
+        pdf_content=pdf_bytes  # ✅ nombre del parámetro como te lo dejé
     )
 
 
