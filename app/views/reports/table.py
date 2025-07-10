@@ -1138,7 +1138,7 @@ def reports(request):
     company_filter2 = {'obamacare__company': company_id} if not request.user.is_superuser else {}
 
     # Filtrar por company_filter y donde payable sea mayor a 0
-    filtered_qs = PaymentsOneil.objects.filter(**company_filter, payable__gt=0)
+    filtered_qs = PaymentsOneil.objects.filter(payable__gt=0)
 
     # Obtener pagos únicos por obamacare y mes (usando values para agrupar)
     distinct_payments = (
