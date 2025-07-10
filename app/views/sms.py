@@ -926,7 +926,7 @@ def sendTemplate(request, to_number, nameTemplate):
             imagen_base_path = os.path.join(settings.BASE_DIR, 'static', 'assets', 'images', 'template-images', f'{nameTemplate}.jpg')
             base = Image.open(imagen_base_path).convert("RGBA")
         except:
-            return JsonResponse({'error':'No se encuentra Template'})
+            return JsonResponse({'error':'No se encuentra Template'},  status=500)
 
         # Redimensionar y pegar la imagen del usuario
         imagen_usuario = imagen_usuario.resize((2000, 1000))
