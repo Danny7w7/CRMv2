@@ -1137,10 +1137,26 @@ def reports(request):
     company_filter = {'company': company_id} if not request.user.is_superuser else {}
     company_filter2 = {'obamacare__company': company_id} if not request.user.is_superuser else {}
 
-    #Reports de Paymet!
-    payments = Payments.objects.filter(**company_filter).values('month').annotate(total=Count('id')).order_by('month')
-    # Calcular el total general de todos los meses
-    total_general = Payments.objects.filter(**company_filter).aggregate(total=Count('id'))['total']
+    # Filtrar por company_filter y donde payable sea mayor a 0
+    filtered_qs = PaymentsOneil.objects.filter(**company_filter, payable__gt=0)
+
+    # Obtener pagos únicos por obamacare y mes (usando values para agrupar)
+    distinct_payments = (
+        filtered_qs
+        .values('coverageMonth', 'obamacare')  # Agrupación por mes y obamacare
+        .distinct()
+    )
+
+    # Contar pagos únicos por mes
+    payments = (
+        distinct_payments
+        .values('coverageMonth')
+        .annotate(total=Count('obamacare'))  # Cada obamacare solo se cuenta una vez por mes
+        .order_by('coverageMonth')
+    )
+
+    # Total general de pagos únicos en todos los meses
+    total_general = distinct_payments.count()
 
     #Reports de Action Required
     # Cantidad de registros donde agent_completed es NULL
