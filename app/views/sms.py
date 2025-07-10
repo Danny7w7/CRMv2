@@ -921,12 +921,9 @@ def sendTemplate(request, to_number, nameTemplate):
         # Leer la imagen del usuario directamente desde memoria
         imagen_usuario = Image.open(imagen_usuario_file).convert("RGBA")
 
-        try:
-            # Cargar imagen base
-            imagen_base_path = os.path.join(settings.BASE_DIR, 'static', 'assets', 'images', 'template-images', f'{nameTemplate}.jpg')
-            base = Image.open(imagen_base_path).convert("RGBA")
-        except:
-            return JsonResponse({'error':'No se encuentra Template'},  status=500)
+        # Cargar imagen base
+        imagen_base_path = os.path.join(settings.BASE_DIR, 'static', 'assets', 'images', 'template-images', f'{nameTemplate}.jpg')
+        base = Image.open(imagen_base_path).convert("RGBA")
 
         # Redimensionar y pegar la imagen del usuario
         imagen_usuario = imagen_usuario.resize((2000, 1000))

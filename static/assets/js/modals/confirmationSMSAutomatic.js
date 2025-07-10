@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				Swal.fire({
 					icon: 'error',
 					title: 'Error al enviar',
-					text: `Hubo un error al enviar el SMS. Detalles: ${data.error}`
+					text: `Hubo un error al enviar el SMS.`
 				});
 			}
 		} catch (error) {
