@@ -116,7 +116,7 @@ def paymentClients(request):
 
     months = request.POST.getlist("months")  # Capturar lista de meses seleccionados
     # Obtener pagos que correspondan a los meses seleccionados
-    clients = Payments.objects.select_related("obamacare").filter(month__in=months,  **company_filter)
+    clients = PaymentsOneil.objects.select_related("obamacare").filter(coverageMonth__in=months,  **company_filter)
 
     # ✅ Crear un nuevo archivo Excel
     wb = openpyxl.Workbook()
@@ -140,7 +140,7 @@ def paymentClients(request):
                 client.obamacare.profiling_date.strftime("%m-%d-%Y") if client.obamacare.profiling_date else '',
                 client.obamacare.status,
                 client.obamacare.created_at.strftime("%m-%d-%Y") if client.obamacare.created_at else '',  # Convertir fecha a string legible
-                client.month,
+                client.coverageMonth,
                 client.created_at.strftime("%m-%d-%Y")
             ])
 
