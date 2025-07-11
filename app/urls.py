@@ -141,7 +141,7 @@ urlpatterns = [
     path('editTicket/<ticket_id>/', edits.editTicket, name='editTicket'),
     path('toggleTicketStatus/<ticket_id>/', toggles.toggleTicketStatus, name='toggleTicketStatus'),
 
-    path('leads/', leadConector.obtainLeadsByGoHighLevel, name='obtainLeadsByGoHighLevel'),
+    path('leadsByGoHighLevel/', leadConector.obtainLeadsByGoHighLevel, name='obtainLeadsByGoHighLevel'),
 
     #<---------------------------SMS--------------------------->
     path('smsBlue/', sms.index, name='smsBlue'),
