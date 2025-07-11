@@ -568,20 +568,36 @@ class ExcelFileMetadata(models.Model):
     class Meta:
         db_table = 'excel_file_metadata'
 
-class BdExcel(models.Model):
+class BasePerson(models.Model):
     first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255,null=True)
+    last_name = models.CharField(max_length=255, null=True)
     phone = models.BigIntegerField()
-    address = models.CharField(max_length=255,null=True)
-    city = models.CharField(max_length=200,null=True)
-    state = models.CharField(max_length=200,null=True)
+    address = models.CharField(max_length=255, null=True)
+    city = models.CharField(max_length=200, null=True)
+    state = models.CharField(max_length=200, null=True)
     zipCode = models.IntegerField(null=True)
     agent_id = models.IntegerField(null=True)
-    excel_metadata = models.ForeignKey(ExcelFileMetadata,on_delete=models.CASCADE,related_name='records')
-    is_sold = models.BooleanField(default=False)  # Campo booleano para indicar si está "solds"
-    
+    is_sold = models.BooleanField(default=False)
+
+    class Meta:
+        abstract = True  # No se crea tabla para esta clase
+
+
+class BdExcel(BasePerson):
+    excel_metadata = models.ForeignKey(
+        ExcelFileMetadata,
+        on_delete=models.CASCADE,
+        related_name='records'
+    )
+
     class Meta:
         db_table = 'bd_excel'
+
+
+class Leads(BasePerson):
+    class Meta:
+        db_table = 'leads'
+
 
 class ControlQuality(models.Model):
     agent_create = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='created_controls' )
