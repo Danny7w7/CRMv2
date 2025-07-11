@@ -25,7 +25,7 @@ from .views.reports import fecths as fetchsReports
 from .views.reports import table as tableReports
 from .views.reports import charts, download
 from .views.users import users, companies
-from .views import dbExcel, quality, consents, sms, utils, supervisorPanel, whatsApp, comparativeReports
+from .views import dbExcel, quality, consents, sms, utils, supervisorPanel, whatsApp, comparativeReports, leadConector
 
 
 urlpatterns = [
