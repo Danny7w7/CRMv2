@@ -16,6 +16,7 @@ from weasyprint.text.fonts import FontConfiguration  # Agregar aquí
 from app.models import *
 from .table import weekSalesSummary
 from ..decoratorsCompany import *
+from app.views.consents import getCompanyPerAgent
 
 def downloadPdf(request, week_number):
     
@@ -110,13 +111,15 @@ def downloadAccionRequired(request):
 @company_ownership_required_sinURL
 def paymentClients(request):
 
-    company_id = request.company_id  # Obtener company_id desde request
-    # Definir el filtro de compañía (será un diccionario vacío si es superusuario)
-    company_filter = {'company': company_id} if not request.user.is_superuser else {}
+    months = request.POST.getlist("months")  # ['1', '2', '3', ...]
+    months = list(map(int, months))  # Convertir a enteros
 
-    months = request.POST.getlist("months")  # Capturar lista de meses seleccionados
-    # Obtener pagos que correspondan a los meses seleccionados
-    clients = PaymentsOneil.objects.select_related("obamacare").filter(coverageMonth__in=months,  **company_filter)
+    # Construir Q() dinámicamente para hacer OR entre los meses seleccionados
+    query = Q()
+    for month in months:
+        query |= Q(coverageMonth__month=month)
+
+    clients = PaymentsOneil.objects.select_related("obamacare").filter(query)
 
     # ✅ Crear un nuevo archivo Excel
     wb = openpyxl.Workbook()
@@ -124,7 +127,7 @@ def paymentClients(request):
     ws.title = "Clientes_PAYMENT"
 
     # ✅ Encabezados
-    headers = ["Agent","First Name", "Last Name", "Plan", "Carrier", "Profiling", "Date-Profiling", "Status", "Created At","Month","Date payment was marked"]
+    headers = ["Agent", "Agente USA", "Company", "First Name", "Last Name", "Carrier", "Profiling", "Date-Profiling", "Status", "Created At","Month","Coverage Month"]
     ws.append(headers)
 
     # ✅ Agregar datos al archivo Excel
@@ -132,16 +135,17 @@ def paymentClients(request):
         if client.obamacare.is_active:
             ws.append([
                 f"{client.obamacare.agent.first_name} {client.obamacare.agent.last_name}",
+                client.obamacare.agent_usa,
+                getCompanyPerAgent(client.obamacare.agent_usa),
                 client.obamacare.client.first_name,
                 client.obamacare.client.last_name,
-                client.obamacare.plan_name,
                 client.obamacare.carrier,
                 client.obamacare.profiling,
                 client.obamacare.profiling_date.strftime("%m-%d-%Y") if client.obamacare.profiling_date else '',
                 client.obamacare.status,
                 client.obamacare.created_at.strftime("%m-%d-%Y") if client.obamacare.created_at else '',  # Convertir fecha a string legible
+                client.created_at.strftime("%m-%d-%Y"),
                 client.coverageMonth,
-                client.created_at.strftime("%m-%d-%Y")
             ])
 
     # ✅ Preparar la respuesta HTTP
