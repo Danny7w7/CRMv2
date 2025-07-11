@@ -595,8 +595,17 @@ class BdExcel(BasePerson):
 
 
 class Leads(BasePerson):
+    email = models.EmailField(max_length=254)
     class Meta:
         db_table = 'leads'
+
+class LeadExtraField(models.Model):
+    lead = models.ForeignKey(Leads, on_delete=models.CASCADE, related_name='extra_fields')
+    field_name = models.CharField(max_length=255)
+    field_value = models.TextField()
+
+    class Meta:
+        db_table = 'lead_extra_fields'
 
 
 class ControlQuality(models.Model):
