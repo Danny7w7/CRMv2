@@ -117,25 +117,28 @@
 				<h5 class="mb-3">Planes disponibles</h5>
 
 				{% for plan in planes.plans %}
-				<div class="col-md-6 col-lg-4">
-					<div class="card h-100 shadow-sm border-0">
-						<div class="card-body">
-							<h6 class="card-title fw-bold text-primary">{{ plan.name }}</h6>
-							<p class="mb-1"><strong>Valor del Plan:</strong> ${{ plan.premium }}</p>
-							<p class="mb-1"><strong>Prima mensual:</strong> ${{ plan.premium_w_credit }}</p>
-							<p class="mb-1"><strong>Deducible:</strong> $ {{ plan.tiered_deductibles.0.amount }}</p>
-							<p class="mb-1"><strong>Máximo bolsillo:</strong> $ {{ plan.tiered_moops.0.amount }}</p>
-						</div>
-						<div class="card-footer bg-white border-0">
-							<a href="{{ plan.benefits_url }}" target="_blank" class="btn btn-outline-primary btn-sm w-100 mb-2">
-								Resumen de Beneficios
-							</a>
-							<a href="{{ plan.brochure_url }}" target="_blank" class="btn btn-outline-primary btn-sm w-100">
-								Brochure Plan
-							</a>
+					<div class="col-md-6 col-lg-4">
+						<div class="card h-100 shadow-sm border-0">
+							<div class="card-body">
+								<h6 class="card-title fw-bold text-primary">{{ plan.issuer.name }}</h6>
+								<h6 class="card-title fw-bold text-primary">{{ plan.name }}</h6>
+								<p class="mb-1"><strong>Categoria:</strong> {{ plan.metal_level }}</p>
+								<p class="mb-1"><strong>Tipo de plan:</strong> {{ plan.type }}</p>
+								<p class="mb-1"><strong>Valor del Plan:</strong> ${{ plan.premium }}</p>
+								<p class="mb-1"><strong>Prima mensual:</strong> ${{ plan.premium_w_credit }}</p>
+								<p class="mb-1"><strong>Deducible:</strong> $ {{ plan.tiered_deductibles.0.amount }}</p>
+								<p class="mb-1"><strong>Máximo bolsillo:</strong> $ {{ plan.tiered_moops.0.amount }}</p>
+							</div>
+							<div class="card-footer bg-white border-0">
+								<a href="{{ plan.benefits_url }}" target="_blank" class="btn btn-outline-primary btn-sm w-100 mb-2">
+									Resumen de Beneficios
+								</a>
+								<a href="{{ plan.brochure_url }}" target="_blank" class="btn btn-outline-primary btn-sm w-100">
+									Brochure Plan
+								</a>
+							</div>
 						</div>
 					</div>
-				</div>
 				{% endfor %}
 
 			</div>				

@@ -71,7 +71,7 @@
 						<li> <a href="{% url 'index'  %}"><i class='bx bx-radio-circle'></i>Home</a>
 						</li>
 
-						{% if request.user.role == 'Admin' or request.user.role == 'S' or request.user.role == 'TV' %}
+						{% if request.user.role == 'Admin' or request.user.role == 'TV' %}
 
 							{% if request.user|has_module:"OBAMACARE" or request.user|has_module:"SUPP" or request.user|has_module:"ASSURE" or request.user|has_module:"LIFE INSURANCE" or  request.user|has_module:"MEDICARE" %}
 
@@ -207,7 +207,6 @@
 					{% endif %}
 
 				{% endif %}
-
 
 				{% if request.user|has_module:"SALE REPORTS" or request.user|has_module:"CUSTOMER REPORTS" %}
 
