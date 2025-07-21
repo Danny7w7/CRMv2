@@ -938,7 +938,6 @@ def dataQuery():
         paymentDate(startDatedatetime, endDatedatetime),
         obamacareStatus(startDateDateField, endDateDateField),
         appointmentClients(startDatedatetime, endDatedatetime),
-        lettersCardStatus(startDateDateField, endDateDateField)
     ]
     
     return partes_sms  # una lista de strings
