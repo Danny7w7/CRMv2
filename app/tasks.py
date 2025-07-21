@@ -162,7 +162,7 @@ def test():
 
     telnyx.Message.create(
         from_='+17869848427',
-        to='+7863034781',
+        to='+17863034781',
         subject='Reporte PDF',
         text= sms
     )
