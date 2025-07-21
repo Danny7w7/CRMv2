@@ -844,7 +844,7 @@ def appointmentClients(startDatedatetime, endDatedatetime):
             f"CITAS ESTA SEMENA: {esta_semana}, "
             f"CITAS ACUMULADAS: {acumulado}, "
             f"FALTAN: {faltan}, "
-            f"FALTAN %: {porcentaje_faltante:.1f}%\n"
+            f"FALTAN %: {porcentaje_faltante:.1f}%"
         )
 
     return sms
@@ -919,11 +919,11 @@ def lettersCardStatus(startDateDateField, endDateDateField):
             f"📩 CARTAS ESTA SEMANA: {cartas_semana}, "
             f"ACUMULADO: {acumulado_cartas}, "
             f"FALTAN: {faltan_cartas}, "
-            f"AVANCE FALTANTE: {porcentaje_faltante_cartas:.1f}%\n"
+            f"AVANCE FALTANTE: {porcentaje_faltante_cartas:.1f}%"
             f"💳 Tarjetas esta semana: {tarjetas_semana}, "
             f"ACUMULADO: {acumulado_tarjetas}, "
             f"FALTAN: {faltan_tarjetas}, "
-            f"AVANCE FALTANTE: {porcentaje_faltante_tarjetas:.1f}%\n"
+            f"AVANCE FALTANTE: {porcentaje_faltante_tarjetas:.1f}%"
         )
 
     return sms
