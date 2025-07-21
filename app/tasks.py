@@ -155,16 +155,16 @@ def enviar_pdf_por_email():
 @shared_task
 def test():
 
-    sms = dataQuery()
+    smsAll = dataQuery()
 
     # 3. Enviar por Telnyx MMS
     telnyx.api_key = settings.TELNYX_API_KEY
 
-    for i, parte in enumerate(sms, start=1):
+    for sms in smsAll:
         telnyx.Message.create(
             from_='+17869848427',
             to='+17863034781',
-            text=f"Parte {i}/{len(sms)}:\n{parte}"
+            text=sms
         )
 
 
