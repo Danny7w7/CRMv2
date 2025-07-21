@@ -450,40 +450,153 @@ from datetime import date, timedelta
 from django.utils import timezone
 from django.http import HttpResponse
 
-def dataQuery():
+# def dataQuery():
 
-    # ✅ Cálculo del rango de fechas de la semana anterior
-    def get_previous_week_date_range():
-        today = date.today()
-        start_of_current_week = today - timedelta(days=today.weekday())
-        start_of_last_week = start_of_current_week - timedelta(days=7)
-        end_of_last_week = start_of_last_week + timedelta(days=6)
-        return start_of_last_week, end_of_last_week
+#     # ✅ Cálculo del rango de fechas de la semana anterior
+#     def get_previous_week_date_range():
+#         today = date.today()
+#         start_of_current_week = today - timedelta(days=today.weekday())
+#         start_of_last_week = start_of_current_week - timedelta(days=7)
+#         end_of_last_week = start_of_last_week + timedelta(days=6)
+#         return start_of_last_week, end_of_last_week
 
 
-    # # ✅ Cálculo del rango de fechas de la semana actual
-    # def get_current_week_date_range():
-    #     today = date.today()
-    #     start_of_week = today - timedelta(days=today.weekday())
-    #     end_of_week = start_of_week + timedelta(days=6)
-    #     return start_of_week, end_of_week
+#     # # ✅ Cálculo del rango de fechas de la semana actual
+#     # def get_current_week_date_range():
+#     #     today = date.today()
+#     #     start_of_week = today - timedelta(days=today.weekday())
+#     #     end_of_week = start_of_week + timedelta(days=6)
+#     #     return start_of_week, end_of_week
 
-    start_date_week, end_date_week = get_previous_week_date_range()
+#     start_date_week, end_date_week = get_previous_week_date_range()
 
-    # ✅ Fechas aware para campos DateTimeField
-    start_datetime = timezone.make_aware(
-        timezone.datetime(start_date_week.year, start_date_week.month, start_date_week.day, 0, 0, 0)
-    )
-    end_datetime = timezone.make_aware(
-        timezone.datetime(end_date_week.year, end_date_week.month, end_date_week.day, 23, 59, 59, 999999)
-    )
+#     # ✅ Fechas aware para campos DateTimeField
+#     start_datetime = timezone.make_aware(
+#         timezone.datetime(start_date_week.year, start_date_week.month, start_date_week.day, 0, 0, 0)
+#     )
+#     end_datetime = timezone.make_aware(
+#         timezone.datetime(end_date_week.year, end_date_week.month, end_date_week.day, 23, 59, 59, 999999)
+#     )
 
-    # ✅ Consulta: ObservationCustomer (agrupado por agente)
-    effectiveManager = ObservationCustomer.objects.filter(
-        created_at__range=(start_datetime, end_datetime)
+#     # ✅ Consulta: ObservationCustomer (agrupado por agente)
+#     effectiveManager = ObservationCustomer.objects.filter(
+#         created_at__range=(start_datetime, end_datetime)
+#     ).values(
+#         'agent__first_name',
+#         'agent__last_name'
+#     ).annotate(
+#         total_observations=Count('id'),
+#         total_effective_management=Count(
+#             Case(When(typification__icontains='EFFECTIVE MANAGEMENT', then=1), output_field=BooleanField())
+#         ),
+#         total_others=Count(
+#             Case(When(~Q(typification__icontains='EFFECTIVE MANAGEMENT'), then=1), output_field=BooleanField())
+#         )
+#     ).order_by('agent__first_name', 'agent__last_name')
+
+#     sms_text = ("--- Resultados de effectiveManager ---")
+#     for item in effectiveManager:
+#         sms_text += (f"Agente: {item['agent__first_name']} {item['agent__last_name']}, "
+#               f"Total: {item['total_observations']}, "
+#               f"Effective Management: {item['total_effective_management']}, "
+#               f"Otros: {item['total_others']}")
+#     sms_text += ("---------------------------------------------------------------")
+
+#     # ✅ Consulta: UserCarrier (por fechas DATE, no datetime)
+#     userCarrier = UserCarrier.objects.filter(
+#         dateUserCarrier__range=(start_date_week, end_date_week)
+#     ).values(
+#         'agent_create__first_name',
+#         'agent_create__last_name'
+#     ).annotate(
+#         total_observationss=Count('id')
+#     ).order_by('agent_create__first_name', 'agent_create__last_name')
+
+#     sms_text += ("--- Resultados de userCarrier ---")
+#     for item in userCarrier:
+#         sms_text += (f"Agente2: {item['agent_create__first_name']} {item['agent_create__last_name']}, "
+#               f"Total2: {item['total_observationss']}, ")
+#     sms_text += ("---------------------------------------------------------------")
+
+#     # ✅ Consulta: PaymentDate (usa created_at datetime)
+#     paymentReminder = PaymentDate.objects.filter(
+#         created_at__range=(start_datetime, end_datetime)
+#     ).values(
+#         'agent_create__first_name',
+#         'agent_create__last_name'
+#     ).annotate(
+#         total_observationss=Count('id')
+#     ).order_by('agent_create__first_name', 'agent_create__last_name')
+
+#     sms_text += ("--- Resultados de paymentReminder ---")
+#     for item in paymentReminder:
+#         sms_text += (f"Agente3: {item['agent_create__first_name']} {item['agent_create__last_name']}, "
+#               f"Total3: {item['total_observationss']}, ")
+#     sms_text += ("---------------------------------------------------------------")
+
+#     # ✅ Consulta: ObamaCare agrupado por profiling
+#     statusPolicyClients = ObamaCare.objects.filter(created_at__range=(start_datetime, end_datetime))
+
+#     resultados = statusPolicyClients.values('profiling').annotate(
+#         total_registros=Count('id'),
+#         total_activos=Count(
+#             Case(When(status__iexact='ACTIVO', then=1), output_field=BooleanField())
+#         ),
+#         total_policy_lleno=Count(
+#             Case(When(~Q(policyNumber='') & ~Q(policyNumber__isnull=True), then=1), output_field=BooleanField())
+#         )
+#     ).order_by('profiling')
+
+#     sms_text += ("--- Resultados de ObamaCare agrupado por profiling ---")
+#     for item in resultados:
+#         sms_text += (f"Profiling: {item['profiling']}, "
+#               f"Total: {item['total_registros']}, "
+#               f"Activos: {item['total_activos']}, "
+#               f"Con Policy: {item['total_policy_lleno']}")
+#     sms_text += ("---------------------------------------------------------------")
+
+#     # ✅ Consulta: AppointmentClient
+#     appointmentClients = AppointmentClient.objects.filter(
+#         created_at__range=(start_datetime, end_datetime)
+#     ).values(
+#         'agent_create__first_name',
+#         'agent_create__last_name'
+#     ).annotate(
+#         total_observationss=Count('id')
+#     ).order_by('agent_create__first_name', 'agent_create__last_name')
+
+#     sms_text += ("--- Resultados de appointmentClients ---")
+#     for item in appointmentClients:
+#         sms_text += (f"Agente6: {item['agent_create__first_name']} {item['agent_create__last_name']}, "
+#               f"Total6: {item['total_observationss']}, ")
+#     sms_text += ("---------------------------------------------------------------")
+
+#     print(sms_text)
+
+#     return sms_text
+
+
+#     # return HttpResponse("OK")
+
+from datetime import date, timedelta
+from django.utils import timezone
+from django.db.models import Count, Case, When, Q, BooleanField
+from app.models import ObservationCustomer, UserCarrier, PaymentDate, ObamaCare, AppointmentClient
+
+# 👉 Rango de fechas de la semana anterior
+def get_week_range():
+    today = date.today()
+    start = today - timedelta(days=today.weekday() + 7)
+    end = start + timedelta(days=6)
+    start_dt = timezone.make_aware(timezone.datetime(start.year, start.month, start.day, 0, 0, 0))
+    end_dt = timezone.make_aware(timezone.datetime(end.year, end.month, end.day, 23, 59, 59, 999999))
+    return start, end, start_dt, end_dt
+
+def get_effective_manager(start_dt, end_dt):
+    data = ObservationCustomer.objects.filter(
+        created_at__range=(start_dt, end_dt)
     ).values(
-        'agent__first_name',
-        'agent__last_name'
+        'agent__first_name', 'agent__last_name'
     ).annotate(
         total_observations=Count('id'),
         total_effective_management=Count(
@@ -494,50 +607,43 @@ def dataQuery():
         )
     ).order_by('agent__first_name', 'agent__last_name')
 
-    sms_text = ("--- Resultados de effectiveManager ---")
-    for item in effectiveManager:
-        sms_text += (f"Agente: {item['agent__first_name']} {item['agent__last_name']}, "
-              f"Total: {item['total_observations']}, "
-              f"Effective Management: {item['total_effective_management']}, "
-              f"Otros: {item['total_others']}")
-    #sms_text += ("---------------------------------------------------------------")
+    sms = "--- Resultados de effectiveManager ---\n"
+    for item in data:
+        sms += f"Agente: {item['agent__first_name']} {item['agent__last_name']}, Total: {item['total_observations']}, Effective Management: {item['total_effective_management']}, Otros: {item['total_others']}\n"
+    return sms
 
-    # ✅ Consulta: UserCarrier (por fechas DATE, no datetime)
-    userCarrier = UserCarrier.objects.filter(
-        dateUserCarrier__range=(start_date_week, end_date_week)
+def get_user_carrier(start_date, end_date):
+    data = UserCarrier.objects.filter(
+        dateUserCarrier__range=(start_date, end_date)
     ).values(
-        'agent_create__first_name',
-        'agent_create__last_name'
+        'agent_create__first_name', 'agent_create__last_name'
     ).annotate(
         total_observationss=Count('id')
     ).order_by('agent_create__first_name', 'agent_create__last_name')
 
-    sms_text += ("--- Resultados de userCarrier ---")
-    for item in userCarrier:
-        sms_text += (f"Agente2: {item['agent_create__first_name']} {item['agent_create__last_name']}, "
-              f"Total2: {item['total_observationss']}, ")
-    #sms_text += ("---------------------------------------------------------------")
+    sms = "--- Resultados de userCarrier ---\n"
+    for item in data:
+        sms += f"Agente2: {item['agent_create__first_name']} {item['agent_create__last_name']}, Total2: {item['total_observationss']}\n"
+    return sms
 
-    # ✅ Consulta: PaymentDate (usa created_at datetime)
-    paymentReminder = PaymentDate.objects.filter(
-        created_at__range=(start_datetime, end_datetime)
+def get_payment_reminder(start_dt, end_dt):
+    data = PaymentDate.objects.filter(
+        created_at__range=(start_dt, end_dt)
     ).values(
-        'agent_create__first_name',
-        'agent_create__last_name'
+        'agent_create__first_name', 'agent_create__last_name'
     ).annotate(
         total_observationss=Count('id')
     ).order_by('agent_create__first_name', 'agent_create__last_name')
 
-    sms_text += ("--- Resultados de paymentReminder ---")
-    for item in paymentReminder:
-        sms_text += (f"Agente3: {item['agent_create__first_name']} {item['agent_create__last_name']}, "
-              f"Total3: {item['total_observationss']}, ")
-    #sms_text += ("---------------------------------------------------------------")
+    sms = "--- Resultados de paymentReminder ---\n"
+    for item in data:
+        sms += f"Agente3: {item['agent_create__first_name']} {item['agent_create__last_name']}, Total3: {item['total_observationss']}\n"
+    return sms
 
-    # ✅ Consulta: ObamaCare agrupado por profiling
-    statusPolicyClients = ObamaCare.objects.filter(created_at__range=(start_datetime, end_datetime))
-
-    resultados = statusPolicyClients.values('profiling').annotate(
+def get_obamacare_status(start_dt, end_dt):
+    data = ObamaCare.objects.filter(
+        created_at__range=(start_dt, end_dt)
+    ).values('profiling').annotate(
         total_registros=Count('id'),
         total_activos=Count(
             Case(When(status__iexact='ACTIVO', then=1), output_field=BooleanField())
@@ -547,35 +653,35 @@ def dataQuery():
         )
     ).order_by('profiling')
 
-    sms_text += ("--- Resultados de ObamaCare agrupado por profiling ---")
-    for item in resultados:
-        sms_text += (f"Profiling: {item['profiling']}, "
-              f"Total: {item['total_registros']}, "
-              f"Activos: {item['total_activos']}, "
-              f"Con Policy: {item['total_policy_lleno']}")
-    #sms_text += ("---------------------------------------------------------------")
+    sms = "--- Resultados de ObamaCare agrupado por profiling ---\n"
+    for item in data:
+        sms += f"Profiling: {item['profiling']}, Total: {item['total_registros']}, Activos: {item['total_activos']}, Con Policy: {item['total_policy_lleno']}\n"
+    return sms
 
-    # ✅ Consulta: AppointmentClient
-    appointmentClients = AppointmentClient.objects.filter(
-        created_at__range=(start_datetime, end_datetime)
+def get_appointment_clients(start_dt, end_dt):
+    data = AppointmentClient.objects.filter(
+        created_at__range=(start_dt, end_dt)
     ).values(
-        'agent_create__first_name',
-        'agent_create__last_name'
+        'agent_create__first_name', 'agent_create__last_name'
     ).annotate(
         total_observationss=Count('id')
     ).order_by('agent_create__first_name', 'agent_create__last_name')
 
-    sms_text += ("--- Resultados de appointmentClients ---")
-    for item in appointmentClients:
-        sms_text += (f"Agente6: {item['agent_create__first_name']} {item['agent_create__last_name']}, "
-              f"Total6: {item['total_observationss']}, ")
-    #sms_text += ("---------------------------------------------------------------")
+    sms = "--- Resultados de appointmentClients ---\n"
+    for item in data:
+        sms += f"Agente6: {item['agent_create__first_name']} {item['agent_create__last_name']}, Total6: {item['total_observationss']}\n"
+    return sms
 
-    print(sms_text)
-
-    return sms_text
-
-
-    # return HttpResponse("OK")
-
+def dataQuery():
+    start_date, end_date, start_dt, end_dt = get_week_range()
+    
+    partes_sms = [
+        get_effective_manager(start_dt, end_dt),
+        get_user_carrier(start_date, end_date),
+        get_payment_reminder(start_dt, end_dt),
+        get_obamacare_status(start_dt, end_dt),
+        get_appointment_clients(start_dt, end_dt),
+    ]
+    
+    return partes_sms  # una lista de strings
 

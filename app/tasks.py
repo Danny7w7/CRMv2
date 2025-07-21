@@ -160,12 +160,11 @@ def test():
     # 3. Enviar por Telnyx MMS
     telnyx.api_key = settings.TELNYX_API_KEY
 
-    telnyx.Message.create(
-        from_='+17869848427',
-        to='+17863034781',
-        subject='Reporte PDF',
-        text= sms
-    )
-
+    for parte in enumerate(sms, start=1):
+        telnyx.Message.create(
+            from_='+17869848427',
+            to='+17863034781',
+            text=parte
+        )
 
 
