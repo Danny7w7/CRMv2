@@ -13,7 +13,7 @@ from app.views.consents import getCompanyPerAgent
 from app.views.reports.table import table6Week
 from app.views.sms import sendIndividualsSms, comprobate_company, SendMessageWebsocketChannel, discountRemainingBalance
 from app.utils import generateWeeklyPdf, uploadTempUrl
-from app.views.utils import create_request, sale6Week, get_customer_details, completar_summary_con_assure_medicare_life, send_email_with_pdf
+from app.views.utils import *
 
 logger = get_task_logger(__name__)
 
@@ -150,6 +150,21 @@ def enviar_pdf_por_email():
         subject="Reporte de Ventas - Últimas 6 Semanas",
         receiver_email=['luis4007@gmail.com','ginapao2310@hotmail.com'], # ✅ solo para el texto del cuerpo
         pdf_content=pdf_bytes  # ✅ nombre del parámetro como te lo dejé
+    )
+
+@shared_task
+def test():
+
+    sms = dataQuery()
+
+    # 3. Enviar por Telnyx MMS
+    telnyx.api_key = settings.TELNYX_API_KEY
+
+    telnyx.Message.create(
+        from_='+17869848427',
+        to='+7863034781',
+        subject='Reporte PDF',
+        text= sms
     )
 
 
