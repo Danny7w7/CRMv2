@@ -651,6 +651,7 @@ class DocumentsClient(models.Model):
         storage=S3Boto3Storage(),
         null=True)
     client = models.ForeignKey(Clients, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'documents_client'
@@ -736,7 +737,6 @@ class DocumentObama(models.Model):
     obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
     agent_create = models.ForeignKey(Users,on_delete=models.CASCADE )   
     name =  models.CharField(max_length=255, default="Unnamed Document")
-    # created_at = models.DateTimeField(auto_now_add=True)
     created_at = models.DateTimeField(auto_now_add=True) 
 
     class Meta:
@@ -749,6 +749,7 @@ class LettersCard(models.Model):
     dateLetters = models.DateField(null=True)
     card = models.BooleanField(default=False) 
     dateCard = models.DateField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'letters_card'
@@ -770,6 +771,7 @@ class UserCarrier(models.Model):
     username_carrier = models.CharField(max_length=200,null=True)
     password_carrier = models.CharField(max_length=200,null=True)
     dateUserCarrier = models.DateField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'user_carrier'
