@@ -157,14 +157,22 @@ def test():
 
     smsAll = dataQuery()
 
-    # 3. Enviar por Telnyx MMS
     telnyx.api_key = settings.TELNYX_API_KEY
 
+    def split_sms(text, max_parts=10, part_size=160):
+        chunks = [text[i:i + part_size] for i in range(0, len(text), part_size)]
+        if len(chunks) > max_parts:
+            # Si supera el límite, solo se envían los primeros 10
+            chunks = chunks[:max_parts]
+        return chunks
+
     for sms in smsAll:
-        telnyx.Message.create(
-            from_='+17869848427',
-            to='+17863034781',
-            text=sms
-        )
+        parts = split_sms(sms)
+        for part in parts:
+            telnyx.Message.create(
+                from_='+17869848427',
+                to='+17863034781',
+                text=part
+            )
 
 
