@@ -914,11 +914,16 @@ def lettersCardStatus(startDateDateField, endDateDateField):
         porcentaje_faltante_tarjetas = (faltan_tarjetas / total_clients * 100) if total_clients > 0 else 0
 
         sms += (
-            f"AGENTE: 🧑‍💼 {full_name}, CLIENTES TOTALES: {total_clients}\n"
-            f"   📩 CARTAS ESTA SEMANA: {cartas_semana}, ACUMULADO: {acumulado_cartas}, "
-            f"FALTAN: {faltan_cartas}, AVANCE FALTANTE: {porcentaje_faltante_cartas:.1f}%\n"
-            f"   💳 Tarjetas esta semana: {tarjetas_semana}, ACUMULADO: {acumulado_tarjetas}, "
-            f"FALTAN: {faltan_tarjetas}, AVANCE FALTANTE: {porcentaje_faltante_tarjetas:.1f}%\n"
+            f"AGENTE: 🧑‍💼 {full_name}, "
+            f"CLIENTES TOTALES: {total_clients}, "
+            f"📩 CARTAS ESTA SEMANA: {cartas_semana}, "
+            f"ACUMULADO: {acumulado_cartas}, "
+            f"FALTAN: {faltan_cartas}, "
+            f"AVANCE FALTANTE: {porcentaje_faltante_cartas:.1f}%\n"
+            f"💳 Tarjetas esta semana: {tarjetas_semana}, "
+            f"ACUMULADO: {acumulado_tarjetas}, "
+            f"FALTAN: {faltan_tarjetas}, "
+            f"AVANCE FALTANTE: {porcentaje_faltante_tarjetas:.1f}%\n"
         )
 
     return sms
