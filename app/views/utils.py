@@ -584,17 +584,32 @@ from django.db.models import Count, Case, When, Q, BooleanField
 from app.models import ObservationCustomer, UserCarrier, PaymentDate, ObamaCare, AppointmentClient
 
 # 👉 Rango de fechas de la semana anterior
-def get_week_range():
+def weekRange():
     today = date.today()
-    start = today - timedelta(days=today.weekday() + 7)
-    end = start + timedelta(days=6)
-    start_dt = timezone.make_aware(timezone.datetime(start.year, start.month, start.day, 0, 0, 0))
-    end_dt = timezone.make_aware(timezone.datetime(end.year, end.month, end.day, 23, 59, 59, 999999))
-    return start, end, start_dt, end_dt
+    startDateDateField = today - timedelta(days=today.weekday() + 7)
+    endDateDateField = startDateDateField + timedelta(days=6)
+    startDatedatetime = timezone.make_aware(timezone.datetime(startDateDateField.year, startDateDateField.month, startDateDateField.day, 0, 0, 0))
+    endDatedatetime = timezone.make_aware(timezone.datetime(endDateDateField.year, endDateDateField.month, endDateDateField.day, 23, 59, 59, 999999))
+    return startDateDateField, endDateDateField, startDatedatetime, endDatedatetime
 
-def get_effective_manager(start_dt, end_dt):
+def observationCustomer(startDatedatetime, endDatedatetime):
+    
+    # 🔢 Total acumulado histórico por agente
+    acumulado = ObservationCustomer.objects.values(
+        'agent__first_name', 'agent__last_name'
+    ).annotate(
+        total_acumulado=Count('id')
+    )
+
+    # 🔄 Diccionario: nombre -> total_acumulado
+    acumulado_dict = {
+        f"{a['agent__first_name']} {a['agent__last_name']}": a['total_acumulado']
+        for a in acumulado
+    }
+
+    # 📆 Observaciones solo de esta semana
     data = ObservationCustomer.objects.filter(
-        created_at__range=(start_dt, end_dt)
+        created_at__range=(startDatedatetime, endDatedatetime)
     ).values(
         'agent__first_name', 'agent__last_name'
     ).annotate(
@@ -607,80 +622,243 @@ def get_effective_manager(start_dt, end_dt):
         )
     ).order_by('agent__first_name', 'agent__last_name')
 
-    sms = "--- Resultados de effectiveManager ---\n"
+    # 📨 Mensaje SMS
+    sms = "--- Resultados de Llamadas Efectivas ---\n"
     for item in data:
-        sms += f"Agente: {item['agent__first_name']} {item['agent__last_name']}, Total: {item['total_observations']}, Effective Management: {item['total_effective_management']}, Otros: {item['total_others']}\n"
-    return sms
+        nombre = f"{item['agent__first_name']} {item['agent__last_name']}"
+        esta_semana = item['total_observations']
+        acumulado_total = acumulado_dict.get(nombre, 0)
 
-def get_user_carrier(start_date, end_date):
-    data = UserCarrier.objects.filter(
-        dateUserCarrier__range=(start_date, end_date)
-    ).values(
-        'agent_create__first_name', 'agent_create__last_name'
-    ).annotate(
-        total_observationss=Count('id')
-    ).order_by('agent_create__first_name', 'agent_create__last_name')
-
-    sms = "--- Resultados de userCarrier ---\n"
-    for item in data:
-        sms += f"Agente2: {item['agent_create__first_name']} {item['agent_create__last_name']}, Total2: {item['total_observationss']}\n"
-    return sms
-
-def get_payment_reminder(start_dt, end_dt):
-    data = PaymentDate.objects.filter(
-        created_at__range=(start_dt, end_dt)
-    ).values(
-        'agent_create__first_name', 'agent_create__last_name'
-    ).annotate(
-        total_observationss=Count('id')
-    ).order_by('agent_create__first_name', 'agent_create__last_name')
-
-    sms = "--- Resultados de paymentReminder ---\n"
-    for item in data:
-        sms += f"Agente3: {item['agent_create__first_name']} {item['agent_create__last_name']}, Total3: {item['total_observationss']}\n"
-    return sms
-
-def get_obamacare_status(start_dt, end_dt):
-    data = ObamaCare.objects.filter(
-        created_at__range=(start_dt, end_dt)
-    ).values('profiling').annotate(
-        total_registros=Count('id'),
-        total_activos=Count(
-            Case(When(status__iexact='ACTIVO', then=1), output_field=BooleanField())
-        ),
-        total_policy_lleno=Count(
-            Case(When(~Q(policyNumber='') & ~Q(policyNumber__isnull=True), then=1), output_field=BooleanField())
+        sms += (
+            f"Agente: {nombre}, Semana: {esta_semana}, "
+            f"Llamadas Efectivas: {item['total_effective_management']}, "
+            f"Llamadas NO Efectivas: {item['total_others']}, "
+            f"Acumulado: {acumulado_total}, "
         )
-    ).order_by('profiling')
 
-    sms = "--- Resultados de ObamaCare agrupado por profiling ---\n"
-    for item in data:
-        sms += f"Profiling: {item['profiling']}, Total: {item['total_registros']}, Activos: {item['total_activos']}, Con Policy: {item['total_policy_lleno']}\n"
     return sms
 
-def get_appointment_clients(start_dt, end_dt):
-    data = AppointmentClient.objects.filter(
-        created_at__range=(start_dt, end_dt)
-    ).values(
-        'agent_create__first_name', 'agent_create__last_name'
-    ).annotate(
-        total_observationss=Count('id')
-    ).order_by('agent_create__first_name', 'agent_create__last_name')
+def userCarrier(startDateDateField,endDateDateField):
 
-    sms = "--- Resultados de appointmentClients ---\n"
-    for item in data:
-        sms += f"Agente6: {item['agent_create__first_name']} {item['agent_create__last_name']}, Total6: {item['total_observationss']}\n"
+    sms = "--- Resultados de Usuarios de Carries Creados ---\n"
+
+    # 🔹 Todos los agentes con agentes USA asignados
+    agentes_crm = Users.objects.prefetch_related('usaAgents').all()
+
+    # 🔹 Acumulado histórico (filtrado)
+    historical_qs = UserCarrier.objects.filter(
+        obamacare__is_active=True,
+        username_carrier__isnull=False,
+        password_carrier__isnull=False
+    ).exclude(username_carrier='', password_carrier='')
+
+    historical_map = historical_qs.values('agent_create').annotate(total=Count('id'))
+    historical_dict = {item['agent_create']: item['total'] for item in historical_map}
+
+    # 🔹 Formularios esta semana (mismos filtros)
+    weekly_qs = UserCarrier.objects.filter(
+        obamacare__is_active=True,
+        dateUserCarrier__range=(startDateDateField, endDateDateField),
+        username_carrier__isnull=False,
+        password_carrier__isnull=False
+    ).exclude(username_carrier='', password_carrier='')
+
+    weekly_map = weekly_qs.values('agent_create').annotate(total=Count('id'))
+    weekly_dict = {item['agent_create']: item['total'] for item in weekly_map}
+
+    for agente in agentes_crm:
+        usa_names = list(agente.usaAgents.values_list("name", flat=True))
+        if not usa_names:
+            continue  # Ignorar agentes sin usaAgents
+
+        total_clients = ObamaCare.objects.filter(
+            is_active=True,
+            agent_usa__in=usa_names
+        ).count()
+
+        total_all_time = historical_dict.get(agente.id, 0)
+        total_week = weekly_dict.get(agente.id, 0)
+        faltan = total_clients - total_all_time
+        faltan_pct = (faltan / total_clients * 100) if total_clients > 0 else 0
+
+        sms += (
+            f"Agente: {agente.first_name} {agente.last_name}, "
+            f"Clientes Totales: {total_clients}, "
+            f"Clientes llenados esta semana: {total_week}, "
+            f"Acumulado Total: {total_all_time}, "
+            f"Faltan: {faltan}, "
+            f"Faltan %: {faltan_pct:.1f}%\n"
+        )
+
     return sms
+
+def paymentDate(startDatedatetime, endDatedatetime):
+
+    sms = "--- Resultados de Programar SMS de pago Automatico ---\n"
+
+    agentes_crm = Users.objects.prefetch_related('usaAgents').all()
+
+    for agente in agentes_crm:
+        usa_names = list(agente.usaAgents.values_list("name", flat=True))
+        if not usa_names:
+            continue  # Ignorar si no tiene agentes USA
+
+        full_name = f"{agente.first_name} {agente.last_name}"
+
+        # Total de clientes activos con premium > 0
+        total_clients = ObamaCare.objects.filter(
+            is_active=True,
+            premium__gt=0,
+            agent_usa__in=usa_names
+        ).count()
+
+        # Total acumulado de formularios válidos
+        acumulado = PaymentDate.objects.filter(
+            agent_create=agente,
+            obamacare__isnull=False,
+            obamacare__is_active=True,
+            obamacare__premium__gt=0,
+            obamacare__agent_usa__in=usa_names
+        ).count()
+
+        # Total esta semana con mismos filtros
+        esta_semana = PaymentDate.objects.filter(
+            agent_create=agente,
+            created_at__range=(startDatedatetime, endDatedatetime),
+            obamacare__isnull=False,
+            obamacare__is_active=True,
+            obamacare__premium__gt=0,
+            obamacare__agent_usa__in=usa_names
+        ).count()
+
+        faltan = total_clients - acumulado
+        porcentaje_faltante = (faltan / total_clients * 100) if total_clients > 0 else 0
+
+        sms += (
+            f"Agente: {full_name}, "
+            f"Clientes Totales: {total_clients}, "
+            f"Clientes llenados esta semana: {esta_semana}, "
+            f"Acumulado: {acumulado}, "
+            f"Faltan: {faltan}, "
+            f"Faltan %: {porcentaje_faltante:.1f}%\n"
+        )
+
+    return sms
+
+def obamacareStatus(startDateDateField,endDateDateField):
+
+    sms = "--- Resultados de ObamaCare por Agente CRM ---\n"
+
+    agentes_crm = Users.objects.prefetch_related('usaAgents').all()
+
+    for agente in agentes_crm:
+        usa_agents_names = list(agente.usaAgents.values_list("name", flat=True))
+
+        if not usa_agents_names:
+            continue
+
+        full_name = f"{agente.first_name} {agente.last_name}"
+
+        # Total clientes activos
+        total_clientes = ObamaCare.objects.filter(
+            is_active=True,
+            agent_usa__in=usa_agents_names
+        )
+
+        total_clientes_count = total_clientes.count()
+
+        # Total clientes perfilados en la semana
+        clientes_semanales = ObamaCare.objects.filter(
+            profiling_date__range=(startDateDateField, endDateDateField),
+            agent_usa__in=usa_agents_names
+        ).count()
+
+        # Total con status ACTIVO
+        total_activos = ObamaCare.objects.filter(
+            agent_usa__in=usa_agents_names,
+            status__iexact='ACTIVO'
+        ).count()
+
+        # Total con policyNumber lleno
+        total_policy = ObamaCare.objects.filter(
+            agent_usa__in=usa_agents_names
+        ).exclude(
+            policyNumber__isnull=True
+        ).exclude(
+            policyNumber=''
+        ).count()
+
+        sms += (
+            f"Agente: {full_name}, "
+            f"Clientes Totales: {total_clientes_count}, "
+            f"Perfilados esta semana: {clientes_semanales}, "
+            f"Clientes Activos: {total_activos}, "
+            f"Clientes Con # Policy: {total_policy}\n"
+        )
+
+    return sms
+
+def appointmentClients(startDatedatetime, endDatedatetime):
+
+    sms = "--- Resultados de Citas agendadas para el cliente ---\n"
+
+    agentes_crm = Users.objects.prefetch_related('usaAgents').all()
+
+    for agente in agentes_crm:
+        usa_agents_names = list(agente.usaAgents.values_list("name", flat=True))
+
+        if not usa_agents_names:
+            continue  # Ignorar agentes sin relación USA
+
+        full_name = f"{agente.first_name} {agente.last_name}"
+
+        # Clientes activos del agente USA
+        total_clients = ObamaCare.objects.filter(
+            is_active=True,
+            agent_usa__in=usa_agents_names
+        ).count()
+
+        # Total acumulado de citas con obamacare activo
+        acumulado = AppointmentClient.objects.filter(
+            agent_create=agente,
+            obamacare__isnull=False,
+            obamacare__is_active=True,
+            obamacare__agent_usa__in=usa_agents_names
+        ).count()
+
+        # Citas esta semana
+        esta_semana = AppointmentClient.objects.filter(
+            agent_create=agente,
+            created_at__range=(startDatedatetime, endDatedatetime),
+            obamacare__isnull=False,
+            obamacare__is_active=True,
+            obamacare__agent_usa__in=usa_agents_names
+        ).count()
+
+        faltan = total_clients - acumulado
+        porcentaje_faltante = (faltan / total_clients * 100) if total_clients > 0 else 0
+
+        sms += (
+            f"Agente: {full_name}, "
+            f"Clientes Totales: {total_clients}, "
+            f"Citas esta semana: {esta_semana}, "
+            f"Citas acumulado: {acumulado}, "
+            f"Faltan: {faltan}, "
+            f"Avance faltante: {porcentaje_faltante:.1f}%\n"
+        )
+
+    return sms
+
 
 def dataQuery():
-    start_date, end_date, start_dt, end_dt = get_week_range()
+    startDateDateField, endDateDateField , startDatedatetime, endDatedatetime = weekRange()
     
     partes_sms = [
-        get_effective_manager(start_dt, end_dt),
-        get_user_carrier(start_date, end_date),
-        get_payment_reminder(start_dt, end_dt),
-        get_obamacare_status(start_dt, end_dt),
-        get_appointment_clients(start_dt, end_dt),
+        observationCustomer(startDatedatetime, endDatedatetime),
+        userCarrier(startDateDateField, endDateDateField),
+        paymentDate(startDatedatetime, endDatedatetime),
+        obamacareStatus(startDateDateField, endDateDateField),
+        appointmentClients(startDatedatetime, endDatedatetime),
     ]
     
     return partes_sms  # una lista de strings
