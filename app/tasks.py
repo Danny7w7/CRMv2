@@ -163,7 +163,7 @@ def test():
     for i, parte in enumerate(sms, start=1):
         telnyx.Message.create(
             from_='+17869848427',
-            to='+7863034781',
+            to='+17863034781',
             text=f"Parte {i}/{len(sms)}:\n{parte}"
         )
 
