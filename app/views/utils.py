@@ -500,7 +500,7 @@ def dataQuery():
               f"Total: {item['total_observations']}, "
               f"Effective Management: {item['total_effective_management']}, "
               f"Otros: {item['total_others']}")
-    sms_text += ("---------------------------------------------------------------")
+    #sms_text += ("---------------------------------------------------------------")
 
     # ✅ Consulta: UserCarrier (por fechas DATE, no datetime)
     userCarrier = UserCarrier.objects.filter(
@@ -516,7 +516,7 @@ def dataQuery():
     for item in userCarrier:
         sms_text += (f"Agente2: {item['agent_create__first_name']} {item['agent_create__last_name']}, "
               f"Total2: {item['total_observationss']}, ")
-    sms_text += ("---------------------------------------------------------------")
+    #sms_text += ("---------------------------------------------------------------")
 
     # ✅ Consulta: PaymentDate (usa created_at datetime)
     paymentReminder = PaymentDate.objects.filter(
@@ -532,7 +532,7 @@ def dataQuery():
     for item in paymentReminder:
         sms_text += (f"Agente3: {item['agent_create__first_name']} {item['agent_create__last_name']}, "
               f"Total3: {item['total_observationss']}, ")
-    sms_text += ("---------------------------------------------------------------")
+    #sms_text += ("---------------------------------------------------------------")
 
     # ✅ Consulta: ObamaCare agrupado por profiling
     statusPolicyClients = ObamaCare.objects.filter(created_at__range=(start_datetime, end_datetime))
@@ -553,7 +553,7 @@ def dataQuery():
               f"Total: {item['total_registros']}, "
               f"Activos: {item['total_activos']}, "
               f"Con Policy: {item['total_policy_lleno']}")
-    sms_text += ("---------------------------------------------------------------")
+    #sms_text += ("---------------------------------------------------------------")
 
     # ✅ Consulta: AppointmentClient
     appointmentClients = AppointmentClient.objects.filter(
@@ -569,7 +569,7 @@ def dataQuery():
     for item in appointmentClients:
         sms_text += (f"Agente6: {item['agent_create__first_name']} {item['agent_create__last_name']}, "
               f"Total6: {item['total_observationss']}, ")
-    sms_text += ("---------------------------------------------------------------")
+    #sms_text += ("---------------------------------------------------------------")
 
     print(sms_text)
 
