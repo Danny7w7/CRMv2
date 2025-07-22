@@ -880,14 +880,17 @@ def lettersCardStatus(startDateDateField, endDateDateField):
 def dataQuery():
     startDateDateField, endDateDateField , startDatedatetime, endDatedatetime = weekRange()
 
-    return {
-        "📞 Llamadas Efectivas": observationCustomer(startDatedatetime, endDatedatetime),
-        "👥 Usuarios de Carriers": userCarrier(startDateDateField, endDateDateField),
-        "💵 Pagos Programados": paymentDate(startDatedatetime, endDatedatetime),
-        "🏥 Estado de Obamacare": obamacareStatus(startDateDateField, endDateDateField),
-        "📅 Citas Agendadas": appointmentClients(startDatedatetime, endDatedatetime),
-        "✉️ Letters & Cards": lettersCardStatus(startDateDateField, endDateDateField)
-    }
+    secciones = [
+        observationCustomer(startDatedatetime, endDatedatetime),
+        userCarrier(startDateDateField, endDateDateField).splitlines(),
+        paymentDate(startDatedatetime, endDatedatetime).splitlines(),
+        obamacareStatus(startDateDateField, endDateDateField).splitlines(),
+        appointmentClients(startDatedatetime, endDatedatetime).splitlines(),
+        lettersCardStatus(startDateDateField, endDateDateField).splitlines()
+    ]
+
+    return secciones
+
 
 
 

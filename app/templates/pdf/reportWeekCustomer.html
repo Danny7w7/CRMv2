@@ -33,12 +33,13 @@
     <h1>📊 Reporte Semanal - Lapeira</h1>
 
     {% for titulo, contenido in secciones %}
-    <section>
-        <h2>{{ titulo }}</h2>
-        {% for linea in contenido %}
-            <div class="agent-block">{{ linea }}</div>
-        {% endfor %}
-    </section>
+        <section>
+            <h2>{{ titulo }}</h2>
+            {% for linea in contenido %}
+                <div class="agent-block">{{ linea }}</div>
+            {% endfor %}
+        </section>
     {% endfor %}
+
 </body>
 </html>
