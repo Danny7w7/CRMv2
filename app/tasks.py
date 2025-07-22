@@ -185,26 +185,27 @@ from datetime import datetime
 
 @shared_task
 def test():
-    # 1. Obtener los mensajes
+    # 1. Obtener datos
     mensajes = dataQuery()
     contenido = "\n\n".join(mensajes)
 
-    # 2. Crear el PDF en memoria
+    # 2. Crear PDF en memoria
     pdf_buffer = BytesIO()
     c = canvas.Canvas(pdf_buffer)
-    text_object = c.beginText(40, 800)
-    text_object.setFont("Helvetica", 10)
+    text = c.beginText(40, 800)
+    text.setFont("Helvetica", 10)
 
-    for line in contenido.split('\n'):
-        text_object.textLine(line)
-    c.drawText(text_object)
+    for linea in contenido.split('\n'):
+        text.textLine(linea)
+
+    c.drawText(text)
     c.showPage()
     c.save()
+    pdf_buffer.seek(0)
 
-    pdf_buffer.seek(0)  # Importante: mover el cursor al inicio
+    # 3. Subir a S3 (sin ACL)
+    nombre_archivo = f"mms_reports/reporte_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
 
-    # 3. Subir el PDF directamente a S3
-    file_name = f"mms_reports/reporte_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
     s3 = boto3.client(
         's3',
         aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
@@ -215,23 +216,24 @@ def test():
     s3.upload_fileobj(
         pdf_buffer,
         settings.AWS_STORAGE_BUCKET_NAME,
-        file_name,
+        nombre_archivo,
         ExtraArgs={
             'ContentType': 'application/pdf'
+            # ⚠️ NO INCLUIMOS 'ACL': 'public-read'
         }
     )
 
-    # 4. Construir la URL pública del archivo
-    url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.{settings.AWS_S3_REGION_NAME}.amazonaws.com/{file_name}"
+    # 4. Generar URL pública (debes asegurarte que el bucket lo permita)
+    url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.{settings.AWS_S3_REGION_NAME}.amazonaws.com/{nombre_archivo}"
 
-    # 5. Enviar MMS con Telnyx
+    # 5. Enviar el MMS
     telnyx.api_key = settings.TELNYX_API_KEY
+
     telnyx.Message.create(
-        from_='+17869848427',
-        to='+17863034781',
+        from_='+17869848427',  # Tu número Telnyx
+        to='+17863034781',     # Número destino
         text='📄 Reporte semanal adjunto.',
         media_urls=[url]
     )
-
 
 
