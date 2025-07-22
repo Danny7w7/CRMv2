@@ -584,6 +584,8 @@ from django.db.models import Count, Case, When, Q, BooleanField
 from app.models import ObservationCustomer, UserCarrier, PaymentDate, ObamaCare, AppointmentClient
 
 # 👉 Rango de fechas de la semana anterior
+
+
 def weekRange():
     today = date.today()
     startDateDateField = today - timedelta(days=today.weekday() + 7)
@@ -593,7 +595,6 @@ def weekRange():
     return startDateDateField, endDateDateField, startDatedatetime, endDatedatetime
 
 def observationCustomer(startDatedatetime, endDatedatetime):
-    
     # 🔢 Total acumulado histórico por agente
     acumulado = ObservationCustomer.objects.values(
         'agent__first_name', 'agent__last_name'
@@ -622,27 +623,25 @@ def observationCustomer(startDatedatetime, endDatedatetime):
         )
     ).order_by('agent__first_name', 'agent__last_name')
 
-    # 📨 Mensaje SMS
-    #sms = "--- RESULTADO DE LLAMADAS EFECTIVAS ---\n"
+    # 📨 Crear lista de resultados en lugar de sobrescribir sms
+    resultados = []
     for item in data:
         nombre = f"{item['agent__first_name']} {item['agent__last_name']}"
         esta_semana = item['total_observations']
         acumulado_total = acumulado_dict.get(nombre, 0)
 
-        sms = (
+        linea = (
             f"AGENTE: 🧑 {nombre}, "
             f"Semana: {esta_semana}, "
             f"LLAMADAS EFECTIVAS: {item['total_effective_management']}, "
             f"LLAMADAS NO EFECTIVAS: {item['total_others']}, "
-            f"ACULADO DE LLAMADAS: {acumulado_total}, \n"
+            f"ACUMULADO DE LLAMADAS: {acumulado_total}"
         )
+        resultados.append(linea)
 
-    return sms
+    return resultados  # Devolver lista, no string
 
-def userCarrier(startDateDateField,endDateDateField):
-
-    #sms = "--- RESULTADO DE USARIOS DE COMPANIES CREADOS ---\n"
-
+def userCarrier(startDateDateField, endDateDateField):
     # 🔹 Todos los agentes con agentes USA asignados
     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
 
@@ -667,6 +666,7 @@ def userCarrier(startDateDateField,endDateDateField):
     weekly_map = weekly_qs.values('agent_create').annotate(total=Count('id'))
     weekly_dict = {item['agent_create']: item['total'] for item in weekly_map}
 
+    resultados = []
     for agente in agentes_crm:
         usa_names = list(agente.usaAgents.values_list("name", flat=True))
         if not usa_names:
@@ -682,23 +682,22 @@ def userCarrier(startDateDateField,endDateDateField):
         faltan = total_clients - total_all_time
         faltan_pct = (faltan / total_clients * 100) if total_clients > 0 else 0
 
-        sms = (
+        linea = (
             f"AGENTE: 🧑 {agente.first_name} {agente.last_name}, "
             f"CLIENTES TOTALES: {total_clients}, "
             f"CLIENTES LLENADOS EN LA SEMANA: {total_week}, "
             f"ACUMULADO TOTAL: {total_all_time}, "
             f"FALTAN: {faltan}, "
-            f"FALTAN %: {faltan_pct:.1f}% \n"
+            f"FALTAN %: {faltan_pct:.1f}%"
         )
+        resultados.append(linea)
 
-    return sms
+    return resultados
 
 def paymentDate(startDatedatetime, endDatedatetime):
-
-    #sms = "--- RESULTADO DE PROGRAMAR PAGOS (SMS) ---\n"
-
     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
 
+    resultados = []
     for agente in agentes_crm:
         usa_names = list(agente.usaAgents.values_list("name", flat=True))
         if not usa_names:
@@ -735,23 +734,22 @@ def paymentDate(startDatedatetime, endDatedatetime):
         faltan = total_clients - acumulado
         porcentaje_faltante = (faltan / total_clients * 100) if total_clients > 0 else 0
 
-        sms = (
+        linea = (
             f"AGENTE: 🧑 {full_name}, "
             f"CLIENTES TOTALES: {total_clients}, "
             f"CLIENTES LLENADO EN LA SEMANA: {esta_semana}, "
             f"ACUMULADO: {acumulado}, "
             f"FALTAN: {faltan}, "
-            f"FALTAN %: {porcentaje_faltante:.1f}%\n"
+            f"FALTAN %: {porcentaje_faltante:.1f}%"
         )
+        resultados.append(linea)
 
-    return sms
+    return resultados
 
-def obamacareStatus(startDateDateField,endDateDateField):
-
-    #sms = "--- RESULTADOS DE OBAMACARE ---\n"
-
+def obamacareStatus(startDateDateField, endDateDateField):
     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
 
+    resultados = []
     for agente in agentes_crm:
         usa_agents_names = list(agente.usaAgents.values_list("name", flat=True))
 
@@ -789,22 +787,21 @@ def obamacareStatus(startDateDateField,endDateDateField):
             policyNumber=''
         ).count()
 
-        sms = (
+        linea = (
             f"AGENTE: 🧑 {full_name}, "
             f"CLIENTES TOTALES: {total_clientes_count}, "
             f"PERFILADOS ESTA SEMANA: {clientes_semanales}, "
             f"CLIENTES ACTIVOS: {total_activos}, "
-            f"CLIENTES CON # POLIZA: {total_policy}\n"
+            f"CLIENTES CON # POLIZA: {total_policy}"
         )
+        resultados.append(linea)
 
-    return sms
+    return resultados
 
 def appointmentClients(startDatedatetime, endDatedatetime):
-
-    #sms = "--- RESULTADOS DE CITAS AGENDADAS PARA EL CLIENTE ---\n"
-
     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
 
+    resultados = []
     for agente in agentes_crm:
         usa_agents_names = list(agente.usaAgents.values_list("name", flat=True))
 
@@ -839,23 +836,22 @@ def appointmentClients(startDatedatetime, endDatedatetime):
         faltan = total_clients - acumulado
         porcentaje_faltante = (faltan / total_clients * 100) if total_clients > 0 else 0
 
-        sms = (
+        linea = (
             f"AGENTE: 🧑 {full_name}, "
             f"CLIENTES TOTALES: {total_clients}, "
-            f"CITAS ESTA SEMENA: {esta_semana}, "
+            f"CITAS ESTA SEMANA: {esta_semana}, "  # Corregido typo "SEMENA"
             f"CITAS ACUMULADAS: {acumulado}, "
             f"FALTAN: {faltan}, "
             f"FALTAN %: {porcentaje_faltante:.1f}%"
         )
+        resultados.append(linea)
 
-    return sms
+    return resultados
 
 def lettersCardStatus(startDateDateField, endDateDateField):
-
-    #sms = "--- RESULTADOS DE LETTERS AND CARD ---\n"
-
     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
 
+    resultados = []
     for agente in agentes_crm:
         usa_agents_names = list(agente.usaAgents.values_list("name", flat=True))
         if not usa_agents_names:
@@ -914,20 +910,42 @@ def lettersCardStatus(startDateDateField, endDateDateField):
         porcentaje_faltante_cartas = (faltan_cartas / total_clients * 100) if total_clients > 0 else 0
         porcentaje_faltante_tarjetas = (faltan_tarjetas / total_clients * 100) if total_clients > 0 else 0
 
-        sms = (
+        linea = (
             f"AGENTE: 🧑 {full_name}, "
             f"CLIENTES TOTALES: {total_clients}, "
             f"CARTAS ESTA SEMANA: {cartas_semana}, "
-            f"ACUMULADO: {acumulado_cartas}, "
-            f"FALTAN: {faltan_cartas}, "
-            f"AVANCE FALTANTE: {porcentaje_faltante_cartas:.1f}% "
+            f"ACUMULADO CARTAS: {acumulado_cartas}, "
+            f"FALTAN CARTAS: {faltan_cartas} ({porcentaje_faltante_cartas:.1f}%), "
             f"TARJETAS ESTA SEMANA: {tarjetas_semana}, "
-            f"ACUMULADO: {acumulado_tarjetas}, "
-            f"FALTAN: {faltan_tarjetas}, "
-            f"AVANCE FALTANTE: {porcentaje_faltante_tarjetas:.1f}% \n"
+            f"ACUMULADO TARJETAS: {acumulado_tarjetas}, "
+            f"FALTAN TARJETAS: {faltan_tarjetas} ({porcentaje_faltante_tarjetas:.1f}%)"
         )
+        resultados.append(linea)
 
-    return sms
+    return resultados
+
+
+# FUNCIÓN MODIFICADA PARA GENERAR PDF
+from django.template.loader import render_to_string
+from weasyprint import HTML
+
+def generar_pdf_bonito(datos_secciones, output_path):
+    # datos_secciones es una lista de listas de strings
+    # Necesitamos convertirlo al formato que espera el template
+    
+    llamadas, carriers, pagos, obamacare, citas, cartas = datos_secciones
+    
+    context = {
+        'llamadas': llamadas,
+        'carriers': carriers, 
+        'pagos': pagos,
+        'obamacare': obamacare,
+        'citas': citas,
+        'cartas': cartas
+    }
+    
+    html_content = render_to_string('pdf/reportWeekCustomer.html', context)
+    HTML(string=html_content).write_pdf(output_path)
 
 
 def dataQuery():
@@ -944,14 +962,4 @@ def dataQuery():
     
     return partes_sms  # una lista de strings
 
-
-
-from django.template.loader import render_to_string
-from weasyprint import HTML
-
-def generar_pdf_bonito(datos_secciones, output_path):
-    html_content = render_to_string('pdf/reportWeekCustomer.html', {
-        'secciones': datos_secciones
-    })
-    HTML(string=html_content).write_pdf(output_path)
 
