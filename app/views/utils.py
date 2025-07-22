@@ -593,8 +593,6 @@ def weekRange():
     return startDateDateField, endDateDateField, startDatedatetime, endDatedatetime
 
 def observationCustomer(startDatedatetime, endDatedatetime):
-
-    sms =[]
     
     # 🔢 Total acumulado histórico por agente
     acumulado = ObservationCustomer.objects.values(
@@ -625,24 +623,30 @@ def observationCustomer(startDatedatetime, endDatedatetime):
     ).order_by('agent__first_name', 'agent__last_name')
 
     # 📨 Mensaje SMS
+    sms = "--- RESULTADO DE LLAMADAS EFECTIVAS ---\n"
     for item in data:
-            nombre = f"{item['agent__first_name']} {item['agent__last_name']}"
-            esta_semana = item['total_observations']
-            acumulado_total = acumulado_dict.get(nombre, 0)
+        nombre = f"{item['agent__first_name']} {item['agent__last_name']}"
+        esta_semana = item['total_observations']
+        acumulado_total = acumulado_dict.get(nombre, 0)
 
-            sms.append(
-                f"AGENTE: {nombre}, Semana: {esta_semana}, "
-                f"LLAMADAS EFECTIVAS: {item['total_effective_management']}, "
-                f"LLAMADAS NO EFECTIVAS: {item['total_others']}, "
-                f"ACUMULADO DE LLAMADAS: {acumulado_total}"
-            )
+        sms += (
+            f"AGENTE: 🧑‍💼 {nombre}, \n"
+            f"Semana: {esta_semana}, \n"
+            f"LLAMADAS EFECTIVAS: {item['total_effective_management']}, \n"
+            f"LLAMADAS NO EFECTIVAS: {item['total_others']}, \n"
+            f"ACULADO DE LLAMADAS: {acumulado_total}, "
+        )
 
     return sms
 
-def userCarrier(startDateDateField, endDateDateField):
-    agentes_crm = Users.objects.prefetch_related('usaAgents').all()
-    lines = []
+def userCarrier(startDateDateField,endDateDateField):
 
+    sms = "--- RESULTADO DE USARIOS DE COMPANIES CREADOS ---\n"
+
+    # 🔹 Todos los agentes con agentes USA asignados
+    agentes_crm = Users.objects.prefetch_related('usaAgents').all()
+
+    # 🔹 Acumulado histórico (filtrado)
     historical_qs = UserCarrier.objects.filter(
         obamacare__is_active=True,
         username_carrier__isnull=False,
@@ -652,6 +656,7 @@ def userCarrier(startDateDateField, endDateDateField):
     historical_map = historical_qs.values('agent_create').annotate(total=Count('id'))
     historical_dict = {item['agent_create']: item['total'] for item in historical_map}
 
+    # 🔹 Formularios esta semana (mismos filtros)
     weekly_qs = UserCarrier.objects.filter(
         obamacare__is_active=True,
         dateUserCarrier__range=(startDateDateField, endDateDateField),
@@ -665,7 +670,7 @@ def userCarrier(startDateDateField, endDateDateField):
     for agente in agentes_crm:
         usa_names = list(agente.usaAgents.values_list("name", flat=True))
         if not usa_names:
-            continue
+            continue  # Ignorar agentes sin usaAgents
 
         total_clients = ObamaCare.objects.filter(
             is_active=True,
@@ -677,32 +682,38 @@ def userCarrier(startDateDateField, endDateDateField):
         faltan = total_clients - total_all_time
         faltan_pct = (faltan / total_clients * 100) if total_clients > 0 else 0
 
-        lines.append(
-            f"AGENTE: {agente.first_name} {agente.last_name}, CLIENTES TOTALES: {total_clients}, "
-            f"CLIENTES LLENADOS EN LA SEMANA: {total_week}, ACUMULADO TOTAL: {total_all_time}, "
-            f"FALTAN: {faltan}, FALTAN %: {faltan_pct:.1f}%"
+        sms += (
+            f"AGENTE: 🧑‍💼 {agente.first_name} {agente.last_name}, \n"
+            f"CLIENTES TOTALES: {total_clients}, \n"
+            f"CLIENTES LLENADOS EN LA SEMANA: {total_week}, \n"
+            f"ACUMULADO TOTAL: {total_all_time}, \n"
+            f"FALTAN: {faltan}, \n"
+            f"FALTAN %: {faltan_pct:.1f}%\n"
         )
 
-    return lines
-
+    return sms
 
 def paymentDate(startDatedatetime, endDatedatetime):
+
+    sms = "--- RESULTADO DE PROGRAMAR PAGOS (SMS) ---\n"
+
     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
-    lines = []
 
     for agente in agentes_crm:
         usa_names = list(agente.usaAgents.values_list("name", flat=True))
         if not usa_names:
-            continue
+            continue  # Ignorar si no tiene agentes USA
 
         full_name = f"{agente.first_name} {agente.last_name}"
 
+        # Total de clientes activos con premium > 0
         total_clients = ObamaCare.objects.filter(
             is_active=True,
             premium__gt=0,
             agent_usa__in=usa_names
         ).count()
 
+        # Total acumulado de formularios válidos
         acumulado = PaymentDate.objects.filter(
             agent_create=agente,
             obamacare__isnull=False,
@@ -711,6 +722,7 @@ def paymentDate(startDatedatetime, endDatedatetime):
             obamacare__agent_usa__in=usa_names
         ).count()
 
+        # Total esta semana con mismos filtros
         esta_semana = PaymentDate.objects.filter(
             agent_create=agente,
             created_at__range=(startDatedatetime, endDatedatetime),
@@ -723,68 +735,91 @@ def paymentDate(startDatedatetime, endDatedatetime):
         faltan = total_clients - acumulado
         porcentaje_faltante = (faltan / total_clients * 100) if total_clients > 0 else 0
 
-        lines.append(
-            f"AGENTE: {full_name}, CLIENTES TOTALES: {total_clients}, CLIENTES LLENADO EN LA SEMANA: {esta_semana}, "
-            f"ACUMULADO: {acumulado}, FALTAN: {faltan}, FALTAN %: {porcentaje_faltante:.1f}%"
+        sms += (
+            f"AGENTE: 🧑‍💼 {full_name}, \n"
+            f"CLIENTES TOTALES: {total_clients}, \n"
+            f"CLIENTES LLENADO EN LA SEMANA: {esta_semana}, \n"
+            f"ACUMULADO: {acumulado}, \n"
+            f"FALTAN: {faltan}, \n"
+            f"FALTAN %: {porcentaje_faltante:.1f}%\n"
         )
 
-    return lines
+    return sms
 
+def obamacareStatus(startDateDateField,endDateDateField):
 
-def obamacareStatus(startDateDateField, endDateDateField):
+    sms = "--- RESULTADOS DE OBAMACARE ---\n"
+
     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
-    lines = []
 
     for agente in agentes_crm:
         usa_agents_names = list(agente.usaAgents.values_list("name", flat=True))
+
         if not usa_agents_names:
             continue
 
         full_name = f"{agente.first_name} {agente.last_name}"
 
-        total_clientes_count = ObamaCare.objects.filter(
+        # Total clientes activos
+        total_clientes = ObamaCare.objects.filter(
             is_active=True,
             agent_usa__in=usa_agents_names
-        ).count()
+        )
 
+        total_clientes_count = total_clientes.count()
+
+        # Total clientes perfilados en la semana
         clientes_semanales = ObamaCare.objects.filter(
             profiling_date__range=(startDateDateField, endDateDateField),
             agent_usa__in=usa_agents_names
         ).count()
 
+        # Total con status ACTIVO
         total_activos = ObamaCare.objects.filter(
             agent_usa__in=usa_agents_names,
             status__iexact='ACTIVO'
         ).count()
 
+        # Total con policyNumber lleno
         total_policy = ObamaCare.objects.filter(
             agent_usa__in=usa_agents_names
-        ).exclude(policyNumber__isnull=True).exclude(policyNumber='').count()
+        ).exclude(
+            policyNumber__isnull=True
+        ).exclude(
+            policyNumber=''
+        ).count()
 
-        lines.append(
-            f"AGENTE: {full_name}, CLIENTES TOTALES: {total_clientes_count}, PERFILADOS ESTA SEMANA: {clientes_semanales}, "
-            f"CLIENTES ACTIVOS: {total_activos}, CLIENTES CON # POLIZA: {total_policy}"
+        sms += (
+            f"AGENTE: 🧑‍💼 {full_name}, \n"
+            f"CLIENTES TOTALES: {total_clientes_count}, \n"
+            f"PERFILADOS ESTA SEMANA: {clientes_semanales}, \n"
+            f"CLIENTES ACTIVOS: {total_activos}, \n"
+            f"CLIENTES CON # POLIZA: {total_policy}\n"
         )
 
-    return lines
-
+    return sms
 
 def appointmentClients(startDatedatetime, endDatedatetime):
+
+    sms = "--- RESULTADOS DE CITAS AGENDADAS PARA EL CLIENTE ---\n"
+
     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
-    lines = []
 
     for agente in agentes_crm:
         usa_agents_names = list(agente.usaAgents.values_list("name", flat=True))
+
         if not usa_agents_names:
-            continue
+            continue  # Ignorar agentes sin relación USA
 
         full_name = f"{agente.first_name} {agente.last_name}"
 
+        # Clientes activos del agente USA
         total_clients = ObamaCare.objects.filter(
             is_active=True,
             agent_usa__in=usa_agents_names
         ).count()
 
+        # Total acumulado de citas con obamacare activo
         acumulado = AppointmentClient.objects.filter(
             agent_create=agente,
             obamacare__isnull=False,
@@ -792,6 +827,7 @@ def appointmentClients(startDatedatetime, endDatedatetime):
             obamacare__agent_usa__in=usa_agents_names
         ).count()
 
+        # Citas esta semana
         esta_semana = AppointmentClient.objects.filter(
             agent_create=agente,
             created_at__range=(startDatedatetime, endDatedatetime),
@@ -803,17 +839,22 @@ def appointmentClients(startDatedatetime, endDatedatetime):
         faltan = total_clients - acumulado
         porcentaje_faltante = (faltan / total_clients * 100) if total_clients > 0 else 0
 
-        lines.append(
-            f"AGENTE: {full_name}, CLIENTES TOTALES: {total_clients}, CITAS ESTA SEMENA: {esta_semana}, "
-            f"CITAS ACUMULADAS: {acumulado}, FALTAN: {faltan}, FALTAN %: {porcentaje_faltante:.1f}%"
+        sms += (
+            f"AGENTE: 🧑‍💼 {full_name}, \n"
+            f"CLIENTES TOTALES: {total_clients}, \n"
+            f"CITAS ESTA SEMENA: {esta_semana}, \n"
+            f"CITAS ACUMULADAS: {acumulado}, \n"
+            f"FALTAN: {faltan}, \n"
+            f"FALTAN %: {porcentaje_faltante:.1f}%"
         )
 
-    return lines
-
+    return sms
 
 def lettersCardStatus(startDateDateField, endDateDateField):
+
+    sms = "--- RESULTADOS DE LETTERS AND CARD ---\n"
+
     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
-    lines = []
 
     for agente in agentes_crm:
         usa_agents_names = list(agente.usaAgents.values_list("name", flat=True))
@@ -822,11 +863,13 @@ def lettersCardStatus(startDateDateField, endDateDateField):
 
         full_name = f"{agente.first_name} {agente.last_name}"
 
+        # 🔹 Total de clientes activos asociados al agente USA
         total_clients = ObamaCare.objects.filter(
             is_active=True,
             agent_usa__in=usa_agents_names
         ).count()
 
+        # 🔹 Acumulado de cartas
         acumulado_cartas = LettersCard.objects.filter(
             agent_create=agente,
             letters=True,
@@ -835,6 +878,7 @@ def lettersCardStatus(startDateDateField, endDateDateField):
             obamacare__agent_usa__in=usa_agents_names
         ).count()
 
+        # 🔹 Acumulado de tarjetas
         acumulado_tarjetas = LettersCard.objects.filter(
             agent_create=agente,
             card=True,
@@ -843,6 +887,7 @@ def lettersCardStatus(startDateDateField, endDateDateField):
             obamacare__agent_usa__in=usa_agents_names
         ).count()
 
+        # 🔹 Esta semana: cartas
         cartas_semana = LettersCard.objects.filter(
             agent_create=agente,
             dateCard__range=(startDateDateField, endDateDateField),
@@ -852,6 +897,7 @@ def lettersCardStatus(startDateDateField, endDateDateField):
             obamacare__agent_usa__in=usa_agents_names
         ).count()
 
+        # 🔹 Esta semana: tarjetas
         tarjetas_semana = LettersCard.objects.filter(
             agent_create=agente,
             dateLetters__range=(startDateDateField, endDateDateField),
@@ -861,37 +907,42 @@ def lettersCardStatus(startDateDateField, endDateDateField):
             obamacare__agent_usa__in=usa_agents_names
         ).count()
 
+        # 🔹 Porcentajes faltantes
         faltan_cartas = total_clients - acumulado_cartas
         faltan_tarjetas = total_clients - acumulado_tarjetas
 
         porcentaje_faltante_cartas = (faltan_cartas / total_clients * 100) if total_clients > 0 else 0
         porcentaje_faltante_tarjetas = (faltan_tarjetas / total_clients * 100) if total_clients > 0 else 0
 
-        lines.append(
-            f"AGENTE: {full_name}, CLIENTES TOTALES: {total_clients}, 📩 CARTAS ESTA SEMANA: {cartas_semana}, "
-            f"ACUMULADO: {acumulado_cartas}, FALTAN: {faltan_cartas}, AVANCE FALTANTE: {porcentaje_faltante_cartas:.1f}%, "
-            f"💳 TARJETAS ESTA SEMANA: {tarjetas_semana}, ACUMULADO: {acumulado_tarjetas}, "
-            f"FALTAN: {faltan_tarjetas}, AVANCE FALTANTE: {porcentaje_faltante_tarjetas:.1f}%"
+        sms += (
+            f"AGENTE: 🧑‍💼 {full_name}, \n"
+            f"CLIENTES TOTALES: {total_clients}, \n"
+            f"📩 CARTAS ESTA SEMANA: {cartas_semana}, \n"
+            f"ACUMULADO: {acumulado_cartas}, \n"
+            f"FALTAN: {faltan_cartas}, \n"
+            f"AVANCE FALTANTE: {porcentaje_faltante_cartas:.1f}% \n"
+            f"💳 Tarjetas esta semana: {tarjetas_semana}, \n"
+            f"ACUMULADO: {acumulado_tarjetas}, \n"
+            f"FALTAN: {faltan_tarjetas}, \n"
+            f"AVANCE FALTANTE: {porcentaje_faltante_tarjetas:.1f}% \n"
         )
 
-    return lines
+    return sms
 
 
 def dataQuery():
     startDateDateField, endDateDateField , startDatedatetime, endDatedatetime = weekRange()
-
-    secciones = [
+    
+    partes_sms = [
         observationCustomer(startDatedatetime, endDatedatetime),
-        userCarrier(startDateDateField, endDateDateField).splitlines(),
-        paymentDate(startDatedatetime, endDatedatetime).splitlines(),
-        obamacareStatus(startDateDateField, endDateDateField).splitlines(),
-        appointmentClients(startDatedatetime, endDatedatetime).splitlines(),
-        lettersCardStatus(startDateDateField, endDateDateField).splitlines()
+        userCarrier(startDateDateField, endDateDateField),
+        paymentDate(startDatedatetime, endDatedatetime),
+        obamacareStatus(startDateDateField, endDateDateField),
+        appointmentClients(startDatedatetime, endDatedatetime),
+        lettersCardStatus(startDateDateField, endDateDateField)
     ]
-
-    return secciones
-
-
+    
+    return partes_sms  # una lista de strings
 
 
 
