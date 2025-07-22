@@ -934,12 +934,12 @@ def dataQuery():
     startDateDateField, endDateDateField , startDatedatetime, endDatedatetime = weekRange()
     
     partes_sms = [
-        observationCustomer(startDatedatetime, endDatedatetime).splitlines(),
-        userCarrier(startDateDateField, endDateDateField).splitlines(),
-        paymentDate(startDatedatetime, endDatedatetime).splitlines(),
-        obamacareStatus(startDateDateField, endDateDateField).splitlines(),
-        appointmentClients(startDatedatetime, endDatedatetime).splitlines(),
-        lettersCardStatus(startDateDateField, endDateDateField).splitlines()
+        observationCustomer(startDatedatetime, endDatedatetime),
+        userCarrier(startDateDateField, endDateDateField),
+        paymentDate(startDatedatetime, endDatedatetime),
+        obamacareStatus(startDateDateField, endDateDateField),
+        appointmentClients(startDatedatetime, endDatedatetime),
+        lettersCardStatus(startDateDateField, endDateDateField)
     ]
     
     return partes_sms  # una lista de strings
