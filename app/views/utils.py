@@ -944,39 +944,13 @@ def dataQuery():
     return partes_sms  # una lista de strings
 
 
-import os
-import base64
-import requests
-from django.conf import settings
 
-def uploadTempUrl(local_file_path, s3_key, expiration=86400):  # 1 día por defecto
-    s3 = boto3.client(
-        's3',
-        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-        region_name=settings.AWS_S3_REGION_NAME
-    )
+from django.template.loader import render_to_string
+from weasyprint import HTML
 
-    bucket_name = settings.AWS_STORAGE_BUCKET_NAME
-
-    # Subir sin ACLs
-    s3.upload_file(
-        local_file_path,
-        bucket_name,
-        s3_key,
-        ExtraArgs={'ContentType': 'application/pdf'}
-    )
-
-    # Generar URL temporal
-    url = s3.generate_presigned_url(
-        ClientMethod='get_object',
-        Params={
-            'Bucket': bucket_name,
-            'Key': s3_key
-        },
-        ExpiresIn=expiration
-    )
-
-    return url
-
+def generar_pdf_bonito(datos_secciones, output_path):
+    html_content = render_to_string('pdf/reportWeekCustomer.html', {
+        'secciones': datos_secciones
+    })
+    HTML(string=html_content).write_pdf(output_path)
 

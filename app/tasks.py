@@ -177,46 +177,31 @@ import telnyx
 
 @shared_task
 def test():
-    # 1. Reunir datos del reporte
-    partes_sms = dataQuery()
-    contenido = "\n\n".join(partes_sms)
+    # 1. Obtener los datos
+    partes_sms = dataQuery()  # Devuelve lista de strings
 
-    # 2. Generar PDF en disco (temporal)
+    # 2. Preparar contenido para HTML
+    titulos = [
+        "📞 Llamadas Efectivas",
+        "💼 Usuarios Companies",
+        "💰 Programar Pagos",
+        "🩺 Obamacare Status",
+        "📅 Citas del Cliente",
+        "✉️ Letters y Cards"
+    ]
+    secciones = list(zip(titulos, partes_sms))
+
+    # 3. Generar PDF
     now = datetime.now()
     filename = f"reporte_test_{now.strftime('%Y%m%d_%H%M%S')}.pdf"
-    local_path = f"/tmp/{filename}"  # ruta local temporal
+    local_path = f"/tmp/{filename}"
+    generar_pdf_bonito(secciones, local_path)
 
-    from reportlab.lib.pagesizes import LETTER
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-    from reportlab.lib.styles import getSampleStyleSheet
-
-    def crear_pdf_bonito(path, contenido):
-        doc = SimpleDocTemplate(path, pagesize=LETTER)
-        styles = getSampleStyleSheet()
-        story = []
-
-        # Agregar título
-        story.append(Paragraph("📊 Reporte Semanal", styles['Title']))
-        story.append(Spacer(1, 12))
-
-        # Agregar cada sección como párrafo
-        for bloque in contenido.split("---"):
-            bloque = bloque.strip()
-            if not bloque:
-                continue
-            story.append(Paragraph("🔹 " + bloque.replace("\n", "<br/>"), styles['Normal']))
-            story.append(Spacer(1, 20))
-
-        doc.build(story)
-
-    # ✅ ¡Importante! Llamar a la función para generar el PDF bonito
-    crear_pdf_bonito(local_path, contenido)
-
-    # 3. Subir a S3 (temporal) y obtener URL temporal
+    # 4. Subir a S3
     s3_key = f"reportes/{filename}"
     s3_url = uploadTempUrl(local_path, s3_key)
 
-    # 4. Enviar por Telnyx MMS
+    # 5. Enviar por Telnyx
     telnyx.api_key = settings.TELNYX_API_KEY
     telnyx.Message.create(
         from_='+17869848427',
@@ -226,7 +211,6 @@ def test():
         media_urls=[s3_url]
     )
 
-    # 5. Eliminar el archivo local
+    # 6. Limpiar
     if os.path.exists(local_path):
         os.remove(local_path)
-
