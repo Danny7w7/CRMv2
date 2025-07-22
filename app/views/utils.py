@@ -682,7 +682,7 @@ def userCarrier(startDateDateField,endDateDateField):
         faltan = total_clients - total_all_time
         faltan_pct = (faltan / total_clients * 100) if total_clients > 0 else 0
 
-        sms += (
+        sms = (
             f"AGENTE: 🧑 {agente.first_name} {agente.last_name}, "
             f"CLIENTES TOTALES: {total_clients}, "
             f"CLIENTES LLENADOS EN LA SEMANA: {total_week}, "
@@ -735,7 +735,7 @@ def paymentDate(startDatedatetime, endDatedatetime):
         faltan = total_clients - acumulado
         porcentaje_faltante = (faltan / total_clients * 100) if total_clients > 0 else 0
 
-        sms += (
+        sms = (
             f"AGENTE: 🧑 {full_name}, "
             f"CLIENTES TOTALES: {total_clients}, "
             f"CLIENTES LLENADO EN LA SEMANA: {esta_semana}, "
@@ -789,7 +789,7 @@ def obamacareStatus(startDateDateField,endDateDateField):
             policyNumber=''
         ).count()
 
-        sms += (
+        sms = (
             f"AGENTE: 🧑 {full_name}, "
             f"CLIENTES TOTALES: {total_clientes_count}, "
             f"PERFILADOS ESTA SEMANA: {clientes_semanales}, "
@@ -839,7 +839,7 @@ def appointmentClients(startDatedatetime, endDatedatetime):
         faltan = total_clients - acumulado
         porcentaje_faltante = (faltan / total_clients * 100) if total_clients > 0 else 0
 
-        sms += (
+        sms = (
             f"AGENTE: 🧑 {full_name}, "
             f"CLIENTES TOTALES: {total_clients}, "
             f"CITAS ESTA SEMENA: {esta_semana}, "
@@ -914,7 +914,7 @@ def lettersCardStatus(startDateDateField, endDateDateField):
         porcentaje_faltante_cartas = (faltan_cartas / total_clients * 100) if total_clients > 0 else 0
         porcentaje_faltante_tarjetas = (faltan_tarjetas / total_clients * 100) if total_clients > 0 else 0
 
-        sms += (
+        sms = (
             f"AGENTE: 🧑 {full_name}, "
             f"CLIENTES TOTALES: {total_clients}, "
             f"CARTAS ESTA SEMANA: {cartas_semana}, "
