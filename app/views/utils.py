@@ -988,19 +988,11 @@ import matplotlib.pyplot as plt
 import os
 from uuid import uuid4
 
-def observationCustomer(startDatedatetime, endDatedatetime):
-    acumulado = ObservationCustomer.objects.values(
-        'agent__first_name', 'agent__last_name'
-    ).annotate(
-        total_acumulado=Count('id'),
-        acumulado_efectivas=Count(
-            Case(When(typification__icontains='EFFECTIVE MANAGEMENT', then=1), output_field=BooleanField())
-        ),
-        acumulado_no_efectivas=Count(
-            Case(When(~Q(typification__icontains='EFFECTIVE MANAGEMENT'), then=1), output_field=BooleanField())
-        )
-    )
+import matplotlib.pyplot as plt
+import os
+from uuid import uuid4
 
+def observationCustomer(startDatedatetime, endDatedatetime):
     data = ObservationCustomer.objects.filter(
         created_at__range=(startDatedatetime, endDatedatetime)
     ).values(
@@ -1015,7 +1007,6 @@ def observationCustomer(startDatedatetime, endDatedatetime):
         )
     ).order_by('agent__first_name', 'agent__last_name')
 
-    # Datos para la gráfica
     nombres = []
     efectivas = []
     no_efectivas = []
@@ -1026,21 +1017,40 @@ def observationCustomer(startDatedatetime, endDatedatetime):
         efectivas.append(item['total_effective_management'])
         no_efectivas.append(item['total_others'])
 
-    # Crear gráfica de barras
-    fig, ax = plt.subplots(figsize=(10, 5))
+    # Gráfico de barras: 2 barras por agente
     x = range(len(nombres))
+    width = 0.35  # Ancho de cada barra
 
-    ax.bar(x, efectivas, label='Efectivas', color='green')
-    ax.bar(x, no_efectivas, bottom=efectivas, label='No Efectivas', color='red')
+    fig, ax = plt.subplots(figsize=(10, 5))
+    x_effectivas = [i - width/2 for i in x]
+    x_no_efectivas = [i + width/2 for i in x]
+
+    bars1 = ax.bar(x_effectivas, efectivas, width=width, label='Efectivas', color='green')
+    bars2 = ax.bar(x_no_efectivas, no_efectivas, width=width, label='No Efectivas', color='red')
+
+    # Etiquetas
     ax.set_xticks(x)
     ax.set_xticklabels(nombres, rotation=45, ha='right')
-    ax.set_ylabel('Total')
-    ax.set_title('Llamadas por Agente (Semana)')
+    ax.set_ylabel('Cantidad')
+    ax.set_title('Llamadas por Agente - Semana')
     ax.legend()
+
+    # Mostrar valores sobre las barras
+    def agregar_valores(barras):
+        for barra in barras:
+            altura = barra.get_height()
+            ax.annotate(f'{int(altura)}',
+                        xy=(barra.get_x() + barra.get_width() / 2, altura),
+                        xytext=(0, 3),  # 3 puntos arriba
+                        textcoords="offset points",
+                        ha='center', va='bottom', fontsize=8)
+
+    agregar_valores(bars1)
+    agregar_valores(bars2)
 
     plt.tight_layout()
 
-    # Guardar imagen temporal
+    # Guardar imagen
     output_dir = os.path.join('temp')
     os.makedirs(output_dir, exist_ok=True)
     filename = f"grafico_llamadas_{uuid4().hex}.png"
@@ -1048,7 +1058,7 @@ def observationCustomer(startDatedatetime, endDatedatetime):
     plt.savefig(image_path)
     plt.close()
 
-    return image_path  # Devuelve la ruta del gráfico
+    return image_path
 
 
 def dataQuery():
