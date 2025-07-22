@@ -631,7 +631,7 @@ def observationCustomer(startDatedatetime, endDatedatetime):
         acumulado_total = acumulado_dict.get(nombre, 0)
 
         linea = (
-            f"AGENTE: 🧑 {nombre}, "
+            f"AGENTE: {nombre}, "
             f"Semana: {esta_semana}, "
             f"LLAMADAS EFECTIVAS: {item['total_effective_management']}, "
             f"LLAMADAS NO EFECTIVAS: {item['total_others']}, "
@@ -683,7 +683,7 @@ def userCarrier(startDateDateField, endDateDateField):
         faltan_pct = (faltan / total_clients * 100) if total_clients > 0 else 0
 
         linea = (
-            f"AGENTE: 🧑 {agente.first_name} {agente.last_name}, "
+            f"AGENTE: {agente.first_name} {agente.last_name}, "
             f"CLIENTES TOTALES: {total_clients}, "
             f"CLIENTES LLENADOS EN LA SEMANA: {total_week}, "
             f"ACUMULADO TOTAL: {total_all_time}, "
@@ -735,7 +735,7 @@ def paymentDate(startDatedatetime, endDatedatetime):
         porcentaje_faltante = (faltan / total_clients * 100) if total_clients > 0 else 0
 
         linea = (
-            f"AGENTE: 🧑 {full_name}, "
+            f"AGENTE: {full_name}, "
             f"CLIENTES TOTALES: {total_clients}, "
             f"CLIENTES LLENADO EN LA SEMANA: {esta_semana}, "
             f"ACUMULADO: {acumulado}, "
@@ -775,7 +775,7 @@ def obamacareStatus(startDateDateField, endDateDateField):
         # Total con status ACTIVO
         total_activos = ObamaCare.objects.filter(
             agent_usa__in=usa_agents_names,
-            status__iexact='ACTIVO'
+            status__iexact='ACTIVE'
         ).count()
 
         # Total con policyNumber lleno
@@ -788,7 +788,7 @@ def obamacareStatus(startDateDateField, endDateDateField):
         ).count()
 
         linea = (
-            f"AGENTE: 🧑 {full_name}, "
+            f"AGENTE: {full_name}, "
             f"CLIENTES TOTALES: {total_clientes_count}, "
             f"PERFILADOS ESTA SEMANA: {clientes_semanales}, "
             f"CLIENTES ACTIVOS: {total_activos}, "
@@ -837,7 +837,7 @@ def appointmentClients(startDatedatetime, endDatedatetime):
         porcentaje_faltante = (faltan / total_clients * 100) if total_clients > 0 else 0
 
         linea = (
-            f"AGENTE: 🧑 {full_name}, "
+            f"AGENTE: {full_name}, "
             f"CLIENTES TOTALES: {total_clients}, "
             f"CITAS ESTA SEMANA: {esta_semana}, "  # Corregido typo "SEMENA"
             f"CITAS ACUMULADAS: {acumulado}, "
@@ -911,7 +911,7 @@ def lettersCardStatus(startDateDateField, endDateDateField):
         porcentaje_faltante_tarjetas = (faltan_tarjetas / total_clients * 100) if total_clients > 0 else 0
 
         linea = (
-            f"AGENTE: 🧑 {full_name}, "
+            f"AGENTE: {full_name}, "
             f"CLIENTES TOTALES: {total_clients}, "
             f"CARTAS ESTA SEMANA: {cartas_semana}, "
             f"ACUMULADO CARTAS: {acumulado_cartas}, "
