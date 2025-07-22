@@ -594,71 +594,71 @@ def weekRange():
     endDatedatetime = timezone.make_aware(timezone.datetime(endDateDateField.year, endDateDateField.month, endDateDateField.day, 23, 59, 59, 999999))
     return startDateDateField, endDateDateField, startDatedatetime, endDatedatetime
 
-def observationCustomer(startDatedatetime, endDatedatetime):
-    # 🔢 Total acumulado histórico por agente con separación por tipo
-    acumulado = ObservationCustomer.objects.values(
-        'agent__first_name', 'agent__last_name'
-    ).annotate(
-        total_acumulado=Count('id'),
-        acumulado_efectivas=Count(
-            Case(When(typification__icontains='EFFECTIVE MANAGEMENT', then=1), output_field=BooleanField())
-        ),
-        acumulado_no_efectivas=Count(
-            Case(When(~Q(typification__icontains='EFFECTIVE MANAGEMENT'), then=1), output_field=BooleanField())
-        )
-    )
+# def observationCustomer(startDatedatetime, endDatedatetime):
+#     # 🔢 Total acumulado histórico por agente con separación por tipo
+#     acumulado = ObservationCustomer.objects.values(
+#         'agent__first_name', 'agent__last_name'
+#     ).annotate(
+#         total_acumulado=Count('id'),
+#         acumulado_efectivas=Count(
+#             Case(When(typification__icontains='EFFECTIVE MANAGEMENT', then=1), output_field=BooleanField())
+#         ),
+#         acumulado_no_efectivas=Count(
+#             Case(When(~Q(typification__icontains='EFFECTIVE MANAGEMENT'), then=1), output_field=BooleanField())
+#         )
+#     )
 
-    # 🔄 Diccionarios: nombre -> totales acumulados
-    acumulado_dict = {}
-    acumulado_efectivas_dict = {}
-    acumulado_no_efectivas_dict = {}
+#     # 🔄 Diccionarios: nombre -> totales acumulados
+#     acumulado_dict = {}
+#     acumulado_efectivas_dict = {}
+#     acumulado_no_efectivas_dict = {}
     
-    for a in acumulado:
-        nombre = f"{a['agent__first_name']} {a['agent__last_name']}"
-        acumulado_dict[nombre] = a['total_acumulado']
-        acumulado_efectivas_dict[nombre] = a['acumulado_efectivas']
-        acumulado_no_efectivas_dict[nombre] = a['acumulado_no_efectivas']
+#     for a in acumulado:
+#         nombre = f"{a['agent__first_name']} {a['agent__last_name']}"
+#         acumulado_dict[nombre] = a['total_acumulado']
+#         acumulado_efectivas_dict[nombre] = a['acumulado_efectivas']
+#         acumulado_no_efectivas_dict[nombre] = a['acumulado_no_efectivas']
 
-    # 📆 Observaciones solo de esta semana
-    data = ObservationCustomer.objects.filter(
-        created_at__range=(startDatedatetime, endDatedatetime)
-    ).values(
-        'agent__first_name', 'agent__last_name'
-    ).annotate(
-        total_observations=Count('id'),
-        total_effective_management=Count(
-            Case(When(typification__icontains='EFFECTIVE MANAGEMENT', then=1), output_field=BooleanField())
-        ),
-        total_others=Count(
-            Case(When(~Q(typification__icontains='EFFECTIVE MANAGEMENT'), then=1), output_field=BooleanField())
-        )
-    ).order_by('agent__first_name', 'agent__last_name')
+#     # 📆 Observaciones solo de esta semana
+#     data = ObservationCustomer.objects.filter(
+#         created_at__range=(startDatedatetime, endDatedatetime)
+#     ).values(
+#         'agent__first_name', 'agent__last_name'
+#     ).annotate(
+#         total_observations=Count('id'),
+#         total_effective_management=Count(
+#             Case(When(typification__icontains='EFFECTIVE MANAGEMENT', then=1), output_field=BooleanField())
+#         ),
+#         total_others=Count(
+#             Case(When(~Q(typification__icontains='EFFECTIVE MANAGEMENT'), then=1), output_field=BooleanField())
+#         )
+#     ).order_by('agent__first_name', 'agent__last_name')
 
-    # 📨 Crear lista de resultados con acumulados separados
-    resultados = []
-    for item in data:
-        nombre = f"{item['agent__first_name']} {item['agent__last_name']}"
-        esta_semana = item['total_observations']
-        efectivas_semana = item['total_effective_management']
-        no_efectivas_semana = item['total_others']
+#     # 📨 Crear lista de resultados con acumulados separados
+#     resultados = []
+#     for item in data:
+#         nombre = f"{item['agent__first_name']} {item['agent__last_name']}"
+#         esta_semana = item['total_observations']
+#         efectivas_semana = item['total_effective_management']
+#         no_efectivas_semana = item['total_others']
         
-        # Obtener acumulados históricos
-        acumulado_total = acumulado_dict.get(nombre, 0)
-        acumulado_efectivas = acumulado_efectivas_dict.get(nombre, 0)
-        acumulado_no_efectivas = acumulado_no_efectivas_dict.get(nombre, 0)
+#         # Obtener acumulados históricos
+#         acumulado_total = acumulado_dict.get(nombre, 0)
+#         acumulado_efectivas = acumulado_efectivas_dict.get(nombre, 0)
+#         acumulado_no_efectivas = acumulado_no_efectivas_dict.get(nombre, 0)
 
-        linea = (
-            f"AGENTE: {nombre}, "
-            f"LLAMADAS ESTA SEMANA: {esta_semana}, "
-            f"EFECTIVAS SEMANA: {efectivas_semana}, "
-            f"NO EFECTIVAS SEMANA: {no_efectivas_semana}, "
-            f"ACUMULADO EFECTIVAS: {acumulado_efectivas}, "
-            f"ACUMULADO NO EFECTIVAS: {acumulado_no_efectivas}, "
-            f"ACUMULADO TOTAL: {acumulado_total}"
-        )
-        resultados.append(linea)
+#         linea = (
+#             f"AGENTE: {nombre}, "
+#             f"LLAMADAS ESTA SEMANA: {esta_semana}, "
+#             f"EFECTIVAS SEMANA: {efectivas_semana}, "
+#             f"NO EFECTIVAS SEMANA: {no_efectivas_semana}, "
+#             f"ACUMULADO EFECTIVAS: {acumulado_efectivas}, "
+#             f"ACUMULADO NO EFECTIVAS: {acumulado_no_efectivas}, "
+#             f"ACUMULADO TOTAL: {acumulado_total}"
+#         )
+#         resultados.append(linea)
 
-    return resultados
+#     return resultados
 
 def userCarrier(startDateDateField, endDateDateField):
     # 🔹 Todos los agentes con agentes USA asignados
@@ -948,37 +948,133 @@ def lettersCardStatus(startDateDateField, endDateDateField):
 from django.template.loader import render_to_string
 from weasyprint import HTML
 
+# def generar_pdf_bonito(datos_secciones, output_path):
+#     # datos_secciones es una lista de listas de strings
+#     # Necesitamos convertirlo al formato que espera el template
+    
+#     llamadas, carriers, pagos, obamacare, citas, cartas = datos_secciones
+    
+#     context = {
+#         'llamadas': llamadas,
+#         'carriers': carriers, 
+#         'pagos': pagos,
+#         'obamacare': obamacare,
+#         'citas': citas,
+#         'cartas': cartas
+#     }
+    
+#     html_content = render_to_string('pdf/reportWeekCustomer.html', context)
+#     HTML(string=html_content).write_pdf(output_path)
+
+
+# def dataQuery():
+#     startDateDateField, endDateDateField , startDatedatetime, endDatedatetime = weekRange()
+    
+#     partes_sms = [
+#         observationCustomer(startDatedatetime, endDatedatetime),
+#         userCarrier(startDateDateField, endDateDateField),
+#         paymentDate(startDatedatetime, endDatedatetime),
+#         obamacareStatus(startDateDateField, endDateDateField),
+#         appointmentClients(startDatedatetime, endDatedatetime),
+#         lettersCardStatus(startDateDateField, endDateDateField)
+#     ]
+    
+#     return partes_sms  # una lista de strings
+
+
+###empezamos con la grafica
+
+import matplotlib.pyplot as plt
+import os
+from uuid import uuid4
+
+def observationCustomer(startDatedatetime, endDatedatetime):
+    acumulado = ObservationCustomer.objects.values(
+        'agent__first_name', 'agent__last_name'
+    ).annotate(
+        total_acumulado=Count('id'),
+        acumulado_efectivas=Count(
+            Case(When(typification__icontains='EFFECTIVE MANAGEMENT', then=1), output_field=BooleanField())
+        ),
+        acumulado_no_efectivas=Count(
+            Case(When(~Q(typification__icontains='EFFECTIVE MANAGEMENT'), then=1), output_field=BooleanField())
+        )
+    )
+
+    data = ObservationCustomer.objects.filter(
+        created_at__range=(startDatedatetime, endDatedatetime)
+    ).values(
+        'agent__first_name', 'agent__last_name'
+    ).annotate(
+        total_observations=Count('id'),
+        total_effective_management=Count(
+            Case(When(typification__icontains='EFFECTIVE MANAGEMENT', then=1), output_field=BooleanField())
+        ),
+        total_others=Count(
+            Case(When(~Q(typification__icontains='EFFECTIVE MANAGEMENT'), then=1), output_field=BooleanField())
+        )
+    ).order_by('agent__first_name', 'agent__last_name')
+
+    # Datos para la gráfica
+    nombres = []
+    efectivas = []
+    no_efectivas = []
+
+    for item in data:
+        nombre = f"{item['agent__first_name']} {item['agent__last_name']}"
+        nombres.append(nombre)
+        efectivas.append(item['total_effective_management'])
+        no_efectivas.append(item['total_others'])
+
+    # Crear gráfica de barras
+    fig, ax = plt.subplots(figsize=(10, 5))
+    x = range(len(nombres))
+
+    ax.bar(x, efectivas, label='Efectivas', color='green')
+    ax.bar(x, no_efectivas, bottom=efectivas, label='No Efectivas', color='red')
+    ax.set_xticks(x)
+    ax.set_xticklabels(nombres, rotation=45, ha='right')
+    ax.set_ylabel('Total')
+    ax.set_title('Llamadas por Agente (Semana)')
+    ax.legend()
+
+    plt.tight_layout()
+
+    # Guardar imagen temporal
+    output_dir = os.path.join('temp')
+    os.makedirs(output_dir, exist_ok=True)
+    filename = f"grafico_llamadas_{uuid4().hex}.png"
+    image_path = os.path.join(output_dir, filename)
+    plt.savefig(image_path)
+    plt.close()
+
+    return image_path  # Devuelve la ruta del gráfico
+
+
+def dataQuery():
+    startDateDateField, endDateDateField, startDatedatetime, endDatedatetime = weekRange()
+
+    return [
+        observationCustomer(startDatedatetime, endDatedatetime),  # ahora es imagen
+        [], [], [], [], []  # las demás secciones aún vacías
+    ]
+
+
 def generar_pdf_bonito(datos_secciones, output_path):
-    # datos_secciones es una lista de listas de strings
-    # Necesitamos convertirlo al formato que espera el template
-    
-    llamadas, carriers, pagos, obamacare, citas, cartas = datos_secciones
-    
+    llamadas_img_path, carriers, pagos, obamacare, citas, cartas = datos_secciones
+
     context = {
-        'llamadas': llamadas,
-        'carriers': carriers, 
+        'llamadas_img': llamadas_img_path,
+        'carriers': carriers,
         'pagos': pagos,
         'obamacare': obamacare,
         'citas': citas,
         'cartas': cartas
     }
-    
+
     html_content = render_to_string('pdf/reportWeekCustomer.html', context)
-    HTML(string=html_content).write_pdf(output_path)
+    HTML(string=html_content, base_url='.').write_pdf(output_path)
 
 
-def dataQuery():
-    startDateDateField, endDateDateField , startDatedatetime, endDatedatetime = weekRange()
-    
-    partes_sms = [
-        observationCustomer(startDatedatetime, endDatedatetime),
-        userCarrier(startDateDateField, endDateDateField),
-        paymentDate(startDatedatetime, endDatedatetime),
-        obamacareStatus(startDateDateField, endDateDateField),
-        appointmentClients(startDatedatetime, endDatedatetime),
-        lettersCardStatus(startDateDateField, endDateDateField)
-    ]
-    
-    return partes_sms  # una lista de strings
 
 

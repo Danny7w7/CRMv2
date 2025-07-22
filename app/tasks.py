@@ -168,28 +168,73 @@ def enviar_pdf_por_email():
 #         )
 
 
-from celery import shared_task
-from django.conf import settings
-from datetime import datetime
-import os
-import telnyx
-
-
-# CORRECCIONES NECESARIAS EN TUS FUNCIONES:
-
-
-# FUNCIÓN MODIFICADA PARA GENERAR PDF
-from django.template.loader import render_to_string
-from weasyprint import HTML
 
 
 
 # TASK CORREGIDO
+# @shared_task
+# def test():
+#     # 1. Obtener los datos (ahora cada función devuelve una lista)
+#     partes_sms = dataQuery()  # Devuelve lista de listas
+    
+#     # 2. Generar PDF con los datos correctos
+#     now = datetime.now()
+#     filename = f"reporte_test_{now.strftime('%Y%m%d_%H%M%S')}.pdf"
+#     local_path = f"/tmp/{filename}"
+#     generar_pdf_bonito(partes_sms, local_path)
+
+#     # 3. Subir a S3
+#     s3_key = f"reportes/{filename}"
+#     s3_url = uploadTempUrl(local_path, s3_key)
+
+#     # 4. Crear mensaje de texto resumido para SMS
+#     # Contar totales por sección
+#     totales_sms = []
+#     secciones_nombres = [
+#         "📞 Llamadas Efectivas",
+#         "💼 Usuarios Companies", 
+#         "💰 Programar Pagos",
+#         "🩺 Obamacare Status",
+#         "📅 Citas del Cliente",
+#         "✉️ Letters y Cards"
+#     ]
+    
+#     for i, (nombre, datos) in enumerate(zip(secciones_nombres, partes_sms)):
+#         total_agentes = len(datos)
+#         totales_sms.append(f"{nombre}: {total_agentes} agentes")
+    
+#     mensaje_sms = (
+#         f"📄 Reporte Semanal Generado\n"
+#         f"📅 {now.strftime('%d/%m/%Y %H:%M')}\n\n" +
+#         "\n".join(totales_sms) +
+#         f"\n\n📎 PDF completo adjunto"
+#     )
+
+#     # 5. Enviar por Telnyx
+#     telnyx.api_key = settings.TELNYX_API_KEY
+#     telnyx.Message.create(
+#         from_='+17869848427',
+#         to='+17863034781',
+#         text=mensaje_sms,
+#         subject='Reporte PDF Semanal',
+#         media_urls=[s3_url]
+#     )
+
+#     # 6. Limpiar
+#     if os.path.exists(local_path):
+#         os.remove(local_path)
+
+from celery import shared_task
+from datetime import datetime
+import os
+import telnyx
+from django.conf import settings
+
 @shared_task
 def test():
-    # 1. Obtener los datos (ahora cada función devuelve una lista)
-    partes_sms = dataQuery()  # Devuelve lista de listas
-    
+    # 1. Obtener los datos (ahora cada función devuelve lista o imagen)
+    partes_sms = dataQuery()  # [llamadas_img_path, carriers, pagos, obamacare, citas, cartas]
+
     # 2. Generar PDF con los datos correctos
     now = datetime.now()
     filename = f"reporte_test_{now.strftime('%Y%m%d_%H%M%S')}.pdf"
@@ -200,22 +245,24 @@ def test():
     s3_key = f"reportes/{filename}"
     s3_url = uploadTempUrl(local_path, s3_key)
 
-    # 4. Crear mensaje de texto resumido para SMS
-    # Contar totales por sección
-    totales_sms = []
+    # 4. Crear mensaje de texto resumido para SMS (excepto imagen)
     secciones_nombres = [
-        "📞 Llamadas Efectivas",
+        "📞 Llamadas Efectivas (ver gráfico)",  # es imagen
         "💼 Usuarios Companies", 
         "💰 Programar Pagos",
         "🩺 Obamacare Status",
         "📅 Citas del Cliente",
         "✉️ Letters y Cards"
     ]
-    
+
+    totales_sms = []
     for i, (nombre, datos) in enumerate(zip(secciones_nombres, partes_sms)):
-        total_agentes = len(datos)
-        totales_sms.append(f"{nombre}: {total_agentes} agentes")
-    
+        if i == 0:
+            totales_sms.append(nombre)
+        else:
+            total_agentes = len(datos)
+            totales_sms.append(f"{nombre}: {total_agentes} agentes")
+
     mensaje_sms = (
         f"📄 Reporte Semanal Generado\n"
         f"📅 {now.strftime('%d/%m/%Y %H:%M')}\n\n" +
@@ -223,7 +270,7 @@ def test():
         f"\n\n📎 PDF completo adjunto"
     )
 
-    # 5. Enviar por Telnyx
+    # 5. Enviar por Telnyx MMS
     telnyx.api_key = settings.TELNYX_API_KEY
     telnyx.Message.create(
         from_='+17869848427',
@@ -233,8 +280,12 @@ def test():
         media_urls=[s3_url]
     )
 
-    # 6. Limpiar
+    # 6. Limpiar PDF local
     if os.path.exists(local_path):
         os.remove(local_path)
 
+    # 7. (Opcional) limpiar imagen temporal si no la usas más
+    llamadas_img_path = partes_sms[0]
+    if os.path.exists(llamadas_img_path):
+        os.remove(llamadas_img_path)
 
