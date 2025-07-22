@@ -171,7 +171,6 @@ def enviar_pdf_por_email():
 from celery import shared_task
 from django.conf import settings
 from datetime import datetime
-from reportlab.pdfgen import canvas
 import os
 import telnyx
 
