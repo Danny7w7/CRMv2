@@ -595,18 +595,29 @@ def weekRange():
     return startDateDateField, endDateDateField, startDatedatetime, endDatedatetime
 
 def observationCustomer(startDatedatetime, endDatedatetime):
-    # 🔢 Total acumulado histórico por agente
+    # 🔢 Total acumulado histórico por agente con separación por tipo
     acumulado = ObservationCustomer.objects.values(
         'agent__first_name', 'agent__last_name'
     ).annotate(
-        total_acumulado=Count('id')
+        total_acumulado=Count('id'),
+        acumulado_efectivas=Count(
+            Case(When(typification__icontains='EFFECTIVE MANAGEMENT', then=1), output_field=BooleanField())
+        ),
+        acumulado_no_efectivas=Count(
+            Case(When(~Q(typification__icontains='EFFECTIVE MANAGEMENT'), then=1), output_field=BooleanField())
+        )
     )
 
-    # 🔄 Diccionario: nombre -> total_acumulado
-    acumulado_dict = {
-        f"{a['agent__first_name']} {a['agent__last_name']}": a['total_acumulado']
-        for a in acumulado
-    }
+    # 🔄 Diccionarios: nombre -> totales acumulados
+    acumulado_dict = {}
+    acumulado_efectivas_dict = {}
+    acumulado_no_efectivas_dict = {}
+    
+    for a in acumulado:
+        nombre = f"{a['agent__first_name']} {a['agent__last_name']}"
+        acumulado_dict[nombre] = a['total_acumulado']
+        acumulado_efectivas_dict[nombre] = a['acumulado_efectivas']
+        acumulado_no_efectivas_dict[nombre] = a['acumulado_no_efectivas']
 
     # 📆 Observaciones solo de esta semana
     data = ObservationCustomer.objects.filter(
@@ -623,23 +634,31 @@ def observationCustomer(startDatedatetime, endDatedatetime):
         )
     ).order_by('agent__first_name', 'agent__last_name')
 
-    # 📨 Crear lista de resultados en lugar de sobrescribir sms
+    # 📨 Crear lista de resultados con acumulados separados
     resultados = []
     for item in data:
         nombre = f"{item['agent__first_name']} {item['agent__last_name']}"
         esta_semana = item['total_observations']
+        efectivas_semana = item['total_effective_management']
+        no_efectivas_semana = item['total_others']
+        
+        # Obtener acumulados históricos
         acumulado_total = acumulado_dict.get(nombre, 0)
+        acumulado_efectivas = acumulado_efectivas_dict.get(nombre, 0)
+        acumulado_no_efectivas = acumulado_no_efectivas_dict.get(nombre, 0)
 
         linea = (
             f"AGENTE: {nombre}, "
-            f"Semana: {esta_semana}, "
-            f"LLAMADAS EFECTIVAS: {item['total_effective_management']}, "
-            f"LLAMADAS NO EFECTIVAS: {item['total_others']}, "
-            f"ACUMULADO DE LLAMADAS: {acumulado_total}"
+            f"LLAMADAS ESTA SEMANA: {esta_semana}, "
+            f"EFECTIVAS SEMANA: {efectivas_semana}, "
+            f"NO EFECTIVAS SEMANA: {no_efectivas_semana}, "
+            f"ACUMULADO EFECTIVAS: {acumulado_efectivas}, "
+            f"ACUMULADO NO EFECTIVAS: {acumulado_no_efectivas}, "
+            f"ACUMULADO TOTAL: {acumulado_total}"
         )
         resultados.append(linea)
 
-    return resultados  # Devolver lista, no string
+    return resultados
 
 def userCarrier(startDateDateField, endDateDateField):
     # 🔹 Todos los agentes con agentes USA asignados
