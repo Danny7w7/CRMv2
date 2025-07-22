@@ -660,58 +660,58 @@ def weekRange():
 
 #     return resultados
 
-def userCarrier(startDateDateField, endDateDateField):
-    # 🔹 Todos los agentes con agentes USA asignados
-    agentes_crm = Users.objects.prefetch_related('usaAgents').all()
+# def userCarrier(startDateDateField, endDateDateField):
+#     # 🔹 Todos los agentes con agentes USA asignados
+#     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
 
-    # 🔹 Acumulado histórico (filtrado)
-    historical_qs = UserCarrier.objects.filter(
-        obamacare__is_active=True,
-        username_carrier__isnull=False,
-        password_carrier__isnull=False
-    ).exclude(username_carrier='', password_carrier='')
+#     # 🔹 Acumulado histórico (filtrado)
+#     historical_qs = UserCarrier.objects.filter(
+#         obamacare__is_active=True,
+#         username_carrier__isnull=False,
+#         password_carrier__isnull=False
+#     ).exclude(username_carrier='', password_carrier='')
 
-    historical_map = historical_qs.values('agent_create').annotate(total=Count('id'))
-    historical_dict = {item['agent_create']: item['total'] for item in historical_map}
+#     historical_map = historical_qs.values('agent_create').annotate(total=Count('id'))
+#     historical_dict = {item['agent_create']: item['total'] for item in historical_map}
 
-    # 🔹 Formularios esta semana (mismos filtros)
-    weekly_qs = UserCarrier.objects.filter(
-        obamacare__is_active=True,
-        dateUserCarrier__range=(startDateDateField, endDateDateField),
-        username_carrier__isnull=False,
-        password_carrier__isnull=False
-    ).exclude(username_carrier='', password_carrier='')
+#     # 🔹 Formularios esta semana (mismos filtros)
+#     weekly_qs = UserCarrier.objects.filter(
+#         obamacare__is_active=True,
+#         dateUserCarrier__range=(startDateDateField, endDateDateField),
+#         username_carrier__isnull=False,
+#         password_carrier__isnull=False
+#     ).exclude(username_carrier='', password_carrier='')
 
-    weekly_map = weekly_qs.values('agent_create').annotate(total=Count('id'))
-    weekly_dict = {item['agent_create']: item['total'] for item in weekly_map}
+#     weekly_map = weekly_qs.values('agent_create').annotate(total=Count('id'))
+#     weekly_dict = {item['agent_create']: item['total'] for item in weekly_map}
 
-    resultados = []
-    for agente in agentes_crm:
-        usa_names = list(agente.usaAgents.values_list("name", flat=True))
-        if not usa_names:
-            continue  # Ignorar agentes sin usaAgents
+#     resultados = []
+#     for agente in agentes_crm:
+#         usa_names = list(agente.usaAgents.values_list("name", flat=True))
+#         if not usa_names:
+#             continue  # Ignorar agentes sin usaAgents
 
-        total_clients = ObamaCare.objects.filter(
-            is_active=True,
-            agent_usa__in=usa_names
-        ).count()
+#         total_clients = ObamaCare.objects.filter(
+#             is_active=True,
+#             agent_usa__in=usa_names
+#         ).count()
 
-        total_all_time = historical_dict.get(agente.id, 0)
-        total_week = weekly_dict.get(agente.id, 0)
-        faltan = total_clients - total_all_time
-        faltan_pct = (faltan / total_clients * 100) if total_clients > 0 else 0
+#         total_all_time = historical_dict.get(agente.id, 0)
+#         total_week = weekly_dict.get(agente.id, 0)
+#         faltan = total_clients - total_all_time
+#         faltan_pct = (faltan / total_clients * 100) if total_clients > 0 else 0
 
-        linea = (
-            f"AGENTE: {agente.first_name} {agente.last_name}, "
-            f"CLIENTES TOTALES: {total_clients}, "
-            f"CLIENTES LLENADOS EN LA SEMANA: {total_week}, "
-            f"ACUMULADO TOTAL: {total_all_time}, "
-            f"FALTAN: {faltan}, "
-            f"FALTAN %: {faltan_pct:.1f}%"
-        )
-        resultados.append(linea)
+#         linea = (
+#             f"AGENTE: {agente.first_name} {agente.last_name}, "
+#             f"CLIENTES TOTALES: {total_clients}, "
+#             f"CLIENTES LLENADOS EN LA SEMANA: {total_week}, "
+#             f"ACUMULADO TOTAL: {total_all_time}, "
+#             f"FALTAN: {faltan}, "
+#             f"FALTAN %: {faltan_pct:.1f}%"
+#         )
+#         resultados.append(linea)
 
-    return resultados
+#     return resultados
 
 def paymentDate(startDatedatetime, endDatedatetime):
     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
