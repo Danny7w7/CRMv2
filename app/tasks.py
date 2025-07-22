@@ -152,19 +152,87 @@ def enviar_pdf_por_email():
         pdf_content=pdf_bytes  # ✅ nombre del parámetro como te lo dejé
     )
 
+# @shared_task
+# def test():
+
+#     smsAll = dataQuery()
+
+#     # 3. Enviar por Telnyx MMS
+#     telnyx.api_key = settings.TELNYX_API_KEY
+
+#     for sms in smsAll:
+#         telnyx.Message.create(
+#             from_='+17869848427',
+#             to='+17863034781',
+#             text=sms
+#         )
+
+from celery import shared_task
+from django.conf import settings
+from reportlab.pdfgen import canvas
+import telnyx
+import os
+from datetime import datetime
+import boto3
+
+from celery import shared_task
+from django.conf import settings
+from reportlab.pdfgen import canvas
+import telnyx
+import boto3
+from io import BytesIO
+from datetime import datetime
+
 @shared_task
 def test():
+    # 1. Obtener los mensajes
+    mensajes = dataQuery()
+    contenido = "\n\n".join(mensajes)
 
-    smsAll = dataQuery()
+    # 2. Crear el PDF en memoria
+    pdf_buffer = BytesIO()
+    c = canvas.Canvas(pdf_buffer)
+    text_object = c.beginText(40, 800)
+    text_object.setFont("Helvetica", 10)
 
-    # 3. Enviar por Telnyx MMS
+    for line in contenido.split('\n'):
+        text_object.textLine(line)
+    c.drawText(text_object)
+    c.showPage()
+    c.save()
+
+    pdf_buffer.seek(0)  # Importante: mover el cursor al inicio
+
+    # 3. Subir el PDF directamente a S3
+    file_name = f"mms_reports/reporte_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+    s3 = boto3.client(
+        's3',
+        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+        region_name=settings.AWS_S3_REGION_NAME
+    )
+
+    s3.upload_fileobj(
+        pdf_buffer,
+        settings.AWS_STORAGE_BUCKET_NAME,
+        file_name,
+        ExtraArgs={
+            'ContentType': 'application/pdf',
+            'ACL': 'public-read'
+        }
+    )
+
+    # 4. Construir la URL pública del archivo
+    url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.{settings.AWS_S3_REGION_NAME}.amazonaws.com/{file_name}"
+
+    # 5. Enviar MMS con Telnyx
     telnyx.api_key = settings.TELNYX_API_KEY
+    telnyx.Message.create(
+        from_='+17869848427',
+        to='+17863034781',
+        text='📄 Reporte semanal adjunto.',
+        media_urls=[url]
+    )
 
-    for sms in smsAll:
-        telnyx.Message.create(
-            from_='+17869848427',
-            to='+17863034781',
-            text=sms
-        )
 
 
