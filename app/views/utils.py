@@ -1162,7 +1162,7 @@ def dataQuery():
     return [
         observationCustomer(startDatedatetime, endDatedatetime),  # ahora es imagen
         userCarrier(startDateDateField, endDateDateField),
-        [], [], [], [], []  # las demás secciones aún vacías
+        [], [], [], [] # las demás secciones aún vacías
     ]
 
 
