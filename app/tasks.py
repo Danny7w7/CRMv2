@@ -184,7 +184,7 @@ def test():
     # 2. Generar PDF en disco (temporal)
     now = datetime.now()
     filename = f"reporte_test_{now.strftime('%Y%m%d_%H%M%S')}.pdf"
-    local_path = f"/tmp/{filename}"
+    local_path = f"/tmp/{filename}"  # ruta local temporal
 
     c = canvas.Canvas(local_path)
     text = c.beginText(40, 800)
@@ -197,25 +197,21 @@ def test():
     c.showPage()
     c.save()
 
-    # 3. Subir a Telnyx como media base64
-    try:
-        media_id = upload_media_to_telnyx(local_path)
-    except Exception as e:
-        print(f"❌ Error al subir media a Telnyx: {e}")
-        return
+    # 3. Subir a S3 (temporal) y obtener URL temporal
+    s3_key = f"reportes/{filename}"
+    s3_url = uploadTempUrl(local_path, s3_key)
 
-    # 4. Enviar el MMS
+    # 4. Enviar por Telnyx MMS
     telnyx.api_key = settings.TELNYX_API_KEY
     telnyx.Message.create(
         from_='+17869848427',
         to='+17863034781',
         text='📄 Reporte generado automáticamente (TEST).',
         subject='Reporte PDF',
-        media=[{"media_id": media_id}]
+        media_urls=[s3_url]
     )
 
-    # 5. Eliminar el archivo local temporal
+    # 5. Eliminar el archivo local
     if os.path.exists(local_path):
         os.remove(local_path)
-
 

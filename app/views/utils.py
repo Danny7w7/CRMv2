@@ -949,28 +949,34 @@ import base64
 import requests
 from django.conf import settings
 
-def upload_media_to_telnyx(file_path):
-    url = "https://api.telnyx.com/v2/media"
-    with open(file_path, "rb") as f:
-        file_data = f.read()
-        file_b64 = base64.b64encode(file_data).decode('utf-8')
+def uploadTempUrl(local_file_path, s3_key, expiration=86400):  # 1 día por defecto
+    s3 = boto3.client(
+        's3',
+        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+        region_name=settings.AWS_S3_REGION_NAME
+    )
 
-    headers = {
-        "Authorization": f"Bearer {settings.TELNYX_API_KEY}",
-        "Content-Type": "application/json"
-    }
+    bucket_name = settings.AWS_STORAGE_BUCKET_NAME
 
-    payload = {
-        "file_name": os.path.basename(file_path),
-        "file_type": "application/pdf",
-        "content": file_b64
-    }
+    # Subir sin ACLs
+    s3.upload_file(
+        local_file_path,
+        bucket_name,
+        s3_key,
+        ExtraArgs={'ContentType': 'application/pdf'}
+    )
 
-    response = requests.post(url, headers=headers, json=payload)
+    # Generar URL temporal
+    url = s3.generate_presigned_url(
+        ClientMethod='get_object',
+        Params={
+            'Bucket': bucket_name,
+            'Key': s3_key
+        },
+        ExpiresIn=expiration
+    )
 
-    if response.status_code == 200:
-        return response.json()["data"]["id"]
-    else:
-        raise Exception(f"Error al subir PDF a Telnyx: {response.text}")
+    return url
 
 
