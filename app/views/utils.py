@@ -1060,22 +1060,118 @@ def observationCustomer(startDatedatetime, endDatedatetime):
 
     return image_path
 
+import matplotlib.pyplot as plt
+import os
+from uuid import uuid4
+
+def userCarrier(startDateDateField, endDateDateField):
+    agentes_crm = Users.objects.prefetch_related('usaAgents').all()
+
+    historical_qs = UserCarrier.objects.filter(
+        obamacare__is_active=True,
+        username_carrier__isnull=False,
+        password_carrier__isnull=False
+    ).exclude(username_carrier='', password_carrier='')
+
+    historical_map = historical_qs.values('agent_create').annotate(total=Count('id'))
+    historical_dict = {item['agent_create']: item['total'] for item in historical_map}
+
+    weekly_qs = UserCarrier.objects.filter(
+        obamacare__is_active=True,
+        dateUserCarrier__range=(startDateDateField, endDateDateField),
+        username_carrier__isnull=False,
+        password_carrier__isnull=False
+    ).exclude(username_carrier='', password_carrier='')
+
+    weekly_map = weekly_qs.values('agent_create').annotate(total=Count('id'))
+    weekly_dict = {item['agent_create']: item['total'] for item in weekly_map}
+
+    # Datos para la gráfica
+    nombres = []
+    acumulado_total = []
+    llenados_semana = []
+    faltan = []
+
+    for agente in agentes_crm:
+        usa_names = list(agente.usaAgents.values_list("name", flat=True))
+        if not usa_names:
+            continue
+
+        total_clients = ObamaCare.objects.filter(
+            is_active=True,
+            agent_usa__in=usa_names
+        ).count()
+
+        total_all_time = historical_dict.get(agente.id, 0)
+        total_week = weekly_dict.get(agente.id, 0)
+        faltan_count = total_clients - total_all_time
+
+        nombres.append(f"{agente.first_name} {agente.last_name}")
+        acumulado_total.append(total_all_time)
+        llenados_semana.append(total_week)
+        faltan.append(faltan_count)
+
+    # Gráfico de barras agrupadas
+    x = range(len(nombres))
+    width = 0.25
+
+    fig, ax = plt.subplots(figsize=(12, 6))
+
+    x1 = [i - width for i in x]
+    x2 = x
+    x3 = [i + width for i in x]
+
+    bars1 = ax.bar(x1, acumulado_total, width, label='Acumulado', color='green')
+    bars2 = ax.bar(x2, llenados_semana, width, label='Semana', color='blue')
+    bars3 = ax.bar(x3, faltan, width, label='Faltan', color='red')
+
+    ax.set_xticks(x)
+    ax.set_xticklabels(nombres, rotation=45, ha='right')
+    ax.set_ylabel('Cantidad')
+    ax.set_title('Formularios Carrier por Agente')
+    ax.legend()
+
+    def agregar_valores(barras):
+        for barra in barras:
+            height = barra.get_height()
+            ax.annotate(f'{int(height)}',
+                        xy=(barra.get_x() + barra.get_width() / 2, height),
+                        xytext=(0, 3),
+                        textcoords="offset points",
+                        ha='center', va='bottom', fontsize=8)
+
+    agregar_valores(bars1)
+    agregar_valores(bars2)
+    agregar_valores(bars3)
+
+    plt.tight_layout()
+
+    output_dir = os.path.join('temp')
+    os.makedirs(output_dir, exist_ok=True)
+    filename = f"user_carrier_{uuid4().hex}.png"
+    image_path = os.path.join(output_dir, filename)
+    plt.savefig(image_path)
+    plt.close()
+
+    return image_path
+
 
 def dataQuery():
     startDateDateField, endDateDateField, startDatedatetime, endDatedatetime = weekRange()
 
     return [
         observationCustomer(startDatedatetime, endDatedatetime),  # ahora es imagen
+        userCarrier(startDateDateField, endDateDateField),
         [], [], [], [], []  # las demás secciones aún vacías
     ]
 
 
 def generar_pdf_bonito(datos_secciones, output_path):
-    llamadas_img_path, carriers, pagos, obamacare, citas, cartas = datos_secciones
+    llamadas_img_path, user_carrier_img_path, pagos, obamacare, citas, cartas = datos_secciones
 
     context = {
         'llamadas_img': llamadas_img_path,
-        'carriers': carriers,
+        'carriers_img': user_carrier_img_path,
         'pagos': pagos,
         'obamacare': obamacare,
         'citas': citas,

@@ -232,10 +232,10 @@ from django.conf import settings
 
 @shared_task
 def test():
-    # 1. Obtener los datos (ahora cada función devuelve lista o imagen)
-    partes_sms = dataQuery()  # [llamadas_img_path, carriers, pagos, obamacare, citas, cartas]
+    # 1. Obtener los datos
+    partes_sms = dataQuery()  # ahora contiene rutas de imágenes + secciones vacías
 
-    # 2. Generar PDF con los datos correctos
+    # 2. Generar PDF
     now = datetime.now()
     filename = f"reporte_test_{now.strftime('%Y%m%d_%H%M%S')}.pdf"
     local_path = f"/tmp/{filename}"
@@ -245,10 +245,10 @@ def test():
     s3_key = f"reportes/{filename}"
     s3_url = uploadTempUrl(local_path, s3_key)
 
-    # 4. Crear mensaje de texto resumido para SMS (excepto imagen)
+    # 4. Crear mensaje SMS
     secciones_nombres = [
         "📞 Llamadas Efectivas (ver gráfico)",  # es imagen
-        "💼 Usuarios Companies", 
+        "📡 Formularios Carrier (ver gráfico)", # también imagen
         "💰 Programar Pagos",
         "🩺 Obamacare Status",
         "📅 Citas del Cliente",
@@ -257,8 +257,8 @@ def test():
 
     totales_sms = []
     for i, (nombre, datos) in enumerate(zip(secciones_nombres, partes_sms)):
-        if i == 0:
-            totales_sms.append(nombre)
+        if i < 2:
+            totales_sms.append(nombre)  # Llamadas y Carrier son imagen
         else:
             total_agentes = len(datos)
             totales_sms.append(f"{nombre}: {total_agentes} agentes")
@@ -280,12 +280,14 @@ def test():
         media_urls=[s3_url]
     )
 
-    # 6. Limpiar PDF local
+    # 6. Limpiar archivos temporales
     if os.path.exists(local_path):
         os.remove(local_path)
 
-    # 7. (Opcional) limpiar imagen temporal si no la usas más
+    # Eliminar imágenes generadas
     llamadas_img_path = partes_sms[0]
-    if os.path.exists(llamadas_img_path):
-        os.remove(llamadas_img_path)
+    user_carrier_img_path = partes_sms[1]
+    for path in [llamadas_img_path, user_carrier_img_path]:
+        if os.path.exists(path):
+            os.remove(path)
 
