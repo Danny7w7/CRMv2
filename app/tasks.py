@@ -186,16 +186,31 @@ def test():
     filename = f"reporte_test_{now.strftime('%Y%m%d_%H%M%S')}.pdf"
     local_path = f"/tmp/{filename}"  # ruta local temporal
 
-    c = canvas.Canvas(local_path)
-    text = c.beginText(40, 800)
-    text.setFont("Helvetica", 10)
+    from reportlab.lib.pagesizes import LETTER
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+    from reportlab.lib.styles import getSampleStyleSheet
 
-    for linea in contenido.split('\n'):
-        text.textLine(linea)
+    def crear_pdf_bonito(path, contenido):
+        doc = SimpleDocTemplate(path, pagesize=LETTER)
+        styles = getSampleStyleSheet()
+        story = []
 
-    c.drawText(text)
-    c.showPage()
-    c.save()
+        # Agregar título
+        story.append(Paragraph("📊 Reporte Semanal", styles['Title']))
+        story.append(Spacer(1, 12))
+
+        # Agregar cada sección como párrafo
+        for bloque in contenido.split("---"):
+            bloque = bloque.strip()
+            if not bloque:
+                continue
+            story.append(Paragraph("🔹 " + bloque.replace("\n", "<br/>"), styles['Normal']))
+            story.append(Spacer(1, 20))
+
+        doc.build(story)
+
+    # ✅ ¡Importante! Llamar a la función para generar el PDF bonito
+    crear_pdf_bonito(local_path, contenido)
 
     # 3. Subir a S3 (temporal) y obtener URL temporal
     s3_key = f"reportes/{filename}"
