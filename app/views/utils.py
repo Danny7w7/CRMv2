@@ -631,10 +631,10 @@ def observationCustomer(startDatedatetime, endDatedatetime):
 
         sms += (
             f"AGENTE: 🧑‍💼 {nombre}, \n"
-            f"Semana: {esta_semana}, \n"
-            f"LLAMADAS EFECTIVAS: {item['total_effective_management']}, \n"
-            f"LLAMADAS NO EFECTIVAS: {item['total_others']}, \n"
-            f"ACULADO DE LLAMADAS: {acumulado_total}, "
+            f"Semana: {esta_semana}, "
+            f"LLAMADAS EFECTIVAS: {item['total_effective_management']}, "
+            f"LLAMADAS NO EFECTIVAS: {item['total_others']}, "
+            f"ACULADO DE LLAMADAS: {acumulado_total}, \n"
         )
 
     return sms
@@ -684,11 +684,11 @@ def userCarrier(startDateDateField,endDateDateField):
 
         sms += (
             f"AGENTE: 🧑‍💼 {agente.first_name} {agente.last_name}, \n"
-            f"CLIENTES TOTALES: {total_clients}, \n"
-            f"CLIENTES LLENADOS EN LA SEMANA: {total_week}, \n"
-            f"ACUMULADO TOTAL: {total_all_time}, \n"
-            f"FALTAN: {faltan}, \n"
-            f"FALTAN %: {faltan_pct:.1f}%\n"
+            f"CLIENTES TOTALES: {total_clients}, "
+            f"CLIENTES LLENADOS EN LA SEMANA: {total_week}, "
+            f"ACUMULADO TOTAL: {total_all_time}, "
+            f"FALTAN: {faltan}, "
+            f"FALTAN %: {faltan_pct:.1f}% \n"
         )
 
     return sms
@@ -737,10 +737,10 @@ def paymentDate(startDatedatetime, endDatedatetime):
 
         sms += (
             f"AGENTE: 🧑‍💼 {full_name}, \n"
-            f"CLIENTES TOTALES: {total_clients}, \n"
-            f"CLIENTES LLENADO EN LA SEMANA: {esta_semana}, \n"
-            f"ACUMULADO: {acumulado}, \n"
-            f"FALTAN: {faltan}, \n"
+            f"CLIENTES TOTALES: {total_clients}, "
+            f"CLIENTES LLENADO EN LA SEMANA: {esta_semana}, "
+            f"ACUMULADO: {acumulado}, "
+            f"FALTAN: {faltan}, "
             f"FALTAN %: {porcentaje_faltante:.1f}%\n"
         )
 
@@ -791,9 +791,9 @@ def obamacareStatus(startDateDateField,endDateDateField):
 
         sms += (
             f"AGENTE: 🧑‍💼 {full_name}, \n"
-            f"CLIENTES TOTALES: {total_clientes_count}, \n"
-            f"PERFILADOS ESTA SEMANA: {clientes_semanales}, \n"
-            f"CLIENTES ACTIVOS: {total_activos}, \n"
+            f"CLIENTES TOTALES: {total_clientes_count}, "
+            f"PERFILADOS ESTA SEMANA: {clientes_semanales}, "
+            f"CLIENTES ACTIVOS: {total_activos}, "
             f"CLIENTES CON # POLIZA: {total_policy}\n"
         )
 
@@ -841,10 +841,10 @@ def appointmentClients(startDatedatetime, endDatedatetime):
 
         sms += (
             f"AGENTE: 🧑‍💼 {full_name}, \n"
-            f"CLIENTES TOTALES: {total_clients}, \n"
-            f"CITAS ESTA SEMENA: {esta_semana}, \n"
-            f"CITAS ACUMULADAS: {acumulado}, \n"
-            f"FALTAN: {faltan}, \n"
+            f"CLIENTES TOTALES: {total_clients}, "
+            f"CITAS ESTA SEMENA: {esta_semana}, "
+            f"CITAS ACUMULADAS: {acumulado}, "
+            f"FALTAN: {faltan}, "
             f"FALTAN %: {porcentaje_faltante:.1f}%"
         )
 
@@ -916,14 +916,14 @@ def lettersCardStatus(startDateDateField, endDateDateField):
 
         sms += (
             f"AGENTE: 🧑‍💼 {full_name}, \n"
-            f"CLIENTES TOTALES: {total_clients}, \n"
-            f"📩 CARTAS ESTA SEMANA: {cartas_semana}, \n"
-            f"ACUMULADO: {acumulado_cartas}, \n"
-            f"FALTAN: {faltan_cartas}, \n"
-            f"AVANCE FALTANTE: {porcentaje_faltante_cartas:.1f}% \n"
-            f"💳 Tarjetas esta semana: {tarjetas_semana}, \n"
-            f"ACUMULADO: {acumulado_tarjetas}, \n"
-            f"FALTAN: {faltan_tarjetas}, \n"
+            f"CLIENTES TOTALES: {total_clients}, "
+            f"📩 CARTAS ESTA SEMANA: {cartas_semana}, "
+            f"ACUMULADO: {acumulado_cartas}, "
+            f"FALTAN: {faltan_cartas}, "
+            f"AVANCE FALTANTE: {porcentaje_faltante_cartas:.1f}% "
+            f"💳 Tarjetas esta semana: {tarjetas_semana}, "
+            f"ACUMULADO: {acumulado_tarjetas}, "
+            f"FALTAN: {faltan_tarjetas}, "
             f"AVANCE FALTANTE: {porcentaje_faltante_tarjetas:.1f}% \n"
         )
 
