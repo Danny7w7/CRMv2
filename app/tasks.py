@@ -247,7 +247,7 @@ def upload_public_to_s3(local_file_path, s3_key):
         local_file_path,
         bucket_name,
         s3_key,
-        ExtraArgs={'ContentType': 'application/pdf'}
+        ExtraArgs={'ContentType': 'application/pdf',   'ACL': 'public-read'  }
     )
 
     return f"https://{bucket_name}.s3.{settings.AWS_S3_REGION_NAME}.amazonaws.com/{s3_key}"
