@@ -22,10 +22,12 @@
             color: #4CAF50;
             border-bottom: 2px solid #eee;
         }
-        .agent-block {
-            margin-bottom: 14px;
+        p {
             line-height: 1.6;
             font-size: 14px;
+        }
+        .agent-block {
+            margin-bottom: 20px;
         }
     </style>
 </head>
@@ -33,13 +35,12 @@
     <h1>📊 Reporte Semanal - Lapeira</h1>
 
     {% for titulo, contenido in secciones %}
-        <section>
-            <h2>{{ titulo }}</h2>
-            {% for linea in contenido %}
-                <div class="agent-block">{{ linea }}</div>
-            {% endfor %}
-        </section>
+    <section>
+        <h2>{{ titulo }}</h2>
+        {% for linea in contenido.splitlines %}
+            <p>{{ linea|linebreaksbr }}</p>
+        {% endfor %}
+    </section>
     {% endfor %}
-
 </body>
 </html>
