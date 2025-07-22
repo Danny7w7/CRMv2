@@ -629,7 +629,7 @@ def observationCustomer(startDatedatetime, endDatedatetime):
         esta_semana = item['total_observations']
         acumulado_total = acumulado_dict.get(nombre, 0)
 
-        sms += (
+        sms = (
             f"AGENTE: 🧑 {nombre}, "
             f"Semana: {esta_semana}, "
             f"LLAMADAS EFECTIVAS: {item['total_effective_management']}, "
