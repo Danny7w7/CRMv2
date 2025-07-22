@@ -217,8 +217,7 @@ def test():
         settings.AWS_STORAGE_BUCKET_NAME,
         file_name,
         ExtraArgs={
-            'ContentType': 'application/pdf',
-            'ACL': 'public-read'
+            'ContentType': 'application/pdf'
         }
     )
 
