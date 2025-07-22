@@ -943,3 +943,34 @@ def dataQuery():
     
     return partes_sms  # una lista de strings
 
+
+import os
+import base64
+import requests
+from django.conf import settings
+
+def upload_media_to_telnyx(file_path):
+    url = "https://api.telnyx.com/v2/media"
+    with open(file_path, "rb") as f:
+        file_data = f.read()
+        file_b64 = base64.b64encode(file_data).decode('utf-8')
+
+    headers = {
+        "Authorization": f"Bearer {settings.TELNYX_API_KEY}",
+        "Content-Type": "application/json"
+    }
+
+    payload = {
+        "file_name": os.path.basename(file_path),
+        "file_type": "application/pdf",
+        "content": file_b64
+    }
+
+    response = requests.post(url, headers=headers, json=payload)
+
+    if response.status_code == 200:
+        return response.json()["data"]["id"]
+    else:
+        raise Exception(f"Error al subir PDF a Telnyx: {response.text}")
+
+

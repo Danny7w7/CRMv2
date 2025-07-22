@@ -167,29 +167,13 @@ def enviar_pdf_por_email():
 #             text=sms
 #         )
 
-from celery import shared_task
-from django.conf import settings
-from reportlab.pdfgen import canvas
-import telnyx
-import os
-from datetime import datetime
-import boto3
 
 from celery import shared_task
 from django.conf import settings
-from reportlab.pdfgen import canvas
-import telnyx
-import boto3
-from io import BytesIO
 from datetime import datetime
-
-from celery import shared_task
-from datetime import datetime
-from django.conf import settings
 from reportlab.pdfgen import canvas
-import telnyx
-import boto3
 import os
+import telnyx
 
 @shared_task
 def test():
@@ -200,7 +184,7 @@ def test():
     # 2. Generar PDF en disco (temporal)
     now = datetime.now()
     filename = f"reporte_test_{now.strftime('%Y%m%d_%H%M%S')}.pdf"
-    local_path = f"/tmp/{filename}"  # ruta local temporal
+    local_path = f"/tmp/{filename}"
 
     c = canvas.Canvas(local_path)
     text = c.beginText(40, 800)
@@ -213,43 +197,25 @@ def test():
     c.showPage()
     c.save()
 
-    # 3. Subir a S3 (público)
-    s3_key = f"reportes/{filename}"
-    s3_url = upload_public_to_s3(local_path, s3_key)
+    # 3. Subir a Telnyx como media base64
+    try:
+        media_id = upload_media_to_telnyx(local_path)
+    except Exception as e:
+        print(f"❌ Error al subir media a Telnyx: {e}")
+        return
 
-    # 4. Enviar por Telnyx MMS
+    # 4. Enviar el MMS
     telnyx.api_key = settings.TELNYX_API_KEY
-
     telnyx.Message.create(
         from_='+17869848427',
         to='+17863034781',
         text='📄 Reporte generado automáticamente (TEST).',
         subject='Reporte PDF',
-        media_urls=[s3_url]
+        media=[{"media_id": media_id}]
     )
 
-    # 5. (Opcional) Eliminar el archivo local temporal
+    # 5. Eliminar el archivo local temporal
     if os.path.exists(local_path):
         os.remove(local_path)
-
-# === Subida pública a S3 ===
-def upload_public_to_s3(local_file_path, s3_key):
-    s3 = boto3.client(
-        's3',
-        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-        region_name=settings.AWS_S3_REGION_NAME
-    )
-
-    bucket_name = settings.AWS_STORAGE_BUCKET_NAME
-
-    s3.upload_file(
-        local_file_path,
-        bucket_name,
-        s3_key,
-        ExtraArgs={'ContentType': 'application/pdf',   'ACL': 'public-read'  }
-    )
-
-    return f"https://{bucket_name}.s3.{settings.AWS_S3_REGION_NAME}.amazonaws.com/{s3_key}"
 
 
