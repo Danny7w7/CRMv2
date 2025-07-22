@@ -623,14 +623,14 @@ def observationCustomer(startDatedatetime, endDatedatetime):
     ).order_by('agent__first_name', 'agent__last_name')
 
     # 📨 Mensaje SMS
-    sms = "--- RESULTADO DE LLAMADAS EFECTIVAS ---\n"
+    #sms = "--- RESULTADO DE LLAMADAS EFECTIVAS ---\n"
     for item in data:
         nombre = f"{item['agent__first_name']} {item['agent__last_name']}"
         esta_semana = item['total_observations']
         acumulado_total = acumulado_dict.get(nombre, 0)
 
         sms += (
-            f"AGENTE: 🧑‍💼 {nombre}, \n"
+            f"AGENTE: 🧑 {nombre}, "
             f"Semana: {esta_semana}, "
             f"LLAMADAS EFECTIVAS: {item['total_effective_management']}, "
             f"LLAMADAS NO EFECTIVAS: {item['total_others']}, "
@@ -641,7 +641,7 @@ def observationCustomer(startDatedatetime, endDatedatetime):
 
 def userCarrier(startDateDateField,endDateDateField):
 
-    sms = "--- RESULTADO DE USARIOS DE COMPANIES CREADOS ---\n"
+    #sms = "--- RESULTADO DE USARIOS DE COMPANIES CREADOS ---\n"
 
     # 🔹 Todos los agentes con agentes USA asignados
     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
@@ -683,7 +683,7 @@ def userCarrier(startDateDateField,endDateDateField):
         faltan_pct = (faltan / total_clients * 100) if total_clients > 0 else 0
 
         sms += (
-            f"AGENTE: 🧑‍💼 {agente.first_name} {agente.last_name}, \n"
+            f"AGENTE: 🧑 {agente.first_name} {agente.last_name}, "
             f"CLIENTES TOTALES: {total_clients}, "
             f"CLIENTES LLENADOS EN LA SEMANA: {total_week}, "
             f"ACUMULADO TOTAL: {total_all_time}, "
@@ -695,7 +695,7 @@ def userCarrier(startDateDateField,endDateDateField):
 
 def paymentDate(startDatedatetime, endDatedatetime):
 
-    sms = "--- RESULTADO DE PROGRAMAR PAGOS (SMS) ---\n"
+    #sms = "--- RESULTADO DE PROGRAMAR PAGOS (SMS) ---\n"
 
     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
 
@@ -736,7 +736,7 @@ def paymentDate(startDatedatetime, endDatedatetime):
         porcentaje_faltante = (faltan / total_clients * 100) if total_clients > 0 else 0
 
         sms += (
-            f"AGENTE: 🧑‍💼 {full_name}, \n"
+            f"AGENTE: 🧑 {full_name}, "
             f"CLIENTES TOTALES: {total_clients}, "
             f"CLIENTES LLENADO EN LA SEMANA: {esta_semana}, "
             f"ACUMULADO: {acumulado}, "
@@ -748,7 +748,7 @@ def paymentDate(startDatedatetime, endDatedatetime):
 
 def obamacareStatus(startDateDateField,endDateDateField):
 
-    sms = "--- RESULTADOS DE OBAMACARE ---\n"
+    #sms = "--- RESULTADOS DE OBAMACARE ---\n"
 
     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
 
@@ -790,7 +790,7 @@ def obamacareStatus(startDateDateField,endDateDateField):
         ).count()
 
         sms += (
-            f"AGENTE: 🧑‍💼 {full_name}, \n"
+            f"AGENTE: 🧑 {full_name}, "
             f"CLIENTES TOTALES: {total_clientes_count}, "
             f"PERFILADOS ESTA SEMANA: {clientes_semanales}, "
             f"CLIENTES ACTIVOS: {total_activos}, "
@@ -801,7 +801,7 @@ def obamacareStatus(startDateDateField,endDateDateField):
 
 def appointmentClients(startDatedatetime, endDatedatetime):
 
-    sms = "--- RESULTADOS DE CITAS AGENDADAS PARA EL CLIENTE ---\n"
+    #sms = "--- RESULTADOS DE CITAS AGENDADAS PARA EL CLIENTE ---\n"
 
     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
 
@@ -840,7 +840,7 @@ def appointmentClients(startDatedatetime, endDatedatetime):
         porcentaje_faltante = (faltan / total_clients * 100) if total_clients > 0 else 0
 
         sms += (
-            f"AGENTE: 🧑‍💼 {full_name}, \n"
+            f"AGENTE: 🧑 {full_name}, "
             f"CLIENTES TOTALES: {total_clients}, "
             f"CITAS ESTA SEMENA: {esta_semana}, "
             f"CITAS ACUMULADAS: {acumulado}, "
@@ -852,7 +852,7 @@ def appointmentClients(startDatedatetime, endDatedatetime):
 
 def lettersCardStatus(startDateDateField, endDateDateField):
 
-    sms = "--- RESULTADOS DE LETTERS AND CARD ---\n"
+    #sms = "--- RESULTADOS DE LETTERS AND CARD ---\n"
 
     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
 
@@ -915,13 +915,13 @@ def lettersCardStatus(startDateDateField, endDateDateField):
         porcentaje_faltante_tarjetas = (faltan_tarjetas / total_clients * 100) if total_clients > 0 else 0
 
         sms += (
-            f"AGENTE: 🧑‍💼 {full_name}, \n"
+            f"AGENTE: 🧑 {full_name}, "
             f"CLIENTES TOTALES: {total_clients}, "
-            f"📩 CARTAS ESTA SEMANA: {cartas_semana}, "
+            f"CARTAS ESTA SEMANA: {cartas_semana}, "
             f"ACUMULADO: {acumulado_cartas}, "
             f"FALTAN: {faltan_cartas}, "
             f"AVANCE FALTANTE: {porcentaje_faltante_cartas:.1f}% "
-            f"💳 Tarjetas esta semana: {tarjetas_semana}, "
+            f"TARJETAS ESTA SEMANA: {tarjetas_semana}, "
             f"ACUMULADO: {acumulado_tarjetas}, "
             f"FALTAN: {faltan_tarjetas}, "
             f"AVANCE FALTANTE: {porcentaje_faltante_tarjetas:.1f}% \n"

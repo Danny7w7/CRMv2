@@ -182,7 +182,7 @@ def test():
     # 2. Preparar contenido para HTML
     titulos = [
         "📞 Llamadas Efectivas",
-        "💼 Usuarios Companies",
+        "💼 Usuarios Companies Creados",
         "💰 Programar Pagos",
         "🩺 Obamacare Status",
         "📅 Citas del Cliente",
