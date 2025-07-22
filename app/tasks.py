@@ -183,15 +183,26 @@ import boto3
 from io import BytesIO
 from datetime import datetime
 
+from celery import shared_task
+from datetime import datetime
+from django.conf import settings
+from reportlab.pdfgen import canvas
+import telnyx
+import boto3
+import os
+
 @shared_task
 def test():
-    # 1. Obtener datos
-    mensajes = dataQuery()
-    contenido = "\n\n".join(mensajes)
+    # 1. Reunir datos del reporte
+    partes_sms = dataQuery()
+    contenido = "\n\n".join(partes_sms)
 
-    # 2. Crear PDF en memoria
-    pdf_buffer = BytesIO()
-    c = canvas.Canvas(pdf_buffer)
+    # 2. Generar PDF en disco (temporal)
+    now = datetime.now()
+    filename = f"reporte_test_{now.strftime('%Y%m%d_%H%M%S')}.pdf"
+    local_path = f"/tmp/{filename}"  # ruta local temporal
+
+    c = canvas.Canvas(local_path)
     text = c.beginText(40, 800)
     text.setFont("Helvetica", 10)
 
@@ -201,11 +212,28 @@ def test():
     c.drawText(text)
     c.showPage()
     c.save()
-    pdf_buffer.seek(0)
 
-    # 3. Subir a S3 (sin ACL)
-    nombre_archivo = f"mms_reports/reporte_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+    # 3. Subir a S3 (público)
+    s3_key = f"reportes/{filename}"
+    s3_url = upload_public_to_s3(local_path, s3_key)
 
+    # 4. Enviar por Telnyx MMS
+    telnyx.api_key = settings.TELNYX_API_KEY
+
+    telnyx.Message.create(
+        from_='+17869848427',
+        to='+17863034781',
+        text='📄 Reporte generado automáticamente (TEST).',
+        subject='Reporte PDF',
+        media_urls=[s3_url]
+    )
+
+    # 5. (Opcional) Eliminar el archivo local temporal
+    if os.path.exists(local_path):
+        os.remove(local_path)
+
+# === Subida pública a S3 ===
+def upload_public_to_s3(local_file_path, s3_key):
     s3 = boto3.client(
         's3',
         aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
@@ -213,27 +241,15 @@ def test():
         region_name=settings.AWS_S3_REGION_NAME
     )
 
-    s3.upload_fileobj(
-        pdf_buffer,
-        settings.AWS_STORAGE_BUCKET_NAME,
-        nombre_archivo,
-        ExtraArgs={
-            'ContentType': 'application/pdf'
-            # ⚠️ NO INCLUIMOS 'ACL': 'public-read'
-        }
+    bucket_name = settings.AWS_STORAGE_BUCKET_NAME
+
+    s3.upload_file(
+        local_file_path,
+        bucket_name,
+        s3_key,
+        ExtraArgs={'ContentType': 'application/pdf'}
     )
 
-    # 4. Generar URL pública (debes asegurarte que el bucket lo permita)
-    url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.{settings.AWS_S3_REGION_NAME}.amazonaws.com/{nombre_archivo}"
-
-    # 5. Enviar el MMS
-    telnyx.api_key = settings.TELNYX_API_KEY
-
-    telnyx.Message.create(
-        from_='+17869848427',  # Tu número Telnyx
-        to='+17863034781',     # Número destino
-        text='📄 Reporte semanal adjunto.',
-        media_urls=[url]
-    )
+    return f"https://{bucket_name}.s3.{settings.AWS_S3_REGION_NAME}.amazonaws.com/{s3_key}"
 
 
