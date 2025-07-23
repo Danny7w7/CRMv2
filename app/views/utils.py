@@ -1225,13 +1225,19 @@ import matplotlib.pyplot as plt
 import os
 from uuid import uuid4
 
+import matplotlib.pyplot as plt
+import numpy as np
+import io
+import base64
+
 def obamacareStatus(startDateDateField, endDateDateField):
     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
 
-    nombres = []
-    perfilados = []
+    nombres_agentes = []
     activos = []
     con_poliza = []
+    sin_poliza = []
+    no_activos = []
 
     for agente in agentes_crm:
         usa_agents_names = list(agente.usaAgents.values_list("name", flat=True))
@@ -1239,72 +1245,48 @@ def obamacareStatus(startDateDateField, endDateDateField):
             continue
 
         full_name = f"{agente.first_name} {agente.last_name}"
+        nombres_agentes.append(full_name)
 
-        # Total clientes perfilados esta semana
-        clientes_semanales = ObamaCare.objects.filter(
-            profiling_date__range=(startDateDateField, endDateDateField),
-            agent_usa__in=usa_agents_names
-        ).count()
+        clientes = ObamaCare.objects.filter(agent_usa__in=usa_agents_names)
 
-        # Total con status ACTIVO
-        total_activos = ObamaCare.objects.filter(
-            agent_usa__in=usa_agents_names,
-            status__iexact='ACTIVE'
-        ).count()
+        total_activos = clientes.filter(status__iexact='ACTIVE').count()
+        total_con_poliza = clientes.exclude(policyNumber__isnull=True).exclude(policyNumber='').count()
+        total_total = clientes.count()
 
-        # Total con policyNumber lleno
-        total_policy = ObamaCare.objects.filter(
-            agent_usa__in=usa_agents_names
-        ).exclude(policyNumber__isnull=True).exclude(policyNumber='').count()
-
-        nombres.append(full_name)
-        perfilados.append(clientes_semanales)
         activos.append(total_activos)
-        con_poliza.append(total_policy)
+        con_poliza.append(total_con_poliza)
+        sin_poliza.append(total_total - total_con_poliza)
+        no_activos.append(total_total - total_activos)
 
-    # Crear gráfico con 3 barras por agente
-    x = range(len(nombres))
-    width = 0.25
+    # 📊 Crear la gráfica
+    x = np.arange(len(nombres_agentes))
+    width = 0.2
 
     fig, ax = plt.subplots(figsize=(12, 6))
+    ax.bar(x - 1.5 * width, activos, width, label='Activos', color='#4CAF50')
+    ax.bar(x - 0.5 * width, con_poliza, width, label='Con Póliza', color='#2196F3')
+    ax.bar(x + 0.5 * width, sin_poliza, width, label='Sin Póliza', color='#FFC107')
+    ax.bar(x + 1.5 * width, no_activos, width, label='No Activos', color='#F44336')
 
-    x1 = [i - width for i in x]
-    x2 = x
-    x3 = [i + width for i in x]
-
-    bars1 = ax.bar(x1, perfilados, width, label='Perfilados Semana', color='royalblue')
-    bars2 = ax.bar(x2, activos, width, label='Activos', color='seagreen')
-    bars3 = ax.bar(x3, con_poliza, width, label='Con Póliza', color='orange')
-
+    ax.set_xlabel('Agentes')
+    ax.set_ylabel('Cantidad de Clientes')
+    ax.set_title('Estado de Clientes ObamaCare por Agente')
     ax.set_xticks(x)
-    ax.set_xticklabels(nombres, rotation=45, ha='right')
-    ax.set_ylabel('Cantidad')
-    ax.set_title('Estado de clientes Obamacare por agente')
+    ax.set_xticklabels(nombres_agentes, rotation=45, ha='right')
     ax.legend()
-
-    def agregar_valores(barras):
-        for barra in barras:
-            height = barra.get_height()
-            ax.annotate(f'{int(height)}',
-                        xy=(barra.get_x() + barra.get_width() / 2, height),
-                        xytext=(0, 3),
-                        textcoords="offset points",
-                        ha='center', va='bottom', fontsize=8)
-
-    agregar_valores(bars1)
-    agregar_valores(bars2)
-    agregar_valores(bars3)
+    ax.grid(axis='y', linestyle='--', alpha=0.6)
 
     plt.tight_layout()
 
-    output_dir = os.path.join('temp')
-    os.makedirs(output_dir, exist_ok=True)
-    filename = f"obamacare_status_{uuid4().hex}.png"
-    image_path = os.path.join(output_dir, filename)
-    plt.savefig(image_path)
+    # Guardar en memoria como imagen base64
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    image_base64 = base64.b64encode(buffer.getvalue()).decode()
+    buffer.close()
     plt.close()
 
-    return image_path
+    return f"data:image/png;base64,{image_base64}"
 
 
 def dataQuery():
