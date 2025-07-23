@@ -4,6 +4,13 @@
   <meta charset="UTF-8">
   <title>📊 Reporte Semanal</title>
   <style>
+      @page {
+    size: A4 landscape;
+    margin: 1cm;
+  }
+  .page-break {
+    page-break-before: always;
+  }
     body {
       font-family: 'DejaVu Sans', sans-serif;
       padding: 40px;
@@ -49,25 +56,35 @@
         <img src="{{ llamadas_img }}" alt="Gráfico de llamadas" style="width: 100%; max-width: 700px;">
     </div>
 
+    <div class="page-break"></div>
+
     <div class="section">
         <h2>📡 Formularios Carrier</h2>
         <img src="{{ carriers_img }}" alt="Gráfico carriers" style="width: 100%; max-width: 700px;">
     </div>
+
+    <div class="page-break"></div>
 
     <div class="section">
         <h2>💰 Pagos llenados por agente</h2>
         <img src="{{ pagos }}" alt="Gráfico de pagos" style="width: 100%; max-width: 700px;">
     </div>
 
+    <div class="page-break"></div>
+
     <div class="section">
         <h2>🩺 Obamacare - Estado de Clientes</h2>
         <img src="{{ obamacare }}" alt="Gráfico obamacare" style="width: 100%; max-width: 700px;">
     </div>
 
+    <div class="page-break"></div>
+
 {% if citas %}
     <h3>Citas por Agente</h3>
     <img src="{{ citas }}" alt="Gráfico de Citas" style="width: 100%; max-width: 700px;">
 {% endif %}
+
+<div class="page-break"></div>
 
 {% if cartas %}
     <h2> Letters & Cards</h2>
