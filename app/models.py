@@ -735,11 +735,12 @@ class DocumentObamaSupp(models.Model):
         upload_to='DocumentObamaSupp',
         storage=S3Boto3Storage())
     obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null=True)
-
+    supp = models.ForeignKey(Supp, on_delete=models.CASCADE, null=True)
+    client = models.ForeignKey(Clients, on_delete=models.CASCADE, null=True)
     agent_create = models.ForeignKey(Users,on_delete=models.CASCADE )   
     name =  models.CharField(max_length=255, default="Unnamed Document")
     created_at = models.DateTimeField(auto_now_add=True) 
-
+    typePlan = models.CharField(max_length=20, default='OBAMACARE')  
 
     class Meta:
         db_table = 'document_obama_supp'
