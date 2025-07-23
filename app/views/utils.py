@@ -765,57 +765,57 @@ def weekRange():
 
 #     return resultados
 
-def obamacareStatus(startDateDateField, endDateDateField):
-    agentes_crm = Users.objects.prefetch_related('usaAgents').all()
+# def obamacareStatus(startDateDateField, endDateDateField):
+#     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
 
-    resultados = []
-    for agente in agentes_crm:
-        usa_agents_names = list(agente.usaAgents.values_list("name", flat=True))
+#     resultados = []
+#     for agente in agentes_crm:
+#         usa_agents_names = list(agente.usaAgents.values_list("name", flat=True))
 
-        if not usa_agents_names:
-            continue
+#         if not usa_agents_names:
+#             continue
 
-        full_name = f"{agente.first_name} {agente.last_name}"
+#         full_name = f"{agente.first_name} {agente.last_name}"
 
-        # Total clientes activos
-        total_clientes = ObamaCare.objects.filter(
-            is_active=True,
-            agent_usa__in=usa_agents_names
-        )
+#         # Total clientes activos
+#         total_clientes = ObamaCare.objects.filter(
+#             is_active=True,
+#             agent_usa__in=usa_agents_names
+#         )
 
-        total_clientes_count = total_clientes.count()
+#         total_clientes_count = total_clientes.count()
 
-        # Total clientes perfilados en la semana
-        clientes_semanales = ObamaCare.objects.filter(
-            profiling_date__range=(startDateDateField, endDateDateField),
-            agent_usa__in=usa_agents_names
-        ).count()
+#         # Total clientes perfilados en la semana
+#         clientes_semanales = ObamaCare.objects.filter(
+#             profiling_date__range=(startDateDateField, endDateDateField),
+#             agent_usa__in=usa_agents_names
+#         ).count()
 
-        # Total con status ACTIVO
-        total_activos = ObamaCare.objects.filter(
-            agent_usa__in=usa_agents_names,
-            status__iexact='ACTIVE'
-        ).count()
+#         # Total con status ACTIVO
+#         total_activos = ObamaCare.objects.filter(
+#             agent_usa__in=usa_agents_names,
+#             status__iexact='ACTIVE'
+#         ).count()
 
-        # Total con policyNumber lleno
-        total_policy = ObamaCare.objects.filter(
-            agent_usa__in=usa_agents_names
-        ).exclude(
-            policyNumber__isnull=True
-        ).exclude(
-            policyNumber=''
-        ).count()
+#         # Total con policyNumber lleno
+#         total_policy = ObamaCare.objects.filter(
+#             agent_usa__in=usa_agents_names
+#         ).exclude(
+#             policyNumber__isnull=True
+#         ).exclude(
+#             policyNumber=''
+#         ).count()
 
-        linea = (
-            f"AGENTE: {full_name}, "
-            f"CLIENTES TOTALES: {total_clientes_count}, "
-            f"PERFILADOS ESTA SEMANA: {clientes_semanales}, "
-            f"CLIENTES ACTIVOS: {total_activos}, "
-            f"CLIENTES CON # POLIZA: {total_policy}"
-        )
-        resultados.append(linea)
+#         linea = (
+#             f"AGENTE: {full_name}, "
+#             f"CLIENTES TOTALES: {total_clientes_count}, "
+#             f"PERFILADOS ESTA SEMANA: {clientes_semanales}, "
+#             f"CLIENTES ACTIVOS: {total_activos}, "
+#             f"CLIENTES CON # POLIZA: {total_policy}"
+#         )
+#         resultados.append(linea)
 
-    return resultados
+#     return resultados
 
 def appointmentClients(startDatedatetime, endDatedatetime):
     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
@@ -1221,6 +1221,91 @@ def paymentDate(startDatedatetime, endDatedatetime):
 
     return image_path
 
+import matplotlib.pyplot as plt
+import os
+from uuid import uuid4
+
+def obamacareStatus(startDateDateField, endDateDateField):
+    agentes_crm = Users.objects.prefetch_related('usaAgents').all()
+
+    nombres = []
+    perfilados = []
+    activos = []
+    con_poliza = []
+
+    for agente in agentes_crm:
+        usa_agents_names = list(agente.usaAgents.values_list("name", flat=True))
+        if not usa_agents_names:
+            continue
+
+        full_name = f"{agente.first_name} {agente.last_name}"
+
+        # Total clientes perfilados esta semana
+        clientes_semanales = ObamaCare.objects.filter(
+            profiling_date__range=(startDateDateField, endDateDateField),
+            agent_usa__in=usa_agents_names
+        ).count()
+
+        # Total con status ACTIVO
+        total_activos = ObamaCare.objects.filter(
+            agent_usa__in=usa_agents_names,
+            status__iexact='ACTIVE'
+        ).count()
+
+        # Total con policyNumber lleno
+        total_policy = ObamaCare.objects.filter(
+            agent_usa__in=usa_agents_names
+        ).exclude(policyNumber__isnull=True).exclude(policyNumber='').count()
+
+        nombres.append(full_name)
+        perfilados.append(clientes_semanales)
+        activos.append(total_activos)
+        con_poliza.append(total_policy)
+
+    # Crear gráfico con 3 barras por agente
+    x = range(len(nombres))
+    width = 0.25
+
+    fig, ax = plt.subplots(figsize=(12, 6))
+
+    x1 = [i - width for i in x]
+    x2 = x
+    x3 = [i + width for i in x]
+
+    bars1 = ax.bar(x1, perfilados, width, label='Perfilados Semana', color='royalblue')
+    bars2 = ax.bar(x2, activos, width, label='Activos', color='seagreen')
+    bars3 = ax.bar(x3, con_poliza, width, label='Con Póliza', color='orange')
+
+    ax.set_xticks(x)
+    ax.set_xticklabels(nombres, rotation=45, ha='right')
+    ax.set_ylabel('Cantidad')
+    ax.set_title('Estado de clientes Obamacare por agente')
+    ax.legend()
+
+    def agregar_valores(barras):
+        for barra in barras:
+            height = barra.get_height()
+            ax.annotate(f'{int(height)}',
+                        xy=(barra.get_x() + barra.get_width() / 2, height),
+                        xytext=(0, 3),
+                        textcoords="offset points",
+                        ha='center', va='bottom', fontsize=8)
+
+    agregar_valores(bars1)
+    agregar_valores(bars2)
+    agregar_valores(bars3)
+
+    plt.tight_layout()
+
+    output_dir = os.path.join('temp')
+    os.makedirs(output_dir, exist_ok=True)
+    filename = f"obamacare_status_{uuid4().hex}.png"
+    image_path = os.path.join(output_dir, filename)
+    plt.savefig(image_path)
+    plt.close()
+
+    return image_path
+
 
 def dataQuery():
     startDateDateField, endDateDateField, startDatedatetime, endDatedatetime = weekRange()
@@ -1229,7 +1314,8 @@ def dataQuery():
         observationCustomer(startDatedatetime, endDatedatetime),  # ahora es imagen
         userCarrier(startDateDateField, endDateDateField),
         paymentDate(startDatedatetime, endDatedatetime),
-        [], [], [] # las demás secciones aún vacías
+        obamacareStatus(startDateDateField, endDateDateField),
+        [], [] # las demás secciones aún vacías
     ]
 
 
