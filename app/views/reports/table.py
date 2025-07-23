@@ -663,7 +663,7 @@ def customerPerformance(request):
     totalActiveCms = obamacare.filter(Q(status='ACTIVE') | Q(status='SELF-ENROLMENT')).count()
     totalNoActiveCms = obamacare.exclude(Q(status='ACTIVE') | Q(status='SELF-ENROLMENT')).count()
 
-    documents = DocumentObama.objects.select_related('agent_create').filter(created_at__range=(start_date, end_date), **company_filter2)
+    documents = DocumentObamaSupp.objects.select_related('agent_create').filter(created_at__range=(start_date, end_date), **company_filter2)
     appointments = AppointmentClient.objects.select_related('agent_create').filter(created_at__range=(start_date, end_date), **company_filter2)
     payments = Payments.objects.select_related('agent').filter(created_at__range=(start_date, end_date), **company_filter)
     paymentDate = PaymentDate.objects.filter(created_at__range=(start_date, end_date), **company_filter)

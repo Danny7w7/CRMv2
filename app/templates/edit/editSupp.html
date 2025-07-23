@@ -358,6 +358,7 @@
 							<button type="submit" name="action" value="save_supp" id="enviar" class="btn btn-primary px-4"  >Submit</button>
 							<button type="submit" name="action" id="enviar2" value="save_supp_agent" class="btn btn-primary px-4" style="display: none;">Submits</button>                            
 							<a href="{% url 'clientSupp' %}" class="btn btn-light px-4">Back</a>
+							<a class="btn btn-light px-4" data-bs-toggle="modal" data-bs-target="#verDocument">Document</a>
                         </div>
                     </div>
                     {% csrf_token %}	
@@ -387,6 +388,10 @@
 							Date Payment
 						</button>
 					{% endif %}
+					<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalDocument">
+						Documents
+					</button>
+
 					<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#AgentTicketAssignment">
 						Ticket
 					</button>
@@ -652,6 +657,75 @@
 							</div>
 						</div>
 					</div>
+
+					<!-- Modal para ingresar Document -->
+					<div class="modal fade" id="modalDocument" tabindex="-1" aria-labelledby="modalDocumentLabel" aria-hidden="true">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="modalIngresarTextoLabel">Upload Document </h5>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								</div>
+								<div class="modal-body">
+									<div class="card">
+										<div class="card-body">
+											<form  method="POST" enctype="multipart/form-data">
+												{% csrf_token %}
+												<input type="file" id="pdfUploader" name="documents" multiple>
+												<div id="fileNamesContainer"></div>												
+												<button id="loadDocument" type="submit" class="btn" data-upload-url="{% url 'saveDocumentClientSupp' supps.id %}" > <i class="fa-solid fa-floppy-disk"></i></button>
+											</form>
+										</div>
+									</div>
+
+									<div id="loader" class="loader-overlay">
+										<div class="loader"></div>
+										<p>Uploading files, please wait...</p>
+									</div>
+									
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Modal para ver las Document -->
+					<div class="modal fade" id="verDocument" tabindex="-1" aria-labelledby="verDocument" aria-hidden="true">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="verDocument">Saved documents</h5>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								</div>
+								<div class="modal-body">
+									{% if document or documentSupp%}
+										<ul class="list-group">
+
+											{% if document %} <h5>Documents Consent</h5> {% endif %}
+
+											{% for documents in document %}													
+												<li class="list-group-item">
+													<strong>Documents Consent #{{forloop.counter}}:</strong> <a href="{{ documents.file.url }}" target="_blank" >View  <i class="lni lni-display"></i></a> 
+												</li>
+											{% endfor %}
+
+											{% if document and documentSupp %} <hr> {% endif %}
+
+											{% if documentSupp %} <h5>Documents Upload CRM</h5> {% endif %}
+
+											{% for documents in documentSupp %}															
+												<li class="list-group-item">
+													<strong>{{documents.name}}:</strong> <a href="{{ documents.file.url }}" target="_blank" >View  <i class="lni lni-display"></i></a> 
+												</li>
+											{% endfor %}
+
+										</ul>
+									{% else %}
+										<p>No Documents.</p>
+									{% endif %}
+								</div>
+							</div>
+						</div>
+					</div>
 					
 				</div>
             </div>
@@ -760,6 +834,10 @@
 	<!-- Incluir JS de Choices.js -->
 	<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
+	<link href="https://unpkg.com/filepond/dist/filepond.min.css" rel="stylesheet">
+	<script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
+	<script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.min.js"></script>
+
 	<!--app JS-->
 	<script src="{% static 'assets/js/app.js' %}"></script>
 	<script src="{% static 'assets/js/validations/blockSocial.js' %}"></script>
@@ -767,6 +845,7 @@
 	<script src="{% static 'assets/js/validations/editSupp.js' %}"></script>
 	<script src="{% static 'assets/js/payments/paymentDateSupp.js' %}"></script>
 	<script src="{% static 'assets/js/payments/fetchPayments.js' %}"></script>
+	<script src="{% static 'assets/js/validations/saveDocumentObama.js' %}" defer></script>	
 
 	<!-- Scripts SMS's -->
 	<script>

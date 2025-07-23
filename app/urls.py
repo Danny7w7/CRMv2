@@ -120,6 +120,7 @@ urlpatterns = [
     path('saveCustomerObservationSupp/', modals.saveCustomerObservationSupp, name='saveCustomerObservationSupp'),
     path('fetchPaymentSuplementalsstatus/<suppId>/', fetchInformations.fetchPaymentSuplementals, name='fetchPaymentSuplementals'),
     path('paymentDateSupp/<supp_id>/', modals.paymentDateSupp, name='paymentDateSupp'),
+    path('saveDocumentClientSupp/<int:supp_id>/', modals.saveDocumentClientSupp, name='saveDocumentClientSupp'),
 
     path('clientMedicare/', table.clientMedicare, name='clientMedicare'),
     path('editClientMedicare/<medicare_id>/', edits.editClientMedicare, name='editClientMedicare'),

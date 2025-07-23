@@ -730,17 +730,20 @@ class TemporaryToken(models.Model):
     class Meta:
         db_table = 'temporary_token'
 
-class DocumentObama(models.Model):
+class DocumentObamaSupp(models.Model):
     file = models.FileField(
-        upload_to='DocumentObama',
+        upload_to='DocumentObamaSupp',
         storage=S3Boto3Storage())
-    obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
+    obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null=True)
+    supp = models.ForeignKey(Supp, on_delete=models.CASCADE, null=True)
+    client = models.ForeignKey(Clients, on_delete=models.CASCADE)
     agent_create = models.ForeignKey(Users,on_delete=models.CASCADE )   
     name =  models.CharField(max_length=255, default="Unnamed Document")
     created_at = models.DateTimeField(auto_now_add=True) 
+    typePlan = models.CharField(max_length=20, default='OBAMACARE')  
 
     class Meta:
-        db_table = 'document_obama'
+        db_table = 'document_obama_supp'
 
 class LettersCard(models.Model):
     obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
