@@ -1021,7 +1021,7 @@ def observationCustomer(startDatedatetime, endDatedatetime):
     x = range(len(nombres))
     width = 0.35  # Ancho de cada barra
 
-    fig, ax = plt.subplots(figsize=(10, 5))
+    fig, ax = plt.subplots(figsize=(11.7, 8.3))
     x_effectivas = [i - width/2 for i in x]
     x_no_efectivas = [i + width/2 for i in x]
 
@@ -1103,7 +1103,7 @@ def userCarrier(startDateDateField, endDateDateField):
     x = range(len(nombres))
     width = 0.35
 
-    fig, ax = plt.subplots(figsize=(12, 6))
+    fig, ax = plt.subplots(figsize=(11.7, 8.3))
 
     x1 = [i - width/2 for i in x]
     x2 = [i + width/2 for i in x]
@@ -1184,7 +1184,7 @@ def paymentDate(startDatedatetime, endDatedatetime):
     x = range(len(nombres))
     width = 0.35
 
-    fig, ax = plt.subplots(figsize=(12, 6))
+    fig, ax = plt.subplots(figsize=(11.7, 8.3))
 
     x1 = [i - width/2 for i in x]
     x2 = [i + width/2 for i in x]
@@ -1270,7 +1270,7 @@ def obamacareStatus(startDateDateField, endDateDateField):
     x = np.arange(len(nombres_agentes))
     width = 0.15
 
-    fig, ax = plt.subplots(figsize=(14, 6))
+    fig, ax = plt.subplots(figsize=(11.7, 8.3))
 
     bars1 = ax.bar(x - 2 * width, activos, width, label='Activos', color='#4CAF50')
     bars2 = ax.bar(x - width, con_poliza, width, label='Con Póliza', color='#2196F3')
@@ -1366,7 +1366,7 @@ def appointmentClients(startDatedatetime, endDatedatetime):
     x = np.arange(len(agentes))
     width = 0.25
 
-    fig, ax = plt.subplots(figsize=(12, 6))
+    fig, ax = plt.subplots(figsize=(11.7, 8.3))
     bars1 = ax.bar(x - width, acumuladas, width, label='Acumuladas', color='#4CAF50')
     bars2 = ax.bar(x, esta_semana, width, label='Esta semana', color='#2196F3')
     bars3 = ax.bar(x + width, faltan, width, label='Faltan', color='#F44336')
@@ -1471,7 +1471,7 @@ def lettersCardStatus(startDateDateField, endDateDateField):
     x = range(len(nombres_agentes))
     width = 0.2
 
-    fig, ax = plt.subplots(figsize=(12, 6))
+    fig, ax = plt.subplots(figsize=(11.7, 8.3))
 
     b1 = ax.bar([i - 1.5*width for i in x], cartas_semana, width, label='Cartas Semana', color='#4CAF50')
     b2 = ax.bar([i - 0.5*width for i in x], tarjetas_semana, width, label='Tarjetas Semana', color='#2196F3')
