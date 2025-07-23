@@ -867,81 +867,81 @@ def weekRange():
 
 #     return resultados
 
-def lettersCardStatus(startDateDateField, endDateDateField):
-    agentes_crm = Users.objects.prefetch_related('usaAgents').all()
+# def lettersCardStatus(startDateDateField, endDateDateField):
+#     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
 
-    resultados = []
-    for agente in agentes_crm:
-        usa_agents_names = list(agente.usaAgents.values_list("name", flat=True))
-        if not usa_agents_names:
-            continue
+#     resultados = []
+#     for agente in agentes_crm:
+#         usa_agents_names = list(agente.usaAgents.values_list("name", flat=True))
+#         if not usa_agents_names:
+#             continue
 
-        full_name = f"{agente.first_name} {agente.last_name}"
+#         full_name = f"{agente.first_name} {agente.last_name}"
 
-        # 🔹 Total de clientes activos asociados al agente USA
-        total_clients = ObamaCare.objects.filter(
-            is_active=True,
-            agent_usa__in=usa_agents_names
-        ).count()
+#         # 🔹 Total de clientes activos asociados al agente USA
+#         total_clients = ObamaCare.objects.filter(
+#             is_active=True,
+#             agent_usa__in=usa_agents_names
+#         ).count()
 
-        # 🔹 Acumulado de cartas
-        acumulado_cartas = LettersCard.objects.filter(
-            agent_create=agente,
-            letters=True,
-            obamacare__isnull=False,
-            obamacare__is_active=True,
-            obamacare__agent_usa__in=usa_agents_names
-        ).count()
+#         # 🔹 Acumulado de cartas
+#         acumulado_cartas = LettersCard.objects.filter(
+#             agent_create=agente,
+#             letters=True,
+#             obamacare__isnull=False,
+#             obamacare__is_active=True,
+#             obamacare__agent_usa__in=usa_agents_names
+#         ).count()
 
-        # 🔹 Acumulado de tarjetas
-        acumulado_tarjetas = LettersCard.objects.filter(
-            agent_create=agente,
-            card=True,
-            obamacare__isnull=False,
-            obamacare__is_active=True,
-            obamacare__agent_usa__in=usa_agents_names
-        ).count()
+#         # 🔹 Acumulado de tarjetas
+#         acumulado_tarjetas = LettersCard.objects.filter(
+#             agent_create=agente,
+#             card=True,
+#             obamacare__isnull=False,
+#             obamacare__is_active=True,
+#             obamacare__agent_usa__in=usa_agents_names
+#         ).count()
 
-        # 🔹 Esta semana: cartas
-        cartas_semana = LettersCard.objects.filter(
-            agent_create=agente,
-            dateCard__range=(startDateDateField, endDateDateField),
-            letters=True,
-            obamacare__isnull=False,
-            obamacare__is_active=True,
-            obamacare__agent_usa__in=usa_agents_names
-        ).count()
+#         # 🔹 Esta semana: cartas
+#         cartas_semana = LettersCard.objects.filter(
+#             agent_create=agente,
+#             dateCard__range=(startDateDateField, endDateDateField),
+#             letters=True,
+#             obamacare__isnull=False,
+#             obamacare__is_active=True,
+#             obamacare__agent_usa__in=usa_agents_names
+#         ).count()
 
-        # 🔹 Esta semana: tarjetas
-        tarjetas_semana = LettersCard.objects.filter(
-            agent_create=agente,
-            dateLetters__range=(startDateDateField, endDateDateField),
-            card=True,
-            obamacare__isnull=False,
-            obamacare__is_active=True,
-            obamacare__agent_usa__in=usa_agents_names
-        ).count()
+#         # 🔹 Esta semana: tarjetas
+#         tarjetas_semana = LettersCard.objects.filter(
+#             agent_create=agente,
+#             dateLetters__range=(startDateDateField, endDateDateField),
+#             card=True,
+#             obamacare__isnull=False,
+#             obamacare__is_active=True,
+#             obamacare__agent_usa__in=usa_agents_names
+#         ).count()
 
-        # 🔹 Porcentajes faltantes
-        faltan_cartas = total_clients - acumulado_cartas
-        faltan_tarjetas = total_clients - acumulado_tarjetas
+#         # 🔹 Porcentajes faltantes
+#         faltan_cartas = total_clients - acumulado_cartas
+#         faltan_tarjetas = total_clients - acumulado_tarjetas
 
-        porcentaje_faltante_cartas = (faltan_cartas / total_clients * 100) if total_clients > 0 else 0
-        porcentaje_faltante_tarjetas = (faltan_tarjetas / total_clients * 100) if total_clients > 0 else 0
+#         porcentaje_faltante_cartas = (faltan_cartas / total_clients * 100) if total_clients > 0 else 0
+#         porcentaje_faltante_tarjetas = (faltan_tarjetas / total_clients * 100) if total_clients > 0 else 0
 
-        linea = (
-            f"AGENTE: {full_name}, "
-            f"CLIENTES TOTALES: {total_clients}, "
-            f"CARTAS ESTA SEMANA: {cartas_semana}, "
-            f"ACUMULADO CARTAS: {acumulado_cartas}, "
-            f"FALTAN CARTAS: {faltan_cartas} ({porcentaje_faltante_cartas:.1f}%), "
-            f"TARJETAS ESTA SEMANA: {tarjetas_semana}, "
-            f"ACUMULADO TARJETAS: {acumulado_tarjetas}, "
-            f"FALTAN TARJETAS: {faltan_tarjetas} ({porcentaje_faltante_tarjetas:.1f}%)"
-        )
-        resultados.append(linea)
+#         linea = (
+#             f"AGENTE: {full_name}, "
+#             f"CLIENTES TOTALES: {total_clients}, "
+#             f"CARTAS ESTA SEMANA: {cartas_semana}, "
+#             f"ACUMULADO CARTAS: {acumulado_cartas}, "
+#             f"FALTAN CARTAS: {faltan_cartas} ({porcentaje_faltante_cartas:.1f}%), "
+#             f"TARJETAS ESTA SEMANA: {tarjetas_semana}, "
+#             f"ACUMULADO TARJETAS: {acumulado_tarjetas}, "
+#             f"FALTAN TARJETAS: {faltan_tarjetas} ({porcentaje_faltante_tarjetas:.1f}%)"
+#         )
+#         resultados.append(linea)
 
-    return resultados
+#     return resultados
 
 
 # FUNCIÓN MODIFICADA PARA GENERAR PDF
@@ -1399,6 +1399,107 @@ def appointmentClients(startDatedatetime, endDatedatetime):
 
     return img_path
 
+import matplotlib.pyplot as plt
+from io import BytesIO
+import base64
+
+def lettersCardStatus(startDateDateField, endDateDateField):
+    agentes_crm = Users.objects.prefetch_related('usaAgents').all()
+
+    nombres_agentes = []
+    cartas_semana = []
+    tarjetas_semana = []
+    faltan_cartas = []
+    faltan_tarjetas = []
+
+    for agente in agentes_crm:
+        usa_agents_names = list(agente.usaAgents.values_list("name", flat=True))
+        if not usa_agents_names:
+            continue
+
+        full_name = f"{agente.first_name} {agente.last_name}"
+
+        total_clients = ObamaCare.objects.filter(
+            is_active=True,
+            agent_usa__in=usa_agents_names
+        ).count()
+
+        acumulado_cartas = LettersCard.objects.filter(
+            agent_create=agente,
+            letters=True,
+            obamacare__isnull=False,
+            obamacare__is_active=True,
+            obamacare__agent_usa__in=usa_agents_names
+        ).count()
+
+        acumulado_tarjetas = LettersCard.objects.filter(
+            agent_create=agente,
+            card=True,
+            obamacare__isnull=False,
+            obamacare__is_active=True,
+            obamacare__agent_usa__in=usa_agents_names
+        ).count()
+
+        c_semana = LettersCard.objects.filter(
+            agent_create=agente,
+            dateCard__range=(startDateDateField, endDateDateField),
+            letters=True,
+            obamacare__isnull=False,
+            obamacare__is_active=True,
+            obamacare__agent_usa__in=usa_agents_names
+        ).count()
+
+        t_semana = LettersCard.objects.filter(
+            agent_create=agente,
+            dateLetters__range=(startDateDateField, endDateDateField),
+            card=True,
+            obamacare__isnull=False,
+            obamacare__is_active=True,
+            obamacare__agent_usa__in=usa_agents_names
+        ).count()
+
+        faltan_c = max(0, total_clients - acumulado_cartas)
+        faltan_t = max(0, total_clients - acumulado_tarjetas)
+
+        nombres_agentes.append(full_name)
+        cartas_semana.append(c_semana)
+        tarjetas_semana.append(t_semana)
+        faltan_cartas.append(faltan_c)
+        faltan_tarjetas.append(faltan_t)
+
+    # 📊 GRAFICAR
+    x = range(len(nombres_agentes))
+    width = 0.2
+
+    fig, ax = plt.subplots(figsize=(12, 6))
+
+    b1 = ax.bar([i - 1.5*width for i in x], cartas_semana, width, label='Cartas Semana', color='#4CAF50')
+    b2 = ax.bar([i - 0.5*width for i in x], tarjetas_semana, width, label='Tarjetas Semana', color='#2196F3')
+    b3 = ax.bar([i + 0.5*width for i in x], faltan_cartas, width, label='Faltan Cartas', color='#FFC107')
+    b4 = ax.bar([i + 1.5*width for i in x], faltan_tarjetas, width, label='Faltan Tarjetas', color='#F44336')
+
+    # Etiquetas de cantidad
+    for bars in [b1, b2, b3, b4]:
+        for bar in bars:
+            height = bar.get_height()
+            ax.text(bar.get_x() + bar.get_width()/2, height + 0.5, str(height), ha='center', va='bottom', fontsize=8)
+
+    ax.set_ylabel('Cantidad')
+    ax.set_title('Cartas y Tarjetas por Agente')
+    ax.set_xticks(list(x))
+    ax.set_xticklabels(nombres_agentes, rotation=45, ha='right')
+    ax.legend()
+    ax.grid(axis='y', linestyle='--', alpha=0.7)
+
+    # Guardar imagen como base64
+    buffer = BytesIO()
+    plt.tight_layout()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    img_base64 = base64.b64encode(buffer.read()).decode('utf-8')
+    plt.close()
+
+    return f"data:image/png;base64,{img_base64}"
 
 
 def dataQuery():
@@ -1410,7 +1511,7 @@ def dataQuery():
         paymentDate(startDatedatetime, endDatedatetime),
         obamacareStatus(startDateDateField, endDateDateField),
         appointmentClients(startDatedatetime, endDatedatetime),
-        [] # las demás secciones aún vacías
+        lettersCardStatus(startDateDateField, endDateDateField)
     ]
 
 

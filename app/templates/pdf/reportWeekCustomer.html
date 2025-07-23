@@ -69,11 +69,11 @@
     <img src="{{ citas }}" alt="Gráfico de Citas" style="width: 100%; max-width: 700px;">
 {% endif %}
 
-  <div class="section">
+{% if cartas %}
     <h2> Letters & Cards</h2>
-    {% for linea in cartas %}
-      <div class="item"> {{ linea }}</div>
-    {% endfor %}
-  </div>
+    <img src="{{ cartas }}" alt="Gráfico de Citas" style="width: 100%; max-width: 700px;">
+{% endif %}
+
+
 </body>
 </html>
