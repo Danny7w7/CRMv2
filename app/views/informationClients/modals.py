@@ -221,6 +221,7 @@ def validarCita(request):
 def saveDocumentClient(request, obamacare_id, way):
     if request.method == "POST":
         obama = get_object_or_404(ObamaCare, id=obamacare_id)
+        client = get_object_or_404(Clients, id = obama.client.id)
         documents = request.FILES.getlist("documents")  # 📌 Recibe la lista de archivos
         filenames = request.POST.getlist("filenames")  # 📌 Recibe la lista de nombres
 
@@ -232,15 +233,46 @@ def saveDocumentClient(request, obamacare_id, way):
             document_name = filenames[index].strip() if index < len(filenames) and filenames[index].strip() else document.name
 
             # ✅ Guarda el documento con el nombre en la BD
-            DocumentObama.objects.create(
+            DocumentObamaSupp.objects.create(
                 file=document,
                 name=document_name,  # ✅ Guardar nombre del documento
                 obamacare=obama,
+                client = client,
                 agent_create=request.user
             )
 
         messages.success(request, "Archivos subidos correctamente.")
         return JsonResponse({"success": True, "message": "Archivos subidos correctamente.", "redirect_url": f"/editObama/{obamacare_id}/{way}/"})
+    
+    return JsonResponse({"success": False, "message": "Método no permitido."}, status=405)
+
+@login_required(login_url='/login')
+def saveDocumentClientSupp(request, supp_id):
+    if request.method == "POST":
+        supp = get_object_or_404(Supp, id=supp_id)
+        client = get_object_or_404(Clients, id = supp.client.id)
+        documents = request.FILES.getlist("documents")  # 📌 Recibe la lista de archivos
+        filenames = request.POST.getlist("filenames")  # 📌 Recibe la lista de nombres
+
+        if not documents:
+            return JsonResponse({"success": False, "message": "No se han subido archivos."})
+
+        for index, document in enumerate(documents):
+            # ✅ Usa el nombre si existe, si no, asigna "Documento sin nombre"
+            document_name = filenames[index].strip() if index < len(filenames) and filenames[index].strip() else document.name
+
+            # ✅ Guarda el documento con el nombre en la BD
+            DocumentObamaSupp.objects.create(
+                file=document,
+                name=document_name,  # ✅ Guardar nombre del documento
+                supp=supp,
+                client = client,
+                agent_create=request.user,
+                typePlan = 'SUPP'
+            )
+
+        messages.success(request, "Archivos subidos correctamente.")
+        return JsonResponse({"success": True, "message": "Archivos subidos correctamente.", "redirect_url": f"/editSupp/{supp_id}/"})
     
     return JsonResponse({"success": False, "message": "Método no permitido."}, status=405)
 
