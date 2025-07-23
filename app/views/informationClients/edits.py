@@ -292,7 +292,7 @@ def editObama(request ,obamacare_id, way):
     consent = Consents.objects.filter(obamacare = obamacare_id )
     income = IncomeLetter.objects.filter(obamacare = obamacare_id)
     document = DocumentsClient.objects.filter(client = obamacare.client)
-    documentObama = DocumentObamaSupp.objects.filter(client = obamacare.client.id)
+    documentObama = DocumentObamaSupp.objects.filter(obamacare = obamacare)
     incomeffm = IncomeLetterFFM.objects.filter(obamacare = obamacare_id)
     complaint = Complaint.objects.filter(obamacare = obamacare_id).exclude(pdf='')
     smsTemplate = SmsTemplate.objects.select_related('contentTemplate').filter(obamacare = obamacare_id)
@@ -683,7 +683,7 @@ def editSupp(request, supp_id):
     list_drow = DropDownList.objects.filter(profiling_supp__isnull=False)
     paymentDateSupp = PaymentDate.objects.filter(supp = supp).first()
     users = Users.objects.filter(role='SUPP', company = company_id, is_active = True)
-    documentSupp = DocumentObamaSupp.objects.filter(client = supp.client.id)
+    documentSupp = DocumentObamaSupp.objects.filter(supp = supp)
 
     # Obtener el objeto Supp que tiene el id `supp_id`
     supp_instance = Supp.objects.get(id=supp_id)
