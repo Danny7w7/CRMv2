@@ -713,57 +713,57 @@ def weekRange():
 
 #     return resultados
 
-def paymentDate(startDatedatetime, endDatedatetime):
-    agentes_crm = Users.objects.prefetch_related('usaAgents').all()
+# def paymentDate(startDatedatetime, endDatedatetime):
+#     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
 
-    resultados = []
-    for agente in agentes_crm:
-        usa_names = list(agente.usaAgents.values_list("name", flat=True))
-        if not usa_names:
-            continue  # Ignorar si no tiene agentes USA
+#     resultados = []
+#     for agente in agentes_crm:
+#         usa_names = list(agente.usaAgents.values_list("name", flat=True))
+#         if not usa_names:
+#             continue  # Ignorar si no tiene agentes USA
 
-        full_name = f"{agente.first_name} {agente.last_name}"
+#         full_name = f"{agente.first_name} {agente.last_name}"
 
-        # Total de clientes activos con premium > 0
-        total_clients = ObamaCare.objects.filter(
-            is_active=True,
-            premium__gt=0,
-            agent_usa__in=usa_names
-        ).count()
+#         # Total de clientes activos con premium > 0
+#         total_clients = ObamaCare.objects.filter(
+#             is_active=True,
+#             premium__gt=0,
+#             agent_usa__in=usa_names
+#         ).count()
 
-        # Total acumulado de formularios válidos
-        acumulado = PaymentDate.objects.filter(
-            agent_create=agente,
-            obamacare__isnull=False,
-            obamacare__is_active=True,
-            obamacare__premium__gt=0,
-            obamacare__agent_usa__in=usa_names
-        ).count()
+#         # Total acumulado de formularios válidos
+#         acumulado = PaymentDate.objects.filter(
+#             agent_create=agente,
+#             obamacare__isnull=False,
+#             obamacare__is_active=True,
+#             obamacare__premium__gt=0,
+#             obamacare__agent_usa__in=usa_names
+#         ).count()
 
-        # Total esta semana con mismos filtros
-        esta_semana = PaymentDate.objects.filter(
-            agent_create=agente,
-            created_at__range=(startDatedatetime, endDatedatetime),
-            obamacare__isnull=False,
-            obamacare__is_active=True,
-            obamacare__premium__gt=0,
-            obamacare__agent_usa__in=usa_names
-        ).count()
+#         # Total esta semana con mismos filtros
+#         esta_semana = PaymentDate.objects.filter(
+#             agent_create=agente,
+#             created_at__range=(startDatedatetime, endDatedatetime),
+#             obamacare__isnull=False,
+#             obamacare__is_active=True,
+#             obamacare__premium__gt=0,
+#             obamacare__agent_usa__in=usa_names
+#         ).count()
 
-        faltan = total_clients - acumulado
-        porcentaje_faltante = (faltan / total_clients * 100) if total_clients > 0 else 0
+#         faltan = total_clients - acumulado
+#         porcentaje_faltante = (faltan / total_clients * 100) if total_clients > 0 else 0
 
-        linea = (
-            f"AGENTE: {full_name}, "
-            f"CLIENTES TOTALES: {total_clients}, "
-            f"CLIENTES LLENADO EN LA SEMANA: {esta_semana}, "
-            f"ACUMULADO: {acumulado}, "
-            f"FALTAN: {faltan}, "
-            f"FALTAN %: {porcentaje_faltante:.1f}%"
-        )
-        resultados.append(linea)
+#         linea = (
+#             f"AGENTE: {full_name}, "
+#             f"CLIENTES TOTALES: {total_clients}, "
+#             f"CLIENTES LLENADO EN LA SEMANA: {esta_semana}, "
+#             f"ACUMULADO: {acumulado}, "
+#             f"FALTAN: {faltan}, "
+#             f"FALTAN %: {porcentaje_faltante:.1f}%"
+#         )
+#         resultados.append(linea)
 
-    return resultados
+#     return resultados
 
 def obamacareStatus(startDateDateField, endDateDateField):
     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
@@ -1108,7 +1108,7 @@ def userCarrier(startDateDateField, endDateDateField):
     x1 = [i - width/2 for i in x]
     x2 = [i + width/2 for i in x]
 
-    bars1 = ax.bar(x1, llenados_semana, width, label='Semana', color='blue')
+    bars1 = ax.bar(x1, llenados_semana, width, label='Semana', color='green')
     bars2 = ax.bar(x2, faltan, width, label='Faltan', color='red')
 
     ax.set_xticks(x)
@@ -1140,6 +1140,87 @@ def userCarrier(startDateDateField, endDateDateField):
 
     return image_path
 
+import matplotlib.pyplot as plt
+import os
+from uuid import uuid4
+
+def paymentDate(startDatedatetime, endDatedatetime):
+    agentes_crm = Users.objects.prefetch_related('usaAgents').all()
+
+    nombres = []
+    llenados_semana = []
+    faltantes = []
+
+    for agente in agentes_crm:
+        usa_names = list(agente.usaAgents.values_list("name", flat=True))
+        if not usa_names:
+            continue
+
+        full_name = f"{agente.first_name} {agente.last_name}"
+
+        # Clientes activos con premium > 0
+        total_clients = ObamaCare.objects.filter(
+            is_active=True,
+            premium__gt=0,
+            agent_usa__in=usa_names
+        ).count()
+
+        esta_semana = PaymentDate.objects.filter(
+            agent_create=agente,
+            created_at__range=(startDatedatetime, endDatedatetime),
+            obamacare__isnull=False,
+            obamacare__is_active=True,
+            obamacare__premium__gt=0,
+            obamacare__agent_usa__in=usa_names
+        ).count()
+
+        faltan = total_clients - esta_semana
+
+        nombres.append(full_name)
+        llenados_semana.append(esta_semana)
+        faltantes.append(faltan)
+
+    # Crear gráfico
+    x = range(len(nombres))
+    width = 0.35
+
+    fig, ax = plt.subplots(figsize=(12, 6))
+
+    x1 = [i - width/2 for i in x]
+    x2 = [i + width/2 for i in x]
+
+    bars1 = ax.bar(x1, llenados_semana, width, label='Semana', color='royalblue')
+    bars2 = ax.bar(x2, faltantes, width, label='Faltan', color='tomato')
+
+    ax.set_xticks(x)
+    ax.set_xticklabels(nombres, rotation=45, ha='right')
+    ax.set_ylabel('Cantidad')
+    ax.set_title('Pagos llenados vs faltantes por agente')
+    ax.legend()
+
+    def agregar_valores(barras):
+        for barra in barras:
+            height = barra.get_height()
+            ax.annotate(f'{int(height)}',
+                        xy=(barra.get_x() + barra.get_width() / 2, height),
+                        xytext=(0, 3),
+                        textcoords="offset points",
+                        ha='center', va='bottom', fontsize=8)
+
+    agregar_valores(bars1)
+    agregar_valores(bars2)
+
+    plt.tight_layout()
+
+    output_dir = os.path.join('temp')
+    os.makedirs(output_dir, exist_ok=True)
+    filename = f"payment_date_{uuid4().hex}.png"
+    image_path = os.path.join(output_dir, filename)
+    plt.savefig(image_path)
+    plt.close()
+
+    return image_path
+
 
 def dataQuery():
     startDateDateField, endDateDateField, startDatedatetime, endDatedatetime = weekRange()
@@ -1147,7 +1228,8 @@ def dataQuery():
     return [
         observationCustomer(startDatedatetime, endDatedatetime),  # ahora es imagen
         userCarrier(startDateDateField, endDateDateField),
-        [], [], [], [] # las demás secciones aún vacías
+        paymentDate(startDatedatetime, endDatedatetime),
+        [], [], [] # las demás secciones aún vacías
     ]
 
 
