@@ -817,55 +817,55 @@ def weekRange():
 
 #     return resultados
 
-def appointmentClients(startDatedatetime, endDatedatetime):
-    agentes_crm = Users.objects.prefetch_related('usaAgents').all()
+# def appointmentClients(startDatedatetime, endDatedatetime):
+#     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
 
-    resultados = []
-    for agente in agentes_crm:
-        usa_agents_names = list(agente.usaAgents.values_list("name", flat=True))
+#     resultados = []
+#     for agente in agentes_crm:
+#         usa_agents_names = list(agente.usaAgents.values_list("name", flat=True))
 
-        if not usa_agents_names:
-            continue  # Ignorar agentes sin relación USA
+#         if not usa_agents_names:
+#             continue  # Ignorar agentes sin relación USA
 
-        full_name = f"{agente.first_name} {agente.last_name}"
+#         full_name = f"{agente.first_name} {agente.last_name}"
 
-        # Clientes activos del agente USA
-        total_clients = ObamaCare.objects.filter(
-            is_active=True,
-            agent_usa__in=usa_agents_names
-        ).count()
+#         # Clientes activos del agente USA
+#         total_clients = ObamaCare.objects.filter(
+#             is_active=True,
+#             agent_usa__in=usa_agents_names
+#         ).count()
 
-        # Total acumulado de citas con obamacare activo
-        acumulado = AppointmentClient.objects.filter(
-            agent_create=agente,
-            obamacare__isnull=False,
-            obamacare__is_active=True,
-            obamacare__agent_usa__in=usa_agents_names
-        ).count()
+#         # Total acumulado de citas con obamacare activo
+#         acumulado = AppointmentClient.objects.filter(
+#             agent_create=agente,
+#             obamacare__isnull=False,
+#             obamacare__is_active=True,
+#             obamacare__agent_usa__in=usa_agents_names
+#         ).count()
 
-        # Citas esta semana
-        esta_semana = AppointmentClient.objects.filter(
-            agent_create=agente,
-            created_at__range=(startDatedatetime, endDatedatetime),
-            obamacare__isnull=False,
-            obamacare__is_active=True,
-            obamacare__agent_usa__in=usa_agents_names
-        ).count()
+#         # Citas esta semana
+#         esta_semana = AppointmentClient.objects.filter(
+#             agent_create=agente,
+#             created_at__range=(startDatedatetime, endDatedatetime),
+#             obamacare__isnull=False,
+#             obamacare__is_active=True,
+#             obamacare__agent_usa__in=usa_agents_names
+#         ).count()
 
-        faltan = total_clients - acumulado
-        porcentaje_faltante = (faltan / total_clients * 100) if total_clients > 0 else 0
+#         faltan = total_clients - acumulado
+#         porcentaje_faltante = (faltan / total_clients * 100) if total_clients > 0 else 0
 
-        linea = (
-            f"AGENTE: {full_name}, "
-            f"CLIENTES TOTALES: {total_clients}, "
-            f"CITAS ESTA SEMANA: {esta_semana}, "  # Corregido typo "SEMENA"
-            f"CITAS ACUMULADAS: {acumulado}, "
-            f"FALTAN: {faltan}, "
-            f"FALTAN %: {porcentaje_faltante:.1f}%"
-        )
-        resultados.append(linea)
+#         linea = (
+#             f"AGENTE: {full_name}, "
+#             f"CLIENTES TOTALES: {total_clients}, "
+#             f"CITAS ESTA SEMANA: {esta_semana}, "  # Corregido typo "SEMENA"
+#             f"CITAS ACUMULADAS: {acumulado}, "
+#             f"FALTAN: {faltan}, "
+#             f"FALTAN %: {porcentaje_faltante:.1f}%"
+#         )
+#         resultados.append(linea)
 
-    return resultados
+#     return resultados
 
 def lettersCardStatus(startDateDateField, endDateDateField):
     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
@@ -1230,6 +1230,11 @@ import numpy as np
 import io
 import base64
 
+import matplotlib.pyplot as plt
+import numpy as np
+import io
+import base64
+
 def obamacareStatus(startDateDateField, endDateDateField):
     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
 
@@ -1238,6 +1243,7 @@ def obamacareStatus(startDateDateField, endDateDateField):
     con_poliza = []
     sin_poliza = []
     no_activos = []
+    perfilados_semana = []  # 🔵 NUEVA LISTA
 
     for agente in agentes_crm:
         usa_agents_names = list(agente.usaAgents.values_list("name", flat=True))
@@ -1252,21 +1258,39 @@ def obamacareStatus(startDateDateField, endDateDateField):
         total_activos = clientes.filter(status__iexact='ACTIVE').count()
         total_con_poliza = clientes.exclude(policyNumber__isnull=True).exclude(policyNumber='').count()
         total_total = clientes.count()
+        total_perfilados = clientes.filter(profiling_date__range=(startDateDateField, endDateDateField)).count()  # 🆕
 
         activos.append(total_activos)
         con_poliza.append(total_con_poliza)
         sin_poliza.append(total_total - total_con_poliza)
         no_activos.append(total_total - total_activos)
+        perfilados_semana.append(total_perfilados)  # 🆕
 
-    # 📊 Crear la gráfica
+    # 📊 Crear gráfica
     x = np.arange(len(nombres_agentes))
-    width = 0.2
+    width = 0.15
 
-    fig, ax = plt.subplots(figsize=(12, 6))
-    ax.bar(x - 1.5 * width, activos, width, label='Activos', color='#4CAF50')
-    ax.bar(x - 0.5 * width, con_poliza, width, label='Con Póliza', color='#2196F3')
-    ax.bar(x + 0.5 * width, sin_poliza, width, label='Sin Póliza', color='#FFC107')
-    ax.bar(x + 1.5 * width, no_activos, width, label='No Activos', color='#F44336')
+    fig, ax = plt.subplots(figsize=(14, 6))
+
+    bars1 = ax.bar(x - 2 * width, activos, width, label='Activos', color='#4CAF50')
+    bars2 = ax.bar(x - width, con_poliza, width, label='Con Póliza', color='#2196F3')
+    bars3 = ax.bar(x, sin_poliza, width, label='Sin Póliza', color='#FFC107')
+    bars4 = ax.bar(x + width, no_activos, width, label='No Activos', color='#F44336')
+    bars5 = ax.bar(x + 2 * width, perfilados_semana, width, label='Perfilados Semana', color='#9C27B0')  # 🆕
+
+    # ✅ Agregar etiquetas de número encima de cada barra
+    def add_labels(bars):
+        for bar in bars:
+            height = bar.get_height()
+            if height > 0:
+                ax.annotate(f'{height}',
+                            xy=(bar.get_x() + bar.get_width() / 2, height),
+                            xytext=(0, 3),
+                            textcoords="offset points",
+                            ha='center', va='bottom', fontsize=8)
+
+    for bars in [bars1, bars2, bars3, bars4, bars5]:
+        add_labels(bars)
 
     ax.set_xlabel('Agentes')
     ax.set_ylabel('Cantidad de Clientes')
@@ -1278,7 +1302,7 @@ def obamacareStatus(startDateDateField, endDateDateField):
 
     plt.tight_layout()
 
-    # Guardar en memoria como imagen base64
+    # 🖼️ Guardar imagen como base64
     buffer = io.BytesIO()
     plt.savefig(buffer, format='png')
     buffer.seek(0)
@@ -1289,6 +1313,94 @@ def obamacareStatus(startDateDateField, endDateDateField):
     return f"data:image/png;base64,{image_base64}"
 
 
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+import uuid
+
+def appointmentClients(startDatedatetime, endDatedatetime):
+    agentes_crm = Users.objects.prefetch_related('usaAgents').all()
+
+    agentes = []
+    acumuladas = []
+    esta_semana = []
+    faltan = []
+
+    for agente in agentes_crm:
+        usa_agents_names = list(agente.usaAgents.values_list("name", flat=True))
+        if not usa_agents_names:
+            continue
+
+        full_name = f"{agente.first_name} {agente.last_name}"
+        total_clients = ObamaCare.objects.filter(
+            is_active=True,
+            agent_usa__in=usa_agents_names
+        ).count()
+
+        acumulado = AppointmentClient.objects.filter(
+            agent_create=agente,
+            obamacare__isnull=False,
+            obamacare__is_active=True,
+            obamacare__agent_usa__in=usa_agents_names
+        ).count()
+
+        esta_semana_count = AppointmentClient.objects.filter(
+            agent_create=agente,
+            created_at__range=(startDatedatetime, endDatedatetime),
+            obamacare__isnull=False,
+            obamacare__is_active=True,
+            obamacare__agent_usa__in=usa_agents_names
+        ).count()
+
+        faltan_count = total_clients - acumulado
+
+        agentes.append(full_name)
+        acumuladas.append(acumulado)
+        esta_semana.append(esta_semana_count)
+        faltan.append(faltan_count)
+
+    if not agentes:
+        return None  # No hay datos
+
+    # Crear gráfico
+    x = np.arange(len(agentes))
+    width = 0.25
+
+    fig, ax = plt.subplots(figsize=(12, 6))
+    bars1 = ax.bar(x - width, acumuladas, width, label='Acumuladas', color='#4CAF50')
+    bars2 = ax.bar(x, esta_semana, width, label='Esta semana', color='#2196F3')
+    bars3 = ax.bar(x + width, faltan, width, label='Faltan', color='#F44336')
+
+    # Mostrar valores encima de cada barra
+    for bars in [bars1, bars2, bars3]:
+        for bar in bars:
+            height = bar.get_height()
+            ax.annotate(f'{height}',
+                        xy=(bar.get_x() + bar.get_width() / 2, height),
+                        xytext=(0, 3),  # 3 puntos hacia arriba
+                        textcoords="offset points",
+                        ha='center', va='bottom', fontsize=8)
+
+    ax.set_ylabel('Cantidad de Citas')
+    ax.set_title('Citas por Agente')
+    ax.set_xticks(x)
+    ax.set_xticklabels(agentes, rotation=45, ha='right')
+    ax.legend()
+    ax.grid(True, axis='y', linestyle='--', alpha=0.7)
+
+    # Guardar imagen
+    output_dir = 'temp'
+    os.makedirs(output_dir, exist_ok=True)
+    filename = f"{uuid.uuid4().hex}_citas.png"
+    img_path = os.path.join(output_dir, filename)
+    plt.tight_layout()
+    plt.savefig(img_path)
+    plt.close()
+
+    return img_path
+
+
+
 def dataQuery():
     startDateDateField, endDateDateField, startDatedatetime, endDatedatetime = weekRange()
 
@@ -1297,7 +1409,8 @@ def dataQuery():
         userCarrier(startDateDateField, endDateDateField),
         paymentDate(startDatedatetime, endDatedatetime),
         obamacareStatus(startDateDateField, endDateDateField),
-        [], [] # las demás secciones aún vacías
+        appointmentClients(startDatedatetime, endDatedatetime),
+        [] # las demás secciones aún vacías
     ]
 
 
