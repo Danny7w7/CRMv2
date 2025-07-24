@@ -184,22 +184,38 @@ def reportCustomerWeek():
         media_urls=[s3_url]
     )
 
-    # --- INICIO: Agregar envío de correo electrónico ---
     try:
-        with open(local_path, 'rb') as pdf_file:
-            pdf_bytes = pdf_file.read()
-            
-        send_email_with_pdf(
-            subject=f"Reporte Semanal - {now.strftime('%d/%m/%Y')}", # Un asunto más dinámico
-            receiver_email=['it.bluestream2@gmail.com'],
-            pdf_content=pdf_bytes, # <-- ¡Aquí pasamos los bytes del PDF!
-            pdf_filename=filename # <-- También puedes pasar el nombre original del archivo
+        email_subject = f"📄 Reporte Semanal - {now.strftime('%d/%m/%Y')}"
+        email_body = f"""
+        Estimado/a,
+
+        Se ha generado el reporte semanal correspondiente al {now.strftime('%d de %B de %Y a las %H:%M')}.
+
+        El archivo PDF con el reporte completo se encuentra adjunto a este correo.
+
+        Saludos cordiales,
+        Sistema de Reportes
+        """
+        
+        email = EmailMessage(
+            subject=email_subject,
+            body=email_body,
+            from_email=settings.SENDER_EMAIL_ADDRESS,  # usando tu variable de entorno
+            to=['it.bluestream2@gmail.com'],  
         )
-    except FileNotFoundError:
-        print(f"Error: No se encontró el archivo PDF en {local_path} para adjuntar al email.")
+        
+        # Adjuntar el PDF al email
+        with open(local_path, 'rb') as pdf_file:
+            email.attach(filename, pdf_file.read(), 'application/pdf')
+        
+        # Enviar el email
+        email.send()
+        
+        print(f"✅ Email enviado correctamente a: destinatario@example.com")
+        
     except Exception as e:
-        print(f"Error al preparar o enviar el correo electrónico: {e}")
-    # --- FIN: Agregar envío de correo electrónico ---
+        print(f"❌ Error al enviar email: {str(e)}")
+        # Opcional: puedes loggear el error o manejarlo según tus necesidades
 
     # 6. Limpiar archivos temporales
     if os.path.exists(local_path):
