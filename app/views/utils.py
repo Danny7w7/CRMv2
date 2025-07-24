@@ -902,8 +902,23 @@ def lettersCardStatus(startDateDateField, endDateDateField):
             obamacare__company = 2
         ).count()
 
-        faltan_c = max(0, total_clients - acumulado_cartas)
-        faltan_t = max(0, total_clients - acumulado_tarjetas)
+        # Clientes sin cartas
+        faltan_c = ObamaCare.objects.filter(
+            is_active=True,
+            company=2,
+            agent_usa__in=usa_agents_names
+        ).exclude(
+            letterscard__letters=True
+        ).count()
+
+        # Clientes sin tarjetas
+        faltan_t = ObamaCare.objects.filter(
+            is_active=True,
+            company=2,
+            agent_usa__in=usa_agents_names
+        ).exclude(
+            letterscard__card=True
+        ).count()
 
         nombres_agentes.append(full_name)
         cartas_semana.append(c_semana)
