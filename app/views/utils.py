@@ -634,7 +634,8 @@ def paymentDate(startDatedatetime, endDatedatetime):
             obamacare__isnull=False,
             obamacare__is_active=True,
             obamacare__premium__gt=0,
-            obamacare__agent_usa__in=usa_names
+            obamacare__agent_usa__in=usa_names,
+            obamacare__company = 2
         ).count()
 
         faltan = total_clients - esta_semana
@@ -781,7 +782,8 @@ def appointmentClients(startDatedatetime, endDatedatetime):
             agent_create=agente,
             obamacare__isnull=False,
             obamacare__is_active=True,
-            obamacare__agent_usa__in=usa_agents_names
+            obamacare__agent_usa__in=usa_agents_names,
+            obamacare__company = 2
         ).count()
 
         esta_semana_count = AppointmentClient.objects.filter(
@@ -789,7 +791,8 @@ def appointmentClients(startDatedatetime, endDatedatetime):
             created_at__range=(startDatedatetime, endDatedatetime),
             obamacare__isnull=False,
             obamacare__is_active=True,
-            obamacare__agent_usa__in=usa_agents_names
+            obamacare__agent_usa__in=usa_agents_names,
+            obamacare__company = 2
         ).count()
 
         faltan_count = total_clients - acumulado
