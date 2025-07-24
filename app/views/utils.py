@@ -4,10 +4,14 @@ import smtplib
 import ssl
 from email.message import EmailMessage
 from typing import Dict
-import boto3
 import matplotlib.pyplot as plt
 import numpy as np
 import base64
+import matplotlib.pyplot as plt
+import os
+import io
+import uuid
+from uuid import uuid4
 
 
 # Django core libraries
@@ -23,7 +27,7 @@ from datetime import date, timedelta
 from collections import defaultdict
 from django.utils import timezone
 from weasyprint import HTML, CSS
-from django.db.models import Count
+from django.db.models import Count, Case, When, Q, BooleanField
 
 # Third-party libraries
 from asgiref.sync import async_to_sync
@@ -444,41 +448,14 @@ def get_customer_details(company_id):
 
     return resultado
 
-# SMS automatico de reporte de customer enviado con telnyx
-from django.db.models import Count, Case, When, Q, BooleanField
-from datetime import date, timedelta
-from django.utils import timezone
-from django.http import HttpResponse
-
-
-
-# 👉 Rango de fechas de la semana anterior
-
-
+# SMS automatico de reporte de customer enviado con telnyx de gestion semanal
 def weekRange():
     today = date.today()
-    startDateDateField = today - timedelta(days=today.weekday() + 7)
+    startDateDateField = today - timedelta(days=today.weekday())
     endDateDateField = startDateDateField + timedelta(days=6)
     startDatedatetime = timezone.make_aware(timezone.datetime(startDateDateField.year, startDateDateField.month, startDateDateField.day, 0, 0, 0))
     endDatedatetime = timezone.make_aware(timezone.datetime(endDateDateField.year, endDateDateField.month, endDateDateField.day, 23, 59, 59, 999999))
     return startDateDateField, endDateDateField, startDatedatetime, endDatedatetime
-
-
-
-# FUNCIÓN MODIFICADA PARA GENERAR PDF
-from django.template.loader import render_to_string
-from weasyprint import HTML
-
-
-###empezamos con la grafica
-
-import matplotlib.pyplot as plt
-import os
-from uuid import uuid4
-
-import matplotlib.pyplot as plt
-import os
-from uuid import uuid4
 
 def observationCustomer(startDatedatetime, endDatedatetime):
     data = ObservationCustomer.objects.filter(
@@ -547,10 +524,6 @@ def observationCustomer(startDatedatetime, endDatedatetime):
     plt.close()
 
     return image_path
-
-import matplotlib.pyplot as plt
-import os
-from uuid import uuid4
 
 def userCarrier(startDateDateField, endDateDateField):
     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
@@ -627,10 +600,6 @@ def userCarrier(startDateDateField, endDateDateField):
     plt.close()
 
     return image_path
-
-import matplotlib.pyplot as plt
-import os
-from uuid import uuid4
 
 def paymentDate(startDatedatetime, endDatedatetime):
     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
@@ -709,20 +678,6 @@ def paymentDate(startDatedatetime, endDatedatetime):
 
     return image_path
 
-import matplotlib.pyplot as plt
-import os
-from uuid import uuid4
-
-import matplotlib.pyplot as plt
-import numpy as np
-import io
-import base64
-
-import matplotlib.pyplot as plt
-import numpy as np
-import io
-import base64
-
 def obamacareStatus(startDateDateField, endDateDateField):
     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
 
@@ -731,7 +686,7 @@ def obamacareStatus(startDateDateField, endDateDateField):
     con_poliza = []
     sin_poliza = []
     no_activos = []
-    perfilados_semana = []  # 🔵 NUEVA LISTA
+    perfilados_semana = []
 
     for agente in agentes_crm:
         usa_agents_names = list(agente.usaAgents.values_list("name", flat=True))
@@ -741,7 +696,7 @@ def obamacareStatus(startDateDateField, endDateDateField):
         full_name = f"{agente.first_name} {agente.last_name}"
         nombres_agentes.append(full_name)
 
-        clientes = ObamaCare.objects.filter(agent_usa__in=usa_agents_names)
+        clientes = ObamaCare.objects.filter(agent_usa__in=usa_agents_names, is_active = True)
 
         total_activos = clientes.filter(status__iexact='ACTIVE').count()
         total_con_poliza = clientes.exclude(policyNumber__isnull=True).exclude(policyNumber='').count()
@@ -761,10 +716,10 @@ def obamacareStatus(startDateDateField, endDateDateField):
     fig, ax = plt.subplots(figsize=(10, 7))
 
     bars1 = ax.bar(x - 2 * width, activos, width, label='Activos', color='#4CAF50')
-    bars2 = ax.bar(x - width, con_poliza, width, label='Con Póliza', color='#2196F3')
-    bars3 = ax.bar(x, sin_poliza, width, label='Sin Póliza', color='#FFC107')
+    bars2 = ax.bar(x - width, con_poliza, width, label='Con # Póliza', color='#2196F3')
+    bars3 = ax.bar(x, sin_poliza, width, label='Sin # Póliza', color='#FFC107')
     bars4 = ax.bar(x + width, no_activos, width, label='No Activos', color='#F44336')
-    bars5 = ax.bar(x + 2 * width, perfilados_semana, width, label='Perfilados Semana', color='#9C27B0')  # 🆕
+    bars5 = ax.bar(x + 2 * width, perfilados_semana, width, label='Perfilados en laSemana', color='#9C27B0') 
 
     # ✅ Agregar etiquetas de número encima de cada barra
     def add_labels(bars):
@@ -799,12 +754,6 @@ def obamacareStatus(startDateDateField, endDateDateField):
     plt.close()
 
     return f"data:image/png;base64,{image_base64}"
-
-
-import matplotlib.pyplot as plt
-import numpy as np
-import os
-import uuid
 
 def appointmentClients(startDatedatetime, endDatedatetime):
     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
@@ -886,10 +835,6 @@ def appointmentClients(startDatedatetime, endDatedatetime):
     plt.close()
 
     return img_path
-
-import matplotlib.pyplot as plt
-from io import BytesIO
-import base64
 
 def lettersCardStatus(startDateDateField, endDateDateField):
     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
@@ -989,12 +934,11 @@ def lettersCardStatus(startDateDateField, endDateDateField):
 
     return f"data:image/png;base64,{img_base64}"
 
-
 def dataQuery():
     startDateDateField, endDateDateField, startDatedatetime, endDatedatetime = weekRange()
 
     return [
-        observationCustomer(startDatedatetime, endDatedatetime),  # ahora es imagen
+        observationCustomer(startDatedatetime, endDatedatetime),  
         userCarrier(startDateDateField, endDateDateField),
         paymentDate(startDatedatetime, endDatedatetime),
         obamacareStatus(startDateDateField, endDateDateField),
@@ -1002,12 +946,13 @@ def dataQuery():
         lettersCardStatus(startDateDateField, endDateDateField)
     ]
 
-def generar_pdf_bonito(datos_secciones, output_path):
+def generarPDFChart(datos_secciones, output_path):
+
     llamadas, userCarrier, pagos, obamacare, citas, cartas = datos_secciones
 
     today = date.today()
     start_of_week = today - timedelta(days=today.weekday())
-    end_of_week = start_of_week + timedelta(days=5) # Para lunes a sábado
+    end_of_week = start_of_week + timedelta(days=5)
 
     formatted_start = start_of_week.strftime('%A %d de %B')
     formatted_end = end_of_week.strftime('%d de %B')
