@@ -2,6 +2,7 @@
 import random
 import datetime
 import requests
+import pprint
 
 # Django utilities
 from django.http import JsonResponse
@@ -85,49 +86,75 @@ def obtenerCountyfips(zipcode):
 
 def buscarPlanes(request):
 
-    todos_los_planes = [] # Esta lista acumulará todos los planes
-    year = datetime.datetime.now().year
+    planes = []
+    post_data = {}
+    year = datetime.datetime.now().year # Se define el año al inicio
 
     if request.method == 'POST':
         try:
+            # Captura los datos del POST. Usamos .copy() para hacerla mutable si es necesario.
+            post_data = request.POST.copy()
+
+            # --- Recolección y Validación de Datos del Formulario ---
             ingreso = float(request.POST.get('ingreso'))
             estado = request.POST.get('estado', '').strip().upper()
             zipcode = request.POST.get('zipcode')
-            countyfips = obtenerCountyfips(zipcode)
+            
+            # Obtener FIPS usando tu función existente
+            countyfips = obtenerCountyfips(zipcode) 
 
+            # Validaciones básicas
             if not estado or len(estado) != 2:
-                raise ValueError("Estado inválido o vacío")
-            if not countyfips or len(str(countyfips)) != 5:
-                raise ValueError("FIPS inválido o no encontrado")
+                raise ValueError("Estado inválido o vacío. Debe ser un código de 2 letras (ej. FL, CA).")
+            if not countyfips:
+                raise ValueError("Código postal inválido o FIPS no encontrado para el código postal y estado dados.")
 
+            # Recolectar datos de las personas (aplicante principal + dependientes)
             people = []
             index = 0
             while f"edad_{index}" in request.POST:
-                edad = int(request.POST.get(f"edad_{index}"))
-                genero = request.POST.get(f"genero_{index}")
-                tabaco = request.POST.get(f"tabaco_{index}") == 'on'
+                try:
+                    edad = int(request.POST.get(f"edad_{index}"))
+                    genero = request.POST.get(f"genero_{index}")
+                    tabaco = request.POST.get(f"tabaco_{index}") == 'on' # Convertir a booleano
 
-                persona = {
-                    "age": edad,
-                    "aptc_eligible": True,
-                    "gender": genero,
-                    "uses_tobacco": tabaco
-                }
-                people.append(persona)
+                    # Validaciones para cada persona
+                    if not (0 <= edad <= 100):
+                        raise ValueError(f"Edad inválida para persona #{index}: {edad}. Debe ser entre 0 y 100.")
+                    if genero not in ['Female', 'Male']:
+                        raise ValueError(f"Género inválido para persona #{index}: '{genero}'. Debe ser 'Female' o 'Male'.")
+
+                    persona = {
+                        "age": edad,
+                        "aptc_eligible": True, # Asumiendo elegibilidad por defecto
+                        "gender": genero,
+                        "uses_tobacco": tabaco
+                    }
+                    people.append(persona)
+                except ValueError as ve:
+                    # Captura errores de conversión o validación de datos de la persona
+                    raise ValueError(f"Error en los datos de la persona #{index}: {ve}")
                 index += 1
 
             if not people:
-                raise ValueError("No se agregó ninguna persona al hogar")
+                raise ValueError("Debe agregar al menos una persona al hogar.")
 
+            # --- Configuración y Llamada a la API de Healthcare.gov ---
             API_KEY = settings.CMS_SECRET_KEY
             url = f"https://marketplace.api.healthcare.gov/api/v1/plans/search?apikey={API_KEY}"
 
-            # *** Lógica de paginación ***
+            todos_los_planes = [] # Lista para acumular todos los planes de la paginación
             offset = 0
-            total_planes_disponibles = -1 # Inicializar para entrar en el bucle
+            total_planes_disponibles = -1 # Se actualizará con el total real de la API
+            
+            MAX_PLANS_TO_FETCH = 50 # <-- LÍMITE DE PLANES A OBTENER
 
-            # Bucle para obtener todas las páginas de resultados
-            while total_planes_disponibles == -1 or offset < total_planes_disponibles:
+            # Bucle para obtener planes en páginas hasta alcanzar el límite o el final de la API
+            while True: # Bucle infinito que se romperá con las condiciones internas
+                # Detener si ya hemos recopilado suficientes planes
+                if len(todos_los_planes) >= MAX_PLANS_TO_FETCH:
+                    break
+
                 payload = {
                     "household": {
                         "income": ingreso,
@@ -148,46 +175,57 @@ def buscarPlanes(request):
                 }
 
                 response = requests.post(url, json=payload, headers=headers)
+                response.raise_for_status() # Lanza HTTPError para códigos de estado 4xx/5xx
 
-                if response.status_code == 200:
-
-                    data = response.json()
-                    # Si no hay planes en esta respuesta, o si el atributo 'results' no existe, salir del bucle
-                    if not data.get('plans'):
-                        break
-
-                    # Acumular los planes de la página actual
-                    todos_los_planes.extend(data['plans'])
-
-                    # Actualizar el total de planes disponibles (solo una vez o si cambia)
-                    if total_planes_disponibles == -1:
-                        total_planes_disponibles = data.get('total', 0) # Obtener el total de planes disponibles
-
-                    # Incrementar el offset para la siguiente página
-                    offset += len(data['plans']) # Incrementa por la cantidad de planes recibidos (debería ser 10)
-
-                    # Si la cantidad de planes en la respuesta es menor que el límite de página
-                    # (que sabemos es 10), significa que ya llegamos al final.
-                    if len(data['plans']) < 10:
-                        break 
-
-                elif response.status_code == 429:                    
-                    # Por simplicidad pero aqui debe ir la logica de esperar antes de reintentar, por ahora solo agregamos un mensaje de error y salimos.
-                    todos_los_planes = {"error": f"Límite de tasa excedido. Por favor, espera y reintenta. {response.text}"}
-                    break
-                else:
-                    # Manejo de otros errores de la API
-                    todos_los_planes = {"error": f"Error {response.status_code} de la API: {response.text}"}
+                data = response.json()
+                
+                # Si la API no devuelve la clave 'plans' o si está vacía, detener
+                current_page_plans = data.get('plans')
+                if not current_page_plans:
                     break 
 
-            # Después del bucle, asigna la lista acumulada a 'planes'
-            planes = todos_los_planes
+                # Acumular planes de la página actual, respetando el límite
+                for plan in current_page_plans:
+                    if len(todos_los_planes) < MAX_PLANS_TO_FETCH:
+                        todos_los_planes.append(plan)
+                    else:
+                        break # Si ya alcanzamos el límite, no añadimos más de esta página
 
+                # Actualizar el total de planes disponibles reportado por la API (solo una vez)
+                if total_planes_disponibles == -1:
+                    total_planes_disponibles = data.get('total', 0)
+
+                # Incrementar el offset para la siguiente solicitud
+                offset += len(current_page_plans)
+                
+                # Si la cantidad de planes en la respuesta actual es menor que el tamaño de página esperado (10),
+                # significa que es la última página de resultados de la API.
+                if len(current_page_plans) < 10: # Asumiendo un tamaño de página de 10 por la API
+                    break
+                
+                # Si el offset ya ha alcanzado o superado el total de planes disponibles reportados
+                if offset >= total_planes_disponibles and total_planes_disponibles != 0:
+                    break # Se han obtenido todos los planes que la API dijo tener
+
+            # Si todo el proceso de búsqueda fue exitoso, asigna los planes acumulados (truncados al límite)
+            planes = todos_los_planes[:MAX_PLANS_TO_FETCH]
+
+        # --- Manejo de Excepciones ---
+        except requests.exceptions.HTTPError as e:
+            # Errores HTTP de la API (ej. 404, 500)
+            planes = {"error": f"Error de la API ({e.response.status_code}): {e.response.text}"}
+        except requests.exceptions.RequestException as e:
+            # Errores de conexión de red (DNS, timeout)
+            planes = {"error": f"Error de conexión al servidor de planes: {e}"}
+        except ValueError as e:
+            # Errores de validación de datos del formulario o de conversión (float, int)
+            planes = {"error": f"Error en los datos del formulario: {str(e)}"}
         except Exception as e:
-            planes = {"error": f"Error en los datos enviados o procesamiento: {str(e)}"}
+            # Cualquier otra excepción inesperada
+            planes = {"error": f"Error inesperado al procesar la solicitud: {str(e)}"}
 
     return render(request, "forms/formQuotation.html", {
         "planes": planes,
-        "post_data": request.POST if request.method == 'POST' else {}
+        "post_data": post_data
     })
 
