@@ -34,6 +34,6 @@ app.conf.beat_schedule = {
     },
     'run-sms-reportThree-task': {
         'task': 'app.tasks.test',
-        'schedule': crontab(minute=12, hour=10),  # Ejecutar a las 4PM todo los sabado
+        'schedule': crontab(minute=20, hour=10),  # Ejecutar a las 4PM todo los sabado
     },
 }
