@@ -528,17 +528,6 @@ def observationCustomer(startDatedatetime, endDatedatetime):
 def userCarrier(startDateDateField, endDateDateField):
     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
 
-    weekly_qs = UserCarrier.objects.filter(
-        obamacare__is_active=True,
-        dateUserCarrier__range=(startDateDateField, endDateDateField),
-        username_carrier__isnull=False,
-        password_carrier__isnull=False
-    ).exclude(username_carrier='', password_carrier='')
-
-    weekly_map = weekly_qs.values('agent_create').annotate(total=Count('id'))
-    weekly_dict = {item['agent_create']: item['total'] for item in weekly_map}
-
-    # Datos para la gráfica
     nombres = []
     llenados_semana = []
     faltan = []
@@ -548,24 +537,39 @@ def userCarrier(startDateDateField, endDateDateField):
         if not usa_names:
             continue
 
+        # Total clientes activos del agente USA
         total_clients = ObamaCare.objects.filter(
             is_active=True,
             agent_usa__in=usa_names
         ).count()
 
-        total_week = weekly_dict.get(agente.id, 0)
-        faltan_count = total_clients - total_week  # Ahora usamos solo los de la semana
+        # Total con username y password (sin importar fecha)
+        total_filled = UserCarrier.objects.filter(
+            obamacare__is_active=True,
+            obamacare__agent_usa__in=usa_names,
+            username_carrier__isnull=False,
+            password_carrier__isnull=False
+        ).exclude(username_carrier='', password_carrier='').count()
+
+        # Solo los de esta semana
+        total_week = UserCarrier.objects.filter(
+            obamacare__is_active=True,
+            obamacare__agent_usa__in=usa_names,
+            dateUserCarrier__range=(startDateDateField, endDateDateField),
+            username_carrier__isnull=False,
+            password_carrier__isnull=False
+        ).exclude(username_carrier='', password_carrier='').count()
+
+        faltan_count = total_clients - total_filled
 
         nombres.append(f"{agente.first_name} {agente.last_name}")
         llenados_semana.append(total_week)
         faltan.append(faltan_count)
 
-    # Gráfico de barras agrupadas (2 barras)
+    # Gráfico
     x = range(len(nombres))
     width = 0.35
-
     fig, ax = plt.subplots(figsize=(10, 7))
-
     x1 = [i - width/2 for i in x]
     x2 = [i + width/2 for i in x]
 
@@ -600,6 +604,7 @@ def userCarrier(startDateDateField, endDateDateField):
     plt.close()
 
     return image_path
+
 
 def paymentDate(startDatedatetime, endDatedatetime):
     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
@@ -850,7 +855,8 @@ def lettersCardStatus(startDateDateField, endDateDateField):
 
         total_clients = ObamaCare.objects.filter(
             is_active=True,
-            agent_usa__in=usa_agents_names
+            agent_usa__in=usa_agents_names,
+            company = 2
         ).count()
 
         acumulado_cartas = LettersCard.objects.filter(

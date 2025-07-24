@@ -152,23 +152,6 @@ def enviar_pdf_por_email():
         pdf_content=pdf_bytes  # ✅ nombre del parámetro como te lo dejé
     )
 
-from django.core.mail import EmailMessage
-from django.conf import settings
-import telnyx
-import os
-from datetime import datetime
-
-from django.conf import settings
-import telnyx
-import os
-import smtplib
-import ssl
-from email.message import EmailMessage
-from datetime import datetime
-import logging
-
-logger = logging.getLogger(__name__)
-
 @shared_task
 def reportCustomerWeek():
 
@@ -203,7 +186,6 @@ def reportCustomerWeek():
 
     # 5. Enviar por Email - TODO INTEGRADO AQUÍ
     try:
-        print("📧 Preparando envío de email...")
         
         # Leer el PDF como bytes
         with open(local_path, 'rb') as pdf_file:
@@ -215,10 +197,9 @@ def reportCustomerWeek():
 
 Se ha generado el reporte semanal correspondiente al {now.strftime('%d de %B de %Y a las %H:%M')}.
 
-El archivo PDF con el reporte completo se encuentra adjunto a este correo.
+El archivo PDF con el reporte completo del equipo de customer de la semana actual se encuentra adjunto a este correo.
 
-También puedes acceder al reporte desde el siguiente enlace:
-{s3_url}
+Reporte Generado por el mejor equipo de IT.
 
 Saludos cordiales,
 Sistema de Reportes
@@ -238,18 +219,12 @@ Sistema de Reportes
             subtype='pdf',
             filename=filename
         )
-
-        print(f"📤 Enviando email desde {settings.SENDER_EMAIL_ADDRESS} a it.bluestream2@gmail.com...")
-        print(f"📧 Usando SMTP: {settings.SMTP_HOST}:{settings.SMTP_PORT}")
         
         # Enviar el email usando SMTP_SSL
         context = ssl.create_default_context()
         with smtplib.SMTP_SSL(settings.SMTP_HOST, int(settings.SMTP_PORT), context=context) as server:
             server.login(settings.SENDER_EMAIL_ADDRESS, settings.EMAIL_PASSWORD)
             server.send_message(message)
-
-        print("✅ Email enviado exitosamente")
-        logger.info(f"✅ Email enviado exitosamente a it.bluestream2@gmail.com")
 
     except smtplib.SMTPAuthenticationError as e:
         print(f"❌ Error de autenticación SMTP: {str(e)}")
@@ -273,6 +248,3 @@ Sistema de Reportes
     for path in [llamadas_img_path, user_carrier_img_path]:
         if os.path.exists(path):
             os.remove(path)
-
-    print("🧹 Archivos temporales eliminados")
-    print("✅ Tarea completada exitosamente")
