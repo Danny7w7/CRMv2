@@ -171,7 +171,7 @@ def reportCustomerWeek():
     mensaje_sms = (
         f"📄 Reporte Semanal Generado\n"
         f"📅 {now.strftime('%d/%m/%Y %H:%M')}\n\n" +
-        f"\n\n📎 PDF completo adjunto"
+        f"📎 PDF completo adjunto"
     )
 
     # 5. Enviar por Telnyx MMS
