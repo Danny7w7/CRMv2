@@ -606,7 +606,6 @@ def userCarrier(startDateDateField, endDateDateField):
 
     return image_path
 
-
 def paymentDate(startDatedatetime, endDatedatetime):
     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
 
@@ -625,7 +624,8 @@ def paymentDate(startDatedatetime, endDatedatetime):
         total_clients = ObamaCare.objects.filter(
             is_active=True,
             premium__gt=0,
-            agent_usa__in=usa_names
+            agent_usa__in=usa_names,
+            company = 2
         ).count()
 
         esta_semana = PaymentDate.objects.filter(
@@ -701,7 +701,7 @@ def obamacareStatus(startDateDateField, endDateDateField):
         full_name = f"{agente.first_name} {agente.last_name}"
         nombres_agentes.append(full_name)
 
-        clientes = ObamaCare.objects.filter(agent_usa__in=usa_agents_names, is_active=True)
+        clientes = ObamaCare.objects.filter(agent_usa__in=usa_agents_names, is_active=True, company = 2)
 
         total_activos = clientes.filter(status__iexact='ACTIVE').count()
         total_con_poliza = clientes.exclude(policyNumber__isnull=True).exclude(policyNumber='').count()
@@ -773,7 +773,8 @@ def appointmentClients(startDatedatetime, endDatedatetime):
         full_name = f"{agente.first_name} {agente.last_name}"
         total_clients = ObamaCare.objects.filter(
             is_active=True,
-            agent_usa__in=usa_agents_names
+            agent_usa__in=usa_agents_names,
+            company = 2
         ).count()
 
         acumulado = AppointmentClient.objects.filter(
