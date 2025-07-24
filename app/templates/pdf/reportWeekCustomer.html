@@ -48,20 +48,24 @@
   </style>
 </head>
 <body>
-  <h1>📊 Reporte Semanal de Agentes</h1>
 
-    {% if llamadas %}
-        <div class="section">
-            <h2>Llamadas Efectivas '{{dateWeek}}' </h2>
+    <div style="page-break-inside: avoid; break-inside: avoid;">
+        <h1>📊 Reporte Semanal de Customer '{{dateWeek}}' </h1>
+
+        {% if llamadas %}
+            <div class="section">
+            <h2>Llamadas Efectivas </h2>
             <img src="{{ llamadas }}" alt="Gráfico de llamadas" style="width: 100%; max-width: 700px;">
-        </div>
-    {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
 
     <div class="page-break"></div>
 
     {% if userCarrier %}
         <div class="section">
-            <h2>📡 Formularios Carrier '{{dateWeek}}' </h2>
+            <h2>📡 Formularios Carrier</h2>
             <img src="{{ userCarrier }}" alt="Gráfico carriers" style="width: 100%; max-width: 700px;">
         </div>
     {% endif %}
@@ -70,7 +74,7 @@
 
     {% if pagos %}
         <div class="section">
-            <h2>💰 Pagos llenados por agente '{{dateWeek}}' </h2>
+            <h2>💰 Pagos llenados por agente </h2>
             <img src="{{ pagos }}" alt="Gráfico de pagos" style="width: 100%; max-width: 700px;">
         </div>
     {% endif %}
@@ -79,7 +83,7 @@
 
     {% if obamacare %}
         <div class="section">
-            <h2>🩺 Obamacare - Estado de Clientes '{{dateWeek}}' </h2>
+            <h2>🩺 Obamacare - Estado de Clientes </h2>
             <img src="{{ obamacare }}" alt="Gráfico obamacare" style="width: 100%; max-width: 700px;">
         </div>
     {% endif %}
@@ -88,7 +92,7 @@
 
     {% if citas %}
         <div class="section">
-            <h3>Citas por Agente '{{dateWeek}}'</h3>
+            <h3>Citas por Agente </h3>
             <img src="{{ citas }}" alt="Gráfico de Citas" style="width: 100%; max-width: 700px;">
         </div>
     {% endif %}
