@@ -866,7 +866,8 @@ def lettersCardStatus(startDateDateField, endDateDateField):
             letters=True,
             obamacare__isnull=False,
             obamacare__is_active=True,
-            obamacare__agent_usa__in=usa_agents_names
+            obamacare__agent_usa__in=usa_agents_names,
+            obamacare__company = 2
         ).count()
 
         acumulado_tarjetas = LettersCard.objects.filter(
@@ -874,7 +875,8 @@ def lettersCardStatus(startDateDateField, endDateDateField):
             card=True,
             obamacare__isnull=False,
             obamacare__is_active=True,
-            obamacare__agent_usa__in=usa_agents_names
+            obamacare__agent_usa__in=usa_agents_names,
+            obamacare__company = 2
         ).count()
 
         c_semana = LettersCard.objects.filter(
@@ -883,7 +885,8 @@ def lettersCardStatus(startDateDateField, endDateDateField):
             letters=True,
             obamacare__isnull=False,
             obamacare__is_active=True,
-            obamacare__agent_usa__in=usa_agents_names
+            obamacare__agent_usa__in=usa_agents_names,
+            obamacare__company = 2
         ).count()
 
         t_semana = LettersCard.objects.filter(
@@ -892,7 +895,8 @@ def lettersCardStatus(startDateDateField, endDateDateField):
             card=True,
             obamacare__isnull=False,
             obamacare__is_active=True,
-            obamacare__agent_usa__in=usa_agents_names
+            obamacare__agent_usa__in=usa_agents_names,
+            obamacare__company = 2
         ).count()
 
         faltan_c = max(0, total_clients - acumulado_cartas)
