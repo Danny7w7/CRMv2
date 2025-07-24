@@ -84,7 +84,8 @@ def obtenerCountyfips(zipcode):
     return None
 
 def buscarPlanes(request):
-    planes = []
+
+    todos_los_planes = [] # Esta lista acumulará todos los planes
     year = datetime.datetime.now().year
 
     if request.method == 'POST':
@@ -121,39 +122,72 @@ def buscarPlanes(request):
             API_KEY = settings.CMS_SECRET_KEY
             url = f"https://marketplace.api.healthcare.gov/api/v1/plans/search?apikey={API_KEY}"
 
-            payload = {
-                "household": {
-                    "income": ingreso,
-                    "people": people
-                },
-                "market": "Individual",
-                "place": {
-                    "state": estado,
-                    "zipcode": zipcode,
-                    "countyfips": countyfips
-                },
-                "year": year
-            }
+            # *** Lógica de paginación ***
+            offset = 0
+            total_planes_disponibles = -1 # Inicializar para entrar en el bucle
 
-            headers = {
-                "Content-Type": "application/json"
-            }
+            # Bucle para obtener todas las páginas de resultados
+            while total_planes_disponibles == -1 or offset < total_planes_disponibles:
+                payload = {
+                    "household": {
+                        "income": ingreso,
+                        "people": people
+                    },
+                    "market": "Individual",
+                    "place": {
+                        "state": estado,
+                        "zipcode": zipcode,
+                        "countyfips": countyfips
+                    },
+                    "year": year,
+                    "offset": offset 
+                }
 
-            response = requests.post(url, json=payload, headers=headers)
+                headers = {
+                    "Content-Type": "application/json"
+                }
 
-            if response.status_code == 200:
-                planes = response.json()
-            else:
-                # planes = {"error": f"Error {response.status_code} - {response.text}"}
-                planes = {"error": "No hay planes!"}
+                response = requests.post(url, json=payload, headers=headers)
+
+                if response.status_code == 200:
+
+                    data = response.json()
+                    # Si no hay planes en esta respuesta, o si el atributo 'results' no existe, salir del bucle
+                    if not data.get('plans'):
+                        break
+
+                    # Acumular los planes de la página actual
+                    todos_los_planes.extend(data['plans'])
+
+                    # Actualizar el total de planes disponibles (solo una vez o si cambia)
+                    if total_planes_disponibles == -1:
+                        total_planes_disponibles = data.get('total', 0) # Obtener el total de planes disponibles
+
+                    # Incrementar el offset para la siguiente página
+                    offset += len(data['plans']) # Incrementa por la cantidad de planes recibidos (debería ser 10)
+
+                    # Si la cantidad de planes en la respuesta es menor que el límite de página
+                    # (que sabemos es 10), significa que ya llegamos al final.
+                    if len(data['plans']) < 10:
+                        break 
+
+                elif response.status_code == 429:                    
+                    # Por simplicidad pero aqui debe ir la logica de esperar antes de reintentar, por ahora solo agregamos un mensaje de error y salimos.
+                    todos_los_planes = {"error": f"Límite de tasa excedido. Por favor, espera y reintenta. {response.text}"}
+                    break
+                else:
+                    # Manejo de otros errores de la API
+                    todos_los_planes = {"error": f"Error {response.status_code} de la API: {response.text}"}
+                    break 
+
+            # Después del bucle, asigna la lista acumulada a 'planes'
+            planes = todos_los_planes
 
         except Exception as e:
-            planes = {"error": f"Error en los datos enviados: {str(e)}"}
+            planes = {"error": f"Error en los datos enviados o procesamiento: {str(e)}"}
 
     return render(request, "forms/formQuotation.html", {
         "planes": planes,
         "post_data": request.POST if request.method == 'POST' else {}
     })
-
-
 

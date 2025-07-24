@@ -106,18 +106,18 @@
 	</div>
 </div>
 
-{% if planes.plans %}
+{% if planes and not planes.error  %}
 
 	<hr>
 
 	<div class="card">
 		<div class="card-body">
 
-			<div class="row g-3">
+			<div class="row g-3" id="planes-container">
 				<h5 class="mb-3">Planes disponibles</h5>
 
-				{% for plan in planes.plans %}
-					<div class="col-md-6 col-lg-4">
+				{% for plan in planes %}
+					<div class="col-md-6 col-lg-4 plan-card ">
 						<div class="card h-100 shadow-sm border-0">
 							<div class="card-body">
 								<h6 class="card-title fw-bold text-primary">{{ plan.issuer.name }}</h6>
@@ -141,7 +141,16 @@
 					</div>
 				{% endfor %}
 
-			</div>				
+			</div>
+			
+			{# Añade el contenedor para los controles de paginación #}
+            <div class="d-flex justify-content-center mt-4">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination" id="pagination-controls">
+                        {# Los botones de paginación se generarán aquí con JS #}
+                    </ul>
+                </nav>
+            </div>
 			
 		</div>
 	</div>
@@ -177,6 +186,7 @@
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 	<script src="{% static "assets/js/cms/Quotation.js" %}"></script>
+	<script src="{% static "assets/js/cms/pagination.js" %}"></script>
 	
 
 {% endblock %}
