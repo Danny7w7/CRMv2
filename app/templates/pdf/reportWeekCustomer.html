@@ -49,17 +49,14 @@
 </head>
 <body>
 
-    <div style="page-break-inside: avoid; break-inside: avoid;">
-        <h1>📊 Reporte Semanal de Customer '{{dateWeek}}' </h1>
+    <h1>📊 Reporte Semanal de Customer '{{dateWeek}}' </h1>
 
-        {% if llamadas %}
-            <div class="section">
-            <h2>Llamadas Efectivas </h2>
-            <img src="{{ llamadas }}" alt="Gráfico de llamadas" style="width: 100%; max-width: 700px;">
-            </div>
-        {% endif %}
-    </div>
-
+    {% if llamadas %}
+        <div class="section">
+        <h2>Llamadas Efectivas </h2>
+        <img src="{{ llamadas }}" alt="Gráfico de llamadas" style="width: 100%; max-width: 700px;">
+        </div>
+    {% endif %}
 
     <div class="page-break"></div>
 

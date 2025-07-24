@@ -509,7 +509,7 @@ def observationCustomer(startDatedatetime, endDatedatetime):
     x = range(len(nombres))
     width = 0.35  # Ancho de cada barra
 
-    fig, ax = plt.subplots(figsize=(9, 6))
+    fig, ax = plt.subplots(figsize=(8, 4))
     x_effectivas = [i - width/2 for i in x]
     x_no_efectivas = [i + width/2 for i in x]
 
