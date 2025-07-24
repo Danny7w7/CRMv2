@@ -540,7 +540,8 @@ def userCarrier(startDateDateField, endDateDateField):
         # Total clientes activos del agente USA
         total_clients = ObamaCare.objects.filter(
             is_active=True,
-            agent_usa__in=usa_names
+            agent_usa__in=usa_names,
+            company = 2
         ).count()
 
         # Total con username y password (sin importar fecha)
