@@ -751,70 +751,6 @@ def obamacareStatus(startDateDateField, endDateDateField):
 
     return f"data:image/png;base64,{image_base64}"
 
-import matplotlib.pyplot as plt
-import numpy as np
-import io
-import base64
-from datetime import timedelta
-from django.utils.timezone import now
-from app.models import ObamaCare  # Ajusta el import a tu estructura
-
-def weeklySalesAndProfilings(startDatedatetime, endDatedatetime,startDateDateField, endDateDateField):
-
-    # 📊 Ventas por día
-    ventas_por_dia = {i: 0 for i in range(7)}  # lunes=0, ..., domingo=6
-    ventas = ObamaCare.objects.filter(created_at__date__range=(startDatedatetime, endDatedatetime))
-    for venta in ventas:
-        weekday = venta.created_at.weekday()
-        ventas_por_dia[weekday] += 1
-
-    # 🧑‍💼 Perfilamientos por agente
-    perfilamientos = ObamaCare.objects.filter(profiling_date__range=(startDateDateField, endDateDateField))
-    conteo_por_agente = {}
-    for entry in perfilamientos:
-        nombre = entry.profiling.strip() if entry.profiling else "Sin nombre"
-        conteo_por_agente[nombre] = conteo_por_agente.get(nombre, 0) + 1
-
-    # 📉 Preparar datos para gráfico
-    dias_semana = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
-    ventas = [ventas_por_dia[i] for i in range(7)]
-    agentes = list(conteo_por_agente.keys())
-    cantidades = list(conteo_por_agente.values())
-
-    fig, ax1 = plt.subplots(figsize=(10, 6))
-
-    # 📈 Gráfico de barras - ventas por día
-    ax1.bar(dias_semana, ventas, color='skyblue', label='Ventas por día')
-    ax1.set_ylabel('Ventas', color='skyblue')
-    ax1.set_title('Ventas y Perfilamientos de la Semana Actual')
-
-    # 📊 Gráfico de líneas - perfilamientos por agente
-    ax2 = ax1.twinx()
-    ax2.plot(agentes, cantidades, 'o-', color='purple', label='Perfilamientos')
-    ax2.set_ylabel('Perfilamientos', color='purple')
-    ax2.tick_params(axis='x', rotation=45)
-
-    # 📎 Etiquetas
-    for i, v in enumerate(ventas):
-        if v > 0:
-            ax1.text(i, v + 0.1, str(v), ha='center', fontsize=8)
-
-    for i, (nombre, cantidad) in enumerate(zip(agentes, cantidades)):
-        if cantidad > 0:
-            ax2.text(i, cantidad + 0.1, str(cantidad), ha='center', fontsize=8, color='purple')
-
-    fig.tight_layout()
-
-    # 🖼️ Guardar como base64
-    buffer = io.BytesIO()
-    plt.savefig(buffer, format='png')
-    buffer.seek(0)
-    image_base64 = base64.b64encode(buffer.getvalue()).decode()
-    buffer.close()
-    plt.close()
-
-    return f"data:image/png;base64,{image_base64}"
-
 def appointmentClients(startDatedatetime, endDatedatetime):
     agentes_crm = Users.objects.prefetch_related('usaAgents').all()
 
@@ -1002,14 +938,13 @@ def dataQuery():
         userCarrier(startDateDateField, endDateDateField),
         paymentDate(startDatedatetime, endDatedatetime),
         obamacareStatus(startDateDateField, endDateDateField),
-        weeklySalesAndProfilings(startDatedatetime, endDatedatetime,startDateDateField, endDateDateField),
         appointmentClients(startDatedatetime, endDatedatetime),
         lettersCardStatus(startDateDateField, endDateDateField),
     ]
 
 def generarPDFChart(datos_secciones, output_path):
 
-    llamadas, userCarrier, pagos, obamacare, sale , citas, cartas = datos_secciones
+    llamadas, userCarrier, pagos, obamacare , citas, cartas = datos_secciones
 
     today = date.today()
     start_of_week = today - timedelta(days=today.weekday())
@@ -1025,7 +960,6 @@ def generarPDFChart(datos_secciones, output_path):
         'userCarrier': userCarrier,
         'pagos': pagos,
         'obamacare': obamacare,
-        'sale' : sale,
         'citas': citas,
         'cartas': cartas,
         'dateWeek': dateWeek

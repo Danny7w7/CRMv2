@@ -184,6 +184,23 @@ def reportCustomerWeek():
         media_urls=[s3_url]
     )
 
+    # --- INICIO: Agregar envío de correo electrónico ---
+    try:
+        with open(local_path, 'rb') as pdf_file:
+            pdf_bytes = pdf_file.read()
+            
+        send_email_with_pdf(
+            subject=f"Reporte Semanal - {now.strftime('%d/%m/%Y')}", # Un asunto más dinámico
+            receiver_email=['it.bluestream2@gmail.com'],
+            pdf_content=pdf_bytes, # <-- ¡Aquí pasamos los bytes del PDF!
+            pdf_filename=filename # <-- También puedes pasar el nombre original del archivo
+        )
+    except FileNotFoundError:
+        print(f"Error: No se encontró el archivo PDF en {local_path} para adjuntar al email.")
+    except Exception as e:
+        print(f"Error al preparar o enviar el correo electrónico: {e}")
+    # --- FIN: Agregar envío de correo electrónico ---
+
     # 6. Limpiar archivos temporales
     if os.path.exists(local_path):
         os.remove(local_path)
