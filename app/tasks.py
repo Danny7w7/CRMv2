@@ -152,6 +152,12 @@ def enviar_pdf_por_email():
         pdf_content=pdf_bytes  # ✅ nombre del parámetro como te lo dejé
     )
 
+from django.core.mail import EmailMessage
+from django.conf import settings
+import telnyx
+import os
+from datetime import datetime
+
 @shared_task
 def reportCustomerWeek():
 
@@ -174,7 +180,7 @@ def reportCustomerWeek():
         f"📎 PDF completo adjunto"
     )
 
-    # 5. Enviar por Telnyx MMS
+    # 4. Enviar por Telnyx MMS
     telnyx.api_key = settings.TELNYX_API_KEY
     telnyx.Message.create(
         from_='+17869848427',
@@ -184,25 +190,27 @@ def reportCustomerWeek():
         media_urls=[s3_url]
     )
 
+    # 5. Enviar por Email
     try:
         email_subject = f"📄 Reporte Semanal - {now.strftime('%d/%m/%Y')}"
-        email_body = f"""
-        Estimado/a,
+        email_body = f"""Estimado/a,
 
-        Se ha generado el reporte semanal correspondiente al {now.strftime('%d de %B de %Y a las %H:%M')}.
+Se ha generado el reporte semanal correspondiente al {now.strftime('%d de %B de %Y a las %H:%M')}.
 
-        El archivo PDF con el reporte completo se encuentra adjunto a este correo.
+El archivo PDF con el reporte completo se encuentra adjunto a este correo.
 
-        Saludos cordiales,
-        Sistema de Reportes
-        """
+Saludos cordiales,
+Sistema de Reportes
+"""
         
+        # MÉTODO CORRECTO: sin subject en el constructor
         email = EmailMessage(
-            subject=email_subject,
             body=email_body,
-            from_email=settings.SENDER_EMAIL_ADDRESS,  # usando tu variable de entorno
+            from_email=settings.SENDER_EMAIL_ADDRESS,
             to=['it.bluestream2@gmail.com'],  
         )
+        # Asignar subject como atributo
+        email.subject = email_subject
         
         # Adjuntar el PDF al email
         with open(local_path, 'rb') as pdf_file:
@@ -211,11 +219,10 @@ def reportCustomerWeek():
         # Enviar el email
         email.send()
         
-        print(f"✅ Email enviado correctamente a: destinatario@example.com")
+        print(f"✅ Email enviado correctamente a: it.bluestream2@gmail.com")
         
     except Exception as e:
         print(f"❌ Error al enviar email: {str(e)}")
-        # Opcional: puedes loggear el error o manejarlo según tus necesidades
 
     # 6. Limpiar archivos temporales
     if os.path.exists(local_path):
@@ -227,4 +234,3 @@ def reportCustomerWeek():
     for path in [llamadas_img_path, user_carrier_img_path]:
         if os.path.exists(path):
             os.remove(path)
-
