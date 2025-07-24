@@ -158,6 +158,17 @@ import telnyx
 import os
 from datetime import datetime
 
+from django.conf import settings
+import telnyx
+import os
+import smtplib
+import ssl
+from email.message import EmailMessage
+from datetime import datetime
+import logging
+
+logger = logging.getLogger(__name__)
+
 @shared_task
 def reportCustomerWeek():
 
@@ -181,17 +192,24 @@ def reportCustomerWeek():
     )
 
     # 4. Enviar por Telnyx MMS
-    # telnyx.api_key = settings.TELNYX_API_KEY
-    # telnyx.Message.create(
-    #     from_='+17869848427',
-    #     to='+17863034781',
-    #     text=mensaje_sms,
-    #     subject='Reporte PDF Semanal',
-    #     media_urls=[s3_url]
-    # )
+    telnyx.api_key = settings.TELNYX_API_KEY
+    telnyx.Message.create(
+        from_='+17869848427',
+        to='+17863034781',
+        text=mensaje_sms,
+        subject='Reporte PDF Semanal',
+        media_urls=[s3_url]
+    )
 
-    # 5. Enviar por Email
+    # 5. Enviar por Email - TODO INTEGRADO AQUÍ
     try:
+        print("📧 Preparando envío de email...")
+        
+        # Leer el PDF como bytes
+        with open(local_path, 'rb') as pdf_file:
+            pdf_content = pdf_file.read()
+        
+        # Configurar el mensaje del email
         email_subject = f"📄 Reporte Semanal - {now.strftime('%d/%m/%Y')}"
         email_body = f"""Estimado/a,
 
@@ -199,30 +217,51 @@ Se ha generado el reporte semanal correspondiente al {now.strftime('%d de %B de 
 
 El archivo PDF con el reporte completo se encuentra adjunto a este correo.
 
+También puedes acceder al reporte desde el siguiente enlace:
+{s3_url}
+
 Saludos cordiales,
 Sistema de Reportes
 """
         
-        # MÉTODO CORRECTO: sin subject en el constructor
-        email = EmailMessage(
-            body=email_body,
-            from_email=settings.SENDER_EMAIL_ADDRESS,
-            to=['it.bluestream2@gmail.com'],  
+        # Crear el mensaje de email
+        message = EmailMessage()
+        message['Subject'] = email_subject
+        message['From'] = settings.SENDER_EMAIL_ADDRESS
+        message['To'] = 'it.bluestream2@gmail.com'
+        message.set_content(email_body)
+
+        # Adjuntar el PDF
+        message.add_attachment(
+            pdf_content,
+            maintype='application',
+            subtype='pdf',
+            filename=filename
         )
-        # Asignar subject como atributo
-        email.subject = email_subject
+
+        print(f"📤 Enviando email desde {settings.SENDER_EMAIL_ADDRESS} a it.bluestream2@gmail.com...")
+        print(f"📧 Usando SMTP: {settings.SMTP_HOST}:{settings.SMTP_PORT}")
         
-        # Adjuntar el PDF al email
-        with open(local_path, 'rb') as pdf_file:
-            email.attach(filename, pdf_file.read(), 'application/pdf')
-        
-        # Enviar el email
-        email.send()
-        
-        print(f"✅ Email enviado correctamente a: it.bluestream2@gmail.com")
-        
+        # Enviar el email usando SMTP_SSL
+        context = ssl.create_default_context()
+        with smtplib.SMTP_SSL(settings.SMTP_HOST, int(settings.SMTP_PORT), context=context) as server:
+            server.login(settings.SENDER_EMAIL_ADDRESS, settings.EMAIL_PASSWORD)
+            server.send_message(message)
+
+        print("✅ Email enviado exitosamente")
+        logger.info(f"✅ Email enviado exitosamente a it.bluestream2@gmail.com")
+
+    except smtplib.SMTPAuthenticationError as e:
+        print(f"❌ Error de autenticación SMTP: {str(e)}")
+        logger.error(f"Error de autenticación SMTP: {str(e)}")
+    except smtplib.SMTPException as e:
+        print(f"❌ Error SMTP: {str(e)}")
+        logger.error(f"Error SMTP: {str(e)}")
     except Exception as e:
-        print(f"❌ Error al enviar email: {str(e)}")
+        print(f"❌ Error inesperado al enviar email: {str(e)}")
+        logger.error(f"Error inesperado al enviar email: {str(e)}")
+        import traceback
+        print(f"❌ Traceback: {traceback.format_exc()}")
 
     # 6. Limpiar archivos temporales
     if os.path.exists(local_path):
@@ -234,3 +273,6 @@ Sistema de Reportes
     for path in [llamadas_img_path, user_carrier_img_path]:
         if os.path.exists(path):
             os.remove(path)
+
+    print("🧹 Archivos temporales eliminados")
+    print("✅ Tarea completada exitosamente")
