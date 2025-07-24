@@ -181,14 +181,14 @@ def reportCustomerWeek():
     )
 
     # 4. Enviar por Telnyx MMS
-    telnyx.api_key = settings.TELNYX_API_KEY
-    telnyx.Message.create(
-        from_='+17869848427',
-        to='+17863034781',
-        text=mensaje_sms,
-        subject='Reporte PDF Semanal',
-        media_urls=[s3_url]
-    )
+    # telnyx.api_key = settings.TELNYX_API_KEY
+    # telnyx.Message.create(
+    #     from_='+17869848427',
+    #     to='+17863034781',
+    #     text=mensaje_sms,
+    #     subject='Reporte PDF Semanal',
+    #     media_urls=[s3_url]
+    # )
 
     # 5. Enviar por Email
     try:
