@@ -533,6 +533,8 @@ def userCarrier(startDateDateField, endDateDateField):
     faltan = []
     acumulado = []
 
+    status = ['ACTIVE','ENROLLED','SELF-ENROLMENT','IN PROGRESS']
+
     for agente in agentes_crm:
         usa_names = list(agente.usaAgents.values_list("name", flat=True))
         if not usa_names:
@@ -543,7 +545,7 @@ def userCarrier(startDateDateField, endDateDateField):
             is_active=True,
             agent_usa__in=usa_names,
             company = 2,
-            status = 'ACTIVE'
+            status = status
         ).count()
 
         # Total con username y password (sin importar fecha)
@@ -552,7 +554,7 @@ def userCarrier(startDateDateField, endDateDateField):
             obamacare__agent_usa__in=usa_names,
             username_carrier__isnull=False,
             password_carrier__isnull=False,
-            obamacare__status = 'ACTIVE',
+            obamacare__status = status,
             obamacare__company = 2
         ).exclude(username_carrier='', password_carrier='').count()
 
@@ -563,7 +565,7 @@ def userCarrier(startDateDateField, endDateDateField):
             dateUserCarrier__range=(startDateDateField, endDateDateField),
             username_carrier__isnull=False,
             password_carrier__isnull=False,
-            obamacare__status = 'ACTIVE',
+            obamacare__status = status,
             obamacare__company = 2
         ).exclude(username_carrier='', password_carrier='').count()
 
@@ -625,6 +627,8 @@ def paymentDate(startDatedatetime, endDatedatetime):
     faltantes = []
     acumulados = []
 
+    status = ['ACTIVE','ENROLLED','SELF-ENROLMENT','IN PROGRESS']
+
     for agente in agentes_crm:
         usa_names = list(agente.usaAgents.values_list("name", flat=True))
         if not usa_names:
@@ -638,7 +642,7 @@ def paymentDate(startDatedatetime, endDatedatetime):
             premium__gt=0,
             agent_usa__in=usa_names,
             company = 2,
-            status = 'ACTIVE'
+            status = status
         ).count()
 
         esta_semana = PaymentDate.objects.filter(
@@ -649,7 +653,7 @@ def paymentDate(startDatedatetime, endDatedatetime):
             obamacare__premium__gt=0,
             obamacare__agent_usa__in=usa_names,
             obamacare__company = 2,
-            obamacare__status = 'ACTIVE'
+            obamacare__status = status
         ).count()
 
         # Acumulado total histórico
@@ -660,7 +664,7 @@ def paymentDate(startDatedatetime, endDatedatetime):
             obamacare__premium__gt=0,
             obamacare__agent_usa__in=usa_names,
             obamacare__company=2,
-            obamacare__status='ACTIVE'
+            obamacare__status = status
         ).count()
 
         faltan = total_clients - acumulado_total
@@ -723,6 +727,8 @@ def obamacareStatus(startDateDateField, endDateDateField):
     sin_poliza = []
     no_activos = []
 
+    status = ['ACTIVE','ENROLLED','SELF-ENROLMENT','IN PROGRESS']
+
     for agente in agentes_crm:
         usa_agents_names = list(agente.usaAgents.values_list("name", flat=True))
         if not usa_agents_names:
@@ -735,7 +741,7 @@ def obamacareStatus(startDateDateField, endDateDateField):
 
         total_activos = clientes.filter(status__iexact='ACTIVE').count()
         total_con_poliza = clientes.filter(status__iexact='ACTIVE').exclude(policyNumber__isnull=True).exclude(policyNumber='').count()
-        total_total = clientes.count()
+        total_total = clientes.filter(status = status).count()
 
         activos.append(total_activos)
         con_poliza.append(total_con_poliza)
@@ -748,10 +754,10 @@ def obamacareStatus(startDateDateField, endDateDateField):
 
     fig, ax = plt.subplots(figsize=(10, 7))
 
-    bars1 = ax.bar(x - 1.5 * width, activos, width, label='Clientes Activos', color='#4CAF50')
-    bars2 = ax.bar(x - 0.5 * width, con_poliza, width, label='Clientes Activos con # Póliza', color='#2196F3')
-    bars3 = ax.bar(x + 0.5 * width, sin_poliza, width, label='Clientes Activos sin # Póliza', color='#FFC107')
-    bars4 = ax.bar(x + 1.5 * width, no_activos, width, label='Clientes NO Activos', color='#F44336')
+    bars1 = ax.bar(x - 1.5 * width, activos, width, label='Clientes Activos', color='green')
+    bars2 = ax.bar(x - 0.5 * width, con_poliza, width, label='Clientes Activos con # Póliza', color='blue')
+    bars3 = ax.bar(x + 0.5 * width, sin_poliza, width, label='Clientes Activos sin # Póliza', color='orange')
+    bars4 = ax.bar(x + 1.5 * width, no_activos, width, label='Clientes NO Activos', color='red')
     
 
     # ✅ Etiquetas
@@ -796,6 +802,8 @@ def appointmentClients(startDatedatetime, endDatedatetime):
     esta_semana = []
     faltan = []
 
+    status = ['ACTIVE','ENROLLED','SELF-ENROLMENT','IN PROGRESS']
+
     for agente in agentes_crm:
         usa_agents_names = list(agente.usaAgents.values_list("name", flat=True))
         if not usa_agents_names:
@@ -806,7 +814,7 @@ def appointmentClients(startDatedatetime, endDatedatetime):
             is_active=True,
             agent_usa__in=usa_agents_names,
             company = 2,
-            status = 'ACTIVE'
+            status = status
         ).count()
 
         acumulado = AppointmentClient.objects.filter(
@@ -815,7 +823,7 @@ def appointmentClients(startDatedatetime, endDatedatetime):
             obamacare__is_active=True,
             obamacare__agent_usa__in=usa_agents_names,
             obamacare__company = 2,
-            obamacare__status = 'ACTIVE'
+            obamacare__status = status
         ).count()
 
         esta_semana_count = AppointmentClient.objects.filter(
@@ -825,7 +833,7 @@ def appointmentClients(startDatedatetime, endDatedatetime):
             obamacare__is_active=True,
             obamacare__agent_usa__in=usa_agents_names,
             obamacare__company = 2,
-            obamacare__status = 'ACTIVE'
+            obamacare__status = status
         ).count()
 
         faltan_count = total_clients - acumulado
@@ -884,6 +892,8 @@ def lettersCardStatus(startDateDateField, endDateDateField):
     faltan_cartas = []
     faltan_tarjetas = []
 
+    status = ['ACTIVE','ENROLLED','SELF-ENROLMENT','IN PROGRESS']
+
     for agente in agentes_crm:
         usa_agents_names = list(agente.usaAgents.values_list("name", flat=True))
         if not usa_agents_names:
@@ -899,7 +909,7 @@ def lettersCardStatus(startDateDateField, endDateDateField):
             obamacare__is_active=True,
             obamacare__agent_usa__in=usa_agents_names,
             obamacare__company = 2,
-            obamacare__status = 'ACTIVE'  
+            obamacare__status = status  
         ).count()
 
         t_semana = LettersCard.objects.filter(
@@ -910,7 +920,7 @@ def lettersCardStatus(startDateDateField, endDateDateField):
             obamacare__is_active=True,
             obamacare__agent_usa__in=usa_agents_names,
             obamacare__company = 2,
-            obamacare__status = 'ACTIVE'    
+            obamacare__status = status   
         ).count()
 
         # Clientes sin cartas
@@ -918,7 +928,7 @@ def lettersCardStatus(startDateDateField, endDateDateField):
             is_active=True,
             company=2,
             agent_usa__in=usa_agents_names,
-            status = 'ACTIVE',
+            status = status,
             letterscard__letters = False    
         ).count()
 
@@ -927,7 +937,7 @@ def lettersCardStatus(startDateDateField, endDateDateField):
             is_active=True,
             company=2,
             agent_usa__in=usa_agents_names,
-            status = 'ACTIVE',
+            status = status,
             letterscard__card = False                      
         ).count()
 
@@ -943,10 +953,10 @@ def lettersCardStatus(startDateDateField, endDateDateField):
 
     fig, ax = plt.subplots(figsize=(10, 7))
 
-    b1 = ax.bar([i - 1.5*width for i in x], cartas_semana, width, label='Cartas Semana', color='#4CAF50')
-    b2 = ax.bar([i - 0.5*width for i in x], tarjetas_semana, width, label='Tarjetas Semana', color='#2196F3')
-    b3 = ax.bar([i + 0.5*width for i in x], faltan_cartas, width, label='# Cartas faltantes', color='#FFC107')
-    b4 = ax.bar([i + 1.5*width for i in x], faltan_tarjetas, width, label='# Tarjetas faltantes', color='#F44336')
+    b1 = ax.bar([i - 1.5*width for i in x], cartas_semana, width, label='Cartas Semana', color='green')
+    b2 = ax.bar([i - 0.5*width for i in x], tarjetas_semana, width, label='Tarjetas Semana', color='blue')
+    b3 = ax.bar([i + 0.5*width for i in x], faltan_cartas, width, label='# Cartas faltantes', color='orange')
+    b4 = ax.bar([i + 1.5*width for i in x], faltan_tarjetas, width, label='# Tarjetas faltantes', color='red')
 
     # Etiquetas de cantidad
     for bars in [b1, b2, b3, b4]:
@@ -979,6 +989,8 @@ def documentsUploaded(startDatedatetime, endDatedatetime):
     faltantes = []
     acumulado = []
 
+    status = ['ACTIVE','ENROLLED','SELF-ENROLMENT','IN PROGRESS']
+
     for agente in agentes_crm:
         usa_names = list(agente.usaAgents.values_list("name", flat=True))
         if not usa_names:
@@ -991,7 +1003,7 @@ def documentsUploaded(startDatedatetime, endDatedatetime):
             is_active=True,
             agent_usa__in=usa_names,
             company=2,
-            status='ACTIVE'
+            status= status
         ).count()
 
         # Documentos esta semana
@@ -1002,7 +1014,7 @@ def documentsUploaded(startDatedatetime, endDatedatetime):
             obamacare__agent_usa__in=usa_names,
             obamacare__is_active=True,
             obamacare__company=2,
-            obamacare__status='ACTIVE'
+            obamacare__status=status
         ).count()
 
         # Documentos total acumulado
@@ -1012,7 +1024,7 @@ def documentsUploaded(startDatedatetime, endDatedatetime):
             obamacare__agent_usa__in=usa_names,
             obamacare__is_active=True,
             obamacare__company=2,
-            obamacare__status='ACTIVE'
+            obamacare__status=status
         ).values('obamacare_id').distinct().count()
 
         faltan = max(0, total_clients - total_docs)
@@ -1065,7 +1077,6 @@ def documentsUploaded(startDatedatetime, endDatedatetime):
     plt.close()
 
     return image_path
-
 
 def dataQuery():
     startDateDateField, endDateDateField, startDatedatetime, endDatedatetime = weekRange()
