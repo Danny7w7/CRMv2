@@ -531,6 +531,7 @@ def userCarrier(startDateDateField, endDateDateField):
     nombres = []
     llenados_semana = []
     faltan = []
+    acumulado = []
 
     for agente in agentes_crm:
         usa_names = list(agente.usaAgents.values_list("name", flat=True))
@@ -541,7 +542,8 @@ def userCarrier(startDateDateField, endDateDateField):
         total_clients = ObamaCare.objects.filter(
             is_active=True,
             agent_usa__in=usa_names,
-            company = 2
+            company = 2,
+            status = 'ACTIVE'
         ).count()
 
         # Total con username y password (sin importar fecha)
@@ -549,7 +551,9 @@ def userCarrier(startDateDateField, endDateDateField):
             obamacare__is_active=True,
             obamacare__agent_usa__in=usa_names,
             username_carrier__isnull=False,
-            password_carrier__isnull=False
+            password_carrier__isnull=False,
+            obamacare__status = 'ACTIVE',
+            obamacare__company = 2
         ).exclude(username_carrier='', password_carrier='').count()
 
         # Solo los de esta semana
@@ -558,7 +562,9 @@ def userCarrier(startDateDateField, endDateDateField):
             obamacare__agent_usa__in=usa_names,
             dateUserCarrier__range=(startDateDateField, endDateDateField),
             username_carrier__isnull=False,
-            password_carrier__isnull=False
+            password_carrier__isnull=False,
+            obamacare__status = 'ACTIVE',
+            obamacare__company = 2
         ).exclude(username_carrier='', password_carrier='').count()
 
         faltan_count = total_clients - total_filled
@@ -566,21 +572,25 @@ def userCarrier(startDateDateField, endDateDateField):
         nombres.append(f"{agente.first_name} {agente.last_name}")
         llenados_semana.append(total_week)
         faltan.append(faltan_count)
+        acumulado.append(total_filled)
 
     # Gráfico
     x = range(len(nombres))
-    width = 0.35
+    width = 0.25
     fig, ax = plt.subplots(figsize=(10, 7))
-    x1 = [i - width/2 for i in x]
-    x2 = [i + width/2 for i in x]
+
+    x1 = [i - width for i in x]
+    x2 = [i for i in x]
+    x3 = [i + width for i in x]
 
     bars1 = ax.bar(x1, llenados_semana, width, label='Semana', color='green')
     bars2 = ax.bar(x2, faltan, width, label='Faltan', color='red')
+    bars3 = ax.bar(x3, acumulado, width, label='Acumulado', color='blue')
 
     ax.set_xticks(x)
     ax.set_xticklabels(nombres, rotation=45, ha='right')
     ax.set_ylabel('Cantidad')
-    ax.set_title('Formularios Carrier por Agente (Semanal)')
+    ax.set_title('Formularios Carrier por Agente (Semana, Faltan y Acumulado)')
     ax.legend()
 
     def agregar_valores(barras):
@@ -594,6 +604,7 @@ def userCarrier(startDateDateField, endDateDateField):
 
     agregar_valores(bars1)
     agregar_valores(bars2)
+    agregar_valores(bars3)
 
     plt.tight_layout()
 
@@ -625,7 +636,8 @@ def paymentDate(startDatedatetime, endDatedatetime):
             is_active=True,
             premium__gt=0,
             agent_usa__in=usa_names,
-            company = 2
+            company = 2,
+            status = 'ACTIVE'
         ).count()
 
         esta_semana = PaymentDate.objects.filter(
@@ -635,7 +647,8 @@ def paymentDate(startDatedatetime, endDatedatetime):
             obamacare__is_active=True,
             obamacare__premium__gt=0,
             obamacare__agent_usa__in=usa_names,
-            obamacare__company = 2
+            obamacare__company = 2,
+            obamacare__status = 'ACTIVE'
         ).count()
 
         faltan = total_clients - esta_semana
@@ -653,7 +666,7 @@ def paymentDate(startDatedatetime, endDatedatetime):
     x1 = [i - width/2 for i in x]
     x2 = [i + width/2 for i in x]
 
-    bars1 = ax.bar(x1, llenados_semana, width, label='Semana', color='royalblue')
+    bars1 = ax.bar(x1, llenados_semana, width, label='Semana Actual', color='royalblue')
     bars2 = ax.bar(x2, faltantes, width, label='Faltan', color='tomato')
 
     ax.set_xticks(x)
