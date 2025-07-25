@@ -889,7 +889,7 @@ def lettersCardStatus(startDateDateField, endDateDateField):
             company=2,
             agent_usa__in=usa_agents_names,
             status = 'ACTIVE',
-            LettersCard__card = False    
+            Letterscard__card = False    
         ).exclude(
             letterscard__letters=True
         ).count()
@@ -900,7 +900,7 @@ def lettersCardStatus(startDateDateField, endDateDateField):
             company=2,
             agent_usa__in=usa_agents_names,
             status = 'ACTIVE',
-            LettersCard__letters = False          
+            Letterscard__letters = False          
         ).exclude(
             letterscard__card=True
         ).count()
