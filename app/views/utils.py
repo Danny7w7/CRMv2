@@ -583,9 +583,9 @@ def userCarrier(startDateDateField, endDateDateField):
     x2 = [i for i in x]
     x3 = [i + width for i in x]
 
-    bars1 = ax.bar(x1, llenados_semana, width, label='Semana', color='green')
-    bars2 = ax.bar(x2, faltan, width, label='Faltan', color='red')
-    bars3 = ax.bar(x3, acumulado, width, label='Acumulado', color='blue')
+    bars1 = ax.bar(x1, llenados_semana, width, label='Semana Actual', color='green')
+    bars2 = ax.bar(x2, faltan, width, label='Faltan por llenar', color='red')
+    bars3 = ax.bar(x3, acumulado, width, label='Acumulado Total', color='blue')
 
     ax.set_xticks(x)
     ax.set_xticklabels(nombres, rotation=45, ha='right')
@@ -623,6 +623,7 @@ def paymentDate(startDatedatetime, endDatedatetime):
     nombres = []
     llenados_semana = []
     faltantes = []
+    acumulados = []
 
     for agente in agentes_crm:
         usa_names = list(agente.usaAgents.values_list("name", flat=True))
@@ -651,11 +652,23 @@ def paymentDate(startDatedatetime, endDatedatetime):
             obamacare__status = 'ACTIVE'
         ).count()
 
+        # Acumulado total histórico
+        acumulado_total = PaymentDate.objects.filter(
+            agent_create=agente,
+            obamacare__isnull=False,
+            obamacare__is_active=True,
+            obamacare__premium__gt=0,
+            obamacare__agent_usa__in=usa_names,
+            obamacare__company=2,
+            obamacare__status='ACTIVE'
+        ).count()
+
         faltan = total_clients - esta_semana
 
         nombres.append(full_name)
         llenados_semana.append(esta_semana)
         faltantes.append(faltan)
+        acumulados.append(acumulado_total)
 
     # Crear gráfico
     x = range(len(nombres))
@@ -663,16 +676,18 @@ def paymentDate(startDatedatetime, endDatedatetime):
 
     fig, ax = plt.subplots(figsize=(10, 7))
 
-    x1 = [i - width/2 for i in x]
-    x2 = [i + width/2 for i in x]
+    x1 = [i - width for i in x]
+    x2 = [i for i in x]
+    x3 = [i + width for i in x]
 
-    bars1 = ax.bar(x1, llenados_semana, width, label='Semana Actual', color='royalblue')
-    bars2 = ax.bar(x2, faltantes, width, label='Faltan', color='tomato')
+    bars1 = ax.bar(x1, llenados_semana, width, label='Semana Actual', color='green')
+    bars2 = ax.bar(x2, faltantes, width, label='Faltan por llenar', color='red')
+    bars3 = ax.bar(x3, acumulados, width, label='Acumulado Total', color='blue')
 
     ax.set_xticks(x)
     ax.set_xticklabels(nombres, rotation=45, ha='right')
     ax.set_ylabel('Cantidad')
-    ax.set_title('Pagos llenados vs faltantes por agente')
+    ax.set_title('Pagos: semana actual, faltantes y acumulado total por agente')
     ax.legend()
 
     def agregar_valores(barras):
@@ -686,6 +701,7 @@ def paymentDate(startDatedatetime, endDatedatetime):
 
     agregar_valores(bars1)
     agregar_valores(bars2)
+    agregar_valores(bars3)
 
     plt.tight_layout()
 
@@ -718,12 +734,12 @@ def obamacareStatus(startDateDateField, endDateDateField):
         clientes = ObamaCare.objects.filter(agent_usa__in=usa_agents_names, is_active=True, company = 2)
 
         total_activos = clientes.filter(status__iexact='ACTIVE').count()
-        total_con_poliza = clientes.exclude(policyNumber__isnull=True).exclude(policyNumber='').count()
+        total_con_poliza = clientes.filter(status__iexact='ACTIVE').exclude(policyNumber__isnull=True).exclude(policyNumber='').count()
         total_total = clientes.count()
 
         activos.append(total_activos)
         con_poliza.append(total_con_poliza)
-        sin_poliza.append(total_total - total_con_poliza)
+        sin_poliza.append(total_activos - total_con_poliza)
         no_activos.append(total_total - total_activos)
 
     # 📊 Crear gráfica
@@ -732,10 +748,11 @@ def obamacareStatus(startDateDateField, endDateDateField):
 
     fig, ax = plt.subplots(figsize=(10, 7))
 
-    bars1 = ax.bar(x - 1.5 * width, activos, width, label='Activos', color='#4CAF50')
-    bars2 = ax.bar(x - 0.5 * width, con_poliza, width, label='Con # Póliza', color='#2196F3')
-    bars3 = ax.bar(x + 0.5 * width, sin_poliza, width, label='Sin # Póliza', color='#FFC107')
-    bars4 = ax.bar(x + 1.5 * width, no_activos, width, label='No Activos', color='#F44336')
+    bars1 = ax.bar(x - 1.5 * width, activos, width, label='Clientes Activos', color='#4CAF50')
+    bars2 = ax.bar(x - 0.5 * width, con_poliza, width, label='Clientes Activos con # Póliza', color='#2196F3')
+    bars3 = ax.bar(x + 0.5 * width, sin_poliza, width, label='Clientes Activos sin # Póliza', color='#FFC107')
+    bars4 = ax.bar(x + 1.5 * width, no_activos, width, label='Clientes NO Activos', color='#F44336')
+    
 
     # ✅ Etiquetas
     def add_labels(bars):
@@ -826,9 +843,9 @@ def appointmentClients(startDatedatetime, endDatedatetime):
     width = 0.25
 
     fig, ax = plt.subplots(figsize=(10, 7))
-    bars1 = ax.bar(x - width, acumuladas, width, label='Acumuladas', color='#4CAF50')
-    bars2 = ax.bar(x, esta_semana, width, label='Esta semana', color='#2196F3')
-    bars3 = ax.bar(x + width, faltan, width, label='Faltan', color='#F44336')
+    bars1 = ax.bar(x - width, acumuladas, width, label='Acumuladas Total', color='#2196F3')
+    bars2 = ax.bar(x, esta_semana, width, label='Esta semana', color='#4CAF50')
+    bars3 = ax.bar(x + width, faltan, width, label='Faltanes por llenar', color='#F44336')
 
     # Mostrar valores encima de cada barra
     for bars in [bars1, bars2, bars3]:
@@ -932,8 +949,8 @@ def lettersCardStatus(startDateDateField, endDateDateField):
 
     b1 = ax.bar([i - 1.5*width for i in x], cartas_semana, width, label='Cartas Semana', color='#4CAF50')
     b2 = ax.bar([i - 0.5*width for i in x], tarjetas_semana, width, label='Tarjetas Semana', color='#2196F3')
-    b3 = ax.bar([i + 0.5*width for i in x], faltan_cartas, width, label='Faltan Cartas', color='#FFC107')
-    b4 = ax.bar([i + 1.5*width for i in x], faltan_tarjetas, width, label='Faltan Tarjetas', color='#F44336')
+    b3 = ax.bar([i + 0.5*width for i in x], faltan_cartas, width, label='# Cartas faltantes', color='#FFC107')
+    b4 = ax.bar([i + 1.5*width for i in x], faltan_tarjetas, width, label='# Tarjetas faltantes', color='#F44336')
 
     # Etiquetas de cantidad
     for bars in [b1, b2, b3, b4]:
