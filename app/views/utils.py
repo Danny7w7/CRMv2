@@ -1077,11 +1077,12 @@ def dataQuery():
         obamacareStatus(startDateDateField, endDateDateField),
         appointmentClients(startDatedatetime, endDatedatetime),
         lettersCardStatus(startDateDateField, endDateDateField),
+        documentsUploaded(startDatedatetime, endDatedatetime)
     ]
 
 def generarPDFChart(datos_secciones, output_path):
 
-    llamadas, userCarrier, pagos, obamacare , citas, cartas = datos_secciones
+    llamadas, userCarrier, pagos, obamacare , citas, cartas, documentos = datos_secciones
 
     today = date.today()
     start_of_week = today - timedelta(days=today.weekday())
@@ -1099,7 +1100,8 @@ def generarPDFChart(datos_secciones, output_path):
         'obamacare': obamacare,
         'citas': citas,
         'cartas': cartas,
-        'dateWeek': dateWeek
+        'dateWeek': dateWeek,
+        'documentos' : documentos
     }
 
     html_content = render_to_string('pdf/reportWeekCustomer.html', context)
