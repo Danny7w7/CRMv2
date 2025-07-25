@@ -886,8 +886,6 @@ def lettersCardStatus(startDateDateField, endDateDateField):
             company=2,
             agent_usa__in=usa_agents_names,
             status = 'ACTIVE'    
-        ).exclude(
-            letterscard__letters=True
         ).count()
 
         # Clientes sin tarjetas
@@ -896,8 +894,6 @@ def lettersCardStatus(startDateDateField, endDateDateField):
             company=2,
             agent_usa__in=usa_agents_names,
             status = 'ACTIVE'             
-        ).exclude(
-            letterscard__card=True
         ).count()
 
         nombres_agentes.append(full_name)
