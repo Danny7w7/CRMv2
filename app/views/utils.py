@@ -663,7 +663,7 @@ def paymentDate(startDatedatetime, endDatedatetime):
             obamacare__status='ACTIVE'
         ).count()
 
-        faltan = total_clients - esta_semana
+        faltan = total_clients - acumulado_total
 
         nombres.append(full_name)
         llenados_semana.append(esta_semana)
@@ -843,9 +843,9 @@ def appointmentClients(startDatedatetime, endDatedatetime):
     width = 0.25
 
     fig, ax = plt.subplots(figsize=(10, 7))
-    bars1 = ax.bar(x - width, acumuladas, width, label='Acumuladas Total', color='#2196F3')
-    bars2 = ax.bar(x, esta_semana, width, label='Esta semana', color='#4CAF50')
-    bars3 = ax.bar(x + width, faltan, width, label='Faltanes por llenar', color='#F44336')
+    bars1 = ax.bar(x - width, acumuladas, width, label='Acumuladas Total', color='blue')
+    bars2 = ax.bar(x, esta_semana, width, label='Esta semana', color='green')
+    bars3 = ax.bar(x + width, faltan, width, label='Faltanes por llenar', color='red')
 
     # Mostrar valores encima de cada barra
     for bars in [bars1, bars2, bars3]:
@@ -919,9 +919,7 @@ def lettersCardStatus(startDateDateField, endDateDateField):
             company=2,
             agent_usa__in=usa_agents_names,
             status = 'ACTIVE',
-            letterscard__card = False    
-        ).exclude(
-            letterscard__letters=True
+            letterscard__letters = False    
         ).count()
 
         # Clientes sin tarjetas
@@ -930,9 +928,7 @@ def lettersCardStatus(startDateDateField, endDateDateField):
             company=2,
             agent_usa__in=usa_agents_names,
             status = 'ACTIVE',
-            letterscard__letters = False          
-        ).exclude(
-            letterscard__card=True
+            letterscard__card = False                      
         ).count()
 
         nombres_agentes.append(full_name)
@@ -974,6 +970,102 @@ def lettersCardStatus(startDateDateField, endDateDateField):
     plt.close()
 
     return f"data:image/png;base64,{img_base64}"
+
+def documentsUploaded(startDatedatetime, endDatedatetime):
+    agentes_crm = Users.objects.prefetch_related('usaAgents').all()
+
+    nombres = []
+    llenados_semana = []
+    faltantes = []
+    acumulado = []
+
+    for agente in agentes_crm:
+        usa_names = list(agente.usaAgents.values_list("name", flat=True))
+        if not usa_names:
+            continue
+
+        full_name = f"{agente.first_name} {agente.last_name}"
+
+        # Total clientes activos
+        total_clients = ObamaCare.objects.filter(
+            is_active=True,
+            agent_usa__in=usa_names,
+            company=2,
+            status='ACTIVE'
+        ).count()
+
+        # Documentos esta semana
+        esta_semana = DocumentObamaSupp.objects.filter(
+            typePlan="OBAMACARE",
+            created_at__range=(startDatedatetime, endDatedatetime),
+            obamacare__isnull=False,
+            obamacare__agent_usa__in=usa_names,
+            obamacare__is_active=True,
+            obamacare__company=2,
+            obamacare__status='ACTIVE'
+        ).count()
+
+        # Documentos total acumulado
+        total_docs = DocumentObamaSupp.objects.filter(
+            typePlan="OBAMACARE",
+            obamacare__isnull=False,
+            obamacare__agent_usa__in=usa_names,
+            obamacare__is_active=True,
+            obamacare__company=2,
+            obamacare__status='ACTIVE'
+        ).values('obamacare_id').distinct().count()
+
+        faltan = max(0, total_clients - total_docs)
+
+        nombres.append(full_name)
+        llenados_semana.append(esta_semana)
+        faltantes.append(faltan)
+        acumulado.append(total_docs)
+
+    # Crear gráfico
+    x = range(len(nombres))
+    width = 0.3
+
+    fig, ax = plt.subplots(figsize=(11, 7))
+
+    x1 = [i - width for i in x]
+    x2 = x
+    x3 = [i + width for i in x]
+
+    bars1 = ax.bar(x1, llenados_semana, width, label='# Documentos semana actual', color='green')
+    bars2 = ax.bar(x2, faltantes, width, label='Faltan', color='red')
+    bars3 = ax.bar(x3, acumulado, width, label='Acumulado', color='blue')
+
+    ax.set_xticks(x)
+    ax.set_xticklabels(nombres, rotation=45, ha='right')
+    ax.set_ylabel('Cantidad')
+    ax.set_title('Documentos ObamaCare por Agente')
+    ax.legend()
+
+    def agregar_valores(barras):
+        for barra in barras:
+            height = barra.get_height()
+            ax.annotate(f'{int(height)}',
+                        xy=(barra.get_x() + barra.get_width() / 2, height),
+                        xytext=(0, 3),
+                        textcoords="offset points",
+                        ha='center', va='bottom', fontsize=8)
+
+    agregar_valores(bars1)
+    agregar_valores(bars2)
+    agregar_valores(bars3)
+
+    plt.tight_layout()
+
+    output_dir = os.path.join('temp')
+    os.makedirs(output_dir, exist_ok=True)
+    filename = f"documentos_obama_{uuid4().hex}.png"
+    image_path = os.path.join(output_dir, filename)
+    plt.savefig(image_path)
+    plt.close()
+
+    return image_path
+
 
 def dataQuery():
     startDateDateField, endDateDateField, startDatedatetime, endDatedatetime = weekRange()
