@@ -775,7 +775,8 @@ def appointmentClients(startDatedatetime, endDatedatetime):
         total_clients = ObamaCare.objects.filter(
             is_active=True,
             agent_usa__in=usa_agents_names,
-            company = 2
+            company = 2,
+            status = 'ACTIVE'
         ).count()
 
         acumulado = AppointmentClient.objects.filter(
@@ -783,7 +784,8 @@ def appointmentClients(startDatedatetime, endDatedatetime):
             obamacare__isnull=False,
             obamacare__is_active=True,
             obamacare__agent_usa__in=usa_agents_names,
-            obamacare__company = 2
+            obamacare__company = 2,
+            obamacare__status = 'ACTIVE'
         ).count()
 
         esta_semana_count = AppointmentClient.objects.filter(
@@ -792,7 +794,8 @@ def appointmentClients(startDatedatetime, endDatedatetime):
             obamacare__isnull=False,
             obamacare__is_active=True,
             obamacare__agent_usa__in=usa_agents_names,
-            obamacare__company = 2
+            obamacare__company = 2,
+            obamacare__status = 'ACTIVE'
         ).count()
 
         faltan_count = total_clients - acumulado
@@ -885,7 +888,10 @@ def lettersCardStatus(startDateDateField, endDateDateField):
             is_active=True,
             company=2,
             agent_usa__in=usa_agents_names,
-            status = 'ACTIVE'    
+            status = 'ACTIVE',
+            LettersCard__card = False    
+        ).exclude(
+            letterscard__letters=True
         ).count()
 
         # Clientes sin tarjetas
@@ -893,7 +899,10 @@ def lettersCardStatus(startDateDateField, endDateDateField):
             is_active=True,
             company=2,
             agent_usa__in=usa_agents_names,
-            status = 'ACTIVE'             
+            status = 'ACTIVE',
+            LettersCard__letters = False          
+        ).exclude(
+            letterscard__card=True
         ).count()
 
         nombres_agentes.append(full_name)
