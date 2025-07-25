@@ -545,7 +545,7 @@ def userCarrier(startDateDateField, endDateDateField):
             is_active=True,
             agent_usa__in=usa_names,
             company = 2,
-            status = status
+            status__in = status
         ).count()
 
         # Total con username y password (sin importar fecha)
@@ -554,7 +554,7 @@ def userCarrier(startDateDateField, endDateDateField):
             obamacare__agent_usa__in=usa_names,
             username_carrier__isnull=False,
             password_carrier__isnull=False,
-            obamacare__status = status,
+            obamacare__status__in = status,
             obamacare__company = 2
         ).exclude(username_carrier='', password_carrier='').count()
 
@@ -565,7 +565,7 @@ def userCarrier(startDateDateField, endDateDateField):
             dateUserCarrier__range=(startDateDateField, endDateDateField),
             username_carrier__isnull=False,
             password_carrier__isnull=False,
-            obamacare__status = status,
+            obamacare__status__in = status,
             obamacare__company = 2
         ).exclude(username_carrier='', password_carrier='').count()
 
@@ -642,7 +642,7 @@ def paymentDate(startDatedatetime, endDatedatetime):
             premium__gt=0,
             agent_usa__in=usa_names,
             company = 2,
-            status = status
+            status__in = status
         ).count()
 
         esta_semana = PaymentDate.objects.filter(
@@ -653,7 +653,7 @@ def paymentDate(startDatedatetime, endDatedatetime):
             obamacare__premium__gt=0,
             obamacare__agent_usa__in=usa_names,
             obamacare__company = 2,
-            obamacare__status = status
+            obamacare__status__in = status
         ).count()
 
         # Acumulado total histórico
@@ -664,7 +664,7 @@ def paymentDate(startDatedatetime, endDatedatetime):
             obamacare__premium__gt=0,
             obamacare__agent_usa__in=usa_names,
             obamacare__company=2,
-            obamacare__status = status
+            obamacare__status__in = status
         ).count()
 
         faltan = total_clients - acumulado_total
@@ -741,7 +741,7 @@ def obamacareStatus(startDateDateField, endDateDateField):
 
         total_activos = clientes.filter(status__iexact='ACTIVE').count()
         total_con_poliza = clientes.filter(status__iexact='ACTIVE').exclude(policyNumber__isnull=True).exclude(policyNumber='').count()
-        total_total = clientes.filter(status = status).count()
+        total_total = clientes.filter(status__in = status).count()
 
         activos.append(total_activos)
         con_poliza.append(total_con_poliza)
@@ -814,7 +814,7 @@ def appointmentClients(startDatedatetime, endDatedatetime):
             is_active=True,
             agent_usa__in=usa_agents_names,
             company = 2,
-            status = status
+            status__in = status
         ).count()
 
         acumulado = AppointmentClient.objects.filter(
@@ -823,7 +823,7 @@ def appointmentClients(startDatedatetime, endDatedatetime):
             obamacare__is_active=True,
             obamacare__agent_usa__in=usa_agents_names,
             obamacare__company = 2,
-            obamacare__status = status
+            obamacare__status__in = status
         ).count()
 
         esta_semana_count = AppointmentClient.objects.filter(
@@ -833,7 +833,7 @@ def appointmentClients(startDatedatetime, endDatedatetime):
             obamacare__is_active=True,
             obamacare__agent_usa__in=usa_agents_names,
             obamacare__company = 2,
-            obamacare__status = status
+            obamacare__status__in = status
         ).count()
 
         faltan_count = total_clients - acumulado
@@ -909,7 +909,7 @@ def lettersCardStatus(startDateDateField, endDateDateField):
             obamacare__is_active=True,
             obamacare__agent_usa__in=usa_agents_names,
             obamacare__company = 2,
-            obamacare__status = status  
+            obamacare__status__in = status  
         ).count()
 
         t_semana = LettersCard.objects.filter(
@@ -920,7 +920,7 @@ def lettersCardStatus(startDateDateField, endDateDateField):
             obamacare__is_active=True,
             obamacare__agent_usa__in=usa_agents_names,
             obamacare__company = 2,
-            obamacare__status = status   
+            obamacare__status__in = status   
         ).count()
 
         # Clientes sin cartas
@@ -928,7 +928,7 @@ def lettersCardStatus(startDateDateField, endDateDateField):
             is_active=True,
             company=2,
             agent_usa__in=usa_agents_names,
-            status = status,
+            status__in = status,
             letterscard__letters = False    
         ).count()
 
@@ -937,7 +937,7 @@ def lettersCardStatus(startDateDateField, endDateDateField):
             is_active=True,
             company=2,
             agent_usa__in=usa_agents_names,
-            status = status,
+            status__in = status,
             letterscard__card = False                      
         ).count()
 
@@ -1003,7 +1003,7 @@ def documentsUploaded(startDatedatetime, endDatedatetime):
             is_active=True,
             agent_usa__in=usa_names,
             company=2,
-            status= status
+            status__in = status
         ).count()
 
         # Documentos esta semana
@@ -1014,7 +1014,7 @@ def documentsUploaded(startDatedatetime, endDatedatetime):
             obamacare__agent_usa__in=usa_names,
             obamacare__is_active=True,
             obamacare__company=2,
-            obamacare__status=status
+            obamacare__status__in = status
         ).count()
 
         # Documentos total acumulado
@@ -1024,7 +1024,7 @@ def documentsUploaded(startDatedatetime, endDatedatetime):
             obamacare__agent_usa__in=usa_names,
             obamacare__is_active=True,
             obamacare__company=2,
-            obamacare__status=status
+            obamacare__status__in = status
         ).values('obamacare_id').distinct().count()
 
         faltan = max(0, total_clients - total_docs)
