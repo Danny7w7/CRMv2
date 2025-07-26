@@ -727,8 +727,6 @@ def obamacareStatus(startDateDateField, endDateDateField):
     sin_poliza = []
     no_activos = []
 
-    status = ['ACTIVE','ENROLLED','SELF-ENROLMENT','IN PROGRESS']
-
     for agente in agentes_crm:
         usa_agents_names = list(agente.usaAgents.values_list("name", flat=True))
         if not usa_agents_names:
@@ -741,7 +739,7 @@ def obamacareStatus(startDateDateField, endDateDateField):
 
         total_activos = clientes.filter(status__iexact='ACTIVE').count()
         total_con_poliza = clientes.filter(status__iexact='ACTIVE').exclude(policyNumber__isnull=True).exclude(policyNumber='').count()
-        total_total = clientes.filter(status__in = status).count()
+        total_total = clientes.count()
 
         activos.append(total_activos)
         con_poliza.append(total_con_poliza)
