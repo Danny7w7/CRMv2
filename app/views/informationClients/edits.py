@@ -2,6 +2,7 @@
 import calendar
 import datetime
 import json
+from itertools import chain
 
 #libreria de paises
 import urllib.request
@@ -286,6 +287,7 @@ def editObama(request ,obamacare_id, way):
     obsObama = ObservationAgent.objects.select_related('obamaCare__agent').filter(obamaCare=obamacare_id)  
     users = Users.objects.filter(role='C', company = company_id)
     usersActive = Users.objects.filter(role='C', company = company_id, is_active = True)
+    userInactive = Users.objects.filter(company = company_id)
     list_drow = DropDownList.objects.filter(profiling_obama__isnull=False)
     description = DropDownList.objects.filter(description__isnull=False)
     obsCus = ObservationCustomer.objects.select_related('agent').filter(obamacare=obamacare_id)
@@ -508,6 +510,7 @@ def editObama(request ,obamacare_id, way):
         'formatted_social':formatted_social,
         'users': users,
         'usersActive' : usersActive,
+        'userInactive' : userInactive,
         'obsObamaText': '\n'.join([f"{obs.content} - {obs.obamaCare.agent.first_name} {obs.obamaCare.agent.last_name}  - {obs.created_at.strftime('%b %d, %Y')}"for obs in obsObama]),
         'obsCustomer': obsCus,
         'list_drow': list_drow,

@@ -167,6 +167,10 @@ USE_L10N = True
 
 USE_TZ = True
 
+# Cierra la sesión tras 30 minutos (1800 segundos) de inactividad
+SESSION_COOKIE_AGE = 1800  # 30 minutos = 30*60
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_SAVE_EVERY_REQUEST = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
