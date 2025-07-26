@@ -176,7 +176,7 @@ def reportCustomerWeek():
 
     # 4. Enviar por Telnyx MMS
     telnyx.api_key = settings.TELNYX_API_KEY
-    recipient = ['+17863034781','+17863034781']
+    recipient = ['+13052199932','+13052190572']
     for item in recipient:
         telnyx.Message.create(
             from_='+17869848427',
@@ -211,7 +211,7 @@ Sistema de Reportes
         message = EmailMessage()
         message['Subject'] = email_subject
         message['From'] = settings.SENDER_EMAIL_ADDRESS
-        message['To'] = 'it.bluestream2@gmail.com'
+        message['To'] = 'Jlhernandezt.88@gmail.com'
         message.set_content(email_body)
 
         # Adjuntar el PDF
@@ -250,3 +250,6 @@ Sistema de Reportes
     for path in [llamadas_img_path, user_carrier_img_path]:
         if os.path.exists(path):
             os.remove(path)
+
+
+
