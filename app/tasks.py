@@ -36,7 +36,7 @@ def my_daily_task():
             chat = Chat.objects.select_related('agent').filter(contact_id=clientSms.id).first()
 
             sendIndividualsSms(
-                chat.agent.assigned_phone.phone_number,
+                '+17869848427',
                 clientBlue.phone_number,
                 Users.objects.get(id=1),
                 clientSms.company,
@@ -115,7 +115,7 @@ def smsPayment():
                 message = f'Hola {plan.client.first_name} {plan.client.last_name} 👋,{getCompanyPerAgent(agentFirstName)} le recuerda que su pago de ${plan.premium} de su póliza de {plan.carrier} se vence en 2 días. 💚'
 
                 sendIndividualsSms(
-                    agent_phone_number,
+                    '+17869848427',
                     client_phone_number,
                     Users.objects.get(id=1), # Asegúrate de que este usuario con ID 1 siempre exista
                     plan.client.company,
