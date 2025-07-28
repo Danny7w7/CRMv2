@@ -3,6 +3,7 @@ from django.conf import settings
 import requests
 import telnyx
 from django.core.files.base import ContentFile
+from django.db.models import Q
 
 from celery import shared_task
 from datetime import datetime, date
@@ -44,35 +45,93 @@ def my_daily_task():
 
 @shared_task
 def smsPayment():
+
     now = datetime.now().date()
-    payments = PaymentDate.objects.select_related('obamacare__client__agent', 'supp__client__agent').filter(
-        payment_date__month=now.month,
+    payments = PaymentDate.objects.select_related(
+        'obamacare__client__agent__assigned_phone',
+        'supp__client__agent__assigned_phone',
+        'assure__agent__assigned_phone',
+        'life_insurance__agent__assigned_phone'
+    ).filter(
+        (
+            Q(obamacare__isnull=False) |
+            Q(supp__isnull=False) |
+            Q(assure__isnull=False) |
+            Q(life_insurance__isnull=False)
+        ), 
+        payment_date__month=now.month, 
         payment_date__day=now.day,
     )
 
     for payment in payments:
-        if payment.obamacare or payment.supp:
-            plan = payment.supp or payment.obamacare
+        plan = None
+        plan_type = None # Para depuración, si quieres saber qué tipo de plan es
 
-        if not plan:  # Si no hay plan, continuar con el siguiente plan
+        if payment.obamacare:
+            plan = payment.obamacare
+            plan_type = 'Obamacare'
+        elif payment.supp:
+            plan = payment.supp
+            plan_type = 'Supp'
+        elif payment.assure: # Nuevo
+            plan = payment.assure
+            plan_type = 'Assure'
+        elif payment.life_insurance: # Nuevo
+            plan = payment.life_insurance
+            plan_type = 'Life Insurance'
+
+        if not plan:
+            # Si un PaymentDate no está asociado a NINGÚN plan, lo saltamos.
+            print(f"DEBUG: PaymentDate ID {payment.id} para {payment.payment_date} no tiene ningún plan asociado. Saltando.")
             break
 
-        lines = plan.agent_usa.split("\n")
-        agentFirstName = lines[0].split()[0]
+        # --- Verificaciones de existencia para la cadena de relaciones ---
+        # Estas verificaciones son cruciales para evitar el AttributeError
+        if not hasattr(plan, 'client') or not plan.client:
+            print(f"DEBUG: Plan {plan_type} ID {plan.id} no tiene cliente. Saltando.")
+            break
 
-        if plan.client:
-            company = plan.client.company  # Obtén la empresa asociada al cliente
+        if not hasattr(plan.client, 'agent') or not plan.client.agent:
+            print(f"DEBUG: Cliente {plan.client.id} de Plan {plan_type} ID {plan.id} no tiene agente. Saltando.")
+            break
+
+        # Asegurarse de que el agente tenga un 'assigned_phone' si es un campo ForeignKey
+        if not hasattr(plan.client.agent, 'assigned_phone') or not plan.client.agent.assigned_phone:
+            print(f"DEBUG: Agente {plan.client.agent.id} de Plan {plan_type} ID {plan.id} no tiene teléfono asignado. Saltando.")
+            break
+
+        # --- Si todo existe, procedemos con el envío del SMS ---
+        try:
+            agent_phone_number = plan.client.agent.assigned_phone.phone_number
+            client_phone_number = plan.client.phone_number
+
+
+            lines = plan.agent_usa.split("\n")
+            agentFirstName = lines[0].split()[0] # Esto podría fallar si lines[0] está vacío
+
+            company = plan.client.company 
 
             if not comprobate_company(company):
-                message =f'Hola {plan.client.first_name} {plan.client.last_name} 👋,{getCompanyPerAgent(agentFirstName)} le recuerda que su pago de ${plan.premium} de su póliza de {plan.carrier} se vence en 2 días. 💚'
+                message = f'Hola {plan.client.first_name} {plan.client.last_name} 👋,{getCompanyPerAgent(agentFirstName)} le recuerda que su pago de ${plan.premium} de su póliza de {plan.carrier} se vence en 2 días. 💚'
 
                 sendIndividualsSms(
-                    plan.client.agent.assigned_phone.phone_number,
-                    plan.client.phone_number,
-                    Users.objects.get(id=1),
+                    agent_phone_number,
+                    client_phone_number,
+                    Users.objects.get(id=1), # Asegúrate de que este usuario con ID 1 siempre exista
                     plan.client.company,
                     message
                 )
+                print(f"DEBUG: SMS enviado para Plan {plan_type} ID {plan.id}, Cliente: {plan.client.first_name} {plan.client.last_name}")
+            else:
+                print(f"DEBUG: Compañía {company} del Plan {plan_type} ID {plan.id} no cumple la comprobación. No se envía SMS.")
+
+        except AttributeError as e:
+            print(f"ERROR: AttributeError al procesar el Plan {plan_type} ID {plan.id} (posible campo faltante): {e}")
+        except IndexError as e:
+            # Esto captura si lines[0] es vacío o no se puede dividir (e.g., plan.agent_usa está vacío)
+            print(f"ERROR: IndexError al obtener agentFirstName para Plan {plan_type} ID {plan.id}: {e}")
+        except Exception as e:
+            print(f"ERROR: Error inesperado al procesar el Plan {plan_type} ID {plan.id}: {e}")
 
 @shared_task
 def reportBoosLapeira():
