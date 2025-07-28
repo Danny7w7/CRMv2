@@ -1150,7 +1150,7 @@
 									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 								</div>
 								<div class="modal-body">
-									{% if document or DocumentObamaSupp%}
+									{% if document or documentObama%}
 										<ul class="list-group">
 
 											{% if document %} <h5>Documents Consent</h5> {% endif %}
@@ -1161,11 +1161,11 @@
 												</li>
 											{% endfor %}
 
-											{% if document and DocumentObamaSupp %} <hr> {% endif %}
+											{% if document and documentObama %} <hr> {% endif %}
 
-											{% if DocumentObamaSupp %} <h5>Documents Upload CRM</h5> {% endif %}
+											{% if documentObama %} <h5>Documents Upload CRM</h5> {% endif %}
 
-											{% for documents in DocumentObamaSupp %}															
+											{% for documents in documentObama %}															
 												<li class="list-group-item">
 													<strong>{{documents.name}}:</strong> <a href="{{ documents.file.url }}" target="_blank" >View  <i class="lni lni-display"></i></a> 
 												</li>
