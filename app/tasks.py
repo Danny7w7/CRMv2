@@ -46,6 +46,9 @@ def my_daily_task():
 @shared_task
 def smsPayment():
 
+    status = ['ACTIVE','ENROLLED','SELF-ENROLMENT']
+    statusSupp = ['ACTIVE', 'PAYMENT PROCESS (PENDING)']
+
     now = datetime.now().date()
     payments = PaymentDate.objects.select_related(
         'obamacare__client__agent__assigned_phone',
@@ -61,6 +64,16 @@ def smsPayment():
         ), 
         payment_date__month=now.month, 
         payment_date__day=now.day,
+    ).exclude(
+
+        # (Obamacare es inactivo O su estado NO está en la lista 'status')
+        Q(obamacare__is_active=False) | ~Q(obamacare__status__in=status) |
+        # O (Supp es inactivo)
+        Q(supp__is_active=False) | ~Q(supp__status__in=statusSupp) |
+        # O (Assure es inactivo)
+        Q(assure__is_active=False) |
+        # O (Life Insurance es inactivo)
+        Q(life_insurance__is_active=False)
     )
 
     for payment in payments:
