@@ -4,7 +4,10 @@
     <meta charset="utf-8">
     <title>Reporte Semanal</title>
     <style>
-        body { font-family: sans-serif; }
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
         .chart {
             margin-bottom: 40px;
             text-align: center;
@@ -13,16 +16,18 @@
             width: 90%;
             max-width: 700px;
             border: 1px solid #ccc;
-            margin: 0 auto;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
     <h1 style="text-align: center;">📊 Reporte Semanal</h1>
+
     {% for chart in charts %}
-    <div class="chart">
-        <img src="{{ chart }}" alt="Gráfico semanal">
-    </div>
-{% endfor %}
+        <div class="chart">
+            <img src="file://{{ chart }}" alt="Gráfico semanal">
+        </div>
+    {% endfor %}
+
 </body>
 </html>
