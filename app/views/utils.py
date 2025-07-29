@@ -1278,24 +1278,28 @@ def generate_weekly_chart_images():
     return image_paths
 
 
+import base64
 
 def generate_matplotlib_charts():
-    """
-    Esta función genera imágenes de gráficos y retorna la lista de sus paths.
-    """
-    charts_paths = []
+    charts_base64 = []
 
-    for i in range(2):  # Generamos 2 gráficos como ejemplo
+    for i in range(2):
         plt.figure()
         plt.bar(['A', 'B', 'C'], [i + 1, i + 2, i + 3], color='skyblue')
         plt.title(f'Gráfico ejemplo {i+1}')
-        
+
         tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.png', dir='/tmp')
         plt.savefig(tmp_file.name, bbox_inches='tight')
-        charts_paths.append(tmp_file.name)
         plt.close()
 
-    return charts_paths
+        with open(tmp_file.name, "rb") as f:
+            encoded = base64.b64encode(f.read()).decode('utf-8')
+            charts_base64.append(f"data:image/png;base64,{encoded}")
+
+        os.remove(tmp_file.name)
+
+    return charts_base64
+
 
 
 def generarPDFChart6Week(image_paths, output_pdf_path):

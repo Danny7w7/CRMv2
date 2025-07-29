@@ -20,10 +20,9 @@
 <body>
     <h1 style="text-align: center;">📊 Reporte Semanal</h1>
     {% for chart in charts %}
-        <div class="chart">
-            <h3>{{ chart.title }}</h3>
-            <img src="file://{{ chart.path }}" alt="Gráfico semanal">
-        </div>
-    {% endfor %}
+    <div class="chart">
+        <img src="{{ chart }}" alt="Gráfico semanal">
+    </div>
+{% endfor %}
 </body>
 </html>
