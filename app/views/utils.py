@@ -1116,6 +1116,194 @@ def generarPDFChart(datos_secciones, output_path):
     html_content = render_to_string('pdf/reportWeekCustomer.html', context)
     HTML(string=html_content, base_url='.').write_pdf(output_path)
 
+#Funcione para Graficas de Ventas
+
+from datetime import date, timedelta
+from collections import defaultdict
+from django.db.models import Count
+from app.models import ObamaCare  # Ajusta al nombre real
+
+from datetime import date, timedelta
+from collections import defaultdict
+from django.db.models import Count
+from app.models import ObamaCare
+
+from collections import defaultdict
+from django.db.models import Count
+
+from collections import defaultdict
+from datetime import timedelta
+from django.utils import timezone
+from django.db.models import Count
+from django.db.models.functions import TruncWeek
+
+from collections import defaultdict
+from datetime import timedelta
+from django.utils import timezone
+from django.db.models import Count
+from app.models import Users, ObamaCare, Supp  # Ajusta tu import
+
+from collections import defaultdict
+from datetime import timedelta
+from django.utils import timezone
+from django.db.models import Count
+from app.models import Users, ObamaCare, Supp
+
+
+def get_bar_chart_data():
+    agentes = Users.objects.filter(is_active = True, company = 2, role__in = ['A','C'])
+    now = timezone.now()
+
+    # 📅 Calcular el lunes anterior (o actual si hoy es lunes)
+    today = now.date()
+    monday = today - timedelta(days=today.weekday())  # Lunes de esta semana
+    start_date = monday - timedelta(weeks=5)  # Lunes de hace 5 semanas
+
+    # 🗓️ Rango de semanas: lunes a sábado
+    weeks = [
+        (start_date + timedelta(days=7 * i), start_date + timedelta(days=7 * i + 5))
+        for i in range(6)
+    ]
+
+    all_carriers = list(Supp.objects.values_list('carrier', flat=True).distinct())
+
+    charts = []
+
+    for week_start, week_end in weeks:
+        semana_label = f"{week_start.strftime('%Y-%m-%d')} a {week_end.strftime('%Y-%m-%d')}"
+        categories = []
+        series_dict = defaultdict(list)
+
+        for agente in agentes:
+            nombre = agente.first_name.upper()
+            categories.append(nombre)
+
+            # Obamacare
+            obamacare_count = ObamaCare.objects.filter(
+                agent=agente,
+                is_active=True,
+                company = 2,
+                status = 'ACTIVE',
+                profiling_date__range=(week_start, week_end)
+            ).count()
+            series_dict['OBAMACARE'].append(obamacare_count)
+
+            # SUPP por carrier
+            supp_counts = {f"SUPP - {c}": 0 for c in all_carriers}
+            supps = Supp.objects.filter(
+                agent=agente,
+                is_active=True,
+                company = 2,
+                status = 'ACTIVE',
+                created_at__range=(week_start, week_end)
+            ).values("carrier").annotate(total=Count("id"))
+
+            for item in supps:
+                key = f"SUPP - {item['carrier']}"
+                supp_counts[key] = item["total"]
+
+            for carrier_key, count in supp_counts.items():
+                series_dict[carrier_key].append(count)
+
+        # Convertir a lista de series para ApexCharts
+        series = [{"name": key, "data": values} for key, values in series_dict.items()]
+
+        charts.append({
+            "semana": semana_label,
+            "series": series,
+            "categories": categories,
+        })
+
+    return charts
+
+import matplotlib.pyplot as plt
+import os
+from django.utils import timezone
+from collections import defaultdict
+from datetime import timedelta
+from django.db.models import Count
+import uuid
+
+def generate_weekly_chart_images():
+    from matplotlib.ticker import MaxNLocator
+    from matplotlib import cm
+
+    charts = get_bar_chart_data()
+    image_paths = []
+
+    for chart in charts:
+        fig, ax = plt.subplots(figsize=(12, 6))
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+        ax.set_title(f"Clientes por Agente: Semana {chart['semana']}", fontsize=14)
+
+        categories = chart["categories"]
+        width = 0.15
+        x = list(range(len(categories)))
+
+        series_list = chart["series"]
+        for i, serie in enumerate(series_list):
+            data = serie["data"]
+            label = serie["name"]
+            positions = [pos + width * i for pos in x]
+            bars = ax.bar(positions, data, width, label=label)
+
+            # Etiquetas sobre cada barra (solo si es > 0)
+            for bar in bars:
+                height = bar.get_height()
+                if height > 0:
+                    ax.annotate(f'{int(height)}', xy=(bar.get_x() + bar.get_width() / 2, height),
+                                xytext=(0, 3), textcoords="offset points", ha='center', fontsize=8)
+
+        ax.set_xticks([pos + width * (len(series_list) / 2 - 0.5) for pos in x])
+        ax.set_xticklabels(categories, rotation=45, ha='right')
+        ax.legend(loc='upper right')
+        ax.grid(True, linestyle='--', linewidth=0.5)
+
+        # Guardar la imagen temporalmente
+        filename = f"temp/chart_{uuid.uuid4().hex}.png"
+        os.makedirs("temp", exist_ok=True)
+        plt.tight_layout()
+        plt.savefig(filename)
+        image_paths.append(filename)
+        plt.close()
+
+    return image_paths
+
+
+
+def generate_matplotlib_charts():
+    """
+    Esta función genera imágenes de gráficos y retorna la lista de sus paths.
+    """
+    charts_paths = []
+
+    for i in range(2):  # Generamos 2 gráficos como ejemplo
+        plt.figure()
+        plt.bar(['A', 'B', 'C'], [i + 1, i + 2, i + 3], color='skyblue')
+        plt.title(f'Gráfico ejemplo {i+1}')
+        
+        tmp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.png', dir='/tmp')
+        plt.savefig(tmp_file.name, bbox_inches='tight')
+        charts_paths.append(tmp_file.name)
+        plt.close()
+
+    return charts_paths
+
+
+def generarPDFChart6Week(image_paths, output_pdf_path):
+    """
+    Renderiza el HTML con los paths de las imágenes y lo convierte en PDF.
+    """
+    template_path = os.path.join(settings.BASE_DIR, 'templates', 'reporte_grafico.html')
+    
+    with open(template_path, encoding='utf-8') as f:
+        template_code = f.read()
+
+    # Usamos Django Engine directamente, sin Jinja2
+    template = Engine().from_string(template_code)
+    rendered_html = template.render(Context({'charts': image_paths}))
+
+    HTML(string=rendered_html).write_pdf(output_pdf_path)
 
 
 

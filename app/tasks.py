@@ -86,31 +86,31 @@ def smsPayment():
         elif payment.supp:
             plan = payment.supp
             plan_type = 'Supp'
-        elif payment.assure: # Nuevo
+        elif payment.assure:
             plan = payment.assure
             plan_type = 'Assure'
-        elif payment.life_insurance: # Nuevo
+        elif payment.life_insurance:
             plan = payment.life_insurance
             plan_type = 'Life Insurance'
 
         if not plan:
             # Si un PaymentDate no está asociado a NINGÚN plan, lo saltamos.
-            print(f"DEBUG: PaymentDate ID {payment.id} para {payment.payment_date} no tiene ningún plan asociado. Saltando.")
+            #print(f"DEBUG: PaymentDate ID {payment.id} para {payment.payment_date} no tiene ningún plan asociado. Saltando.")
             break
 
         # --- Verificaciones de existencia para la cadena de relaciones ---
         # Estas verificaciones son cruciales para evitar el AttributeError
         if not hasattr(plan, 'client') or not plan.client:
-            print(f"DEBUG: Plan {plan_type} ID {plan.id} no tiene cliente. Saltando.")
+            #print(f"DEBUG: Plan {plan_type} ID {plan.id} no tiene cliente. Saltando.")
             break
 
         if not hasattr(plan.client, 'agent') or not plan.client.agent:
-            print(f"DEBUG: Cliente {plan.client.id} de Plan {plan_type} ID {plan.id} no tiene agente. Saltando.")
+            #print(f"DEBUG: Cliente {plan.client.id} de Plan {plan_type} ID {plan.id} no tiene agente. Saltando.")
             break
 
         # Asegurarse de que el agente tenga un 'assigned_phone' si es un campo ForeignKey
         if not hasattr(plan.client.agent, 'assigned_phone') or not plan.client.agent.assigned_phone:
-            print(f"DEBUG: Agente {plan.client.agent.id} de Plan {plan_type} ID {plan.id} no tiene teléfono asignado. Saltando.")
+            #print(f"DEBUG: Agente {plan.client.agent.id} de Plan {plan_type} ID {plan.id} no tiene teléfono asignado. Saltando.")
             break
 
         # --- Si todo existe, procedemos con el envío del SMS ---
@@ -134,9 +134,7 @@ def smsPayment():
                     plan.client.company,
                     message
                 )
-                print(f"DEBUG: SMS enviado para Plan {plan_type} ID {plan.id}, Cliente: {plan.client.first_name} {plan.client.last_name}")
-            else:
-                print(f"DEBUG: Compañía {company} del Plan {plan_type} ID {plan.id} no cumple la comprobación. No se envía SMS.")
+                #print(f"DEBUG: SMS enviado para Plan {plan_type} ID {plan.id}, Cliente: {plan.client.first_name} {plan.client.last_name}")
 
         except AttributeError as e:
             print(f"ERROR: AttributeError al procesar el Plan {plan_type} ID {plan.id} (posible campo faltante): {e}")
@@ -269,15 +267,15 @@ def reportCustomerWeek():
         email_subject = f"📄 Reporte Semanal Customer - {now.strftime('%d/%m/%Y')}"
         email_body = f"""Estimado/a,
 
-Se ha generado el reporte semanal correspondiente al {now.strftime('%d de %B de %Y a las %H:%M')}.
+            Se ha generado el reporte semanal correspondiente al {now.strftime('%d de %B de %Y a las %H:%M')}.
 
-El archivo PDF con el reporte completo del equipo de customer de la semana actual se encuentra adjunto a este correo.
+            El archivo PDF con el reporte completo del equipo de customer de la semana actual se encuentra adjunto a este correo.
 
-Reporte Generado por el mejor equipo de IT.
+            Reporte Generado por el mejor equipo de IT.
 
-Saludos cordiales,
-Sistema de Reportes
-"""
+            Saludos cordiales,
+            Sistema de Reportes
+            """
         
         # Crear el mensaje de email
         message = EmailMessage()
@@ -323,5 +321,40 @@ Sistema de Reportes
         if os.path.exists(path):
             os.remove(path)
 
+@shared_task
+def report6Week():
+    now = datetime.now()
+    filename = f"reporte_graficos_{now.strftime('%Y%m%d_%H%M%S')}.pdf"
+    local_pdf_path = f"/tmp/{filename}"
 
+    # 1. Generar gráficos
+    charts_paths = generate_matplotlib_charts()
+
+    # 2. Generar PDF desde HTML
+    generarPDFChart6Week(charts_paths, local_pdf_path)
+
+    # 3. Subir a S3 y generar URL temporal
+    s3_key = f"reportes/{filename}"
+    s3_url = uploadTempUrl(local_pdf_path, s3_key)
+
+    # 4. Enviar SMS vía Telnyx
+    telnyx.api_key = settings.TELNYX_API_KEY
+    mensaje_sms = (
+        f"📄 Reporte Semanal Generado\n"
+        f"📅 {now.strftime('%d/%m/%Y %H:%M')}\n\n"
+        f"📎 PDF completo adjunto"
+    )
+
+    telnyx.Message.create(
+        from_='+17869848427',
+        to='+17863034781',
+        text=mensaje_sms,
+        subject='Reporte PDF Semanal Customer',
+        media_urls=[s3_url]
+    )
+
+    # 5. Limpiar archivos temporales
+    for path in charts_paths + [local_pdf_path]:
+        if os.path.exists(path):
+            os.remove(path)
 
