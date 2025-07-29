@@ -1296,7 +1296,7 @@ def generarPDFChart6Week(image_paths, output_pdf_path):
     """
     Renderiza el HTML con los paths de las imágenes y lo convierte en PDF.
     """
-    template_path = os.path.join(settings.BASE_DIR, 'templates', 'reporte_grafico.html')
+    template_path = os.path.abspath("templates/reporte_grafico.html")
     
     with open(template_path, encoding='utf-8') as f:
         template_code = f.read()
