@@ -1224,6 +1224,8 @@ from datetime import timedelta
 from django.db.models import Count
 import uuid
 import tempfile
+from django.template import Engine
+
 
 
 def generate_weekly_chart_images():
