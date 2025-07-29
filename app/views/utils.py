@@ -1218,6 +1218,10 @@ def get_bar_chart_data():
 
 import matplotlib.pyplot as plt
 import os
+from django.template import Context  # Necesario para usar Context con Engine
+from weasyprint import HTML          # Para convertir HTML a PDF con WeasyPrint
+from django.conf import settings     # Para acceder a settings.BASE_DIR
+
 from django.utils import timezone
 from collections import defaultdict
 from datetime import timedelta
