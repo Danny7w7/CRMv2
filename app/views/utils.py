@@ -1223,6 +1223,8 @@ from collections import defaultdict
 from datetime import timedelta
 from django.db.models import Count
 import uuid
+import tempfile
+
 
 def generate_weekly_chart_images():
     from matplotlib.ticker import MaxNLocator
