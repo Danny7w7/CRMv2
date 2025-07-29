@@ -328,7 +328,7 @@ def report6Week():
     local_pdf_path = f"/tmp/{filename}"
 
     # 1. Generar gráficos
-    charts_paths = generate_matplotlib_charts()
+    charts_paths = generate_weekly_chart_images()
 
     # 2. Generar PDF desde HTML
     generarPDFChart6Week(charts_paths, local_pdf_path)
