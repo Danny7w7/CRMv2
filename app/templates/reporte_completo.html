@@ -19,25 +19,29 @@
     {% endfor %}
 
     <h2>Resumen General (Últimas 2 Semanas)</h2>
-    {% for chart in charts_two_week %}
-        <h3>{{ chart.semana }}</h3>
-        <img src="file://{{ chart.path }}" alt="Resumen Semanal">
-        <table>
-            <tr>
-                <th>Agente</th>
-                <th>ObamaCare</th>
-                <th>Supp</th>
-                <th>Total</th>
-            </tr>
-            {% for fila in chart.tabla %}
-            <tr class="{% if fila.tiene_ventas %}highlight{% endif %}">
-                <td>{{ fila.agente }}</td>
-                <td>{{ fila.obamacare }}</td>
-                <td>{{ fila.supp }}</td>
-                <td>{{ fila.total }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-    {% endfor %}
+
+{% for chart in charts_two_week %}
+<div style="page-break-inside: avoid;">
+    <h3>{{ chart.semana }}</h3>
+    <img src="file://{{ chart.path }}" alt="Resumen Semanal">
+    <table>
+        <tr>
+            <th>Agente</th>
+            <th>ObamaCare</th>
+            <th>Supp</th>
+            <th>Total</th>
+        </tr>
+        {% for fila in chart.tabla %}
+        <tr class="{% if fila.tiene_ventas %}highlight{% endif %}">
+            <td>{{ fila.agente }}</td>
+            <td>{{ fila.obamacare }}</td>
+            <td>{{ fila.supp }}</td>
+            <td>{{ fila.total }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endfor %}
+
 </body>
 </html>

@@ -1373,11 +1373,11 @@ def generate_weekly_chart_images_two():
     output_dir = "temp"
     os.makedirs(output_dir, exist_ok=True)
 
-    # Generar solo una imagen general (con ambas semanas)
+    # Generar una sola imagen con los datos de ambas semanas
     fig, ax = plt.subplots(figsize=(6, 4))
 
     width = 0.35
-    x = [0, 1]  # una barra por semana
+    x = [0, 1]
     labels = [chart['semana'] for chart in charts]
 
     obamacare_totals = [chart['series'][0]['data'][0] for chart in charts]
@@ -1398,17 +1398,11 @@ def generate_weekly_chart_images_two():
     plt.savefig(filename)
     plt.close()
 
-    # Ahora armamos un resultado por semana con la misma imagen
-    image_path = os.path.abspath(filename)
-    image_paths = []
-    for chart in charts:
-        image_paths.append({
-            "path": image_path,
-            "semana": chart["semana"],
-            "tabla": chart["tabla"]
-        })
-
-    return image_paths
+    # Solo retornamos una entrada con las dos tablas y la única imagen
+    return {
+        "path": os.path.abspath(filename),
+        "tablas": [chart["tabla"] for chart in charts],
+    }
 
 
 def generarPDFChart6Week_two(image_paths, output_pdf_path):
