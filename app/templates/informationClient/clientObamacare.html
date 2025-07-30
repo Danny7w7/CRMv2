@@ -70,12 +70,12 @@
 								{% if obamacare.status == 'ENROLLED' %}
 									<span class="badge rounded-pill bg-warning text-dark">{{obamacare.status}} / {{obamacare.profiling}}</span>
 								{% else %}
-									<span class="badge rounded-pill bg-warning text-dark">{{obamacare.status}}</span>
+									<span class="badge rounded-pill bg-warning text-dark">{{obamacare.status}} / {{obamacare.profiling}}</span>
 								{% endif %}
 							{% elif obamacare.status_color == 3 %}
 								<span class="badge rounded-pill bg-success">{{obamacare.status}} / {{obamacare.profiling}}</span>
 							{% elif obamacare.status_color == 4 %}
-								<span class="badge rounded-pill bg-danger">{{obamacare.status}}</span>
+								<span class="badge rounded-pill bg-danger">{{obamacare.status}} / {{obamacare.profiling}}</span>
 							{% endif  %}
 						</td>
 						{% if request.user.role == 'Admin' %}
