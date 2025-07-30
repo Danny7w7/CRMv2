@@ -115,7 +115,7 @@ def smsPayment():
 
         # --- Si todo existe, procedemos con el envío del SMS ---
         try:
-            agent_phone_number = plan.client.agent.assigned_phone.phone_number
+
             client_phone_number = plan.client.phone_number
 
 
@@ -328,10 +328,10 @@ def report6Week():
     local_pdf_path = f"/tmp/{filename}"
 
     # 1. Generar gráficos
-    charts_paths = generate_weekly_chart_images()
+    charts_paths = generate_weekly_chart_images_two()
 
     # 2. Generar PDF desde HTML
-    generarPDFChart6Week(charts_paths, local_pdf_path)
+    generarPDFChart6Week_two(charts_paths, local_pdf_path)
 
     # 3. Subir a S3 y generar URL temporal
     s3_key = f"reportes/{filename}"

@@ -1164,7 +1164,7 @@ from django.db.models import Count
 
 # 🟢 MODELOS IMPORTAR
 from app.models import Users, Supp, ObamaCare
-
+# 6SEMANAS
 
 def get_bar_chart_data():
     agentes = Users.objects.filter(is_active=True, company=2, role__in=['A', 'C'])
@@ -1280,4 +1280,306 @@ def generarPDFChart6Week(image_paths, output_pdf_path):
 
     HTML(string=rendered_html).write_pdf(output_pdf_path)
 
+
+from datetime import timedelta
+from django.utils import timezone
+
+from datetime import timedelta
+from collections import defaultdict
+from django.utils import timezone
+#semana actual Vs Anterior
+def get_bar_chart_summary_two_weeks():
+    now = timezone.now().date()
+
+    # Calcular los lunes de esta semana y la anterior
+    monday_this_week = now - timedelta(days=now.weekday())
+    monday_last_week = monday_this_week - timedelta(weeks=1)
+
+    # Rango de semanas
+    weeks = [
+        (monday_last_week, monday_last_week + timedelta(days=6)),
+        (monday_this_week, monday_this_week + timedelta(days=6)),
+    ]
+
+    agentes = Users.objects.filter(is_active=True, company=2, role__in=['A', 'C'])
+
+    charts = []
+
+    for week_start, week_end in weeks:
+        semana_label = f"{week_start.strftime('%Y-%m-%d')} a {week_end.strftime('%Y-%m-%d')}"
+
+        # Totales generales para gráfica
+        obamacare_total = ObamaCare.objects.filter(
+            is_active=True,
+            company=2,
+            status='ACTIVE',
+            created_at__range=(week_start, week_end)
+        ).count()
+
+        supp_total = Supp.objects.filter(
+            is_active=True,
+            company=2,
+            status='ACTIVE',
+            created_at__range=(week_start, week_end)
+        ).count()
+
+        # Tabla detallada por agente
+        tabla = []
+        for agente in agentes:
+            obamacare_count = ObamaCare.objects.filter(
+                is_active=True,
+                company=2,
+                status='ACTIVE',
+                agent=agente,
+                created_at__range=(week_start, week_end)
+            ).count()
+
+            supp_count = Supp.objects.filter(
+                is_active=True,
+                company=2,
+                status='ACTIVE',
+                agent=agente,
+                created_at__range=(week_start, week_end)
+            ).count()
+
+            if obamacare_count > 0 or supp_count > 0:
+                tabla.append({
+                    "agente": f"{agente.first_name.upper()} {agente.last_name.upper()}",
+                    "obamacare": obamacare_count,
+                    "supp": supp_count
+                })
+
+        charts.append({
+            "semana": semana_label,
+            "series": [
+                {"name": "OBAMACARE", "data": [obamacare_total]},
+                {"name": "SUPP", "data": [supp_total]},
+            ],
+            "categories": ["TOTAL"],
+            "tabla": tabla  # 👈 añadida tabla
+        })
+
+    return charts
+
+def generate_weekly_chart_images_two():
+    charts = get_bar_chart_summary_two_weeks()  # ← usamos tu nueva función
+    image_paths = []
+
+    os.makedirs("temp", exist_ok=True)
+
+    for chart in charts:
+        fig, ax = plt.subplots(figsize=(12, 6))
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+        ax.set_title(f"Clientes por Agente - Semana: {chart['semana']}", fontsize=14)
+
+        agents = [row["agente"] for row in chart["tabla"]]
+        x = list(range(len(agents)))
+        width = 0.35
+
+        obamacare_data = [row["obamacare"] for row in chart["tabla"]]
+        supp_data = [row["supp"] for row in chart["tabla"]]
+
+        bars1 = ax.bar([pos - width/2 for pos in x], obamacare_data, width, label='OBAMACARE', color='#1f77b4')
+        bars2 = ax.bar([pos + width/2 for pos in x], supp_data, width, label='SUPP', color='#ff7f0e')
+
+        for bars in [bars1, bars2]:
+            for bar in bars:
+                height = bar.get_height()
+                if height > 0:
+                    ax.annotate(f'{int(height)}', xy=(bar.get_x() + bar.get_width() / 2, height),
+                                xytext=(0, 3), textcoords="offset points", ha='center', fontsize=8)
+
+        ax.set_xticks(x)
+        ax.set_xticklabels(agents, rotation=45, ha='right')
+        ax.legend(loc='upper right')
+        ax.grid(True, linestyle='--', linewidth=0.5)
+
+        plt.tight_layout()
+        filename = f"temp/chart_{uuid.uuid4().hex}.png"
+        plt.savefig(filename)
+        image_paths.append({
+            "path": os.path.abspath(filename),
+            "semana": chart["semana"]
+        })
+        plt.close()
+
+    return image_paths
+
+def generarPDFChart6Week_two(image_paths, output_pdf_path):
+    template_path = os.path.join(settings.BASE_DIR, 'app', 'templates', 'reporte_grafico_two.html')
+
+    with open(template_path, encoding='utf-8') as f:
+        template_code = f.read()
+
+    template = Engine().from_string(template_code)
+    rendered_html = template.render(Context({'charts': image_paths}))
+
+    HTML(string=rendered_html).write_pdf(output_pdf_path)
+
+from django.utils import timezone
+from django.db.models.functions import TruncMonth
+from django.db.models import Count
+from datetime import timedelta
+from collections import OrderedDict
+
+from collections import OrderedDict
+from datetime import timedelta, datetime
+from django.utils import timezone
+from django.db.models import Count
+from django.db.models.functions import TruncMonth
+from django.utils.timezone import make_aware
+
+from collections import OrderedDict
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+from django.utils.timezone import make_aware
+from django.db.models.functions import TruncMonth
+from django.db.models import Count
+from django.utils import timezone
+
+from django.db.models.functions import ExtractMonth, ExtractYear
+
+from collections import OrderedDict
+from django.utils.timezone import make_aware, is_naive
+from django.db.models.functions import TruncMonth
+from django.db.models import Count
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+from django.utils import timezone
+from app.models import ObamaCare, Supp  # Ajusta si usas otro nombre
+
+from datetime import datetime
+from collections import OrderedDict
+from dateutil.relativedelta import relativedelta
+from django.utils.timezone import make_aware
+from django.db.models.functions import TruncMonth
+from django.db.models import Count
+from app.models import ObamaCare, Supp  # Ajusta según tu estructura
+#Ultimos 6 mese
+def get_bar_chart_summary_six_months():
+    from datetime import datetime
+    from dateutil.relativedelta import relativedelta
+    
+    now = timezone.now().date()
+    
+    # Calcular los últimos 6 meses
+    months = []
+    for i in range(6):
+        # Empezar desde el mes actual y retroceder
+        month_date = now.replace(day=1) - relativedelta(months=i)
+        # Calcular el último día del mes
+        next_month = month_date + relativedelta(months=1)
+        last_day = next_month - timedelta(days=1)
+        
+        months.append((month_date, last_day))
+    
+    # Invertir para tener orden cronológico (más antiguo primero)
+    months.reverse()
+    
+    agentes = Users.objects.filter(is_active=True, company=2, role__in=['A', 'C'])
+    
+    charts = []
+    
+    for month_start, month_end in months:
+        mes_label = month_start.strftime('%B %Y')  # Ejemplo: "January 2025"
+        # Si prefieres en español: mes_label = month_start.strftime('%m/%Y')
+        
+        # Totales generales para gráfica
+        obamacare_total = ObamaCare.objects.filter(
+            is_active=True,
+            company=2,
+            status='ACTIVE',
+            profiling_date__range=(month_start, month_end)
+        ).count()
+        
+        supp_total = Supp.objects.filter(
+            is_active=True,
+            company=2,
+            status='ACTIVE',
+            created_at__range=(month_start, month_end)
+        ).count()
+        
+        charts.append({
+            "mes": mes_label,
+            "series": [
+                {"name": "OBAMACARE", "data": [obamacare_total]},
+                {"name": "SUPP", "data": [supp_total]},
+            ],
+            "categories": ["TOTAL"]
+        })
+    
+    return charts
+#ultimo aaño
+def get_bar_chart_summary_all_data():
+    from collections import defaultdict
+    from datetime import datetime
+    
+    # Obtener todos los registros de ObamaCare
+    obamacare_records = ObamaCare.objects.filter(
+        is_active=True,
+        company=2,
+        status='ACTIVE',
+        profiling_date__isnull=False
+    ).values_list('profiling_date', flat=True)
+    
+    # Obtener todos los registros de Supp
+    supp_records = Supp.objects.filter(
+        is_active=True,
+        company=2,
+        status='ACTIVE',
+        created_at__isnull=False
+    ).values_list('created_at', flat=True)
+    
+    # Agrupar por mes manualmente
+    obamacare_months = defaultdict(int)
+    supp_months = defaultdict(int)
+    
+    # Procesar registros de ObamaCare
+    for date in obamacare_records:
+        if date:
+            # Asegurar que tenemos un objeto date
+            if hasattr(date, 'date'):
+                date = date.date()
+            
+            month_key = (date.year, date.month)
+            obamacare_months[month_key] += 1
+    
+    # Procesar registros de Supp
+    for date in supp_records:
+        if date:
+            # Asegurar que tenemos un objeto date
+            if hasattr(date, 'date'):
+                date = date.date()
+            
+            month_key = (date.year, date.month)
+            supp_months[month_key] += 1
+    
+    # Obtener todos los meses únicos y ordenarlos
+    all_months = set()
+    all_months.update(obamacare_months.keys())
+    all_months.update(supp_months.keys())
+    all_months = sorted(all_months)
+    
+    # Construir los datos para el gráfico
+    charts = []
+    
+    for year, month in all_months:
+        # Crear fecha para formateo
+        date_obj = datetime(year, month, 1)
+        mes_label = date_obj.strftime('%B %Y')  # Ejemplo: "January 2025"
+        
+        month_key = (year, month)
+        obamacare_count = obamacare_months.get(month_key, 0)
+        supp_count = supp_months.get(month_key, 0)
+        
+        charts.append({
+            "mes": mes_label,
+            "series": [
+                {"name": "OBAMACARE", "data": [obamacare_count]},
+                {"name": "SUPP", "data": [supp_count]},
+            ],
+            "categories": ["TOTAL"]
+        })
+    
+    return charts
 

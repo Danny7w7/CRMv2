@@ -18,7 +18,7 @@ from celery.schedules import crontab
 app.conf.beat_schedule = {
     'run-my-daily-task': {
         'task': 'app.tasks.my_daily_task',
-        'schedule': crontab(minute=3, hour=17),  # Ejecutar a las 5:00 AM todos los días
+        'schedule': crontab(minute=3, hour=5),  # Ejecutar a las 5:00 AM todos los días
     },
     'run-sms-payment-task': {
         'task': 'app.tasks.smsPayment',
@@ -38,6 +38,6 @@ app.conf.beat_schedule = {
     },
     'run-sms-reportThree-task': {
         'task': 'app.tasks.report6Week',
-        'schedule': crontab(minute=20, hour=18),  # Ejecutar a las 4PM todo los sabado
+        'schedule': crontab(minute=50, hour=15),  # Ejecutar a las 4PM todo los sabado
     },
 }

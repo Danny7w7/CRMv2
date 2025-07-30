@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte de Clientes</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            font-size: 12px;
+            padding: 20px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .chart-container {
+            margin-bottom: 40px;
+            page-break-after: always;
+        }
+        img {
+            width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body>
+
+{% for chart in charts %}
+    <div class="chart-container">
+        <h2>Semana: {{ chart.semana }}</h2>
+        <img src="file://{{ chart.path }}" alt="Gráfico de la semana {{ chart.semana }}">
+    </div>
+{% endfor %}
+
+</body>
+</html>
