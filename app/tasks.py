@@ -360,7 +360,7 @@ def report6Week():
 
 
 @shared_task
-def report6WeekTwo():
+def xxxxxxx():
     now = datetime.now()
     filename = f"reporte_graficos_{now.strftime('%Y%m%d_%H%M%S')}.pdf"
     local_pdf_path = f"/tmp/{filename}"
