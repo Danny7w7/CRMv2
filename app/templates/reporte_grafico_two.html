@@ -48,17 +48,18 @@
 </head>
 <body>
 
-{% for chart in charts %}
+{% if charts %}
+  <!-- Muestra la gráfica solo una vez -->
   <div class="chart-container">
-    <h2>Totales Combinados: {{ chart.semanas|join:" y " }}</h2>
-    <img src="file://{{ chart.path }}" width="600">
+    <h2>Totales Generales - Últimas 2 semanas</h2>
+    <img src="file://{{ charts.0.path }}" width="600">
   </div>
 
+  <!-- Tablas de cada semana, una al lado de la otra -->
   <div class="tables-container page-break">
-  {% for item in chart.tablas %}
-    {% with tabla=item.tabla semana=item.semana %}
+    {% for chart in charts %}
       <div style="width: 50%;">
-        <h2>Tabla - Semana {{ semana }}</h2>
+        <h2>Tabla - Semana {{ chart.semana }}</h2>
         <table>
           <thead>
             <tr>
@@ -69,7 +70,7 @@
             </tr>
           </thead>
           <tbody>
-            {% for fila in tabla %}
+            {% for fila in chart.tabla %}
               <tr class="{% if fila.tiene_ventas %}con-ventas{% else %}sin-ventas{% endif %}">
                 <td>{{ fila.agente }}</td>
                 <td>{{ fila.obamacare }}</td>
@@ -80,13 +81,9 @@
           </tbody>
         </table>
       </div>
-    {% endwith %}
-  {% endfor %}
-</div>
-
-
-
-{% endfor %}
+    {% endfor %}
+  </div>
+{% endif %}
 
 </body>
 </html>

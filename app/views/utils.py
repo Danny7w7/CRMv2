@@ -1367,58 +1367,46 @@ def get_bar_chart_summary_two_weeks():
 
     return charts
 
+
 def generate_weekly_chart_images_two():
-    charts = get_bar_chart_summary_two_weeks()
-    image_paths = []
+    charts = get_bar_chart_summary_two_weeks() 
+    output_dir = "temp"
+    os.makedirs(output_dir, exist_ok=True)
 
-    if len(charts) < 2:
-        return []  # Retornar vacío si no hay dos semanas
+    # Generar solo una imagen general (con ambas semanas)
+    fig, ax = plt.subplots(figsize=(6, 4))
 
-    os.makedirs("temp", exist_ok=True)
-
-    # Combinar datos de las dos semanas
-    fig, ax = plt.subplots(figsize=(8, 5))
-    ax.set_title("Totales Generales - Últimas 2 Semanas", fontsize=14)
-
-    categories = charts[0]['categories']  # Agentes
-    semanas = [charts[0]['semana'], charts[1]['semana']]
-    series_data = [charts[0]['series'][0]['data'], charts[1]['series'][0]['data']]
-
-    x = list(range(len(categories)))
     width = 0.35
+    x = [0, 1]  # una barra por semana
+    labels = [chart['semana'] for chart in charts]
 
-    bars_total = []
-    for i, data in enumerate(series_data):
-        positions = [pos + width * (i - 0.5) for pos in x]
-        bars = ax.bar(positions, data, width, label=semanas[i])
-        bars_total.extend(bars)
+    obamacare_totals = [chart['series'][0]['data'][0] for chart in charts]
+    supp_totals = [chart['series'][1]['data'][0] for chart in charts]
 
-    for bar in bars_total:
-        height = bar.get_height()
-        if height > 0:
-            ax.annotate(f'{int(height)}', xy=(bar.get_x() + bar.get_width()/2, height),
-                        xytext=(0, 3), textcoords="offset points", ha='center', fontsize=8)
+    ax.bar([pos - width / 2 for pos in x], obamacare_totals, width=width, label="ObamaCare", color='blue')
+    ax.bar([pos + width / 2 for pos in x], supp_totals, width=width, label="Supp", color='green')
 
     ax.set_xticks(x)
-    ax.set_xticklabels(categories)
+    ax.set_xticklabels(labels, rotation=20)
+    ax.set_ylabel("Cantidad de ventas")
+    ax.set_title("Totales Generales - Últimas 2 semanas")
     ax.legend()
-    ax.grid(True, linestyle='--', linewidth=0.5)
+    ax.grid(True)
 
-    plt.tight_layout()
-    filename = f"temp/combined_chart_{uuid.uuid4().hex}.png"
+    filename = f"{output_dir}/chart_{uuid.uuid4().hex}.png"
+    fig.tight_layout()
     plt.savefig(filename)
     plt.close()
 
-    tablas_por_semana = [
-        {"tabla": charts[0]["tabla"], "semana": charts[0]["semana"]},
-        {"tabla": charts[1]["tabla"], "semana": charts[1]["semana"]}
-    ]
-
-    image_paths.append({
-        "path": os.path.abspath(filename),
-        "semanas": semanas,
-        "tablas": tablas_por_semana
-    })
+    # Ahora armamos un resultado por semana con la misma imagen
+    image_path = os.path.abspath(filename)
+    image_paths = []
+    for chart in charts:
+        image_paths.append({
+            "path": image_path,
+            "semana": chart["semana"],
+            "tabla": chart["tabla"]
+        })
 
     return image_paths
 
