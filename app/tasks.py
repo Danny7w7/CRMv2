@@ -355,7 +355,7 @@ def report6Week():
 
     # 5. Limpiar archivos temporales
     for path in charts_paths + [local_pdf_path]:
-        if os.path.exists(path):
+        if isinstance(path, str) and os.path.exists(path):
             os.remove(path)
 
 
