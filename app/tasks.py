@@ -322,7 +322,7 @@ def reportCustomerWeek():
             os.remove(path)
 
 @shared_task
-def report6Week():
+def xxxxxxxxxxxxxx():
     now = datetime.now()
     filename = f"reporte_graficos_{now.strftime('%Y%m%d_%H%M%S')}.pdf"
     local_pdf_path = f"/tmp/{filename}"
@@ -360,7 +360,7 @@ def report6Week():
 
 
 @shared_task
-def xxxxxxx():
+def report6Week():
     now = datetime.now()
     filename = f"reporte_graficos_{now.strftime('%Y%m%d_%H%M%S')}.pdf"
     local_pdf_path = f"/tmp/{filename}"

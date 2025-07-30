@@ -23,10 +23,14 @@
             object-fit: contain;
             margin-bottom: 10px;
         }
+        .tables-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
             font-size: 11px;
         }
         th, td {
@@ -37,34 +41,45 @@
         th {
             background-color: #ddd;
         }
+        .page-break {
+            page-break-before: always;
+        }
     </style>
 </head>
 <body>
 
 {% for chart in charts %}
-  <div>
-    <h2>{{ chart.semana }}</h2>
+  <div class="chart-container">
+    <h2>Totales Combinados: {{ chart.semanas|join:" y " }}</h2>
     <img src="file://{{ chart.path }}" width="600">
-    <table>
-      <thead>
-        <tr>
-          <th>Agente</th>
-          <th>ObamaCare</th>
-          <th>Supp</th>
-          <th>Total</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for fila in chart.tabla %}
-          <tr class="{% if fila.tiene_ventas %}con-ventas{% else %}sin-ventas{% endif %}">
-            <td>{{ fila.agente }}</td>
-            <td>{{ fila.obamacare }}</td>
-            <td>{{ fila.supp }}</td>
-            <td>{{ fila.total }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  </div>
+
+  <div class="tables-container page-break">
+    {% for tabla, semana in chart.tablas|zip:chart.semanas %}
+      <div style="width: 50%;">
+        <h2>Tabla - Semana {{ semana }}</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Agente</th>
+              <th>ObamaCare</th>
+              <th>Supp</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for fila in tabla %}
+              <tr class="{% if fila.tiene_ventas %}con-ventas{% else %}sin-ventas{% endif %}">
+                <td>{{ fila.agente }}</td>
+                <td>{{ fila.obamacare }}</td>
+                <td>{{ fila.supp }}</td>
+                <td>{{ fila.total }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endfor %}
   </div>
 {% endfor %}
 

@@ -1371,44 +1371,49 @@ def generate_weekly_chart_images_two():
     charts = get_bar_chart_summary_two_weeks()
     image_paths = []
 
+    if len(charts) < 2:
+        return []  # Retornar vacío si no hay dos semanas
+
     os.makedirs("temp", exist_ok=True)
 
-    for chart in charts:
-        fig, ax = plt.subplots(figsize=(6, 4))
-        ax.set_title(f"Totales Generales - Semana: {chart['semana']}", fontsize=14)
+    # Combinar datos de las dos semanas
+    fig, ax = plt.subplots(figsize=(8, 5))
+    ax.set_title("Totales Generales - Últimas 2 Semanas", fontsize=14)
 
-        categories = chart['categories']
-        total_bars = []
+    categories = charts[0]['categories']  # Agentes
+    semanas = [charts[0]['semana'], charts[1]['semana']]
+    series_data = [charts[0]['series'][0]['data'], charts[1]['series'][0]['data']]
 
-        x = list(range(len(categories)))
-        width = 0.35
+    x = list(range(len(categories)))
+    width = 0.35
 
-        for i, serie in enumerate(chart['series']):
-            data = serie['data']
-            positions = [pos + width * (i - 0.5) for pos in x]  # Desfase
-            bars = ax.bar(positions, data, width, label=serie['name'])
-            total_bars.extend(bars)
+    bars_total = []
+    for i, data in enumerate(series_data):
+        positions = [pos + width * (i - 0.5) for pos in x]
+        bars = ax.bar(positions, data, width, label=semanas[i])
+        bars_total.extend(bars)
 
-        for bar in total_bars:
-            height = bar.get_height()
-            if height > 0:
-                ax.annotate(f'{int(height)}', xy=(bar.get_x() + bar.get_width()/2, height),
-                            xytext=(0, 3), textcoords="offset points", ha='center', fontsize=8)
+    for bar in bars_total:
+        height = bar.get_height()
+        if height > 0:
+            ax.annotate(f'{int(height)}', xy=(bar.get_x() + bar.get_width()/2, height),
+                        xytext=(0, 3), textcoords="offset points", ha='center', fontsize=8)
 
-        ax.set_xticks(x)
-        ax.set_xticklabels(categories)
-        ax.legend()
-        ax.grid(True, linestyle='--', linewidth=0.5)
+    ax.set_xticks(x)
+    ax.set_xticklabels(categories)
+    ax.legend()
+    ax.grid(True, linestyle='--', linewidth=0.5)
 
-        plt.tight_layout()
-        filename = f"temp/chart_{uuid.uuid4().hex}.png"
-        plt.savefig(filename)
-        image_paths.append({
-            "path": os.path.abspath(filename),
-            "semana": chart["semana"],
-            "tabla": chart["tabla"]
-        })
-        plt.close()
+    plt.tight_layout()
+    filename = f"temp/combined_chart_{uuid.uuid4().hex}.png"
+    plt.savefig(filename)
+    plt.close()
+
+    image_paths.append({
+        "path": os.path.abspath(filename),
+        "semanas": semanas,
+        "tablas": [charts[0]['tabla'], charts[1]['tabla']]
+    })
 
     return image_paths
 
