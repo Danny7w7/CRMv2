@@ -1301,7 +1301,8 @@ def get_bar_chart_summary_two_weeks():
         (monday_this_week, monday_this_week + timedelta(days=6)),
     ]
 
-    agentes = Users.objects.filter(is_active=True, company=2, role__in=['A', 'C'])
+    # Obtener TODOS los agentes con rol A y C (activos)
+    agentes = Users.objects.filter(is_active=True, company=2, role__in=['A', 'C']).order_by('first_name', 'last_name')
 
     charts = []
 
@@ -1323,7 +1324,7 @@ def get_bar_chart_summary_two_weeks():
             created_at__range=(week_start, week_end)
         ).count()
 
-        # Tabla detallada por agente
+        # Tabla detallada por agente - TODOS los agentes
         tabla = []
         for agente in agentes:
             obamacare_count = ObamaCare.objects.filter(
@@ -1342,12 +1343,17 @@ def get_bar_chart_summary_two_weeks():
                 created_at__range=(week_start, week_end)
             ).count()
 
-            if obamacare_count > 0 or supp_count > 0:
-                tabla.append({
-                    "agente": f"{agente.first_name.upper()} {agente.last_name.upper()}",
-                    "obamacare": obamacare_count,
-                    "supp": supp_count
-                })
+            # Agregar TODOS los agentes, tengan ventas o no
+            tabla.append({
+                "agente": f"{agente.first_name.upper()} {agente.last_name.upper()}",
+                "obamacare": obamacare_count,
+                "supp": supp_count,
+                "total": obamacare_count + supp_count,  # Total para ordenamiento opcional
+                "tiene_ventas": obamacare_count > 0 or supp_count > 0  # Flag para estilos CSS
+            })
+
+        # Opcional: Ordenar por total de ventas (descendente) y luego por nombre
+        tabla.sort(key=lambda x: (-x['total'], x['agente']))
 
         charts.append({
             "semana": semana_label,
@@ -1356,42 +1362,42 @@ def get_bar_chart_summary_two_weeks():
                 {"name": "SUPP", "data": [supp_total]},
             ],
             "categories": ["TOTAL"],
-            "tabla": tabla  # 👈 añadida tabla
+            "tabla": tabla
         })
 
     return charts
 
 def generate_weekly_chart_images_two():
-    charts = get_bar_chart_summary_two_weeks()  # ← usamos tu nueva función
+    charts = get_bar_chart_summary_two_weeks()
     image_paths = []
 
     os.makedirs("temp", exist_ok=True)
 
     for chart in charts:
-        fig, ax = plt.subplots(figsize=(12, 6))
-        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-        ax.set_title(f"Clientes por Agente - Semana: {chart['semana']}", fontsize=14)
+        fig, ax = plt.subplots(figsize=(6, 4))
+        ax.set_title(f"Totales Generales - Semana: {chart['semana']}", fontsize=14)
 
-        agents = [row["agente"] for row in chart["tabla"]]
-        x = list(range(len(agents)))
+        categories = chart['categories']
+        total_bars = []
+
+        x = list(range(len(categories)))
         width = 0.35
 
-        obamacare_data = [row["obamacare"] for row in chart["tabla"]]
-        supp_data = [row["supp"] for row in chart["tabla"]]
+        for i, serie in enumerate(chart['series']):
+            data = serie['data']
+            positions = [pos + width * (i - 0.5) for pos in x]  # Desfase
+            bars = ax.bar(positions, data, width, label=serie['name'])
+            total_bars.extend(bars)
 
-        bars1 = ax.bar([pos - width/2 for pos in x], obamacare_data, width, label='OBAMACARE', color='#1f77b4')
-        bars2 = ax.bar([pos + width/2 for pos in x], supp_data, width, label='SUPP', color='#ff7f0e')
-
-        for bars in [bars1, bars2]:
-            for bar in bars:
-                height = bar.get_height()
-                if height > 0:
-                    ax.annotate(f'{int(height)}', xy=(bar.get_x() + bar.get_width() / 2, height),
-                                xytext=(0, 3), textcoords="offset points", ha='center', fontsize=8)
+        for bar in total_bars:
+            height = bar.get_height()
+            if height > 0:
+                ax.annotate(f'{int(height)}', xy=(bar.get_x() + bar.get_width()/2, height),
+                            xytext=(0, 3), textcoords="offset points", ha='center', fontsize=8)
 
         ax.set_xticks(x)
-        ax.set_xticklabels(agents, rotation=45, ha='right')
-        ax.legend(loc='upper right')
+        ax.set_xticklabels(categories)
+        ax.legend()
         ax.grid(True, linestyle='--', linewidth=0.5)
 
         plt.tight_layout()
@@ -1405,6 +1411,7 @@ def generate_weekly_chart_images_two():
         plt.close()
 
     return image_paths
+
 
 def generarPDFChart6Week_two(image_paths, output_pdf_path):
     template_path = os.path.join(settings.BASE_DIR, 'app', 'templates', 'reporte_grafico_two.html')

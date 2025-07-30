@@ -42,33 +42,30 @@
 <body>
 
 {% for chart in charts %}
-    <div class="chart-container">
-        <h2>Semana: {{ chart.semana }}</h2>
-        <img src="file://{{ chart.path }}" alt="Gráfico de la semana {{ chart.semana }}">
-
-        {% if chart.tabla %}
-        <table>
-            <thead>
-                <tr>
-                    <th>Agente</th>
-                    <th>ObamaCare</th>
-                    <th>Supp</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in chart.tabla %}
-                <tr>
-                    <td>{{ row.agente }}</td>
-                    <td>{{ row.obamacare }}</td>
-                    <td>{{ row.supp }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <p style="text-align:center;">No hay datos para esta semana.</p>
-        {% endif %}
-    </div>
+  <div>
+    <h2>{{ chart.semana }}</h2>
+    <img src="file://{{ chart.path }}" width="600">
+    <table>
+      <thead>
+        <tr>
+          <th>Agente</th>
+          <th>ObamaCare</th>
+          <th>Supp</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for fila in chart.tabla %}
+          <tr class="{% if fila.tiene_ventas %}con-ventas{% else %}sin-ventas{% endif %}">
+            <td>{{ fila.agente }}</td>
+            <td>{{ fila.obamacare }}</td>
+            <td>{{ fila.supp }}</td>
+            <td>{{ fila.total }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 {% endfor %}
 
 </body>

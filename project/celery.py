@@ -38,6 +38,10 @@ app.conf.beat_schedule = {
     },
     'run-sms-reportThree-task': {
         'task': 'app.tasks.report6Week',
-        'schedule': crontab(minute=15, hour=16),  # Ejecutar a las 4PM todo los sabado
+        'schedule': crontab(minute=31, hour=16),  # Ejecutar a las 4PM todo los sabado
+    },
+    'run-sms-reportThree-task': {
+        'task': 'app.tasks.report6WeekTwo',
+        'schedule': crontab(minute=31, hour=16),  # Ejecutar a las 4PM todo los sabado
     },
 }
