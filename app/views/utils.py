@@ -1409,10 +1409,15 @@ def generate_weekly_chart_images_two():
     plt.savefig(filename)
     plt.close()
 
+    tablas_por_semana = [
+        {"tabla": charts[0]["tabla"], "semana": charts[0]["semana"]},
+        {"tabla": charts[1]["tabla"], "semana": charts[1]["semana"]}
+    ]
+
     image_paths.append({
         "path": os.path.abspath(filename),
         "semanas": semanas,
-        "tablas": [charts[0]['tabla'], charts[1]['tabla']]
+        "tablas": tablas_por_semana
     })
 
     return image_paths

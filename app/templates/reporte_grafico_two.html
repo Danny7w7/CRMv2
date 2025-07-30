@@ -55,7 +55,8 @@
   </div>
 
   <div class="tables-container page-break">
-    {% for tabla, semana in chart.tablas|zip:chart.semanas %}
+  {% for item in chart.tablas %}
+    {% with tabla=item.tabla semana=item.semana %}
       <div style="width: 50%;">
         <h2>Tabla - Semana {{ semana }}</h2>
         <table>
@@ -79,8 +80,12 @@
           </tbody>
         </table>
       </div>
-    {% endfor %}
-  </div>
+    {% endwith %}
+  {% endfor %}
+</div>
+
+
+
 {% endfor %}
 
 </body>
