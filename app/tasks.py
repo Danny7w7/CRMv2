@@ -338,23 +338,21 @@ def report6Week():
     s3_url = uploadTempUrl(local_pdf_path, s3_key)
 
     # 4. Enviar SMS vía Telnyx
-    telnyx.api_key = settings.TELNYX_API_KEY
-    mensaje_sms = (
-        f"📄 Reporte Semanal Generado\n"
-        f"📅 {now.strftime('%d/%m/%Y %H:%M')}\n\n"
-        f"📎 PDF completo adjunto"
-    )
-
-    telnyx.Message.create(
-        from_='+17869848427',
-        to='+17863034781',
-        text=mensaje_sms,
-        subject='Reporte PDF Semanal Customer',
-        media_urls=[s3_url]
-    )
+    try:
+        telnyx.Message.create(
+            from_='+17869848427',
+            to='+17863034781',
+            text=mensaje_sms,
+            subject='Reporte PDF Semanal Customer',
+            media_urls=[s3_url]
+        )
+        print("✅ MMS enviado correctamente")
+    except Exception as e:
+        print(f"❌ Error al enviar MMS: {e}")
 
     # 5. Limpiar archivos temporales
     for path in charts_paths + [local_pdf_path]:
         if os.path.exists(path):
             os.remove(path)
+
 
