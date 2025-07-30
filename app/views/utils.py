@@ -1399,7 +1399,8 @@ def generate_weekly_chart_images_two():
         plt.savefig(filename)
         image_paths.append({
             "path": os.path.abspath(filename),
-            "semana": chart["semana"]
+            "semana": chart["semana"],
+            "tabla": chart["tabla"]
         })
         plt.close()
 

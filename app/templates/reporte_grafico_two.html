@@ -19,8 +19,23 @@
         }
         img {
             width: 100%;
-            max-height: 500px;
+            max-height: 400px;
             object-fit: contain;
+            margin-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 11px;
+        }
+        th, td {
+            border: 1px solid #aaa;
+            padding: 5px;
+            text-align: center;
+        }
+        th {
+            background-color: #ddd;
         }
     </style>
 </head>
@@ -30,6 +45,29 @@
     <div class="chart-container">
         <h2>Semana: {{ chart.semana }}</h2>
         <img src="file://{{ chart.path }}" alt="Gráfico de la semana {{ chart.semana }}">
+
+        {% if chart.tabla %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Agente</th>
+                    <th>ObamaCare</th>
+                    <th>Supp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in chart.tabla %}
+                <tr>
+                    <td>{{ row.agente }}</td>
+                    <td>{{ row.obamacare }}</td>
+                    <td>{{ row.supp }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="text-align:center;">No hay datos para esta semana.</p>
+        {% endif %}
     </div>
 {% endfor %}
 
