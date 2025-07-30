@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte Completo</title>
+    <style>
+        body { font-family: sans-serif; font-size: 12px; padding: 20px; }
+        h2 { text-align: center; margin-bottom: 10px; }
+        img { width: 100%; max-width: 700px; margin: 20px 0; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 40px; }
+        th, td { border: 1px solid #ccc; padding: 5px; text-align: center; }
+        .highlight { background-color: #e0f7fa; }
+    </style>
+</head>
+<body>
+    <h2>Reporte de Clientes (Últimas 6 Semanas)</h2>
+    {% for chart_path in charts_weekly %}
+        <img src="file://{{ chart_path }}" alt="Gráfico Semanal">
+    {% endfor %}
+
+    <h2>Resumen General (Últimas 2 Semanas)</h2>
+    {% for chart in charts_two_week %}
+        <h3>{{ chart.semana }}</h3>
+        <img src="file://{{ chart.path }}" alt="Resumen Semanal">
+        <table>
+            <tr>
+                <th>Agente</th>
+                <th>ObamaCare</th>
+                <th>Supp</th>
+                <th>Total</th>
+            </tr>
+            {% for fila in chart.tabla %}
+            <tr class="{% if fila.tiene_ventas %}highlight{% endif %}">
+                <td>{{ fila.agente }}</td>
+                <td>{{ fila.obamacare }}</td>
+                <td>{{ fila.supp }}</td>
+                <td>{{ fila.total }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% endfor %}
+</body>
+</html>

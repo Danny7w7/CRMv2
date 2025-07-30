@@ -1427,6 +1427,25 @@ from django.db.models.functions import TruncMonth
 from django.db.models import Count
 from datetime import timedelta
 from collections import OrderedDict
+#test unificado
+def generarPDFCompleto(output_pdf_path):
+    charts_weekly = generate_weekly_chart_images()
+    charts_two_week = generate_weekly_chart_images_two()
+
+    template_path = os.path.join(settings.BASE_DIR, 'app', 'templates', 'reporte_completo.html')
+
+    with open(template_path, encoding='utf-8') as f:
+        template_code = f.read()
+
+    template = Engine().from_string(template_code)
+
+    context = {
+        'charts_weekly': charts_weekly,
+        'charts_two_week': charts_two_week,
+    }
+
+    rendered_html = template.render(Context(context))
+    HTML(string=rendered_html).write_pdf(output_pdf_path)
 
 from collections import OrderedDict
 from datetime import timedelta, datetime

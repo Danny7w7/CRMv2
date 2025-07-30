@@ -360,7 +360,7 @@ def xxxxxxxxxxxxxx():
 
 
 @shared_task
-def report6Week():
+def mmmm():
     now = datetime.now()
     filename = f"reporte_graficos_{now.strftime('%Y%m%d_%H%M%S')}.pdf"
     local_pdf_path = f"/tmp/{filename}"
@@ -397,139 +397,50 @@ def report6Week():
             os.remove(path)
 
 
-def generate_unified_pdf_report_for_task(output_path):
-    """
-    Versión optimizada para tasks que genera el PDF unificado
-    """
-    import matplotlib.pyplot as plt
-    from matplotlib.ticker import MaxNLocator
-    import uuid
-    from django.template import Engine, Context
-    from weasyprint import HTML
-    
-    # Obtener datos de ambos reportes
-    charts_6week = get_bar_chart_data()
-    charts_2week = get_bar_chart_summary_two_weeks()
-    
-    # Generar imágenes para 6 semanas
-    image_paths_6week = []
-    os.makedirs("/tmp", exist_ok=True)
-    
-    for chart in charts_6week:
-        fig, ax = plt.subplots(figsize=(12, 6))
-        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-        ax.set_title(f"Clientes por Agente: Semana {chart['semana']}", fontsize=14)
-
-        categories = chart["categories"]
-        width = 0.15
-        x = list(range(len(categories)))
-        series_list = chart["series"]
-
-        for i, serie in enumerate(series_list):
-            data = serie["data"]
-            label = serie["name"]
-            positions = [pos + width * i for pos in x]
-            bars = ax.bar(positions, data, width, label=label)
-
-            for bar in bars:
-                height = bar.get_height()
-                if height > 0:
-                    ax.annotate(f'{int(height)}', xy=(bar.get_x() + bar.get_width() / 2, height),
-                                xytext=(0, 3), textcoords="offset points", ha='center', fontsize=8)
-
-        ax.set_xticks([pos + width * (len(series_list) / 2 - 0.5) for pos in x])
-        ax.set_xticklabels(categories, rotation=45, ha='right')
-        ax.legend(loc='upper right')
-        ax.grid(True, linestyle='--', linewidth=0.5)
-
-        filename = f"/tmp/chart_6week_{uuid.uuid4().hex}.png"
-        plt.tight_layout()
-        plt.savefig(filename, dpi=300, bbox_inches='tight')
-        image_paths_6week.append(os.path.abspath(filename))
-        plt.close()
-    
-    # Generar imagen para 2 semanas
-    fig, ax = plt.subplots(figsize=(8, 5))
-    width = 0.35
-    x = [0, 1]
-    labels = [chart['semana'] for chart in charts_2week]
-    
-    obamacare_totals = [chart['series'][0]['data'][0] for chart in charts_2week]
-    supp_totals = [chart['series'][1]['data'][0] for chart in charts_2week]
-    
-    bars1 = ax.bar([pos - width / 2 for pos in x], obamacare_totals, width=width, label="ObamaCare", color='#2E86AB')
-    bars2 = ax.bar([pos + width / 2 for pos in x], supp_totals, width=width, label="Supp", color='#A23B72')
-    
-    # Agregar valores sobre las barras
-    for bars in [bars1, bars2]:
-        for bar in bars:
-            height = bar.get_height()
-            if height > 0:
-                ax.annotate(f'{int(height)}', xy=(bar.get_x() + bar.get_width() / 2, height),
-                            xytext=(0, 3), textcoords="offset points", ha='center', fontweight='bold')
-    
-    ax.set_xticks(x)
-    ax.set_xticklabels([label.replace(' a ', '\na ') for label in labels], fontsize=10)
-    ax.set_ylabel("Cantidad de ventas", fontweight='bold')
-    ax.set_title("Totales Generales - Últimas 2 semanas", fontsize=14, fontweight='bold')
-    ax.legend(loc='upper right')
-    ax.grid(True, alpha=0.3)
-    
-    filename_2week = f"/tmp/chart_2week_{uuid.uuid4().hex}.png"
-    fig.tight_layout()
-    plt.savefig(filename_2week, dpi=300, bbox_inches='tight')
-    plt.close()
-    
-    image_path_2week = os.path.abspath(filename_2week)
-    
-    # Preparar datos para template unificado
-    context_data = {
-        'charts_6week': image_paths_6week,
-        'chart_2week': {
-            'path': image_path_2week,
-            'data': charts_2week
-        },
-        'generated_date': datetime.now().strftime('%d de %B de %Y a las %H:%M'),
-        'total_weeks_analyzed': len(charts_6week),
-        'total_agents': len(charts_2week[0]['tabla']) if charts_2week else 0
-    }
+from celery import shared_task
+from datetime import datetime
+import os
+import telnyx
+from django.conf import settings
 
 @shared_task
-def report_complete_unified():
-    """
-    Task unificada que genera un PDF completo con ambos reportes
-    """
+def report6Week():
     now = datetime.now()
     filename = f"reporte_completo_{now.strftime('%Y%m%d_%H%M%S')}.pdf"
     local_pdf_path = f"/tmp/{filename}"
 
-    try:
-        # Generar PDF unificado usando la Opción 2 (recomendada)
-        pdf_path = generate_unified_pdf_report_for_task(local_pdf_path)
-        
-        # Subir a S3 y generar URL temporal
-        s3_key = f"reportes/{filename}"
-        s3_url = uploadTempUrl(pdf_path, s3_key)
+    # 1. Generar PDF completo con gráficos (6 semanas + 2 semanas)
+    generarPDFCompleto(local_pdf_path)
 
-        # Enviar SMS vía Telnyx
-        telnyx.api_key = settings.TELNYX_API_KEY
-        mensaje_sms = (
-            f"📄 Reporte Completo Generado\n"
-            f"📅 {now.strftime('%d/%m/%Y %H:%M')}\n"
-            f"📊 Incluye análisis 6 semanas + resumen 2 semanas\n\n"
-            f"📎 PDF completo adjunto"
-        )
+    # 2. Subir a S3 y generar URL temporal
+    s3_key = f"reportes/{filename}"
+    s3_url = uploadTempUrl(local_pdf_path, s3_key)
 
-        telnyx.Message.create(
-            from_='+17869848427',
-            to='+17863034781',
-            text=mensaje_sms,
-            subject='Reporte PDF Completo Customer',
-            media_urls=[s3_url]
-        )
+    # 3. Enviar SMS vía Telnyx
+    telnyx.api_key = settings.TELNYX_API_KEY
+    mensaje_sms = (
+        f"📄 Reporte Semanal Generado\n"
+        f"📅 {now.strftime('%d/%m/%Y %H:%M')}\n\n"
+        f"📎 PDF completo adjunto"
+    )
 
-        return f"Reporte completo generado exitosamente: {filename}"
+    telnyx.Message.create(
+        from_='+17869848427',
+        to='+17863034781',
+        text=mensaje_sms,
+        subject='Reporte PDF Semanal Customer',
+        media_urls=[s3_url]
+    )
 
-    except Exception as e:
-        return f"Error generando reporte completo: {str(e)}"
+    # 4. Limpiar archivos temporales
+    temp_folder = os.path.join(settings.BASE_DIR, "temp")
+    if os.path.exists(temp_folder):
+        for archivo in os.listdir(temp_folder):
+            ruta = os.path.join(temp_folder, archivo)
+            if os.path.isfile(ruta):
+                os.remove(ruta)
+
+    if os.path.exists(local_pdf_path):
+        os.remove(local_pdf_path)
+
 
