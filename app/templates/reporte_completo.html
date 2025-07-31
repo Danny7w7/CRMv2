@@ -19,9 +19,9 @@
     {% endfor %}
 
     <h2>Resumen General (Últimas 2 Semanas)</h2>
-    <img src="file://{{ chart.path }}" alt="Resumen Semanal">
     {% for chart in charts_two_week %}
         <h3>{{ chart.semana }}</h3>
+        <img src="file://{{ chart.path }}" alt="Resumen Semanal">
         <table>
             <tr>
                 <th>Agente</th>
