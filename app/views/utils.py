@@ -1367,17 +1367,16 @@ def get_bar_chart_summary_two_weeks():
 
     return charts
 
-
 def generate_weekly_chart_images_two():
-    charts = get_bar_chart_summary_two_weeks() 
+    charts = get_bar_chart_summary_two_weeks()
     output_dir = "temp"
     os.makedirs(output_dir, exist_ok=True)
 
-    # Generar solo una imagen general (con ambas semanas)
+    # Generar una sola imagen general
     fig, ax = plt.subplots(figsize=(6, 4))
 
     width = 0.35
-    x = [0, 1]  # una barra por semana
+    x = [0, 1]
     labels = [chart['semana'] for chart in charts]
 
     obamacare_totals = [chart['series'][0]['data'][0] for chart in charts]
@@ -1398,17 +1397,17 @@ def generate_weekly_chart_images_two():
     plt.savefig(filename)
     plt.close()
 
-    # Ahora armamos un resultado por semana con la misma imagen
-    image_path = os.path.abspath(filename)
-    image_paths = []
+    resumen_chart_path = os.path.abspath(filename)
+
+    # Armar datos semanales sin imagen
+    semanas = []
     for chart in charts:
-        image_paths.append({
-            "path": image_path,
+        semanas.append({
             "semana": chart["semana"],
             "tabla": chart["tabla"]
         })
 
-    return image_paths
+    return resumen_chart_path, semanas
 
 
 def generarPDFChart6Week_two(image_paths, output_pdf_path):
@@ -1430,7 +1429,7 @@ from collections import OrderedDict
 #test unificado
 def generarPDFCompleto(output_pdf_path):
     charts_weekly = generate_weekly_chart_images()
-    charts_two_week = generate_weekly_chart_images_two()
+    resumen_chart_path, charts_two_week = generate_weekly_chart_images_two()
 
     template_path = os.path.join(settings.BASE_DIR, 'app', 'templates', 'reporte_completo.html')
 
@@ -1441,7 +1440,8 @@ def generarPDFCompleto(output_pdf_path):
 
     context = {
         'charts_weekly': charts_weekly,
-        'charts_two_week': charts_two_week,
+        'resumen_chart_path': resumen_chart_path,  # ✅ NUEVA VARIABLE
+        'charts_two_week': charts_two_week         # ✅ SOLO DATOS POR SEMANA
     }
 
     rendered_html = template.render(Context(context))
