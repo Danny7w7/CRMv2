@@ -582,7 +582,6 @@ class BasePerson(models.Model):
     class Meta:
         abstract = True  # No se crea tabla para esta clase
 
-
 class BdExcel(BasePerson):
     excel_metadata = models.ForeignKey(
         ExcelFileMetadata,
@@ -592,7 +591,6 @@ class BdExcel(BasePerson):
 
     class Meta:
         db_table = 'bd_excel'
-
 
 class Leads(BasePerson):
     email = models.EmailField(max_length=254)
@@ -606,7 +604,6 @@ class LeadExtraField(models.Model):
 
     class Meta:
         db_table = 'lead_extra_fields'
-
 
 class ControlQuality(models.Model):
     agent_create = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='created_controls' )

@@ -34,7 +34,8 @@ MODULE_PATHS = {
     'BD': [ 'uploadExcel', 'manageAgentAssignments','reportBd','bd','processAndSave','saveData'],
     'COMPARATIVE': [ 'uploadReports','processExcel','headerProcessor', 'paymentsReports', 'paymentsReportsSupp'],
     'TEAM MANAGEMENT': [ 'customerAssginments'],
-    'QUOTATION': [ 'marketplace','obtenerCountyfips','obtenerLatLon']
+    'QUOTATION': [ 'marketplace','obtenerCountyfips','obtenerLatLon'],
+    'BOOK': ['uploadBook','bookList','bookPages','saveTime','toggleBook','bookReport']
 }
 
 EXCLUDED_VIEWS = ['index','toggleDarkMode' ,'motivationalPhrase','login','logout','viewConsent','consetMedicare','formCreateUser', 'adminSms','addNumbersUsers','incomeLetter','ConsentLifeInsurance','complaint', 'sms','whatsappReply','url_temporal', 'obtainLeadsByGoHighLevel']  # Puedes agregar más si lo necesitas

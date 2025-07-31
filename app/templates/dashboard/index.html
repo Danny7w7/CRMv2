@@ -177,6 +177,28 @@
 					</li>
 				{% endif %}
 
+				{% if request.user|has_module:"BOOK" %}
+					<li class="menu-label">Book</li>
+					<li>
+						<a class="has-arrow" href="javascript:;">
+							<div class="parent-icon"><i class="fadeIn animated bx bx-book-alt"></i></div>
+							<div class="menu-title">Quotation Plans</div>
+						</a>
+						<ul>
+							{% if request.user.role == 'Admin' or request.user.role == 'S'  %}			
+								<li> <a href="{% url 'uploadBook' %}"><i class='bx bx-radio-circle'></i>Upload Book</a> 
+								</li>
+							{% endif %}	
+							<li> <a href="{% url 'bookList' %}"><i class='bx bx-radio-circle'></i>View Books</a> 
+							</li>	
+							{% if request.user.role != 'A' %}			
+								<li> <a href="{% url 'bookReport' %}"><i class='bx bx-radio-circle'></i>Book Reports</a> 
+								</li>
+							{% endif %}						
+						</ul>
+					</li>
+				{% endif %}
+
 				{% if smsIsActive or whatsAppIsActive %}
 
 					{% if request.user|has_module:"SMS" or request.user|has_module:"WHATSAPP" %}

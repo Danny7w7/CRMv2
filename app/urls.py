@@ -25,7 +25,7 @@ from .views.reports import fecths as fetchsReports
 from .views.reports import table as tableReports
 from .views.reports import charts, download
 from .views.users import users, companies
-from .views import dbExcel, quality, consents, sms, utils, supervisorPanel, whatsApp, comparativeReports, leadConector
+from .views import dbExcel, quality, consents, sms, utils, supervisorPanel, whatsApp, comparativeReports, leadConector, book
 
 
 urlpatterns = [
@@ -262,6 +262,15 @@ urlpatterns = [
 
     #<---------------------------Utils---------------------------> 
     path('toggleDarkMode/', utils.toggleDarkMode, name='toggleDarkMode'),
+
+
+    #<---------------------------Book---------------------------> 
+    path('uploadBook/', book.uploadBook, name='uploadBook'),
+    path('bookList/', book.bookList, name='bookList'),
+    path('bookPages/<int:pdf_id>/', book.bookPages, name='bookPages'),
+    path('saveTime/', book.saveTime, name='saveTime'),
+    path('toggleBook/<book_id>/', book.toggleBook, name='toggleBook'),
+    path('bookReport/', book.bookReport, name='bookReport'),
     
 
     #<---------------------------WHATSAPP--------------------------->
