@@ -1166,7 +1166,7 @@ from django.db.models import Count
 from app.models import Users, Supp, ObamaCare
 # 6SEMANAS
 
-def get_bar_chart_data():
+def chart6Week():
     agentes = Users.objects.filter(is_active=True, company=2, role__in=['A', 'C'])
     now = timezone.now()
 
@@ -1226,9 +1226,8 @@ def get_bar_chart_data():
 
     return charts
 
-
-def generate_weekly_chart_images():
-    charts = get_bar_chart_data()
+def generatePDFChart6Week():
+    charts = chart6Week()
     image_paths = []
 
     os.makedirs("temp", exist_ok=True)
@@ -1268,7 +1267,6 @@ def generate_weekly_chart_images():
 
     return image_paths
 
-
 def generarPDFChart6Week(image_paths, output_pdf_path):
     template_path = os.path.join(settings.BASE_DIR, 'app', 'templates', 'reporte_grafico.html')
 
@@ -1288,7 +1286,7 @@ from datetime import timedelta
 from collections import defaultdict
 from django.utils import timezone
 #semana actual Vs Anterior
-def get_bar_chart_summary_two_weeks():
+def chartWeekPrevius():
     now = timezone.now().date()
 
     # Calcular los lunes de esta semana y la anterior
@@ -1367,8 +1365,8 @@ def get_bar_chart_summary_two_weeks():
 
     return charts
 
-def generate_weekly_chart_images_two():
-    charts = get_bar_chart_summary_two_weeks()
+def generatePDFChartWeekPrevius():
+    charts = chartWeekPrevius()
     output_dir = "temp"
     os.makedirs(output_dir, exist_ok=True)
 
@@ -1409,7 +1407,6 @@ def generate_weekly_chart_images_two():
 
     return resumen_chart_path, semanas
 
-
 def generarPDFChart6Week_two(image_paths, output_pdf_path):
     template_path = os.path.join(settings.BASE_DIR, 'app', 'templates', 'reporte_grafico_two.html')
 
@@ -1428,8 +1425,8 @@ from datetime import timedelta
 from collections import OrderedDict
 #test unificado
 def generarPDFCompleto(output_pdf_path):
-    charts_weekly = generate_weekly_chart_images()
-    resumen_chart_path, charts_two_week = generate_weekly_chart_images_two()
+    charts6Weekly = generatePDFChart6Week()
+    resumenChartWeek, charts_two_week = generatePDFChartWeekPrevius()
 
     template_path = os.path.join(settings.BASE_DIR, 'app', 'templates', 'reporte_completo.html')
 
@@ -1439,9 +1436,9 @@ def generarPDFCompleto(output_pdf_path):
     template = Engine().from_string(template_code)
 
     context = {
-        'charts_weekly': charts_weekly,
-        'resumen_chart_path': resumen_chart_path,  # ✅ NUEVA VARIABLE
-        'charts_two_week': charts_two_week         # ✅ SOLO DATOS POR SEMANA
+        'charts_weekly': charts6Weekly,
+        'resumen_chart_path': resumenChartWeek,
+        'charts_two_week': charts_two_week         
     }
 
     rendered_html = template.render(Context(context))
@@ -1534,6 +1531,8 @@ def get_bar_chart_summary_six_months():
         })
     
     return charts
+
+
 #ultimo aaño
 def get_bar_chart_summary_all_data():
     from collections import defaultdict
@@ -1607,4 +1606,84 @@ def get_bar_chart_summary_all_data():
         })
     
     return charts
+
+import matplotlib.pyplot as plt
+import os
+import uuid
+
+def generate_monthly_summary_charts():
+    output_dir = "temp"
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Datos
+    charts_6_months = get_bar_chart_summary_six_months()
+    charts_all_data = get_bar_chart_summary_all_data()
+
+    # ---------------------------
+    # GRAFICA: Últimos 6 meses
+    # ---------------------------
+    fig1, ax1 = plt.subplots(figsize=(8, 4))
+    labels_6 = [c['mes'] for c in charts_6_months]
+    obama_6 = [c['series'][0]['data'][0] for c in charts_6_months]
+    supp_6 = [c['series'][1]['data'][0] for c in charts_6_months]
+    x_6 = range(len(labels_6))
+
+    ax1.bar([x - 0.2 for x in x_6], obama_6, width=0.4, label='ObamaCare', color='blue')
+    ax1.bar([x + 0.2 for x in x_6], supp_6, width=0.4, label='Supp', color='green')
+
+    ax1.set_xticks(list(x_6))
+    ax1.set_xticklabels(labels_6, rotation=30)
+    ax1.set_title("Ventas últimos 6 meses")
+    ax1.legend()
+    ax1.grid(True)
+
+    path_6_months = os.path.abspath(f"{output_dir}/chart_6m_{uuid.uuid4().hex}.png")
+    fig1.tight_layout()
+    plt.savefig(path_6_months)
+    plt.close()
+
+    # ---------------------------
+    # GRAFICA: Todo el histórico
+    # ---------------------------
+    fig2, ax2 = plt.subplots(figsize=(10, 4))
+    labels_all = [c['mes'] for c in charts_all_data]
+    obama_all = [c['series'][0]['data'][0] for c in charts_all_data]
+    supp_all = [c['series'][1]['data'][0] for c in charts_all_data]
+    x_all = range(len(labels_all))
+
+    ax2.bar([x - 0.2 for x in x_all], obama_all, width=0.4, label='ObamaCare', color='blue')
+    ax2.bar([x + 0.2 for x in x_all], supp_all, width=0.4, label='Supp', color='green')
+
+    ax2.set_xticks(list(x_all))
+    ax2.set_xticklabels(labels_all, rotation=30)
+    ax2.set_title("Histórico anual de ventas")
+    ax2.legend()
+    ax2.grid(True)
+
+    path_all_data = os.path.abspath(f"{output_dir}/chart_all_{uuid.uuid4().hex}.png")
+    fig2.tight_layout()
+    plt.savefig(path_all_data)
+    plt.close()
+
+    return path_6_months, path_all_data
+
+from django.template import Engine, Context
+from weasyprint import HTML
+
+def generarPDFResumenMensual(output_pdf_path):
+    chart_6_months, chart_all_data = generate_monthly_summary_charts()
+
+    template_path = os.path.join(settings.BASE_DIR, 'app', 'templates', 'reporte_mensual.html')
+    with open(template_path, encoding='utf-8') as f:
+        template_code = f.read()
+
+    template = Engine().from_string(template_code)
+
+    context = {
+        'chart_6_months': chart_6_months,
+        'chart_all_data': chart_all_data,
+    }
+
+    rendered_html = template.render(Context(context))
+    HTML(string=rendered_html).write_pdf(output_pdf_path)
 

@@ -444,3 +444,44 @@ def report6Week():
         os.remove(local_pdf_path)
 
 
+@shared_task
+def allReports():
+    now = datetime.now()
+    filename = f"reporte_completo_{now.strftime('%Y%m%d_%H%M%S')}.pdf"
+    local_pdf_path = f"/tmp/{filename}"
+
+    # 1. Generar PDF completo con gráficos (6 semanas + 2 semanas)
+    generarPDFResumenMensual(local_pdf_path)
+
+    # 2. Subir a S3 y generar URL temporal
+    s3_key = f"reportes/{filename}"
+    s3_url = uploadTempUrl(local_pdf_path, s3_key)
+
+    # 3. Enviar SMS vía Telnyx
+    telnyx.api_key = settings.TELNYX_API_KEY
+    mensaje_sms = (
+        f"📄 Reporte Semanal Generado\n"
+        f"📅 {now.strftime('%d/%m/%Y %H:%M')}\n\n"
+        f"📎 PDF completo adjunto"
+    )
+
+    telnyx.Message.create(
+        from_='+17869848427',
+        to='+17863034781',
+        text=mensaje_sms,
+        subject='Reporte PDF Semanal Customer',
+        media_urls=[s3_url]
+    )
+
+    # 4. Limpiar archivos temporales
+    temp_folder = os.path.join(settings.BASE_DIR, "temp")
+    if os.path.exists(temp_folder):
+        for archivo in os.listdir(temp_folder):
+            ruta = os.path.join(temp_folder, archivo)
+            if os.path.isfile(ruta):
+                os.remove(ruta)
+
+    if os.path.exists(local_pdf_path):
+        os.remove(local_pdf_path)
+
+
