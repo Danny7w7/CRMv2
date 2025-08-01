@@ -196,3 +196,135 @@ def weekSalesSummarySms(week_number):
             })
     
     return prepared_data, prepared_client_data, rango_fechas, week_days_order, totales_por_dia, gran_total_aca, gran_total_supp
+
+
+import smtplib
+import ssl
+import logging
+from email.message import EmailMessage
+from typing import Optional, Union, List
+from pathlib import Path
+
+logger = logging.getLogger(__name__)
+
+def enviar_email(
+    destinatario: Union[str, List[str]],
+    asunto: str,
+    cuerpo: str,
+    archivo_adjunto: Optional[str] = None,
+    nombre_archivo: Optional[str] = None,
+    cc: Optional[Union[str, List[str]]] = None,
+    bcc: Optional[Union[str, List[str]]] = None,
+    es_html: bool = False
+) -> bool:
+    """
+    Función reutilizable para enviar emails con archivos adjuntos opcionales.
+    
+    Args:
+        destinatario: Email del destinatario o lista de emails
+        asunto: Asunto del email
+        cuerpo: Cuerpo del mensaje
+        archivo_adjunto: Ruta del archivo a adjuntar (opcional)
+        nombre_archivo: Nombre personalizado para el archivo adjunto (opcional)
+        cc: Email(s) en copia (opcional)
+        bcc: Email(s) en copia oculta (opcional)
+        es_html: True si el cuerpo es HTML, False para texto plano
+    
+    Returns:
+        bool: True si el email se envió correctamente, False en caso contrario
+    """
+    
+    try:
+        # Validar que exista el archivo adjunto si se especifica
+        if archivo_adjunto and not Path(archivo_adjunto).exists():
+            print(f"❌ El archivo {archivo_adjunto} no existe")
+            logger.error(f"El archivo {archivo_adjunto} no existe")
+            return False
+        
+        # Crear el mensaje de email
+        message = EmailMessage()
+        message['Subject'] = asunto
+        message['From'] = settings.SENDER_EMAIL_ADDRESS
+        
+        # Configurar destinatarios
+        if isinstance(destinatario, list):
+            message['To'] = ', '.join(destinatario)
+        else:
+            message['To'] = destinatario
+        
+        # Configurar el contenido del mensaje
+        if es_html:
+            message.set_content(cuerpo, subtype='html')
+        else:
+            message.set_content(cuerpo)
+        
+        # Agregar archivo adjunto si se especifica
+        if archivo_adjunto:
+            with open(archivo_adjunto, 'rb') as archivo:
+                contenido_archivo = archivo.read()
+            
+            # Determinar el nombre del archivo
+            if nombre_archivo:
+                nombre_final = nombre_archivo
+            else:
+                nombre_final = Path(archivo_adjunto).name
+            
+            # Determinar el tipo de archivo
+            extension = Path(archivo_adjunto).suffix.lower()
+            
+            if extension == '.pdf':
+                maintype, subtype = 'application', 'pdf'
+            elif extension in ['.jpg', '.jpeg']:
+                maintype, subtype = 'image', 'jpeg'
+            elif extension == '.png':
+                maintype, subtype = 'image', 'png'
+            elif extension == '.txt':
+                maintype, subtype = 'text', 'plain'
+            elif extension in ['.xlsx', '.xls']:
+                maintype, subtype = 'application', 'vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            elif extension == '.csv':
+                maintype, subtype = 'text', 'csv'
+            else:
+                maintype, subtype = 'application', 'octet-stream'
+            
+            message.add_attachment(
+                contenido_archivo,
+                maintype=maintype,
+                subtype=subtype,
+                filename=nombre_final
+            )
+        
+        # Enviar el email usando SMTP_SSL
+        context = ssl.create_default_context()
+        with smtplib.SMTP_SSL(settings.SMTP_HOST, int(settings.SMTP_PORT), context=context) as server:
+            server.login(settings.SENDER_EMAIL_ADDRESS, settings.EMAIL_PASSWORD)
+            server.send_message(message)
+        
+        print(f"✅ Email enviado correctamente a {destinatario}")
+        logger.info(f"Email enviado correctamente a {destinatario}")
+        return True
+        
+    except smtplib.SMTPAuthenticationError as e:
+        print(f"❌ Error de autenticación SMTP: {str(e)}")
+        logger.error(f"Error de autenticación SMTP: {str(e)}")
+        return False
+        
+    except smtplib.SMTPException as e:
+        print(f"❌ Error SMTP: {str(e)}")
+        logger.error(f"Error SMTP: {str(e)}")
+        return False
+        
+    except FileNotFoundError as e:
+        print(f"❌ Archivo no encontrado: {str(e)}")
+        logger.error(f"Archivo no encontrado: {str(e)}")
+        return False
+        
+    except Exception as e:
+        print(f"❌ Error inesperado al enviar email: {str(e)}")
+        logger.error(f"Error inesperado al enviar email: {str(e)}")
+        import traceback
+        print(f"❌ Traceback: {traceback.format_exc()}")
+        return False
+
+
+

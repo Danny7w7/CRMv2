@@ -15,7 +15,7 @@ from app.models import *
 from app.views.consents import getCompanyPerAgent
 from app.views.reports.table import table6Week
 from app.views.sms import sendIndividualsSms, comprobate_company, SendMessageWebsocketChannel, discountRemainingBalance
-from app.utils import generateWeeklyPdf, uploadTempUrl
+from app.utils import enviar_email, generateWeeklyPdf, uploadTempUrl
 from app.views.utils import *
 
 logger = get_task_logger(__name__)
@@ -259,58 +259,35 @@ def reportCustomerWeek():
         )
 
     # 5. Enviar por Email - TODO INTEGRADO AQUÍ
-    try:
-        
-        # Leer el PDF como bytes
-        with open(local_path, 'rb') as pdf_file:
-            pdf_content = pdf_file.read()
-        
-        # Configurar el mensaje del email
-        email_subject = f"📄 Reporte Semanal Customer - {now.strftime('%d/%m/%Y')}"
-        email_body = f"""Estimado/a,
+    email_subject = f"📄 Reporte Semanal Customer - {now.strftime('%d/%m/%Y')}"
+    email_body = f"""Estimado/a,
 
-            Se ha generado el reporte semanal correspondiente al {now.strftime('%d de %B de %Y a las %H:%M')}.
+        Se ha generado el reporte semanal correspondiente al {now.strftime('%d de %B de %Y a las %H:%M')}.
 
-            El archivo PDF con el reporte completo del equipo de customer de la semana actual se encuentra adjunto a este correo.
+        El archivo PDF con el reporte completo del equipo de customer de la semana actual se encuentra adjunto a este correo.
 
-            Reporte Generado por el mejor equipo de IT.
+        Reporte Generado por el mejor equipo de IT.
 
-            Saludos cordiales,
-            Sistema de Reportes
-            """
-        
-        # Crear el mensaje de email
-        message = EmailMessage()
-        message['Subject'] = email_subject
-        message['From'] = settings.SENDER_EMAIL_ADDRESS
-        message['To'] = 'Jlhernandezt.88@gmail.com'
-        message.set_content(email_body)
+        Saludos cordiales,
+        Sistema de Reportes"""
 
-        # Adjuntar el PDF
-        message.add_attachment(
-            pdf_content,
-            maintype='application',
-            subtype='pdf',
-            filename=filename
-        )
-        
-        # Enviar el email usando SMTP_SSL
-        context = ssl.create_default_context()
-        with smtplib.SMTP_SSL(settings.SMTP_HOST, int(settings.SMTP_PORT), context=context) as server:
-            server.login(settings.SENDER_EMAIL_ADDRESS, settings.EMAIL_PASSWORD)
-            server.send_message(message)
+    # Llamar a la función reutilizable
+    email_enviado = enviar_email(
+        destinatario='Jlhernandezt.88@gmail.com',
+        asunto=email_subject,
+        cuerpo=email_body,
+        archivo_adjunto=local_path,
+        nombre_archivo=filename
+    )
+    
+    # Opcional: Verificar si el email se envió correctamente
+    if email_enviado:
+        print("✅ Email del reporte enviado correctamente")
+        logger.info("Email del reporte enviado correctamente")
+    else:
+        print("❌ Error al enviar el email del reporte")
+        logger.error("Error al enviar el email del reporte")
 
-    except smtplib.SMTPAuthenticationError as e:
-        print(f"❌ Error de autenticación SMTP: {str(e)}")
-        logger.error(f"Error de autenticación SMTP: {str(e)}")
-    except smtplib.SMTPException as e:
-        print(f"❌ Error SMTP: {str(e)}")
-        logger.error(f"Error SMTP: {str(e)}")
-    except Exception as e:
-        print(f"❌ Error inesperado al enviar email: {str(e)}")
-        logger.error(f"Error inesperado al enviar email: {str(e)}")
-        import traceback
-        print(f"❌ Traceback: {traceback.format_exc()}")
 
     # 6. Limpiar archivos temporales
     if os.path.exists(local_path):
@@ -322,8 +299,6 @@ def reportCustomerWeek():
     for path in [llamadas_img_path, user_carrier_img_path]:
         if os.path.exists(path):
             os.remove(path)
-
-
 
 
 @shared_task
@@ -347,13 +322,43 @@ def report6Week():
         f"📎 PDF completo adjunto"
     )
 
-    telnyx.Message.create(
-        from_='+17869848427',
-        to='+17863034781',
-        text=mensaje_sms,
-        subject='Reporte PDF Semanal Customer',
-        media_urls=[s3_url]
+    # telnyx.Message.create(
+    #     from_='+17869848427',
+    #     to='+17863034781',
+    #     text=mensaje_sms,
+    #     subject='Reporte PDF Semanal Customer',
+    #     media_urls=[s3_url]
+    # )
+
+    # 5. Enviar por Email - TODO INTEGRADO AQUÍ
+    email_subject = f"📄 Reporte Semanal Customer - {now.strftime('%d/%m/%Y')}"
+    email_body = f"""Estimado/a,
+
+        Se ha generado el reporte semanal correspondiente al {now.strftime('%d de %B de %Y a las %H:%M')}.
+
+        El archivo PDF con el reporte completo del equipo de customer de la semana actual se encuentra adjunto a este correo.
+
+        Reporte Generado por el mejor equipo de IT.
+
+        Saludos cordiales,
+        Sistema de Reportes"""
+
+    # Llamar a la función reutilizable
+    email_enviado = enviar_email(
+        destinatario='it.bluestream2@gmail.com',
+        asunto=email_subject,
+        cuerpo=email_body,
+        archivo_adjunto=s3_url,
+        nombre_archivo=filename
     )
+    
+    # Opcional: Verificar si el email se envió correctamente
+    if email_enviado:
+        print("✅ Email del reporte enviado correctamente")
+        logger.info("Email del reporte enviado correctamente")
+    else:
+        print("❌ Error al enviar el email del reporte")
+        logger.error("Error al enviar el email del reporte")
 
     # 4. Limpiar archivos temporales
     temp_folder = os.path.join(settings.BASE_DIR, "temp")

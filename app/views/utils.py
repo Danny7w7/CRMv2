@@ -1151,7 +1151,7 @@ def chart6WeekAgent():
                 is_active=True,
                 company=2,
                 status='ACTIVE',
-                profiling_date__range=(week_start, week_end)
+                created_at__range=(week_start, week_end)
             ).count()
             series_dict['OBAMACARE'].append(obamacare_count)
 
@@ -1220,17 +1220,6 @@ def generatePDFChart6Week():
         plt.close()
 
     return image_paths
-
-# def generarPDFChart6Week(image_paths, output_pdf_path):
-#     template_path = os.path.join(settings.BASE_DIR, 'app', 'templates', 'reporte_grafico.html')
-
-#     with open(template_path, encoding='utf-8') as f:
-#         template_code = f.read()
-
-#     template = Engine().from_string(template_code)
-#     rendered_html = template.render(Context({'charts': image_paths}))
-
-#     HTML(string=rendered_html).write_pdf(output_pdf_path)
 
 #semana actual VS Anterior
 def chartWeekPrevius():
@@ -1354,17 +1343,6 @@ def generatePDFChartWeekPrevius():
 
     return resumen_chart_path, semanas
 
-# def generarPDFChart6Week_two(image_paths, output_pdf_path):
-#     template_path = os.path.join(settings.BASE_DIR, 'app', 'templates', 'reporte_grafico_two.html')
-
-#     with open(template_path, encoding='utf-8') as f:
-#         template_code = f.read()
-
-#     template = Engine().from_string(template_code)
-#     rendered_html = template.render(Context({'charts': image_paths}))
-
-#     HTML(string=rendered_html).write_pdf(output_pdf_path)
-
 #Unificacion de los 2 reportes antereiores en el PDF
 def generarPDFCompleto(output_pdf_path):
     charts6Weekly = generatePDFChart6Week()
@@ -1420,7 +1398,7 @@ def chartSixMonths():
             is_active=True,
             company=2,
             status='ACTIVE',
-            profiling_date__range=(month_start, month_end)
+            created_at__range=(month_start, month_end)
         ).count()
         
         supp_total = Supp.objects.filter(
@@ -1451,8 +1429,8 @@ def chartAllData():
         is_active=True,
         company=2,
         status='ACTIVE',
-        profiling_date__isnull=False
-    ).values_list('profiling_date', flat=True)
+        created_at__isnull=False
+    ).values_list('created_at', flat=True)
     
     # Obtener todos los registros de Supp
     supp_records = Supp.objects.filter(
