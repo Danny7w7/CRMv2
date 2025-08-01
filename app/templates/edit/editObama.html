@@ -937,7 +937,7 @@
 												{% csrf_token %}
 												<input type="file" id="pdfUploader" name="documents" multiple>
 												<div id="fileNamesContainer"></div>												
-												<button id="loadDocument" type="submit" class="btn" data-upload-url="{% url 'saveDocumentClient' obamacare.id way %}" > <i class="fa-solid fa-floppy-disk"></i></button>
+												<button id="loadDocument" class="btn" data-upload-url="{% url 'saveDocumentClient' obamacare.id way %}" > <i class="fa-solid fa-floppy-disk"></i></button>
 											</form>
 										</div>
 									</div>

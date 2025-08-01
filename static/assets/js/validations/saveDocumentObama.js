@@ -69,7 +69,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 headers: { "X-CSRFToken": csrfToken },
                 body: formData
             })
-            .then(response => response.json())
+            .then(async (response) => {
+                    if (!response.ok) {
+                        const text = await response.text();
+                        throw new Error(text);
+                    }
+                    return response.json();
+                })
             .then(res => {
                 if (res.success) {
                     Swal.fire({

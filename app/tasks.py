@@ -300,7 +300,6 @@ def reportCustomerWeek():
         if os.path.exists(path):
             os.remove(path)
 
-
 @shared_task
 def report6Week():
     now = datetime.now()
@@ -316,27 +315,23 @@ def report6Week():
 
     # 3. Enviar SMS vía Telnyx
     telnyx.api_key = settings.TELNYX_API_KEY
-    mensaje_sms = (
-        f"📄 Reporte Semanal Generado\n"
-        f"📅 {now.strftime('%d/%m/%Y %H:%M')}\n\n"
-        f"📎 PDF completo adjunto"
-    )
-
-    # telnyx.Message.create(
-    #     from_='+17869848427',
-    #     to='+17863034781',
-    #     text=mensaje_sms,
-    #     subject='Reporte PDF Semanal Customer',
-    #     media_urls=[s3_url]
-    # )
+    recipient = ['+13052199932','+13052190572']
+    for item in recipient:
+        telnyx.Message.create(
+            from_='+17869848427',
+            to=item,
+            text='📎 PDF completo adjunto',
+            subject='Reporte Semana actual VS Anterior',
+            media_urls=[s3_url]
+        )
 
     # 5. Enviar por Email - TODO INTEGRADO AQUÍ
-    email_subject = f"📄 Reporte Semanal Customer - {now.strftime('%d/%m/%Y')}"
+    email_subject = f"📄 Reporte Semana actual VS Anterior - {now.strftime('%d/%m/%Y')}"
     email_body = f"""Estimado/a,
 
         Se ha generado el reporte semanal correspondiente al {now.strftime('%d de %B de %Y a las %H:%M')}.
 
-        El archivo PDF con el reporte completo del equipo de customer de la semana actual se encuentra adjunto a este correo.
+        El archivo PDF con el reporte completo de las ventas de la semana Actual y la anterioe 'Ventas Activas' se encuentra adjunto a este correo.
 
         Reporte Generado por el mejor equipo de IT.
 
@@ -345,7 +340,7 @@ def report6Week():
 
     # Llamar a la función reutilizable
     email_enviado = enviar_email(
-        destinatario='it.bluestream2@gmail.com',
+        destinatario='Jlhernandezt.88@gmail.com',
         asunto=email_subject,
         cuerpo=email_body,
         archivo_adjunto=local_pdf_path,
@@ -387,19 +382,44 @@ def allReports():
 
     # 3. Enviar SMS vía Telnyx
     telnyx.api_key = settings.TELNYX_API_KEY
-    mensaje_sms = (
-        f"📄 Reporte Semanal Generado\n"
-        f"📅 {now.strftime('%d/%m/%Y %H:%M')}\n\n"
-        f"📎 PDF completo adjunto"
-    )
+    recipient = ['+13052199932','+13052190572']
+    for item in recipient:
+        telnyx.Message.create(
+            from_='+17869848427',
+            to=item,
+            text='📎 PDF completo adjunto',
+            subject='Reporte General de Ventas',
+            media_urls=[s3_url]
+        )
 
-    telnyx.Message.create(
-        from_='+17869848427',
-        to='+17863034781',
-        text=mensaje_sms,
-        subject='Reporte PDF Semanal Customer',
-        media_urls=[s3_url]
+    email_subject = f"📄 Reporte General de Ventas - {now.strftime('%d/%m/%Y')}"
+    email_body = f"""Estimado/a,
+
+        Se ha generado el reporte semanal correspondiente al {now.strftime('%d de %B de %Y a las %H:%M')}.
+
+        El archivo PDF con el reporte General de las ventas Activas se encuentra adjunto a este correo.
+
+        Reporte Generado por el mejor equipo de IT.
+
+        Saludos cordiales,
+        Sistema de Reportes"""
+
+    # Llamar a la función reutilizable
+    email_enviado = enviar_email(
+        destinatario='Jlhernandezt.88@gmail.com',
+        asunto=email_subject,
+        cuerpo=email_body,
+        archivo_adjunto=local_pdf_path,
+        nombre_archivo=filename
     )
+    
+    # Opcional: Verificar si el email se envió correctamente
+    if email_enviado:
+        print("✅ Email del reporte enviado correctamente")
+        logger.info("Email del reporte enviado correctamente")
+    else:
+        print("❌ Error al enviar el email del reporte")
+        logger.error("Error al enviar el email del reporte")
 
     # 4. Limpiar archivos temporales
     temp_folder = os.path.join(settings.BASE_DIR, "temp")
