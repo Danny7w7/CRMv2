@@ -348,7 +348,7 @@ def report6Week():
         destinatario='it.bluestream2@gmail.com',
         asunto=email_subject,
         cuerpo=email_body,
-        archivo_adjunto=s3_url,
+        archivo_adjunto=local_pdf_path,
         nombre_archivo=filename
     )
     
