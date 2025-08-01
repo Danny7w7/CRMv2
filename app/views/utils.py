@@ -13,7 +13,6 @@ import io
 import uuid
 from uuid import uuid4
 
-
 # Django core libraries
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
@@ -28,6 +27,8 @@ from collections import defaultdict
 from django.utils import timezone
 from weasyprint import HTML, CSS
 from django.db.models import Count, Case, When, Q, BooleanField
+from django.template import Engine, Context
+from matplotlib.ticker import MaxNLocator
 
 # Third-party libraries
 from asgiref.sync import async_to_sync
@@ -1116,57 +1117,10 @@ def generarPDFChart(datos_secciones, output_path):
     html_content = render_to_string('pdf/reportWeekCustomer.html', context)
     HTML(string=html_content, base_url='.').write_pdf(output_path)
 
-#Funcione para Graficas de Ventas
-
-from datetime import date, timedelta
-from collections import defaultdict
-from django.db.models import Count
-from app.models import ObamaCare  # Ajusta al nombre real
-
-from datetime import date, timedelta
-from collections import defaultdict
-from django.db.models import Count
-from app.models import ObamaCare
-
-from collections import defaultdict
-from django.db.models import Count
-
-from collections import defaultdict
-from datetime import timedelta
-from django.utils import timezone
-from django.db.models import Count
-from django.db.models.functions import TruncWeek
-
-from collections import defaultdict
-from datetime import timedelta
-from django.utils import timezone
-from django.db.models import Count
-from app.models import Users, ObamaCare, Supp  # Ajusta tu import
-
-from collections import defaultdict
-from datetime import timedelta
-from django.utils import timezone
-from django.db.models import Count
-from app.models import Users, ObamaCare, Supp
-
-import os
-import uuid
-import tempfile
-import matplotlib.pyplot as plt
-from matplotlib.ticker import MaxNLocator
-from collections import defaultdict
-from datetime import timedelta
-from django.template import Context, Engine
-from weasyprint import HTML
-from django.conf import settings
-from django.utils import timezone
-from django.db.models import Count
-
-# 🟢 MODELOS IMPORTAR
-from app.models import Users, Supp, ObamaCare
+#Funcione para Graficas de Ventas de los Agentes son 4 reportes
 # 6SEMANAS
-
-def chart6Week():
+def chart6WeekAgent():
+    
     agentes = Users.objects.filter(is_active=True, company=2, role__in=['A', 'C'])
     now = timezone.now()
 
@@ -1227,7 +1181,7 @@ def chart6Week():
     return charts
 
 def generatePDFChart6Week():
-    charts = chart6Week()
+    charts = chart6WeekAgent()
     image_paths = []
 
     os.makedirs("temp", exist_ok=True)
@@ -1267,25 +1221,18 @@ def generatePDFChart6Week():
 
     return image_paths
 
-def generarPDFChart6Week(image_paths, output_pdf_path):
-    template_path = os.path.join(settings.BASE_DIR, 'app', 'templates', 'reporte_grafico.html')
+# def generarPDFChart6Week(image_paths, output_pdf_path):
+#     template_path = os.path.join(settings.BASE_DIR, 'app', 'templates', 'reporte_grafico.html')
 
-    with open(template_path, encoding='utf-8') as f:
-        template_code = f.read()
+#     with open(template_path, encoding='utf-8') as f:
+#         template_code = f.read()
 
-    template = Engine().from_string(template_code)
-    rendered_html = template.render(Context({'charts': image_paths}))
+#     template = Engine().from_string(template_code)
+#     rendered_html = template.render(Context({'charts': image_paths}))
 
-    HTML(string=rendered_html).write_pdf(output_pdf_path)
+#     HTML(string=rendered_html).write_pdf(output_pdf_path)
 
-
-from datetime import timedelta
-from django.utils import timezone
-
-from datetime import timedelta
-from collections import defaultdict
-from django.utils import timezone
-#semana actual Vs Anterior
+#semana actual VS Anterior
 def chartWeekPrevius():
     now = timezone.now().date()
 
@@ -1407,28 +1354,23 @@ def generatePDFChartWeekPrevius():
 
     return resumen_chart_path, semanas
 
-def generarPDFChart6Week_two(image_paths, output_pdf_path):
-    template_path = os.path.join(settings.BASE_DIR, 'app', 'templates', 'reporte_grafico_two.html')
+# def generarPDFChart6Week_two(image_paths, output_pdf_path):
+#     template_path = os.path.join(settings.BASE_DIR, 'app', 'templates', 'reporte_grafico_two.html')
 
-    with open(template_path, encoding='utf-8') as f:
-        template_code = f.read()
+#     with open(template_path, encoding='utf-8') as f:
+#         template_code = f.read()
 
-    template = Engine().from_string(template_code)
-    rendered_html = template.render(Context({'charts': image_paths}))
+#     template = Engine().from_string(template_code)
+#     rendered_html = template.render(Context({'charts': image_paths}))
 
-    HTML(string=rendered_html).write_pdf(output_pdf_path)
+#     HTML(string=rendered_html).write_pdf(output_pdf_path)
 
-from django.utils import timezone
-from django.db.models.functions import TruncMonth
-from django.db.models import Count
-from datetime import timedelta
-from collections import OrderedDict
-#test unificado
+#Unificacion de los 2 reportes antereiores en el PDF
 def generarPDFCompleto(output_pdf_path):
     charts6Weekly = generatePDFChart6Week()
     resumenChartWeek, charts_two_week = generatePDFChartWeekPrevius()
 
-    template_path = os.path.join(settings.BASE_DIR, 'app', 'templates', 'reporte_completo.html')
+    template_path = os.path.join(settings.BASE_DIR, 'app', 'templates', 'pdf','reporteCompletoAgents.html')
 
     with open(template_path, encoding='utf-8') as f:
         template_code = f.read()
@@ -1444,41 +1386,8 @@ def generarPDFCompleto(output_pdf_path):
     rendered_html = template.render(Context(context))
     HTML(string=rendered_html).write_pdf(output_pdf_path)
 
-from collections import OrderedDict
-from datetime import timedelta, datetime
-from django.utils import timezone
-from django.db.models import Count
-from django.db.models.functions import TruncMonth
-from django.utils.timezone import make_aware
-
-from collections import OrderedDict
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-from django.utils.timezone import make_aware
-from django.db.models.functions import TruncMonth
-from django.db.models import Count
-from django.utils import timezone
-
-from django.db.models.functions import ExtractMonth, ExtractYear
-
-from collections import OrderedDict
-from django.utils.timezone import make_aware, is_naive
-from django.db.models.functions import TruncMonth
-from django.db.models import Count
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-from django.utils import timezone
-from app.models import ObamaCare, Supp  # Ajusta si usas otro nombre
-
-from datetime import datetime
-from collections import OrderedDict
-from dateutil.relativedelta import relativedelta
-from django.utils.timezone import make_aware
-from django.db.models.functions import TruncMonth
-from django.db.models import Count
-from app.models import ObamaCare, Supp  # Ajusta según tu estructura
 #Ultimos 6 mese
-def get_bar_chart_summary_six_months():
+def chartSixMonths():
     from datetime import datetime
     from dateutil.relativedelta import relativedelta
     
@@ -1532,9 +1441,8 @@ def get_bar_chart_summary_six_months():
     
     return charts
 
-
-#ultimo aaño
-def get_bar_chart_summary_all_data():
+#Ultimo año
+def chartAllData():
     from collections import defaultdict
     from datetime import datetime
     
@@ -1607,17 +1515,13 @@ def get_bar_chart_summary_all_data():
     
     return charts
 
-import matplotlib.pyplot as plt
-import os
-import uuid
-
-def generate_monthly_summary_charts():
+def generateSummaryCharts():
     output_dir = "temp"
     os.makedirs(output_dir, exist_ok=True)
 
     # Datos
-    charts_6_months = get_bar_chart_summary_six_months()
-    charts_all_data = get_bar_chart_summary_all_data()
+    charts_6_months = chartSixMonths()
+    charts_all_data = chartAllData()
 
     # ---------------------------
     # GRAFICA: Últimos 6 meses
@@ -1667,13 +1571,12 @@ def generate_monthly_summary_charts():
 
     return path_6_months, path_all_data
 
-from django.template import Engine, Context
-from weasyprint import HTML
-
+#Unificacion de los 2 reportes antereiores en el PDF
 def generarPDFResumenMensual(output_pdf_path):
-    chart_6_months, chart_all_data = generate_monthly_summary_charts()
 
-    template_path = os.path.join(settings.BASE_DIR, 'app', 'templates', 'reporte_mensual.html')
+    chart_6_months, chart_all_data = generateSummaryCharts()
+
+    template_path = os.path.join(settings.BASE_DIR, 'app', 'templates', 'pdf' ,'reporteMensual.html')
     with open(template_path, encoding='utf-8') as f:
         template_code = f.read()
 

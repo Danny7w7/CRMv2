@@ -180,28 +180,27 @@ def toggleBook(request, book_id):
 @login_required(login_url='/login')  
 def bookReport(request):
 
-    readingUser = BookReading.objects.values('user__username').annotate(
+    readingUser = BookReading.objects.select_related('book').filter(book__is_active = True).values('user__username').annotate(
         total_time=Sum('time_spent')
     ).order_by('-total_time')
 
-    readingPage = BookReading.objects.values('book__title', 'page').annotate(
+    readingPage = BookReading.objects.select_related('book').filter(book__is_active = True).values('book__title', 'page').annotate(
         avg_time=Sum('time_spent') / Count('id')
     ).order_by('book__title', 'page')
 
-    booksRead = pdfBook.objects.all().annotate(
-        total_time=Sum('bookreading__time_spent'),
-        total_lecturas=Count('bookreading')
+    booksRead = pdfBook.objects.filter(is_active = True).annotate(
+        total_time=Sum('bookreading__time_spent'), total_lecturas=Count('bookreading')
     ).order_by('-total_time')
 
-    readingDay = BookReading.objects.values('date').annotate(
+    readingDay = BookReading.objects.select_related('book').filter(book__is_active = True).values('date').annotate(
         total_time=Sum('time_spent')
     ).order_by('date')
 
-    readingsDayUsers = BookReading.objects.values('date', 'user__username').annotate(
+    readingsDayUsers = BookReading.objects.select_related('book').filter(book__is_active = True).values('date', 'user__username').annotate(
         total_time=Sum('time_spent')
     ).order_by('date', 'user__username')
 
-    readingsDayUserBook = BookReading.objects.values('date', 'user__username', 'book__title').annotate(
+    readingsDayUserBook = BookReading.objects.select_related('book').filter(book__is_active = True).values('date', 'user__username', 'book__title').annotate(
         total_time=Sum('time_spent')
     ).order_by('date', 'user__username', 'book__title')
 

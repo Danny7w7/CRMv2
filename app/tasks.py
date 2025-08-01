@@ -1,7 +1,9 @@
 import logging
-from django.conf import settings
+import os
 import requests
 import telnyx
+
+from django.conf import settings
 from django.core.files.base import ContentFile
 from django.db.models import Q
 
@@ -321,87 +323,8 @@ def reportCustomerWeek():
         if os.path.exists(path):
             os.remove(path)
 
-@shared_task
-def xxxxxxxxxxxxxx():
-    now = datetime.now()
-    filename = f"reporte_graficos_{now.strftime('%Y%m%d_%H%M%S')}.pdf"
-    local_pdf_path = f"/tmp/{filename}"
-
-    # 1. Generar gráficos
-    charts_paths = generate_weekly_chart_images()
-
-    # 2. Generar PDF desde HTML
-    generarPDFChart6Week(charts_paths, local_pdf_path)
-
-    # 3. Subir a S3 y generar URL temporal
-    s3_key = f"reportes/{filename}"
-    s3_url = uploadTempUrl(local_pdf_path, s3_key)
-
-    # 4. Enviar SMS vía Telnyx
-    telnyx.api_key = settings.TELNYX_API_KEY
-    mensaje_sms = (
-        f"📄 Reporte Semanal Generado\n"
-        f"📅 {now.strftime('%d/%m/%Y %H:%M')}\n\n"
-        f"📎 PDF completo adjunto"
-    )
-
-    telnyx.Message.create(
-        from_='+17869848427',
-        to='+17863034781',
-        text=mensaje_sms,
-        subject='Reporte PDF Semanal Customer',
-        media_urls=[s3_url]
-    )
-
-    # 5. Limpiar archivos temporales
-    for path in charts_paths + [local_pdf_path]:
-        if os.path.exists(path):
-            os.remove(path)
 
 
-@shared_task
-def mmmm():
-    now = datetime.now()
-    filename = f"reporte_graficos_{now.strftime('%Y%m%d_%H%M%S')}.pdf"
-    local_pdf_path = f"/tmp/{filename}"
-
-    # 1. Generar gráficos
-    charts_paths = generate_weekly_chart_images_two()
-
-    # 2. Generar PDF desde HTML
-    generarPDFChart6Week_two(charts_paths, local_pdf_path)
-
-    # 3. Subir a S3 y generar URL temporal
-    s3_key = f"reportes/{filename}"
-    s3_url = uploadTempUrl(local_pdf_path, s3_key)
-
-    # 4. Enviar SMS vía Telnyx
-    telnyx.api_key = settings.TELNYX_API_KEY
-    mensaje_sms = (
-        f"📄 Reporte Semanal Generado\n"
-        f"📅 {now.strftime('%d/%m/%Y %H:%M')}\n\n"
-        f"📎 PDF completo adjunto"
-    )
-
-    telnyx.Message.create(
-        from_='+17869848427',
-        to='+17863034781',
-        text=mensaje_sms,
-        subject='Reporte PDF Semanal Customer',
-        media_urls=[s3_url]
-    )
-
-    # 5. Limpiar archivos temporales
-    for path in charts_paths + [local_pdf_path]:
-        if isinstance(path, str) and os.path.exists(path):
-            os.remove(path)
-
-
-from celery import shared_task
-from datetime import datetime
-import os
-import telnyx
-from django.conf import settings
 
 @shared_task
 def report6Week():
@@ -443,9 +366,9 @@ def report6Week():
     if os.path.exists(local_pdf_path):
         os.remove(local_pdf_path)
 
-
 @shared_task
 def allReports():
+
     now = datetime.now()
     filename = f"reporte_completo_{now.strftime('%Y%m%d_%H%M%S')}.pdf"
     local_pdf_path = f"/tmp/{filename}"
