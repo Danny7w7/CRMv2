@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (inputElement) {
         const pond = FilePond.create(inputElement, {
-            acceptedFileTypes: ['application/pdf', 'image/png', 'image/jpeg'],
+            acceptedFileTypes: ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'],
             allowMultiple: true,
             allowProcess: false, // 🚀 Evita la subida automática
         });
