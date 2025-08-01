@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (inputElement) {
         const pond = FilePond.create(inputElement, {
-            acceptedFileTypes: ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'],
+            acceptedFileTypes: ['application/pdf', 'image/png', 'image/jpeg'],
             allowMultiple: true,
             allowProcess: false, // 🚀 Evita la subida automática
         });
@@ -69,13 +69,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 headers: { "X-CSRFToken": csrfToken },
                 body: formData
             })
-            .then(async (response) => {
-                    if (!response.ok) {
-                        const text = await response.text();
-                        throw new Error(text);
-                    }
-                    return response.json();
-                })
+            .then(response => response.json())
             .then(res => {
                 if (res.success) {
                     Swal.fire({
