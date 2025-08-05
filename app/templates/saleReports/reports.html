@@ -33,8 +33,8 @@
 		<div class="card mb-3">
             <div class="card-body">
                 <div class="table" >	
-                    <H4>Amount Payments Obamacare</H4>
-                    <table id="table1" width="100%" cellspacing="0" class="table table-striped table-bordered">				
+                    <H4>Amount Payments Lapeira</H4>
+                    <table id="tableLapeira" width="100%" cellspacing="0" class="table table-striped table-bordered">				
                         <thead>					
                             <tr>                        
                                 <th>Month</th>
@@ -42,9 +42,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for payment in payments %}
+                            {% for payment in paymentsLapeira %}
                                 <tr>
-                                    <td>{{ payment.coverageMonth }}</td>
+                                    <td>{{ payment.coverageMonth|date:"m-Y" }}</td>
                                     <td>{{ payment.total }}</td>
                                 </tr>
                                 {% empty %}
@@ -56,7 +56,80 @@
                         <tfoot>
                             <tr>
                                 <th>Total</th>
-                                <th>{{total}}</th>
+                                <th>{{paymentsOneilLapeiraTotal}}</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col">
+		<div class="card mb-3">
+            <div class="card-body">
+                <div class="table" >	
+                    <H4>Amount Payments Secure</H4>
+                    <table id="tableSecure" width="100%" cellspacing="0" class="table table-striped table-bordered">				
+                        <thead>					
+                            <tr>                        
+                                <th>Month</th>
+                                <th>Total Payments</th>                        
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for payment in paymentsSecure %}
+                                <tr>
+                                    <td>{{ payment.coverageMonth|date:"m-Y" }}</td>
+                                    <td>{{ payment.total }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="2">No payments found</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>Total</th>
+                                <th>{{paymentsSecureTotal}}</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="col">
+		<div class="card mb-3">
+            <div class="card-body">
+                <div class="table" >	
+                    <H4>Amount Payments Truinsurance</H4>
+                    <table id="tableTruinsurance" width="100%" cellspacing="0" class="table table-striped table-bordered">				
+                        <thead>					
+                            <tr>                        
+                                <th>Month</th>
+                                <th>Total Payments</th>                        
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for payment in paymentsTruinsurance %}
+                                <tr>
+                                    <td>{{ payment.coverageMonth|date:"m-Y" }}</td>
+                                    <td>{{ payment.total }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="2">No payments found</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>Total</th>
+                                <th>{{paymentsTruinsuranceTotal}}</th>
                             </tr>
                         </tfoot>
                     </table>
@@ -182,8 +255,14 @@
 
 	<script>	
 		$(document).ready(function() {
-			var table = $('#table1').DataTable( {lengthChange: false,buttons: [ 'excel','print']} );		 
-			table.buttons().container().appendTo( '#table1_wrapper .col-md-6:eq(0)' );
+			var tableLapeira = $('#tableLapeira').DataTable( {lengthChange: false,buttons: [ 'excel','print']} );		 
+			tableLapeira.buttons().container().appendTo( '#tableLapeira_wrapper .col-md-6:eq(0)' );
+
+			var tableSecure = $('#tableSecure').DataTable( {lengthChange: false,buttons: [ 'excel','print']} );		 
+			tableSecure.buttons().container().appendTo( '#tableSecure_wrapper .col-md-6:eq(0)' );
+
+			var tableTruinsurance = $('#tableTruinsurance').DataTable( {lengthChange: false,buttons: [ 'excel','print']} );		 
+			tableTruinsurance.buttons().container().appendTo( '#tableTruinsurance_wrapper .col-md-6:eq(0)' );
 		} );
 	</script>
 	<!--app JS-->

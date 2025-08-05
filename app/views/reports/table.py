@@ -1133,30 +1133,43 @@ def weekSalesWiew(request):
 def reports(request):
 
     company_id = request.company_id  # Obtener company_id desde request
+
     # Definir el filtro de compañía (será un diccionario vacío si es superusuario)
-    company_filter = {'company': company_id} if not request.user.is_superuser else {}
     company_filter2 = {'obamacare__company': company_id} if not request.user.is_superuser else {}
 
     # Filtrar por company_filter y donde payable sea mayor a 0
-    filtered_qs = PaymentsOneil.objects.filter(payable__gt=0)
+    paymentsOneilTotal = PaymentsOneil.objects.select_related('obamacare').filter(payable__gt=0)
 
-    # Obtener pagos únicos por obamacare y mes (usando values para agrupar)
-    distinct_payments = (
-        filtered_qs
-        .values('coverageMonth', 'obamacare')  # Agrupación por mes y obamacare
-        .distinct()
-    )
+    paymentsOneilSecurePlus = paymentsOneilTotal.filter(
+        agency='SECUREPLUS INSURANCE LLC'
+    ).values('coverageMonth').annotate(total=Count('id')).order_by('coverageMonth')
+    paymentsOneilSecurePlusTotal = paymentsOneilTotal.filter(agency='SECUREPLUS INSURANCE LLC').count()
 
-    # Contar pagos únicos por mes
-    payments = (
-        distinct_payments
-        .values('coverageMonth')
-        .annotate(total=Count('obamacare'))  # Cada obamacare solo se cuenta una vez por mes
-        .order_by('coverageMonth')
-    )
+    paymentsOneilTruinsurance = paymentsOneilTotal.filter(
+        agency='TRUINSURANCE GROUP LLC'
+    ).values('coverageMonth').annotate(total=Count('id')).order_by('coverageMonth')
+    paymentsOneilTruinsuranceTotal = paymentsOneilTotal.filter(agency='TRUINSURANCE GROUP LLC').count()
 
-    # Total general de pagos únicos en todos los meses
-    total_general = distinct_payments.count()
+    paymentsOneilLapeira = paymentsOneilTotal.filter(
+        agency='LAPEIRA & ASSOCIATES LLC',
+        obamacare__agent_usa__in=[
+            'DANIEL SANTIAGO LAPEIRA ACEVEDO - NPN 19904958',
+            'DANIESKA LOPEZ SEQUEIRA - NPN 20134539',
+            'ZOHIRA RAQUEL DUARTE AGUILAR - NPN 19582295'
+            'ZOHIRA RAQUEL DUARTE AGUILAR - NPN 19582295'
+        ]
+    ).values('coverageMonth', 'obamacare_id').distinct() \
+    .values('coverageMonth') \
+    .annotate(total=Count('obamacare_id')) \
+    .order_by('coverageMonth')
+    paymentsOneilLapeiraTotal = paymentsOneilTotal.filter(
+        agency='LAPEIRA & ASSOCIATES LLC',
+        obamacare__agent_usa__in=[
+            'DANIEL SANTIAGO LAPEIRA ACEVEDO - NPN 19904958',
+            'DANIESKA LOPEZ SEQUEIRA - NPN 20134539',
+            'ZOHIRA RAQUEL DUARTE AGUILAR - NPN 19582295'
+        ]
+    ).count()
 
     #Reports de Action Required
     # Cantidad de registros donde agent_completed es NULL
@@ -1170,8 +1183,12 @@ def reports(request):
 
 
     context = {
-        'payments' : payments, 
-        'total' : total_general,
+        'paymentsSecure' : paymentsOneilSecurePlus, 
+        'paymentsSecureTotal' : paymentsOneilSecurePlusTotal,
+        'paymentsTruinsurance' : paymentsOneilTruinsurance, 
+        'paymentsTruinsuranceTotal' : paymentsOneilTruinsuranceTotal,
+        'paymentsLapeira' : paymentsOneilLapeira, 
+        'paymentsOneilLapeiraTotal' : paymentsOneilLapeiraTotal,
         'pending_count' : pending_count,
         'completed_count' : completed_count,
         'total_count' : total_count
