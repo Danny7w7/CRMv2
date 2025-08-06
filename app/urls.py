@@ -243,6 +243,9 @@ urlpatterns = [
 
     path('complaint/<obamacare_id>/<validationUniq>/', consents.complaint, name='complaint'),
 
+    path('consentL/', consents.consentL, name='consentL'),
+    path('sendConsentForm/', consents.sendConsentForm, name='sendConsentForm'),
+
     #<---------------------------Company---------------------------> 
     path('formCreateCompanies/', companies.formCreateCompanies, name='formCreateCompanies'),
     path('editCompanies/<company_id>', companies.editCompanies, name='editCompanies'),

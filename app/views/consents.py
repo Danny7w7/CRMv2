@@ -817,3 +817,117 @@ def redirect_with_token(request, view_name, *args, **kwargs):
     url = reverse(view_name, args=args, kwargs=kwargs)
     query_params = urlencode({'token': token})
     return redirect(f'{url}?{query_params}')
+
+
+# views.py
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
+from django.core.mail import EmailMessage
+from django.conf import settings
+import json
+import logging
+
+logger = logging.getLogger(__name__)
+
+import logging
+from django.shortcuts import render
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
+from django.core.mail import EmailMessage
+from django.conf import settings
+from django.utils import timezone
+
+logger = logging.getLogger(__name__)
+from app.utils import enviar_email, generateWeeklyPdf, uploadTempUrl
+
+@require_http_methods(["POST"])
+def sendConsentForm(request):
+    """
+    Vista para enviar el formulario de consentimiento por correo electrónico
+    """
+    now = datetime.now()
+    try:
+        logger.info('Recibida petición de envío de formulario de consentimiento')
+        
+        # Obtener datos del formulario
+        first_name = request.POST.get('first_name', '')
+        last_name = request.POST.get('last_name', '')
+        phone = request.POST.get('phone', '')
+        agent = request.POST.get('agent', '')
+        
+        logger.info(f'Datos recibidos: {first_name} {last_name}, {phone}, {agent}')
+        
+        # Obtener el archivo PDF
+        pdf_file = request.FILES.get('pdf_file')
+        
+        if not pdf_file:
+            logger.error('No se encontró el archivo PDF en la petición')
+            return JsonResponse({
+                'success': False,
+                'error': 'No se encontró el archivo PDF'
+            }, status=400)
+        
+        logger.info(f'Archivo PDF recibido: {pdf_file.name}, tamaño: {pdf_file.size} bytes')
+        
+        # Leer el contenido del PDF
+        pdf_content = pdf_file.read()
+
+        import tempfile
+
+        # Guardamos el PDF temporalmente
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_pdf:
+            temp_pdf.write(pdf_content)
+            temp_pdf_path = temp_pdf.name  # Esto es lo que necesita uploadTempUrl
+
+        # Luego lo pasas aquí
+        s3_key = f"consent_forms/test_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf"
+        s3_url = uploadTempUrl(temp_pdf_path, s3_key)
+
+        email_subject = f"📄 Consent Lapeira - {now.strftime('%d/%m/%Y')}"
+        email_body = f"""Estimado/a,
+
+            Se ha generado un Consent proveniente de Lapeira.com {now.strftime('%d de %B de %Y a las %H:%M')}.
+
+            Para mas informacion contactar a el equipo de IT.
+
+            Saludos cordiales,
+            Sistema de Reportes"""
+
+        # Llamar a la función reutilizable
+        email_enviado = enviar_email(
+            destinatario='it.bluestream2@gmail.com',
+            asunto=email_subject,
+            cuerpo=email_body,
+            archivo_adjunto=temp_pdf_path,
+            nombre_archivo=f'Consent {pdf_file.name}'
+        )
+        
+        # Opcional: Verificar si el email se envió correctamente
+        if email_enviado:
+            print("✅ Email del reporte enviado correctamente")
+            logger.info("Email del reporte enviado correctamente")
+        else:
+            print("❌ Error al enviar el email del reporte")
+            logger.error("Error al enviar el email del reporte")
+        
+       
+        logger.info('Intentando enviar email...')
+        
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Formulario enviado correctamente'
+        })
+        
+    except Exception as e:
+        logger.error(f'Error general al enviar formulario de consentimiento: {str(e)}', exc_info=True)
+        return JsonResponse({
+            'success': False,
+            'error': f'Error interno del servidor: {str(e)}'
+        }, status=500)
+
+def consentL(request):
+    """Vista para mostrar el formulario de consentimiento"""
+    return render(request, 'consent/consentL.html')

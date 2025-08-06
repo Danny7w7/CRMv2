@@ -38,7 +38,7 @@ MODULE_PATHS = {
     'BOOK': ['uploadBook','bookList','bookPages','saveTime','toggleBook','bookReport']
 }
 
-EXCLUDED_VIEWS = ['index','toggleDarkMode' ,'motivationalPhrase','login','logout','viewConsent','consetMedicare','formCreateUser', 'adminSms','addNumbersUsers','incomeLetter','ConsentLifeInsurance','complaint', 'sms','whatsappReply','url_temporal', 'obtainLeadsByGoHighLevel']  # Puedes agregar más si lo necesitas
+EXCLUDED_VIEWS = ['index','toggleDarkMode' ,'motivationalPhrase','login','logout','viewConsent','consetMedicare','formCreateUser', 'adminSms','addNumbersUsers','incomeLetter','ConsentLifeInsurance','complaint', 'sms','whatsappReply','url_temporal', 'obtainLeadsByGoHighLevel','consentL','sendConsentForm']  # Puedes agregar más si lo necesitas
 
 class ModuleAccessMiddleware:
     def __init__(self, get_response):
