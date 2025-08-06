@@ -842,7 +842,9 @@ from django.utils import timezone
 logger = logging.getLogger(__name__)
 from app.utils import enviar_email, generateWeeklyPdf, uploadTempUrl
 
-@require_http_methods(["POST"])
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
 def sendConsentForm(request):
     """
     Vista para enviar el formulario de consentimiento por correo electrónico
