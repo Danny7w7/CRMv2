@@ -930,6 +930,9 @@ def sendConsentForm(request):
             'error': f'Error interno del servidor: {str(e)}'
         }, status=500)
 
+
 def consentL(request):
     """Vista para mostrar el formulario de consentimiento"""
-    return render(request, 'consent/consentL.html')
+    response = render(request, 'consent/consentL.html')
+    response["Content-Security-Policy"] = "frame-ancestors https://lapeirainsurance.com"
+    return response
