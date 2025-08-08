@@ -315,7 +315,7 @@ def report6Week():
 
     # 3. Enviar SMS vía Telnyx
     telnyx.api_key = settings.TELNYX_API_KEY
-    recipient = ['+13052199932','+13052190572']
+    recipient = ['+13052199932','+13052190572','+17863034781']
     for item in recipient:
         telnyx.Message.create(
             from_='+17869848427',
@@ -382,7 +382,7 @@ def allReports():
 
     # 3. Enviar SMS vía Telnyx
     telnyx.api_key = settings.TELNYX_API_KEY
-    recipient = ['+13052199932','+13052190572']
+    recipient = ['+13052199932','+13052190572','+17863034781']
     for item in recipient:
         telnyx.Message.create(
             from_='+17869848427',
