@@ -82,6 +82,7 @@ class FilesSMS(models.Model):
 class ContentTemplate(models.Model):
     contentTemplate = models.TextField()
     identification = models.CharField(max_length=100)
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'content_template'
