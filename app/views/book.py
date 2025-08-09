@@ -88,7 +88,7 @@ def bookList(request):
     if request.user.is_superuser:
         books = pdfBook.objects.all()
     else:
-        books = pdfBook.objects.filter(id = company, is_astive = True)
+        books = pdfBook.objects.filter(company_id = company, is_astive = True)
 
     return render(request, 'book/bookList.html', {'books': books})
 
