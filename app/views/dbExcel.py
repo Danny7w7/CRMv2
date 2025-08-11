@@ -6,14 +6,14 @@ import os
 import pandas as pd
 
 # Django utilities
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 
 # Django core libraries
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, TextField, Value
 from django.db.models.functions import Coalesce
 from django.shortcuts import redirect, render 
+from django.views.decorators.csrf import csrf_exempt
 
 # Application-specific imports
 from app.models import *
@@ -302,6 +302,7 @@ def commentDB(request):
     company_filter = {'excel_metadata__company': company_id} if not request.user.is_superuser else {}
 
     roleAuditar = ['S', 'Admin']
+    filterBd = None
 
     # Obtén las opciones para el select desde el modelo DropDownList
     optionBd = DropDownList.objects.values_list('status_bd', flat=True).exclude(status_bd__isnull=True)
@@ -310,54 +311,56 @@ def commentDB(request):
     # Filtra los registros dependiendo del rol del usuario
     if request.user.role in roleAuditar:
         bd = BdExcel.objects.filter(**company_filter)
+        bdName = ExcelFileMetadata.objects.filter(**company_filter)
     else:
         bd = BdExcel.objects.filter(agent_id=request.user.id, is_sold = False, **company_filter)
+        bdName = ExcelFileMetadata.objects.filter(**company_filter)
 
-    # Si es una solicitud POST, procesamos la observación
-    if request.method == 'POST':
-        record_id = request.POST.get('record_id')
-        observation = request.POST.get('observation')
+    if request.method == 'POST':        
 
-        # Validar que se envíen los datos necesarios
-        if not record_id or not observation:
-            messages.error(request, "Please select a valid option.")
-            return redirect(request.META.get('HTTP_REFERER', '/'))
+        filterBd =  request.POST.get('bd')
+        bd = bd.filter(excel_metadata = filterBd)    
 
-        try:
-            # Obtener el objeto BdExcel correspondiente al record_id
-            bd_excel_record = BdExcel.objects.get(id=record_id)
-
-            # Crear un nuevo comentario en la tabla CommentBD
-            CommentBD.objects.create(
-                bd_excel=bd_excel_record,  # Relacionar con el objeto BdExcel
-                agent_create=request.user,  # Relacionar con el usuario actual
-                content=observation,  # Guardar el comentario
-                excel_metadata=bd_excel_record.excel_metadata
-            )
-
-            # Verificar si la opción seleccionada es "sold"
-            if observation == 'SOLD':
-                # Actualizar el campo is_sold en BdExcel
-                bd_excel_record.is_sold = True
-                bd_excel_record.save()
-
-            messages.success(request, "Observation saved successfully.")
-        except BdExcel.DoesNotExist:
-            messages.error(request, "Record not found.")
-        except Exception as e:
-            messages.error(request, f"An error occurred: {str(e)}")
-
-        # Redirige a la página previa después de guardar
-        return redirect(request.META.get('HTTP_REFERER', '/'))
 
     # Si es una solicitud GET, simplemente renderizamos la vista con los datos
     context = {
         'optionBd': optionBd,
         'bd': bd,
-        'comenntAgent':comenntAgent
+        'comenntAgent':comenntAgent,
+        'bdName' : bdName,
+        'filter' : filterBd
     }
 
     return render(request, 'addExcelsDB/bd.html', context)
+
+@login_required(login_url='/login')
+@csrf_exempt
+def saveCommentAjax(request):
+    record_id = request.POST.get('record_id')
+    observation = request.POST.get('observation')
+
+    if not record_id or not observation:
+        return JsonResponse({'success': False, 'message': 'Please select a valid option.'}, status=400)
+
+    try:
+        bd_excel_record = BdExcel.objects.get(id=record_id)
+
+        CommentBD.objects.create(
+            bd_excel=bd_excel_record,
+            agent_create=request.user,
+            content=observation,
+            excel_metadata=bd_excel_record.excel_metadata
+        )
+
+        if observation == 'SOLD':
+            bd_excel_record.is_sold = True
+            bd_excel_record.save()
+
+        return JsonResponse({'success': True, 'message': 'Observation saved successfully.'})
+    except BdExcel.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Record not found.'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)}, status=500)
 
 @login_required(login_url='/login')
 @company_ownership_required_sinURL  

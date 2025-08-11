@@ -14,7 +14,7 @@ from django.shortcuts import render
 
 # Application-specific imports
 from app.models import *
-
+from app.views.utils import *
 from ..decoratorsCompany import *
 
 @company_ownership_required_sinURL
@@ -402,3 +402,23 @@ def averageCustomer(request):
         }    
 
     return render(request, 'graficsReports/averageCustomer.html', context)
+
+@login_required(login_url='/login')
+@company_ownership_required_sinURL
+def mixSale(request):
+
+    charts6WeekAgent = chart6WeekAgent()
+    chartsWeekPrevius = chartWeekPrevius()
+    chartSixMonthsAgents = chartSixMonths()
+    chartAllDataAgents = chartAllData()
+
+    context = {
+        "charts6WeekAgent": json.dumps(charts6WeekAgent),
+        "chartsWeekPrevius_json": json.dumps(chartsWeekPrevius),  # 👈 para JavaScript
+        "chartSixMonthsAgents_json": json.dumps(chartSixMonthsAgents),
+        "chartAllDataAgents_json": json.dumps(chartAllDataAgents)
+    }
+
+    return render(request, 'graficsReports/mixSale.html', context)
+
+

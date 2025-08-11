@@ -1,16 +1,24 @@
 #libreria necesarias
-from django.template.loader import render_to_string
-from weasyprint import HTML
-from weasyprint import HTML
-from django.conf import settings
 import boto3
 import os
+import smtplib
+import ssl
+import logging
+import datetime
 
 from django.utils.timezone import make_aware
-import datetime
 from collections import defaultdict
 from django.db.models import Subquery
-from app.models import CustomerRedFlag, ObamaCare, Supp, ClientsAssure, ClientsLifeInsurance  # Ajusta según tu estructura
+from app.models import CustomerRedFlag, ObamaCare, Supp, ClientsAssure, ClientsLifeInsurance 
+from django.template.loader import render_to_string
+from weasyprint import HTML
+from django.conf import settings
+
+from email.message import EmailMessage
+from typing import Optional, Union, List
+from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 def generateWeeklyPdf(week_number):
 
@@ -196,16 +204,6 @@ def weekSalesSummarySms(week_number):
             })
     
     return prepared_data, prepared_client_data, rango_fechas, week_days_order, totales_por_dia, gran_total_aca, gran_total_supp
-
-
-import smtplib
-import ssl
-import logging
-from email.message import EmailMessage
-from typing import Optional, Union, List
-from pathlib import Path
-
-logger = logging.getLogger(__name__)
 
 def enviar_email(
     destinatario: Union[str, List[str]],

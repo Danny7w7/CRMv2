@@ -25,6 +25,7 @@
 	<link rel="stylesheet" href="{% static 'assets/css/header-colors.css' %}" />
 	<!-- Choise Style CSS -->
 	<link rel="stylesheet" href="{% static 'assets/css/choiseFromEdit.css' %}" />
+	<link rel="stylesheet" href="{% static 'assets/css/styleCopyLinkConsent.css' %}" />
 
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -45,1484 +46,1494 @@
 	
 {% endblock %}
 {% block page_content %}
-<h6 class="mb-0 text-uppercase">Client obamacare</h6>
-<hr/>
 
-<div id="stepper1" class="bs-stepper">
-	<div class="card">
-	  	<div class="card-header">
-		  	<div class="d-lg-flex flex-lg-row align-items-lg-center justify-content-lg-between" role="tablist">
-				<div class="step {% if letterCard.letters and letterCard.card %}active{% endif %}">
-					<div class="step-trigger d-flex flex-column align-items-center">
-						<div class="bs-stepper-circle">
-							<i class="fa-solid fa-file-signature"></i>
-						</div>
-						<h5 class="mb-0 steper-title">L & C</h5>
-					</div>
-				</div>
+	{% if temporalyURL %}
+		<!-- Div flotante -->
+		<div class="floating-container">
+			<button class="copy-button" onclick="copyCurrentURL()">
+				<i class="fas fa-link"></i>
+				Copy Link Consent
+			</button>
+			<div class="success-message">¡Link copiado!</div>
+		</div>
+	{% endif %}
 
-				<div class="bs-stepper-line"></div>
 
-				<div class="step {% if userCarrier.username_carrier != Null and userCarrier.username_carrier != 'None' and userCarrier.username_carrier != '' %}active{% endif %}" >
-					<div class="step-trigger d-flex flex-column align-items-center" role="tab">
-						<div class="bs-stepper-circle">
-							<i class="fa-solid fa-circle-user"></i>
-						</div>
-						<h5 class="mb-0 steper-title">User Carrier</h5>
-					</div>
-				</div>
+	<h6 class="mb-0 text-uppercase">Client obamacare</h6>
+	<hr/>
 
-				<div class="bs-stepper-line"></div>
-
-				<div class="step {% if paymentDateObama %}active{% endif %}" >
-					<div class="step-trigger d-flex flex-column align-items-center" role="tab">
-						<div class="bs-stepper-circle">
-							<i class="fa-solid fa-circle-user"></i>
-						</div>
-						<h5 class="mb-0 steper-title">Setup premium alert</h5>
-					</div>
-				</div>
-
-				<div class="bs-stepper-line"></div>
-
-				<div class="step {% if obamacare.status == 'ACTIVE' %}active{% endif %} " >
-					<div class="step-trigger d-flex flex-column align-items-center" role="tab">
-						<div class="bs-stepper-circle" >
-							<i class="fa-solid fa-circle-check"></i>
-						</div>
-						<h5 class="mb-0 steper-title">Status</h5>
-					</div>
-				</div>
-
-				<div class="bs-stepper-line"></div>
-
-				<div class="step {% if obamacare.doc_income and obamacare.doc_migration%}active{% endif %}">
-					<div class="step-trigger d-flex flex-column align-items-center" role="tab">
-						<div class="bs-stepper-circle">
-							<i class="fa-solid fa-file-invoice"></i>
-						</div>
-						<h5 class="mb-0 steper-title">Documents</h5>
-					</div>
-				</div>
-
-				<div class="bs-stepper-line"></div>
-
-				<div class="step  {% if obamacare.policyNumber != '' and obamacare.policyNumber != Null and obamacare.policyNumber != 'None' %}active{% endif %}">
-					<div class="step-trigger d-flex flex-column align-items-center" role="tab">
-						<div class="bs-stepper-circle">
-							<i class="bi bi-123"></i>
-						</div>
-						<h5 class="mb-0 steper-title">Policy Number</h5>
-					</div>
-				</div>
-
-				<div class="bs-stepper-line"></div>
-
-				<div class="step {% if apppointment %}active{% endif %}">
-					<div class="step-trigger d-flex flex-column align-items-center" role="tab">
-						<div class="bs-stepper-circle">
-							<i class="fa-solid fa-user-doctor"></i>
-						</div>
-						<h5 class="mb-0 steper-title">Appointment</h5>
-					</div>
-				</div>
-			</div>
-			<hr>
-			<div class="progress">
-				<div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="{{percentage}}" aria-valuemin="0" aria-valuemax="100" style="width: {{percentage}}%">{{percentage}}%</div>
-			</div>
-	  	</div>
-	</div>
-</div>
-
-<div class="row">
-    <div class="col-xl-10 mx-auto">
-        <div class="card">
-            <div class="card-body p-4">
-                <form class="row g-3 needs-validation" method="POST">
-                    <h4>Client</h4>						
-						<div class="col-12 col-lg-4">
-							<label for="first_name" class="form-label">First Name</label>
-							<input type="text" class="form-control" name="first_name" id="first_name" placeholder="First Name" value="{{obamacare.client.first_name}}" required>
-							<input class="form-control" hidden name="id_client" id="id_client"  value="{{obamacare.client.id}}">
-						</div>
-						<div class="col-12 col-lg-4">
-							<label for="last_name" class="form-label">Last Name</label>
-							<input type="text" class="form-control" name="last_name" id="last_name" placeholder="Last Name" value="{{obamacare.client.last_name}}" required>
-						</div>
-						<div class="col-12 col-lg-4">
-							<label for="phone_number" class="form-label">Phone Number</label>
-							<input readonly type="number" class="form-control" name ="phone_number" id="phone_number" placeholder="Phone Number" value="{{obamacare.client.phone_number}}" required>
-						</div>
-						<div class="col-12 col-lg-3">
-							<label for="email" class="form-label">E-mail Address</label>
-							<input type="email" class="form-control" name="email" id="email" placeholder="Enter Email Address" value="{{obamacare.client.email}}" required>
-						</div>
-						<div class="col-12 col-lg-3">
-							<label for="address" class="form-label">Address</label>
-							<input type="text" class="form-control" name="address" id="address" placeholder="Address" value="{{obamacare.client.address}}" required>
-						</div>
-						<div class="col-12 col-lg-2">
-							<label for="zipcode" class="form-label">zipCode</label>
-							<input type="text" maxlength="5" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="form-control" name ="zipcode" id="zipcode" value="{{obamacare.client.zipcode}}" required>
-						</div>
-						<div class="col-12 col-lg-2">
-							<label for="city" class="form-label">City</label>
-							<input type="text" class="form-control" name ="city" id="city" value="{{obamacare.client.city}}" readonly required>
-						</div>
-						<div class="col-12 col-lg-2">
-							<label for="state" class="form-label font-weight-bold">State</label>
-							<input type="text" class="form-control" name ="state" id="state" value="{{obamacare.client.state}}" readonly required>
-						</div>
-						<div class="col-12 col-lg-3">
-							<label for="county" class="form-label">County</label>
-							<input type="text" class="form-control" name ="county" id="county" value="{{obamacare.client.county}}" readonly required>
-						</div>
-						<div class="col-12 col-lg-2">
-							<label for="sex" class="form-label">Sex</label>
-							<select class="form-select"  name="sex" id="sex" aria-label="Default select example" required>
-								<option value="" disabled selected>Please Select</option>
-								<option value="M" {% if obamacare.client.sex == "M" %}selected{% endif %} >MALE</option>
-								<option value="F" {% if obamacare.client.sex == "F" %}selected{% endif %} >FEMALE</option>
-							</select>
-						</div>
-						<div class="col-12 col-lg-1">
-							<label for="old" class="form-label">Age</label>
-							<input type="number" class="form-control" name ="old" id="old" placeholder="Old" value="{{old}}" readonly >
-						</div>
-						<div class="col-12 col-lg-3">
-							<label for="date_birth" class="form-label">Date Birth</label>
-							<input type="text" class="form-control" name="date_birth" id="date_birth" value="{{ obamacare.client.date_birth|date:'m/d/Y' }}" required>
-						</div>
-						<div class="col-12 col-lg-3">
-							<label for="social_security" class="form-label">Social Security</label>
-							<div class="input-group">
-								<input type="text" class="form-control" name="social_security" id="social_security" value="{{formatted_social}}"  disabled data-client-id="{{ obamacare.client.id }}">
-								<button id="show-full-social" type="button" class="btn btn-secondary">
-									<i class="lni lni-eye"></i>
-								</button>
-								<button hidden type="button" id="save-social" class="btn btn-success">
-									<i class="lni lni-save"></i>
-								</button>
-								<button hidden type="button" id="block-social" class="btn btn-danger">
-									<i class="lni lni-lock"></i> 
-								</button>
+	<div id="stepper1" class="bs-stepper">
+		<div class="card">
+			<div class="card-header">
+				<div class="d-lg-flex flex-lg-row align-items-lg-center justify-content-lg-between" role="tablist">
+					<div class="step {% if letterCard.letters and letterCard.card %}active{% endif %}">
+						<div class="step-trigger d-flex flex-column align-items-center">
+							<div class="bs-stepper-circle">
+								<i class="fa-solid fa-file-signature"></i>
 							</div>
+							<h5 class="mb-0 steper-title">L & C</h5>
 						</div>
-						
-						<div class="col-12 col-lg-5">
-							<label for="migration_status" class="form-label">Migration Status</label>
-							<select class="form-select" id="migration_status"  name="migration_status" required  >
-								<option value="" disabled selected>Please Select</option>
-								<option value="EMPLOYMENT AUTHORIZATION" {% if obamacare.client.migration_status == "EMPLOYMENT AUTHORIZATION" %}selected{% endif %} >Employment Authorization</option>
-								<option value="NOTICE OF ACTION" {% if obamacare.client.migration_status == "NOTICE OF ACTION" %}selected{% endif %} >Notice of Action (i-797)</option>
-								<option value="REFUGEE" {% if obamacare.client.migration_status == "REFUGEE" %}selected{% endif %} >Refugee</option>
-								<option value="ASYLUM" {% if obamacare.client.migration_status == "ASYLUM" %}selected{% endif %} >Asylum</option>
-								<option value="TPS" {% if obamacare.client.migration_status == "TPS" %}selected{% endif %} >Temporary Protection Status (TPS)</option>
-								<option value="DOMESTIC VIOLENCE" {% if obamacare.client.migration_status == "DOMESTIC VIOLENCE" %}selected{% endif %} >Domestic Violence</option>
-								<option value="PERMANENT RESIDENT" {% if obamacare.client.migration_status == "PERMANENT RESIDENT" %}selected{% endif %} >Permanent Resident (Green Card)</option>
-								<option value="CONDITIONAL RESIDENT" {% if obamacare.client.migration_status == "CONDITIONAL RESIDENT" %}selected{% endif %} >Conditional Resident</option>
-								<option value="PAROLE" {% if obamacare.client.migration_status == "PAROLE" %}selected{% endif %} >Parole</option>
-								<option value="US CITIZEN" {% if obamacare.client.migration_status == "US CITIZEN" %}selected{% endif %} >US Citizen (Driver's License)</option>
-								<option value="STUDENT VISA" {% if obamacare.client.migration_status == "STUDENT VISA" %}selected{% endif %} >Student Visa (I-20)</option>
-								<option value="CURRENTLY IN PROCESS" {% if obamacare.client.migration_status == "CURRENTLY IN PROCESS" %}selected{% endif %} >Currently In Process (this means the client received an i-797)</option>
-							</select>
-						</div>
-						<div class="col-12 col-lg-2">
-							<label for="apply" class="form-label">Apply</label>
-							<select class="form-select" id="apply"  name="apply" required>
-								<option value="" disabled selected>Please Select</option>
-								<option value = True {% if obamacare.client.apply == True %}selected{% endif %} >SI</option>
-								<option value = False {% if obamacare.client.apply == False %}selected{% endif %} >NO</option>
-							</select>
-						</div>
-						<div class="col-12 col-lg-5">
-							<label for="agent_usa" class="form-label font-weight-bold">Agente USA</label>
-							<input type="hidden" id="limitValue" value="{{ c }}">
-							{% if request.user.company != obamacare.client.company %}
-								<input readonly type="text" class="form-control" value="{{ obamacare.client.agent_usa }}" >
-							{% else %}
-								<select class="form-select" id="agent_usa" aria-label="Default select example" name="agent_usa" required >
-									<option value="" disabled selected>Please Select</option>
-									<option {% if obamacare.client.agent_usa == "GINA PAOLA LAPEIRA - NPN 19944280" %}selected{% endif %} value="GINA PAOLA LAPEIRA - NPN 19944280">GINA PAOLA LAPEIRA - NPN 19944280</option>
-									<option {% if obamacare.client.agent_usa == "LUIS EDUARDO LAPEIRA - NPN 20556081" %}selected{% endif %} value="LUIS EDUARDO LAPEIRA - NPN 20556081">LUIS EDUARDO LAPEIRA - NPN 20556081</option>
-									<option {% if obamacare.client.agent_usa == "DANIEL SANTIAGO LAPEIRA ACEVEDO - NPN 19904958" %}selected{% endif %} value="DANIEL SANTIAGO LAPEIRA ACEVEDO - NPN 19904958">DANIEL SANTIAGO LAPEIRA ACEVEDO - NPN 19904958</option>
-									<option {% if obamacare.client.agent_usa == "ZOHIRA RAQUEL DUARTE AGUILAR - NPN 19582295" %}selected{% endif %} value="ZOHIRA RAQUEL DUARTE AGUILAR - NPN 19582295">ZOHIRA RAQUEL DUARTE AGUILAR - NPN 19582295</option>
-									<option {% if obamacare.client.agent_usa == "DANIESKA LOPEZ SEQUEIRA - NPN 20134539" %}selected{% endif %} value="DANIESKA LOPEZ SEQUEIRA - NPN 20134539">DANIESKA LOPEZ SEQUEIRA - NPN 20134539</option>
-									<option {% if obamacare.client.agent_usa == "VLADIMIR DE LA HOZ FONTALVO - NPN 19915005" %}selected{% endif %} value="VLADIMIR DE LA HOZ FONTALVO - NPN 19915005">VLADIMIR DE LA HOZ FONTALVO - NPN 19915005</option>
-									<option {% if obamacare.client.agent_usa == "FRANK JOSE LOPEZ SEQUEIRA - NPN 21226603" %}selected{% endif %} value="FRANK JOSE LOPEZ SEQUEIRA - NPN 21226603">FRANK JOSE LOPEZ SEQUEIRA - NPN 21226603</option>
-									<option {% if obamacare.client.agent_usa == "BORJA G CANTON HERRERA - NPN 20673324" %}selected{% endif %} >BORJA G CANTON HERRERA - NPN 20673324</option>
-									<option {% if obamacare.client.agent_usa == "RODRIGO G CANTON - NPN 20670005" %}selected{% endif %} value="RODRIGO G CANTON - NPN 20670005">RODRIGO G CANTON - NPN 20670005</option>
-									<option {% if obamacare.client.agent_usa == "EVELYN BEATRIZ HERRERA - NPN 20671818" %}selected{% endif %} value="EVELYN BEATRIZ HERRERA - NPN 20671818">EVELYN BEATRIZ HERRERA - NPN 20671818</option>
-								</select>
+					</div>
 
-							{% endif %}							
+					<div class="bs-stepper-line"></div>
+
+					<div class="step {% if userCarrier.username_carrier != Null and userCarrier.username_carrier != 'None' and userCarrier.username_carrier != '' %}active{% endif %}" >
+						<div class="step-trigger d-flex flex-column align-items-center" role="tab">
+							<div class="bs-stepper-circle">
+								<i class="fa-solid fa-circle-user"></i>
+							</div>
+							<h5 class="mb-0 steper-title">User Carrier</h5>
 						</div>
+					</div>
+
+					<div class="bs-stepper-line"></div>
+
+					<div class="step {% if paymentDateObama %}active{% endif %}" >
+						<div class="step-trigger d-flex flex-column align-items-center" role="tab">
+							<div class="bs-stepper-circle">
+								<i class="fa-solid fa-circle-user"></i>
+							</div>
+							<h5 class="mb-0 steper-title">Setup premium alert</h5>
+						</div>
+					</div>
+
+					<div class="bs-stepper-line"></div>
+
+					<div class="step {% if obamacare.status == 'ACTIVE' %}active{% endif %} " >
+						<div class="step-trigger d-flex flex-column align-items-center" role="tab">
+							<div class="bs-stepper-circle" >
+								<i class="fa-solid fa-circle-check"></i>
+							</div>
+							<h5 class="mb-0 steper-title">Status</h5>
+						</div>
+					</div>
+
+					<div class="bs-stepper-line"></div>
+
+					<div class="step {% if obamacare.doc_income and obamacare.doc_migration%}active{% endif %}">
+						<div class="step-trigger d-flex flex-column align-items-center" role="tab">
+							<div class="bs-stepper-circle">
+								<i class="fa-solid fa-file-invoice"></i>
+							</div>
+							<h5 class="mb-0 steper-title">Documents</h5>
+						</div>
+					</div>
+
+					<div class="bs-stepper-line"></div>
+
+					<div class="step  {% if obamacare.policyNumber != '' and obamacare.policyNumber != Null and obamacare.policyNumber != 'None' %}active{% endif %}">
+						<div class="step-trigger d-flex flex-column align-items-center" role="tab">
+							<div class="bs-stepper-circle">
+								<i class="bi bi-123"></i>
+							</div>
+							<h5 class="mb-0 steper-title">Policy Number</h5>
+						</div>
+					</div>
+
+					<div class="bs-stepper-line"></div>
+
+					<div class="step {% if apppointment %}active{% endif %}">
+						<div class="step-trigger d-flex flex-column align-items-center" role="tab">
+							<div class="bs-stepper-circle">
+								<i class="fa-solid fa-user-doctor"></i>
+							</div>
+							<h5 class="mb-0 steper-title">Appointment</h5>
+						</div>
+					</div>
+				</div>
+				<hr>
+				<div class="progress">
+					<div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="{{percentage}}" aria-valuemin="0" aria-valuemax="100" style="width: {{percentage}}%">{{percentage}}%</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-xl-10 mx-auto">
+			<div class="card">
+				<div class="card-body p-4">
+					<form class="row g-3 needs-validation" method="POST">
+						<h4>Client</h4>						
+							<div class="col-12 col-lg-4">
+								<label for="first_name" class="form-label">First Name</label>
+								<input type="text" class="form-control" name="first_name" id="first_name" placeholder="First Name" value="{{obamacare.client.first_name}}" required>
+								<input class="form-control" hidden name="id_client" id="id_client"  value="{{obamacare.client.id}}">
+							</div>
+							<div class="col-12 col-lg-4">
+								<label for="last_name" class="form-label">Last Name</label>
+								<input type="text" class="form-control" name="last_name" id="last_name" placeholder="Last Name" value="{{obamacare.client.last_name}}" required>
+							</div>
+							<div class="col-12 col-lg-4">
+								<label for="phone_number" class="form-label">Phone Number</label>
+								<input readonly type="number" class="form-control" name ="phone_number" id="phone_number" placeholder="Phone Number" value="{{obamacare.client.phone_number}}" required>
+							</div>
+							<div class="col-12 col-lg-3">
+								<label for="email" class="form-label">E-mail Address</label>
+								<input type="email" class="form-control" name="email" id="email" placeholder="Enter Email Address" value="{{obamacare.client.email}}" required>
+							</div>
+							<div class="col-12 col-lg-3">
+								<label for="address" class="form-label">Address</label>
+								<input type="text" class="form-control" name="address" id="address" placeholder="Address" value="{{obamacare.client.address}}" required>
+							</div>
+							<div class="col-12 col-lg-2">
+								<label for="zipcode" class="form-label">zipCode</label>
+								<input type="text" maxlength="5" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="form-control" name ="zipcode" id="zipcode" value="{{obamacare.client.zipcode}}" required>
+							</div>
+							<div class="col-12 col-lg-2">
+								<label for="city" class="form-label">City</label>
+								<input type="text" class="form-control" name ="city" id="city" value="{{obamacare.client.city}}" readonly required>
+							</div>
+							<div class="col-12 col-lg-2">
+								<label for="state" class="form-label font-weight-bold">State</label>
+								<input type="text" class="form-control" name ="state" id="state" value="{{obamacare.client.state}}" readonly required>
+							</div>
+							<div class="col-12 col-lg-3">
+								<label for="county" class="form-label">County</label>
+								<input type="text" class="form-control" name ="county" id="county" value="{{obamacare.client.county}}" readonly required>
+							</div>
+							<div class="col-12 col-lg-2">
+								<label for="sex" class="form-label">Sex</label>
+								<select class="form-select"  name="sex" id="sex" aria-label="Default select example" required>
+									<option value="" disabled selected>Please Select</option>
+									<option value="M" {% if obamacare.client.sex == "M" %}selected{% endif %} >MALE</option>
+									<option value="F" {% if obamacare.client.sex == "F" %}selected{% endif %} >FEMALE</option>
+								</select>
+							</div>
+							<div class="col-12 col-lg-1">
+								<label for="old" class="form-label">Age</label>
+								<input type="number" class="form-control" name ="old" id="old" placeholder="Old" value="{{old}}" readonly >
+							</div>
+							<div class="col-12 col-lg-3">
+								<label for="date_birth" class="form-label">Date Birth</label>
+								<input type="text" class="form-control" name="date_birth" id="date_birth" value="{{ obamacare.client.date_birth|date:'m/d/Y' }}" required>
+							</div>
+							<div class="col-12 col-lg-3">
+								<label for="social_security" class="form-label">Social Security</label>
+								<div class="input-group">
+									<input type="text" class="form-control" name="social_security" id="social_security" value="{{formatted_social}}"  disabled data-client-id="{{ obamacare.client.id }}">
+									<button id="show-full-social" type="button" class="btn btn-secondary">
+										<i class="lni lni-eye"></i>
+									</button>
+									<button hidden type="button" id="save-social" class="btn btn-success">
+										<i class="lni lni-save"></i>
+									</button>
+									<button hidden type="button" id="block-social" class="btn btn-danger">
+										<i class="lni lni-lock"></i> 
+									</button>
+								</div>
+							</div>
+							
+							<div class="col-12 col-lg-5">
+								<label for="migration_status" class="form-label">Migration Status</label>
+								<select class="form-select" id="migration_status"  name="migration_status" required  >
+									<option value="" disabled selected>Please Select</option>
+									<option value="EMPLOYMENT AUTHORIZATION" {% if obamacare.client.migration_status == "EMPLOYMENT AUTHORIZATION" %}selected{% endif %} >Employment Authorization</option>
+									<option value="NOTICE OF ACTION" {% if obamacare.client.migration_status == "NOTICE OF ACTION" %}selected{% endif %} >Notice of Action (i-797)</option>
+									<option value="REFUGEE" {% if obamacare.client.migration_status == "REFUGEE" %}selected{% endif %} >Refugee</option>
+									<option value="ASYLUM" {% if obamacare.client.migration_status == "ASYLUM" %}selected{% endif %} >Asylum</option>
+									<option value="TPS" {% if obamacare.client.migration_status == "TPS" %}selected{% endif %} >Temporary Protection Status (TPS)</option>
+									<option value="DOMESTIC VIOLENCE" {% if obamacare.client.migration_status == "DOMESTIC VIOLENCE" %}selected{% endif %} >Domestic Violence</option>
+									<option value="PERMANENT RESIDENT" {% if obamacare.client.migration_status == "PERMANENT RESIDENT" %}selected{% endif %} >Permanent Resident (Green Card)</option>
+									<option value="CONDITIONAL RESIDENT" {% if obamacare.client.migration_status == "CONDITIONAL RESIDENT" %}selected{% endif %} >Conditional Resident</option>
+									<option value="PAROLE" {% if obamacare.client.migration_status == "PAROLE" %}selected{% endif %} >Parole</option>
+									<option value="US CITIZEN" {% if obamacare.client.migration_status == "US CITIZEN" %}selected{% endif %} >US Citizen (Driver's License)</option>
+									<option value="STUDENT VISA" {% if obamacare.client.migration_status == "STUDENT VISA" %}selected{% endif %} >Student Visa (I-20)</option>
+									<option value="CURRENTLY IN PROCESS" {% if obamacare.client.migration_status == "CURRENTLY IN PROCESS" %}selected{% endif %} >Currently In Process (this means the client received an i-797)</option>
+								</select>
+							</div>
+							<div class="col-12 col-lg-2">
+								<label for="apply" class="form-label">Apply</label>
+								<select class="form-select" id="apply"  name="apply" required>
+									<option value="" disabled selected>Please Select</option>
+									<option value = True {% if obamacare.client.apply == True %}selected{% endif %} >SI</option>
+									<option value = False {% if obamacare.client.apply == False %}selected{% endif %} >NO</option>
+								</select>
+							</div>
+							<div class="col-12 col-lg-5">
+								<label for="agent_usa" class="form-label font-weight-bold">Agente USA</label>
+								<input type="hidden" id="limitValue" value="{{ c }}">
+								{% if request.user.company != obamacare.client.company %}
+									<input readonly type="text" class="form-control" value="{{ obamacare.client.agent_usa }}" >
+								{% else %}
+									<select class="form-select" id="agent_usa" aria-label="Default select example" name="agent_usa" required >
+										<option value="" disabled selected>Please Select</option>
+										<option {% if obamacare.client.agent_usa == "GINA PAOLA LAPEIRA - NPN 19944280" %}selected{% endif %} value="GINA PAOLA LAPEIRA - NPN 19944280">GINA PAOLA LAPEIRA - NPN 19944280</option>
+										<option {% if obamacare.client.agent_usa == "LUIS EDUARDO LAPEIRA - NPN 20556081" %}selected{% endif %} value="LUIS EDUARDO LAPEIRA - NPN 20556081">LUIS EDUARDO LAPEIRA - NPN 20556081</option>
+										<option {% if obamacare.client.agent_usa == "DANIEL SANTIAGO LAPEIRA ACEVEDO - NPN 19904958" %}selected{% endif %} value="DANIEL SANTIAGO LAPEIRA ACEVEDO - NPN 19904958">DANIEL SANTIAGO LAPEIRA ACEVEDO - NPN 19904958</option>
+										<option {% if obamacare.client.agent_usa == "ZOHIRA RAQUEL DUARTE AGUILAR - NPN 19582295" %}selected{% endif %} value="ZOHIRA RAQUEL DUARTE AGUILAR - NPN 19582295">ZOHIRA RAQUEL DUARTE AGUILAR - NPN 19582295</option>
+										<option {% if obamacare.client.agent_usa == "DANIESKA LOPEZ SEQUEIRA - NPN 20134539" %}selected{% endif %} value="DANIESKA LOPEZ SEQUEIRA - NPN 20134539">DANIESKA LOPEZ SEQUEIRA - NPN 20134539</option>
+										<option {% if obamacare.client.agent_usa == "VLADIMIR DE LA HOZ FONTALVO - NPN 19915005" %}selected{% endif %} value="VLADIMIR DE LA HOZ FONTALVO - NPN 19915005">VLADIMIR DE LA HOZ FONTALVO - NPN 19915005</option>
+										<option {% if obamacare.client.agent_usa == "FRANK JOSE LOPEZ SEQUEIRA - NPN 21226603" %}selected{% endif %} value="FRANK JOSE LOPEZ SEQUEIRA - NPN 21226603">FRANK JOSE LOPEZ SEQUEIRA - NPN 21226603</option>
+										<option {% if obamacare.client.agent_usa == "BORJA G CANTON HERRERA - NPN 20673324" %}selected{% endif %} >BORJA G CANTON HERRERA - NPN 20673324</option>
+										<option {% if obamacare.client.agent_usa == "RODRIGO G CANTON - NPN 20670005" %}selected{% endif %} value="RODRIGO G CANTON - NPN 20670005">RODRIGO G CANTON - NPN 20670005</option>
+										<option {% if obamacare.client.agent_usa == "EVELYN BEATRIZ HERRERA - NPN 20671818" %}selected{% endif %} value="EVELYN BEATRIZ HERRERA - NPN 20671818">EVELYN BEATRIZ HERRERA - NPN 20671818</option>
+									</select>
+
+								{% endif %}							
+							</div>
+							
+							<hr>
+							{% if dependents %}
+								<h4>Dependents</h4>
+							{% endif %}
 						
+						{% for dependent in dependents %}
+							<div class="col-12 col-lg-6">
+								<label class="form-label">Name of Dependent #{{ forloop.counter }}</label>
+								<input type="hidden" name="dependentId_{{ dependent.id }}" value="{{ dependent.id }}">
+								<input type="text" class="form-control" name="nameDependent_{{ dependent.id }}" value="{{ dependent.name }}" required >
+							</div>
+							<div class="col-12 col-lg-1">
+								<label class="form-label">Apply</label>
+								<select class="form-select" name="applyDependent_{{ dependent.id }}" required>
+									<option value="" disabled selected>Please Select</option>
+									<option value="YES" {% if dependent.apply == "YES" %}selected{% endif %}>YES</option>
+									<option value="NO" {% if dependent.apply == "NO" %}selected{% endif %}>NO</option>
+								</select>
+							</div>
+							<div class="col-12 col-lg-2">
+								<label class="form-label">Sex</label>
+								<select class="form-select" name="sexDependent_{{ dependent.id }}" required>
+									<option value="" disabled selected>Please Select</option>
+									<option value="M" {% if dependent.sex == "M" %}selected{% endif %}>MALE</option>
+									<option value="F" {% if dependent.sex == "F" %}selected{% endif %}>FEMALE</option>
+								</select>
+							</div>
+							<div class="col-12 col-lg-3">
+								<label class="form-label">Policy Number</label>
+								<input type="text" class="form-control" id="policyNumber"  name="policyNumberDependent_{{ dependent.id }}"  value="{{ dependent.policyNumber|default_if_none:'' }}" >
+							</div>
+							<div class="col-12 col-lg-3">
+								<label for="kinship" class="form-label">Relationship</label>
+								<select class="form-select" id="kinship" name="kinship_{{ dependent.id }}" aria-label="Default select example">
+									<option value="" disabled selected>Please Select</option>
+									<option value="DAD" {% if dependent.kinship == 'DAD' %}selected{% endif %}>DAD</option>
+									<option value="MOM" {% if dependent.kinship == 'MOM' %}selected{% endif %}>MOM</option>
+									<option value="SON" {% if dependent.kinship == 'SON' %}selected{% endif %}>SON</option>
+									<option value="GRANDPARENT" {% if dependent.kinship == 'GRANDPARENT' %}selected{% endif %}>GRANDPARENT</option>
+									<option value="GRANDMOTHER" {% if dependent.kinship == 'GRANDMOTHER' %}selected{% endif %}>GRANDMOTHER</option>
+									<option value="COUPLE" {% if dependent.kinship == 'COUPLE' %}selected{% endif %}>COUPLE</option>
+									<option value="UNKNOWN" {% if dependent.kinship == 'UNKNOWN' %}selected{% endif %}>UNKNOWN</option>
+								</select>
+							</div>
+							<div class="col-12 col-lg-3">
+								<label class="form-label">Date Birth</label>
+								<input type="text" class="form-control" id="dateBirthDependent"  name="dateBirthDependent_{{ dependent.id }}"  value="{{ dependent.date_birth|date:'m/d/Y' }}" >
+							</div>
+							<div class="col-12 col-lg-6">
+								<label class="form-label">Migration Status</label>
+								<select class="form-select" name="migrationStatusDependent_{{ dependent.id }}" required >		
+									<option value="" disabled selected>Please Select</option>
+									<option value="EMPLOYMENT AUTHORIZATION" {% if dependent.migration_status == "EMPLOYMENT AUTHORIZATION" %}selected{% endif %} >Employment Authorization</option>
+									<option value="NOTICE OF ACTION" {% if dependent.migration_status == "NOTICE OF ACTION" %}selected{% endif %} >Notice of Action (i-797)</option>
+									<option value="REFUGEE" {% if dependent.migration_status == "REFUGEE" %}selected{% endif %} >Refugee</option>
+									<option value="ASYLUM" {% if dependent.migration_status == "ASYLUM" %}selected{% endif %} >Asylum</option>
+									<option value="TPS" {% if dependent.migration_status == "TPS" %}selected{% endif %} >Temporary Protection Status (TPS)</option>
+									<option value="DOMESTIC VIOLENCE" {% if dependent.migration_status == "DOMESTIC VIOLENCE" %}selected{% endif %} >Domestic Violence</option>
+									<option value="PERMANENT RESIDENT" {% if dependent.migration_status == "PERMANENT RESIDENT" %}selected{% endif %} >Permanent Resident (Green Card)</option>
+									<option value="CONDITIONAL RESIDENT" {% if dependent.migration_status  == "CONDITIONAL RESIDENT" %}selected{% endif %} >Conditional Resident</option>
+									<option value="PAROLE" {% if  dependent.migration_status == "PAROLE" %}selected{% endif %} >Parole</option>
+									<option value="US CITIZEN" {% if  dependent.migration_status == "US CITIZEN" %}selected{% endif %} >US Citizen (Driver's License)</option>
+									<option value="STUDENT VISA" {% if  dependent.migration_status == "STUDENT VISA" %}selected{% endif %} >Student Visa (I-20)</option>
+									<option value="CURRENTLY IN PROCESS" {% if  dependent.migration_status == "CURRENTLY IN PROCESS" %}selected{% endif %} >Currently In Process (this means the client received an i-797)</option>
+									<option value="UNKNOWN" {% if dependent.migration_status  == "UNKNOWN" %}selected{% endif %} >UNKNOWN</option>
+								</select>
+							</div>
 						<hr>
-						{% if dependents %}
-							<h4>Dependents</h4>
-						{% endif %}
-                    
-                    {% for dependent in dependents %}
-						<div class="col-12 col-lg-6">
-							<label class="form-label">Name of Dependent #{{ forloop.counter }}</label>
-							<input type="hidden" name="dependentId_{{ dependent.id }}" value="{{ dependent.id }}">
-							<input type="text" class="form-control" name="nameDependent_{{ dependent.id }}" value="{{ dependent.name }}" required >
-						</div>
-						<div class="col-12 col-lg-1">
-							<label class="form-label">Apply</label>
-							<select class="form-select" name="applyDependent_{{ dependent.id }}" required>
-								<option value="" disabled selected>Please Select</option>
-								<option value="YES" {% if dependent.apply == "YES" %}selected{% endif %}>YES</option>
-								<option value="NO" {% if dependent.apply == "NO" %}selected{% endif %}>NO</option>
-							</select>
-						</div>
-						<div class="col-12 col-lg-2">
-							<label class="form-label">Sex</label>
-							<select class="form-select" name="sexDependent_{{ dependent.id }}" required>
-								<option value="" disabled selected>Please Select</option>
-								<option value="M" {% if dependent.sex == "M" %}selected{% endif %}>MALE</option>
-								<option value="F" {% if dependent.sex == "F" %}selected{% endif %}>FEMALE</option>
-							</select>
-						</div>
-						<div class="col-12 col-lg-3">
-							<label class="form-label">Policy Number</label>
-							<input type="text" class="form-control" id="policyNumber"  name="policyNumberDependent_{{ dependent.id }}"  value="{{ dependent.policyNumber|default_if_none:'' }}" >
-						</div>
-						<div class="col-12 col-lg-3">
-							<label for="kinship" class="form-label">Relationship</label>
-							<select class="form-select" id="kinship" name="kinship_{{ dependent.id }}" aria-label="Default select example">
-								<option value="" disabled selected>Please Select</option>
-								<option value="DAD" {% if dependent.kinship == 'DAD' %}selected{% endif %}>DAD</option>
-								<option value="MOM" {% if dependent.kinship == 'MOM' %}selected{% endif %}>MOM</option>
-								<option value="SON" {% if dependent.kinship == 'SON' %}selected{% endif %}>SON</option>
-								<option value="GRANDPARENT" {% if dependent.kinship == 'GRANDPARENT' %}selected{% endif %}>GRANDPARENT</option>
-								<option value="GRANDMOTHER" {% if dependent.kinship == 'GRANDMOTHER' %}selected{% endif %}>GRANDMOTHER</option>
-								<option value="COUPLE" {% if dependent.kinship == 'COUPLE' %}selected{% endif %}>COUPLE</option>
-								<option value="UNKNOWN" {% if dependent.kinship == 'UNKNOWN' %}selected{% endif %}>UNKNOWN</option>
-							</select>
-						</div>
-						<div class="col-12 col-lg-3">
-							<label class="form-label">Date Birth</label>
-							<input type="text" class="form-control" id="dateBirthDependent"  name="dateBirthDependent_{{ dependent.id }}"  value="{{ dependent.date_birth|date:'m/d/Y' }}" >
-						</div>
-						<div class="col-12 col-lg-6">
-							<label class="form-label">Migration Status</label>
-							<select class="form-select" name="migrationStatusDependent_{{ dependent.id }}" required >		
-								<option value="" disabled selected>Please Select</option>
-								<option value="EMPLOYMENT AUTHORIZATION" {% if dependent.migration_status == "EMPLOYMENT AUTHORIZATION" %}selected{% endif %} >Employment Authorization</option>
-								<option value="NOTICE OF ACTION" {% if dependent.migration_status == "NOTICE OF ACTION" %}selected{% endif %} >Notice of Action (i-797)</option>
-								<option value="REFUGEE" {% if dependent.migration_status == "REFUGEE" %}selected{% endif %} >Refugee</option>
-								<option value="ASYLUM" {% if dependent.migration_status == "ASYLUM" %}selected{% endif %} >Asylum</option>
-								<option value="TPS" {% if dependent.migration_status == "TPS" %}selected{% endif %} >Temporary Protection Status (TPS)</option>
-								<option value="DOMESTIC VIOLENCE" {% if dependent.migration_status == "DOMESTIC VIOLENCE" %}selected{% endif %} >Domestic Violence</option>
-								<option value="PERMANENT RESIDENT" {% if dependent.migration_status == "PERMANENT RESIDENT" %}selected{% endif %} >Permanent Resident (Green Card)</option>
-								<option value="CONDITIONAL RESIDENT" {% if dependent.migration_status  == "CONDITIONAL RESIDENT" %}selected{% endif %} >Conditional Resident</option>
-								<option value="PAROLE" {% if  dependent.migration_status == "PAROLE" %}selected{% endif %} >Parole</option>
-								<option value="US CITIZEN" {% if  dependent.migration_status == "US CITIZEN" %}selected{% endif %} >US Citizen (Driver's License)</option>
-								<option value="STUDENT VISA" {% if  dependent.migration_status == "STUDENT VISA" %}selected{% endif %} >Student Visa (I-20)</option>
-								<option value="CURRENTLY IN PROCESS" {% if  dependent.migration_status == "CURRENTLY IN PROCESS" %}selected{% endif %} >Currently In Process (this means the client received an i-797)</option>
-								<option value="UNKNOWN" {% if dependent.migration_status  == "UNKNOWN" %}selected{% endif %} >UNKNOWN</option>
-							</select>
-						</div>
+						{% endfor %}
+
+						<H4>Plan</H4>
+							<div class="col-12 col-lg-6">
+								<label for="agent_usa_obamacare" class="form-label font-weight-bold">Agente USA</label>
+								{% if request.user.company != obamacare.company %}
+									<input readonly type="text" class="form-control" value="{{ obamacare.agent_usa }}" >
+								{% else %}
+									<select class="form-select" id="agent_usa_obamacare"  aria-label="Default select example" name="agent_usa_obamacare">
+										<option value="no_valid">Please Select</option>
+										<option {% if obamacare.agent_usa == 'GINA PAOLA LAPEIRA - NPN 19944280' %}selected{% endif %} value="GINA PAOLA LAPEIRA - NPN 19944280">GINA PAOLA LAPEIRA - NPN 19944280</option>
+										<option {% if obamacare.agent_usa == 'LUIS EDUARDO LAPEIRA - NPN 20556081' %}selected{% endif %} value="LUIS EDUARDO LAPEIRA - NPN 20556081">LUIS EDUARDO LAPEIRA - NPN 20556081</option>
+										<option {% if obamacare.agent_usa == 'DANIEL SANTIAGO LAPEIRA ACEVEDO - NPN 19904958' %}selected{% endif %} value="DANIEL SANTIAGO LAPEIRA ACEVEDO - NPN 19904958">DANIEL SANTIAGO LAPEIRA ACEVEDO - NPN 19904958</option>
+										<option {% if obamacare.agent_usa == 'ZOHIRA RAQUEL DUARTE AGUILAR - NPN 19582295' %}selected{% endif %} value="ZOHIRA RAQUEL DUARTE AGUILAR - NPN 19582295">ZOHIRA RAQUEL DUARTE AGUILAR - NPN 19582295</option>
+										<option {% if obamacare.agent_usa == 'DANIESKA LOPEZ SEQUEIRA - NPN 20134539' %}selected{% endif %} value="DANIESKA LOPEZ SEQUEIRA - NPN 20134539">DANIESKA LOPEZ SEQUEIRA - NPN 20134539</option>
+										<option {% if obamacare.agent_usa == 'VLADIMIR DE LA HOZ FONTALVO - NPN 19915005' %}selected{% endif %} value="VLADIMIR DE LA HOZ FONTALVO - NPN 19915005">VLADIMIR DE LA HOZ FONTALVO - NPN 19915005</option>
+										<option {% if obamacare.agent_usa == 'FRANK JOSE LOPEZ SEQUEIRA - NPN 21226603' %}selected{% endif %} value="FRANK JOSE LOPEZ SEQUEIRA - NPN 21226603">FRANK JOSE LOPEZ SEQUEIRA - NPN 21226603</option>
+										<option {% if obamacare.agent_usa == 'BORJA G CANTON HERRERA - NPN 20673324' %}selected{% endif %} value="BORJA G CANTON HERRERA - NPN 20673324">BORJA G CANTON HERRERA - NPN 20673324</option>
+										<option {% if obamacare.agent_usa == 'RODRIGO G CANTON - NPN 20670005' %}selected{% endif %} value="RODRIGO G CANTON - NPN 20670005">RODRIGO G CANTON - NPN 20670005</option>
+										<option {% if obamacare.agent_usa == 'EVELYN BEATRIZ HERRERA - NPN 20671818' %}selected{% endif %} value="EVELYN BEATRIZ HERRERA - NPN 20671818">EVELYN BEATRIZ HERRERA - NPN 20671818</option>
+									</select>
+								{% endif %}
+							</div>
+							<div class="col-12 col-lg-2">
+								<label for="taxes" class="form-label">Taxes</label>
+								<input type="number" class="form-control" id="taxes" name="taxes" value="{{ obamacare.taxes }}" required >
+							</div>
+							<div class="col-12 col-lg-4">
+								<label for="carrierObama" class="form-label">Carrier</label>
+								<select class="form-select" id="carrierObama"  name="carrierObama" required  >
+									<option value="" disabled selected>Please Select</option>
+									<option value="AETNA" {% if obamacare.carrier == "AETNA" %}selected{% endif %} >AETNA</option>
+									<option value="AMBETTER" {% if obamacare.carrier == "AMBETTER" %}selected{% endif %} >AMBETTER</option>
+									<option value="ANTHEM" {% if obamacare.carrier == "ANTHEM" %}selected{% endif %} >ANTHEM</option>
+									<option value="AVMED" {% if obamacare.carrier == "AVMED" %}selected{% endif %} >AVMED</option>
+									<option value="BLUE CROSS" {% if obamacare.carrier == "BLUE CROSS" %}selected{% endif %} >BLUE CROSS</option>
+									<option value="BRIGHT" {% if obamacare.carrier == "BRIGHT" %}selected{% endif %} >BRIGHT</option>
+									<option value="CARE SOURCE" {% if obamacare.carrier == "CARE SOURCE" %}selected{% endif %} >CARE SOURCE</option>
+									<option value="CIGNA" {% if obamacare.carrier == "CIGNA" %}selected{% endif %} >CIGNA</option>
+									<option value="FLORIDA BLUE" {% if obamacare.carrier == "FLORIDA BLUE" %}selected{% endif %} >FLORIDA BLUE</option>
+									<option value="FRIDAY" {% if obamacare.carrier == "FRIDAY" %}selected{% endif %} >FRIDAY</option>
+									<option value="MEDICA" {% if obamacare.carrier == "MEDICA" %}selected{% endif %} >MEDICA</option>
+									<option value="MOLINA" {% if obamacare.carrier == "MOLINA" %}selected{% endif %} >MOLINA</option>
+									<option value="OSCAR" {% if obamacare.carrier == "OSCAR" %}selected{% endif %} >OSCAR</option>
+									<option value="UNITED" {% if obamacare.carrier == "UNITED" %}selected{% endif %} >UNITED</option>
+									<option value="CHRISTUS HEALTH" {% if obamacare.carrier == "CHRISTUS HEALTH" %}selected{% endif %} >CHRISTUS HEALTH</option>
+									<option value="US HEALTH AND LIFE" {% if obamacare.carrier == "US HEALTH AND LIFE" %}selected{% endif %} >US HEALTH AND LIFE</option>
+									<option value="MODA" {% if obamacare.carrier == "MODA" %}selected{% endif %} >MODA</option>
+									<option value="PROVIDENCE" {% if obamacare.carrier == "PROVIDENCE" %}selected{% endif %} >PROVIDENCE</option>
+									<option value="AERIHEALTH CARITAS" {% if obamacare.carrier == "AERIHEALTH CARITAS" %}selected{% endif %} >AERIHEALTH CARITAS</option>
+									<option value="HEALTH FRIST" {% if obamacare.carrier == "HEALTH FRIST" %}selected{% endif %} >HEALTH FRIST</option>
+									<option value="WELLPOINT" {% if obamacare.carrier == "WELLPOINT" %}selected{% endif %} >WELLPOINT</option>
+								</select>
+							</div>
+							<div class="col-12 col-lg-2">
+								<label for="work" class="form-label font-weight-bold">Work</label>
+								<select class="form-select" id="work" aria-label="Default select example"  name="work" required  >
+									<option value="" disabled selected>Please Select</option>
+									<option value="W2" {% if obamacare.work == "W2" %}selected{% endif %} >W2</option>
+									<option value="1099"{% if obamacare.work == "1099"%}selected{% endif %} >1099</option> 
+								</select>
+							</div>
+							<div class="col-12 col-lg-2">
+								<label for="subsidy" class="form-label">Subsidy</label>
+								<input type="number" step="0.00" class="form-control" id="subsidy" name="subsidy" value="{{ obamacare.subsidy }}" >
+							</div>
+							<div class="col-12 col-lg-2">
+								<label for="ffm" class="form-label">FFM</label>
+								<input type="number" class="form-control" id="ffm" name="ffm" value="{{obamacare.ffm}}" >
+							</div>
+							<div class="col-12 col-lg-2">
+								<label for="required_bearing" class="form-label">Bearing</label>
+								<select class="form-select" id="required_bearing" aria-label="Default select example"  name="required_bearing"   >
+									<option value="" disabled selected>Please Select</option>
+									<option value=1 {% if obamacare.required_bearing == 1 %}selected{% endif %}>YES</option>
+									<option value=0 {% if obamacare.required_bearing == 0 %}selected{% endif %}>NO</option> 
+								</select>
+							</div>                    
+							<div class="col-12 col-lg-2">
+								<label for="date_bearing" class="form-label">Bearing Date</label>
+								<input type="text" class="form-control" name="date_bearing" id="date_bearing" value="{{obamacare.date_bearing|date:'m/d/Y'}}" >
+							</div>
+							<div class="col-12 col-lg-2">
+								<label for="doc_income" class="form-label">Income Doc</label>
+								<select class="form-select" id="doc_income"  name="doc_income" required  >
+									<option value ="" disabled selected>Please Select</option>
+									<option value = True {% if obamacare.doc_income == True %}selected{% endif %} >YES</option>
+									<option value = False {% if obamacare.doc_income == False %}selected{% endif %} >NO</option>
+								</select>
+							</div>
+							<div class="col-12 col-lg-2">
+								<label for="doc_migration" class="form-label">Inmigration Doc</label>
+								<select class="form-select" id="doc_migration"  name="doc_migration" required  >
+									<option value="" disabled selected>Please Select</option>
+									<option value = True {% if obamacare.doc_migration == True %}selected{% endif %} >YES</option>
+									<option value = False {% if obamacare.doc_migration == False %}selected{% endif %} >NO</option>
+								</select>
+							</div>						
+							<div class="col-12 col-lg-4">
+								<label for="planName" class="form-label">Plan Name</label>
+								<input type="text" class="form-control" id="planName" name="planName" value="{{ obamacare.plan_name }}" required  >
+							</div>
+							<div class="col-12 col-lg-3">
+								<label for="premium" class="form-label">Premium</label>
+								<input type="number" step="0.01" class="form-control" id="premium" name="premium" value="{{ obamacare.premium }}" required >
+							</div>
+							<div class="col-12 col-lg-3">
+								<label for="policyNumber" class="form-label">Police Number</label>
+								<input type="text" class="form-control" id="policyNumber" name="policyNumber" value="{{ obamacare.policyNumber|default_if_none:'' }}" >
+							</div>
+							<div class="col-12 col-lg-3">
+								<label for="profiling" class="form-label">Enrolled by</label>
+								<select required class="form-select" id="profiling" name="profiling">
+									<option value="" disabled {% if not obamacare.profiling %}selected{% endif %}>Please Select</option>
+									<option value="NO" {% if obamacare.profiling == "NO" %}selected{% endif %}>NO</option>
+
+									{# Lista normal de usuarios inactivos #}
+									{% for user in userInactive %}
+										{% with user.first_name|add:" "|add:user.last_name as full_name %}
+											{% if obamacare.profiling == full_name %}
+												<option value="{{ full_name }}" selected>{{ full_name }}</option>
+											{% endif %}
+										{% endwith %}
+									{% endfor %}
+
+									{# Lista normal de usuarios activos #}
+									{% for user in usersActive %}
+										{% with user.first_name|add:" "|add:user.last_name as full_name %}
+											<option value="{{ full_name }}" {% if obamacare.profiling == full_name %}selected{% endif %}>{{ full_name }}</option>
+										{% endwith %}
+									{% endfor %}
+
+								</select>
+
+							</div>
+							<div class="col-12 col-lg-3">
+								<label for="statusObama" class="form-label">Status</label>
+								<select required class="form-select" id="statusObama"  name="statusObama" required >
+									<option value="" disabled selected>Please Select</option>					
+									{% for  list_drow in list_drow %}
+										<option value="{{list_drow.profiling_obama}}" {% if obamacare.status == list_drow.profiling_obama %}selected{% endif %} >{{list_drow.profiling_obama}}</option>                      
+									{% endfor %}
+								</select>
+							</div>
+							{% if request.user.role != 'A' %}
+							<div class="col-12 col-lg-3">
+								<label for="usernameCarrier" class="form-label">Username Carrier</label>
+								<input type="text" hidden name="usernameCarrierID" id="usernameCarrierID" value="{{userCarrier.id}}" >
+								<input type="text" {% if userCarrier.username_carrier %} readonly {% endif %} class="form-control" name="usernameCarrier" id="usernameCarrier" value="{{userCarrier.username_carrier}}" >
+							</div>
+							<div class="col-12 col-lg-3">
+								<label for="passwordCarrier" class="form-label">Password Carrier</label>
+								<input type="text" class="form-control" {% if userCarrier.password_carrier %} readonly {% endif %} name="passwordCarrier" id="passwordCarrier" value="{{userCarrier.password_carrier}}" >
+							</div>   
+							<div class="col-12 col-lg-3">
+								<label for="letters" class="form-label">Health market letters</label>
+								<input type="text" hidden name="letterCardID" id="letterCardID" value="{{letterCard.id}}">
+								{% if letterCard.letters %}
+									<input type="text" class="form-control" readonly name="letters" id="letters" value="YES">
+								{% else %}
+									<select class="form-select" id="letters"  name="letters" required  >
+										<option value="" disabled selected>Please Select</option>
+										<option value = "True" {% if letterCard.letters %}selected{% endif %} >YES</option>
+										<option value = "False" {% if not letterCard.letters %}selected{% endif %} >NO</option>
+									</select>
+								{% endif %}
+							</div>   
+							<div class="col-12 col-lg-3">
+								<label for="card" class="form-label">Health Market Cards</label>
+								{% if letterCard.card %}
+									<input type="text" class="form-control" readonly name="card" id="card" value="YES">
+								{% else %}
+									<select class="form-select" id="card"  name="card" required  >
+										<option value="" disabled selected>Please Select</option>
+										<option value = "True" {% if letterCard.card  %}selected{% endif %} >YES</option>
+										<option value = "False" {% if not letterCard.card %}selected{% endif %} >NO</option>
+									</select>
+								{% endif %}
+								
+							</div>   
+							{% endif %}
+							<div class="col-12 col-lg-3">
+								<label for="date_effective_coverage" class="form-label">Date Effective Coverage</label>
+								<input type="text" class="form-control" name="date_effective_coverage" id="date_effective_coverage" value="{{obamacare.date_effective_coverage|date:'m/d/Y'}}" >
+							</div>
+							<div class="col-12 col-lg-3">
+								<label for="date_effective_coverage_end" class="form-label">Date Effective Coverage End</label>
+								<input type="text" class="form-control" name="date_effective_coverage_end" id="date_effective_coverage_end" value="{{obamacare.date_effective_coverage_end|date:'m/d/Y'}}" >
+							</div>   	       
+							<div class="col-12 col-lg-6">
+								<label for="observationObama" class="form-label">Observation</label>
+								<textarea class="form-control" id="observationObama" name="observationObama" rows="3"  style="resize: none">{{ obamacare.observation }}</textarea>
+							</div>
+							<div class="col-12 col-lg-6">
+								<label for="observationObama" class="form-label">Observation Agent</label>
+								<textarea class="form-control" id="observationObama" name="observationObama" disabled rows="3"  style="resize: none">{{ obsObamaText }}</textarea>
+							</div>
+							{% if request.user.role == 'A' %}
+							<div class="col-12 col-lg-6" id="obs_agent">
+								<label for="obs_agent" class="form-label">OBS. AGENT</label>
+								<input type="text" class="form-control" id="obs_agent" name="obs_agent"  >
+							</div> 
+							{% endif %}
+							<hr>					            
+							<div class="col-md-12">
+								<div class="d-md-flex d-grid align-items-center gap-3">
+									<button type="submit" name="action" value="save_obamacare" id="enviar" class="btn btn-primary px-4"  >Submit</button>
+									<button type="submit" name="action" id="enviar2" value="save_observation_agent" class="btn btn-primary px-4" style="display: none;">Submits</button>
+									{% if way == 1 %}
+										<a href="{% url 'clientObamacare' %}" class="btn btn-light px-4">Back</a>								
+									{% elif way == 2 %}
+										<a href="{% url 'clientAccionRequired' %}" class="btn btn-light px-4">Back</a>
+									{% endif %}
+									<a class="btn btn-light px-4" data-bs-toggle="modal" data-bs-target="#verConsent">Consent</a>
+									<a class="btn btn-light px-4" data-bs-toggle="modal" data-bs-target="#verIncomeLetter">Income Letter</a>
+									<a class="btn btn-light px-4" data-bs-toggle="modal" data-bs-target="#verDocument">Document</a>
+									<a class="btn btn-light px-4" data-bs-toggle="modal" data-bs-target="#verAppointment">Appointment</a>
+									<a class="btn btn-light px-4" data-bs-toggle="modal" data-bs-target="#verComplaint">Complaint</a>
+								</div>
+							</div>
+						{% csrf_token %}	
+					</form>
 					<hr>
-					{% endfor %}
 
-                    <H4>Plan</H4>
-						<div class="col-12 col-lg-6">
-							<label for="agent_usa_obamacare" class="form-label font-weight-bold">Agente USA</label>
-							{% if request.user.company != obamacare.company %}
-								<input readonly type="text" class="form-control" value="{{ obamacare.agent_usa }}" >
-							{% else %}
-								<select class="form-select" id="agent_usa_obamacare"  aria-label="Default select example" name="agent_usa_obamacare">
-									<option value="no_valid">Please Select</option>
-									<option {% if obamacare.agent_usa == 'GINA PAOLA LAPEIRA - NPN 19944280' %}selected{% endif %} value="GINA PAOLA LAPEIRA - NPN 19944280">GINA PAOLA LAPEIRA - NPN 19944280</option>
-									<option {% if obamacare.agent_usa == 'LUIS EDUARDO LAPEIRA - NPN 20556081' %}selected{% endif %} value="LUIS EDUARDO LAPEIRA - NPN 20556081">LUIS EDUARDO LAPEIRA - NPN 20556081</option>
-									<option {% if obamacare.agent_usa == 'DANIEL SANTIAGO LAPEIRA ACEVEDO - NPN 19904958' %}selected{% endif %} value="DANIEL SANTIAGO LAPEIRA ACEVEDO - NPN 19904958">DANIEL SANTIAGO LAPEIRA ACEVEDO - NPN 19904958</option>
-									<option {% if obamacare.agent_usa == 'ZOHIRA RAQUEL DUARTE AGUILAR - NPN 19582295' %}selected{% endif %} value="ZOHIRA RAQUEL DUARTE AGUILAR - NPN 19582295">ZOHIRA RAQUEL DUARTE AGUILAR - NPN 19582295</option>
-									<option {% if obamacare.agent_usa == 'DANIESKA LOPEZ SEQUEIRA - NPN 20134539' %}selected{% endif %} value="DANIESKA LOPEZ SEQUEIRA - NPN 20134539">DANIESKA LOPEZ SEQUEIRA - NPN 20134539</option>
-									<option {% if obamacare.agent_usa == 'VLADIMIR DE LA HOZ FONTALVO - NPN 19915005' %}selected{% endif %} value="VLADIMIR DE LA HOZ FONTALVO - NPN 19915005">VLADIMIR DE LA HOZ FONTALVO - NPN 19915005</option>
-									<option {% if obamacare.agent_usa == 'FRANK JOSE LOPEZ SEQUEIRA - NPN 21226603' %}selected{% endif %} value="FRANK JOSE LOPEZ SEQUEIRA - NPN 21226603">FRANK JOSE LOPEZ SEQUEIRA - NPN 21226603</option>
-									<option {% if obamacare.agent_usa == 'BORJA G CANTON HERRERA - NPN 20673324' %}selected{% endif %} value="BORJA G CANTON HERRERA - NPN 20673324">BORJA G CANTON HERRERA - NPN 20673324</option>
-									<option {% if obamacare.agent_usa == 'RODRIGO G CANTON - NPN 20670005' %}selected{% endif %} value="RODRIGO G CANTON - NPN 20670005">RODRIGO G CANTON - NPN 20670005</option>
-									<option {% if obamacare.agent_usa == 'EVELYN BEATRIZ HERRERA - NPN 20671818' %}selected{% endif %} value="EVELYN BEATRIZ HERRERA - NPN 20671818">EVELYN BEATRIZ HERRERA - NPN 20671818</option>
-								</select>
-							{% endif %}
+					<div id="password-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+						<div style=" padding: 20px; max-width: 400px; margin: 100px auto; border-radius: 8px; text-align: center;">
+							<h3>Ingresa la clave</h3>
+							<input type="password" id="password-input" class="form-control" placeholder="Clave" style="margin: 10px 0; width: 100%;">
+							<button id="submit-password" class="btn btn-primary">Enviar</button>
+							<button id="cancel-password" class="btn btn-secondary">Cancelar</button>
 						</div>
-						<div class="col-12 col-lg-2">
-							<label for="taxes" class="form-label">Taxes</label>
-							<input type="number" class="form-control" id="taxes" name="taxes" value="{{ obamacare.taxes }}" required >
-						</div>
-						<div class="col-12 col-lg-4">
-							<label for="carrierObama" class="form-label">Carrier</label>
-							<select class="form-select" id="carrierObama"  name="carrierObama" required  >
-								<option value="" disabled selected>Please Select</option>
-								<option value="AETNA" {% if obamacare.carrier == "AETNA" %}selected{% endif %} >AETNA</option>
-								<option value="AMBETTER" {% if obamacare.carrier == "AMBETTER" %}selected{% endif %} >AMBETTER</option>
-								<option value="ANTHEM" {% if obamacare.carrier == "ANTHEM" %}selected{% endif %} >ANTHEM</option>
-								<option value="AVMED" {% if obamacare.carrier == "AVMED" %}selected{% endif %} >AVMED</option>
-								<option value="BLUE CROSS" {% if obamacare.carrier == "BLUE CROSS" %}selected{% endif %} >BLUE CROSS</option>
-								<option value="BRIGHT" {% if obamacare.carrier == "BRIGHT" %}selected{% endif %} >BRIGHT</option>
-								<option value="CARE SOURCE" {% if obamacare.carrier == "CARE SOURCE" %}selected{% endif %} >CARE SOURCE</option>
-								<option value="CIGNA" {% if obamacare.carrier == "CIGNA" %}selected{% endif %} >CIGNA</option>
-								<option value="FLORIDA BLUE" {% if obamacare.carrier == "FLORIDA BLUE" %}selected{% endif %} >FLORIDA BLUE</option>
-								<option value="FRIDAY" {% if obamacare.carrier == "FRIDAY" %}selected{% endif %} >FRIDAY</option>
-								<option value="MEDICA" {% if obamacare.carrier == "MEDICA" %}selected{% endif %} >MEDICA</option>
-								<option value="MOLINA" {% if obamacare.carrier == "MOLINA" %}selected{% endif %} >MOLINA</option>
-								<option value="OSCAR" {% if obamacare.carrier == "OSCAR" %}selected{% endif %} >OSCAR</option>
-								<option value="UNITED" {% if obamacare.carrier == "UNITED" %}selected{% endif %} >UNITED</option>
-								<option value="CHRISTUS HEALTH" {% if obamacare.carrier == "CHRISTUS HEALTH" %}selected{% endif %} >CHRISTUS HEALTH</option>
-								<option value="US HEALTH AND LIFE" {% if obamacare.carrier == "US HEALTH AND LIFE" %}selected{% endif %} >US HEALTH AND LIFE</option>
-								<option value="MODA" {% if obamacare.carrier == "MODA" %}selected{% endif %} >MODA</option>
-								<option value="PROVIDENCE" {% if obamacare.carrier == "PROVIDENCE" %}selected{% endif %} >PROVIDENCE</option>
-								<option value="AERIHEALTH CARITAS" {% if obamacare.carrier == "AERIHEALTH CARITAS" %}selected{% endif %} >AERIHEALTH CARITAS</option>
-								<option value="HEALTH FRIST" {% if obamacare.carrier == "HEALTH FRIST" %}selected{% endif %} >HEALTH FRIST</option>
-								<option value="WELLPOINT" {% if obamacare.carrier == "WELLPOINT" %}selected{% endif %} >WELLPOINT</option>
-							</select>
-						</div>
-						<div class="col-12 col-lg-2">
-							<label for="work" class="form-label font-weight-bold">Work</label>
-							<select class="form-select" id="work" aria-label="Default select example"  name="work" required  >
-								<option value="" disabled selected>Please Select</option>
-								<option value="W2" {% if obamacare.work == "W2" %}selected{% endif %} >W2</option>
-								<option value="1099"{% if obamacare.work == "1099"%}selected{% endif %} >1099</option> 
-							</select>
-						</div>
-						<div class="col-12 col-lg-2">
-							<label for="subsidy" class="form-label">Subsidy</label>
-							<input type="number" step="0.00" class="form-control" id="subsidy" name="subsidy" value="{{ obamacare.subsidy }}" >
-						</div>
-						<div class="col-12 col-lg-2">
-							<label for="ffm" class="form-label">FFM</label>
-							<input type="number" class="form-control" id="ffm" name="ffm" value="{{obamacare.ffm}}" >
-						</div>
-						<div class="col-12 col-lg-2">
-							<label for="required_bearing" class="form-label">Bearing</label>
-							<select class="form-select" id="required_bearing" aria-label="Default select example"  name="required_bearing"   >
-								<option value="" disabled selected>Please Select</option>
-								<option value=1 {% if obamacare.required_bearing == 1 %}selected{% endif %}>YES</option>
-								<option value=0 {% if obamacare.required_bearing == 0 %}selected{% endif %}>NO</option> 
-							</select>
-						</div>                    
-						<div class="col-12 col-lg-2">
-							<label for="date_bearing" class="form-label">Bearing Date</label>
-							<input type="text" class="form-control" name="date_bearing" id="date_bearing" value="{{obamacare.date_bearing|date:'m/d/Y'}}" >
-						</div>
-						<div class="col-12 col-lg-2">
-							<label for="doc_income" class="form-label">Income Doc</label>
-							<select class="form-select" id="doc_income"  name="doc_income" required  >
-								<option value ="" disabled selected>Please Select</option>
-								<option value = True {% if obamacare.doc_income == True %}selected{% endif %} >YES</option>
-								<option value = False {% if obamacare.doc_income == False %}selected{% endif %} >NO</option>
-							</select>
-						</div>
-						<div class="col-12 col-lg-2">
-							<label for="doc_migration" class="form-label">Inmigration Doc</label>
-							<select class="form-select" id="doc_migration"  name="doc_migration" required  >
-								<option value="" disabled selected>Please Select</option>
-								<option value = True {% if obamacare.doc_migration == True %}selected{% endif %} >YES</option>
-								<option value = False {% if obamacare.doc_migration == False %}selected{% endif %} >NO</option>
-							</select>
-						</div>						
-						<div class="col-12 col-lg-4">
-							<label for="planName" class="form-label">Plan Name</label>
-							<input type="text" class="form-control" id="planName" name="planName" value="{{ obamacare.plan_name }}" required  >
-						</div>
-						<div class="col-12 col-lg-3">
-							<label for="premium" class="form-label">Premium</label>
-							<input type="number" step="0.01" class="form-control" id="premium" name="premium" value="{{ obamacare.premium }}" required >
-						</div>
-						<div class="col-12 col-lg-3">
-							<label for="policyNumber" class="form-label">Police Number</label>
-							<input type="text" class="form-control" id="policyNumber" name="policyNumber" value="{{ obamacare.policyNumber|default_if_none:'' }}" >
-						</div>
-						<div class="col-12 col-lg-3">
-							<label for="profiling" class="form-label">Enrolled by</label>
-							<select required class="form-select" id="profiling" name="profiling">
-								<option value="" disabled {% if not obamacare.profiling %}selected{% endif %}>Please Select</option>
-								<option value="NO" {% if obamacare.profiling == "NO" %}selected{% endif %}>NO</option>
+					</div>				
+					
+					<h5>Customer Departament:</h5>
+					<div class="col-12 col-lg-12">
 
-								{# Lista normal de usuarios inactivos #}
-								{% for user in userInactive %}
-									{% with user.first_name|add:" "|add:user.last_name as full_name %}
-										{% if obamacare.profiling == full_name %}
-											<option value="{{ full_name }}" selected>{{ full_name }}</option>
-										{% endif %}
-									{% endwith %}
-								{% endfor %}
+						<div class="row row-cols-auto g-3">
 
-								{# Lista normal de usuarios activos #}
-								{% for user in usersActive %}
-									{% with user.first_name|add:" "|add:user.last_name as full_name %}
-										<option value="{{ full_name }}" {% if obamacare.profiling == full_name %}selected{% endif %}>{{ full_name }}</option>
-									{% endwith %}
-								{% endfor %}
-
-							</select>
-
-						</div>
-						<div class="col-12 col-lg-3">
-							<label for="statusObama" class="form-label">Status</label>
-							<select required class="form-select" id="statusObama"  name="statusObama" required >
-								<option value="" disabled selected>Please Select</option>					
-								{% for  list_drow in list_drow %}
-									<option value="{{list_drow.profiling_obama}}" {% if obamacare.status == list_drow.profiling_obama %}selected{% endif %} >{{list_drow.profiling_obama}}</option>                      
-								{% endfor %}
-							</select>
-						</div>
-						{% if request.user.role != 'A' %}
-						<div class="col-12 col-lg-3">
-							<label for="usernameCarrier" class="form-label">Username Carrier</label>
-							<input type="text" hidden name="usernameCarrierID" id="usernameCarrierID" value="{{userCarrier.id}}" >
-							<input type="text" {% if userCarrier.username_carrier %} readonly {% endif %} class="form-control" name="usernameCarrier" id="usernameCarrier" value="{{userCarrier.username_carrier}}" >
-						</div>
-						<div class="col-12 col-lg-3">
-							<label for="passwordCarrier" class="form-label">Password Carrier</label>
-							<input type="text" class="form-control" {% if userCarrier.password_carrier %} readonly {% endif %} name="passwordCarrier" id="passwordCarrier" value="{{userCarrier.password_carrier}}" >
-						</div>   
-						<div class="col-12 col-lg-3">
-							<label for="letters" class="form-label">Health market letters</label>
-							<input type="text" hidden name="letterCardID" id="letterCardID" value="{{letterCard.id}}">
-							{% if letterCard.letters %}
-								<input type="text" class="form-control" readonly name="letters" id="letters" value="YES">
-							{% else %}
-								<select class="form-select" id="letters"  name="letters" required  >
-									<option value="" disabled selected>Please Select</option>
-									<option value = "True" {% if letterCard.letters %}selected{% endif %} >YES</option>
-									<option value = "False" {% if not letterCard.letters %}selected{% endif %} >NO</option>
-								</select>
-							{% endif %}
-						</div>   
-						<div class="col-12 col-lg-3">
-							<label for="card" class="form-label">Health Market Cards</label>
-							{% if letterCard.card %}
-								<input type="text" class="form-control" readonly name="card" id="card" value="YES">
-							{% else %}
-								<select class="form-select" id="card"  name="card" required  >
-									<option value="" disabled selected>Please Select</option>
-									<option value = "True" {% if letterCard.card  %}selected{% endif %} >YES</option>
-									<option value = "False" {% if not letterCard.card %}selected{% endif %} >NO</option>
-								</select>
+							<!-- Botones para abrir los modales -->
+							<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalDocument">
+								Documents
+							</button>
+							{% if request.user.role != 'A' %}
+								<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalSelector">
+									Observation
+								</button>
+								{% if request.user|has_module:"SMS" %}
+									<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalAppointment">
+										Appointment
+									</button>
+								{% endif %}
+								<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalPayments">
+									Payments
+								</button>
+								{% if request.user|has_module:"SMS" %}
+									<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalPaymentsDate">
+										Date Payment
+									</button>
+								{% endif %}
+								<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalComplaint">
+									Complaint
+								</button>
+								{% if request.user|has_module:"SMS" %}
+									<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalSMS">
+										SMS Temp
+									</button>
+								{% endif %}
+							{% endif %} 
+							<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#AgentTicketAssignment">
+								Ticket
+							</button>
+							<button type="button" class="btn btn-secondary me-2" data-bs-toggle="modal" data-bs-target="#modalVerTexto">
+								See Observations
+							</button>
+							{% if accionRequired %}
+								<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalAccionRequired">
+									See Accion Required
+								</button>
 							{% endif %}
 							
-						</div>   
-						{% endif %}
-						<div class="col-12 col-lg-3">
-							<label for="date_effective_coverage" class="form-label">Date Effective Coverage</label>
-							<input type="text" class="form-control" name="date_effective_coverage" id="date_effective_coverage" value="{{obamacare.date_effective_coverage|date:'m/d/Y'}}" >
 						</div>
-						<div class="col-12 col-lg-3">
-							<label for="date_effective_coverage_end" class="form-label">Date Effective Coverage End</label>
-							<input type="text" class="form-control" name="date_effective_coverage_end" id="date_effective_coverage_end" value="{{obamacare.date_effective_coverage_end|date:'m/d/Y'}}" >
-						</div>   	       
-						<div class="col-12 col-lg-6">
-							<label for="observationObama" class="form-label">Observation</label>
-							<textarea class="form-control" id="observationObama" name="observationObama" rows="3"  style="resize: none">{{ obamacare.observation }}</textarea>
-						</div>
-						<div class="col-12 col-lg-6">
-							<label for="observationObama" class="form-label">Observation Agent</label>
-							<textarea class="form-control" id="observationObama" name="observationObama" disabled rows="3"  style="resize: none">{{ obsObamaText }}</textarea>
-						</div>
-						{% if request.user.role == 'A' %}
-						<div class="col-12 col-lg-6" id="obs_agent">
-							<label for="obs_agent" class="form-label">OBS. AGENT</label>
-							<input type="text" class="form-control" id="obs_agent" name="obs_agent"  >
-						</div> 
-						{% endif %}
-						<hr>					            
-						<div class="col-md-12">
-							<div class="d-md-flex d-grid align-items-center gap-3">
-								<button type="submit" name="action" value="save_obamacare" id="enviar" class="btn btn-primary px-4"  >Submit</button>
-								<button type="submit" name="action" id="enviar2" value="save_observation_agent" class="btn btn-primary px-4" style="display: none;">Submits</button>
-								{% if way == 1 %}
-									<a href="{% url 'clientObamacare' %}" class="btn btn-light px-4">Back</a>								
-								{% elif way == 2 %}
-									<a href="{% url 'clientAccionRequired' %}" class="btn btn-light px-4">Back</a>
-								{% endif %}
-								<a class="btn btn-light px-4" data-bs-toggle="modal" data-bs-target="#verConsent">Consent</a>
-								<a class="btn btn-light px-4" data-bs-toggle="modal" data-bs-target="#verIncomeLetter">Income Letter</a>
-								<a class="btn btn-light px-4" data-bs-toggle="modal" data-bs-target="#verDocument">Document</a>
-								<a class="btn btn-light px-4" data-bs-toggle="modal" data-bs-target="#verAppointment">Appointment</a>
-								<a class="btn btn-light px-4" data-bs-toggle="modal" data-bs-target="#verComplaint">Complaint</a>
+
+						<!-- Modal de selección inicial -->
+						<div class="modal fade" id="modalSelector" tabindex="-1" aria-labelledby="modalSelectorLabel" aria-hidden="true">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title" id="modalSelectorLabel">Select action</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body text-center">
+										<h6 class="mb-4">What action do you wish to take?</h6>
+										<div class="d-grid gap-3">
+											<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalIngresarTexto" data-bs-dismiss="modal">
+												Enter Observation
+											</button>
+											<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalActionrequired" data-bs-dismiss="modal">
+												Enter Action Required
+											</button>
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
-                    {% csrf_token %}	
-                </form>
-				<hr>
-
-				<div id="password-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
-					<div style=" padding: 20px; max-width: 400px; margin: 100px auto; border-radius: 8px; text-align: center;">
-						<h3>Ingresa la clave</h3>
-						<input type="password" id="password-input" class="form-control" placeholder="Clave" style="margin: 10px 0; width: 100%;">
-						<button id="submit-password" class="btn btn-primary">Enviar</button>
-						<button id="cancel-password" class="btn btn-secondary">Cancelar</button>
-					</div>
-				</div>				
 				
-				<h5>Customer Departament:</h5>
-				<div class="col-12 col-lg-12">
-
-					<div class="row row-cols-auto g-3">
-
-						<!-- Botones para abrir los modales -->
-						<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalDocument">
-							Documents
-						</button>
-						{% if request.user.role != 'A' %}
-							<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalSelector">
-								Observation
-							</button>
-							{% if request.user|has_module:"SMS" %}
-								<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalAppointment">
-									Appointment
-								</button>
-							{% endif %}
-							<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalPayments">
-								Payments
-							</button>
-							{% if request.user|has_module:"SMS" %}
-								<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalPaymentsDate">
-									Date Payment
-								</button>
-							{% endif %}
-							<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalComplaint">
-								Complaint
-							</button>
-							{% if request.user|has_module:"SMS" %}
-								<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalSMS">
-									SMS Temp
-								</button>
-							{% endif %}
-						{% endif %} 
-						<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#AgentTicketAssignment">
-							Ticket
-						</button>
-						<button type="button" class="btn btn-secondary me-2" data-bs-toggle="modal" data-bs-target="#modalVerTexto">
-							See Observations
-						</button>
-						{% if accionRequired %}
-							<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalAccionRequired">
-								See Accion Required
-							</button>
-						{% endif %}
-						
-					</div>
-
-					<!-- Modal de selección inicial -->
-					<div class="modal fade" id="modalSelector" tabindex="-1" aria-labelledby="modalSelectorLabel" aria-hidden="true">
-						<div class="modal-dialog">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h5 class="modal-title" id="modalSelectorLabel">Select action</h5>
-									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-								</div>
-								<div class="modal-body text-center">
-									<h6 class="mb-4">What action do you wish to take?</h6>
-									<div class="d-grid gap-3">
-										<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalIngresarTexto" data-bs-dismiss="modal">
-											Enter Observation
-										</button>
-										<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalActionrequired" data-bs-dismiss="modal">
-											Enter Action Required
-										</button>
+						<!-- Modal para ingresar texto -->
+						<div class="modal fade" id="modalIngresarTexto" tabindex="-1" aria-labelledby="modalIngresarTextoLabel" aria-hidden="true">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title" id="modalIngresarTextoLabel">Enter Observation</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										<form id="formIngresarTexto" action="{% url 'saveCustomerObservationACA' %}" method="POST">
+											{% csrf_token %}
+											<input type="hidden" name="obamacare_id" value="{{ obamacare.id }}">
+											<input type="hidden" name="way" value="{{way}}">
+											<div class="mb-3">
+												<label for="textoIngresado" class="form-label">Text:</label>
+												<textarea class="form-control" id="textoIngresado" name="textoIngresado" rows="4" required></textarea>
+											</div>
+											<div class="mb-3">
+												<label for="observaciones" class="form-label">Typification:</label>
+												<select class="form-select"  name="observaciones[]" id="observaciones" multiple required>
+													<option value="1095-A">1095-A</option>
+													<option value="AUDITED">Audited</option>
+													<option value="ACTIVE">Active</option>
+													<option value="CANCEL">Cancel</option>
+													<option value="PLAN CHANGE">Plan Change</option>
+													<option value="AGENT CHANGE">Agent Change</option>
+													<option value="T/C CHANGE">T/C Change</option>
+													<option value="CARRIER">Carrier</option>
+													<option value="APPOINTMENTS">Appointments</option>
+													<option value="SATISFIED CUSTOMER">Satisfied Customer</option>
+													<option value="CORRECTION">Correction</option>
+													<option value="PAYMENT ERROR CORRECTION">Payment Error Correction</option>
+													<option value="PORTAL CREATION">Portal/Member ID/Brochure Creation</option>
+													<option value="DEMOGRAPHIC DATA">Demographic Data</option>
+													<option value="DOCUMENTS IN SHERPA">Documents in Sherpa</option>
+													<option value="DOCUMENTS RECEIVED">Documents Received</option>
+													<option value="ID CARD SEND">ID Card Send</option>
+													<option value="DENTIST LISTING">Dentist listing</option>
+													<option value="OPTOMETER LISTING">Optometer Listing</option>
+													<option value="PLAN EXPLANATION">Plan Explanation</option>
+													<option value="OUT OF SERVICE">Out of Service</option>
+													<option value="HEALTHSAFE ID">HEALTHSAFE ID</option>
+													<option value="ID MEMBER">ID Member</option>
+													<option value="ID SUPERVISOR">ID Supervisor</option>
+													<option value="CARRIER SUP CALL">Carrier Supervisor Call</option>
+													<option value="EFFECTIVE MANAGEMENT">Effective Management</option>
+													<option value="WELCOME MESSAGE">Welcome Message</option>
+													<option value="FOLLOW-UP CALL">Follow-up call</option>
+													<option value="INFORMATIVE MESSAGE">Informative Message</option>
+													<option value="MARKET CALL">Market Call</option>
+													<option value="NO ANSWER">No Answer</option>
+													<option value="OTHER PARTY">Other Party</option>
+													<option value="DENTAL PAYMENT UHC">Dental Payment via UHC</option>
+													<option value="VISION PAYMENT UHC">Vision Payment via UHC</option>
+													<option value="CARRIER ACA PORTAL">Carrier ACA Portal</option>
+													<option value="CARD RECEIPT">Card Receipt</option>
+													<option value="RECOVERED">Recovered</option>
+													<option value="REFERAL">Referal</option>
+													<option value="ROLLED OVER">Rolled Over</option>
+													<option value="PREMIUM PAYMENT">Premium Payment</option>
+													<option value="PCP">PCP</option>
+													<option value="REQUEST DOCUMENTS">Request Documents</option>
+													<option value="SUPPLEMENTARY">Supplemental</option>
+													<option value="TRANSFER">Transfer</option>
+													<option value="UHC ID READY">UHC ID Ready</option>
+													<option value="CALL BACK">Call Back</option>
+													<option value="INFORMATIVE CALLS ACA SUP">Informative Calls ACA/Supplementaries</option>
+													<option value="HANGS UP">Hangs Up</option>
+												</select>
+											</div>
+											<div class="mb-3">
+												<label for="textoIngresado" class="form-label">Typification the Call:</label>
+												<select class="form-select"  name="typeCall" >
+													<option></option>
+													<option value="INBOUND" >Inbound </option>
+													<option value="OUTBOUND" >Outbound </option>
+													<option value="WHATSAPP" >WhatsApp</option>
+													<option value="TXT MESSAGE" >Txt Message</option>
+													<option value="SHERPA" >Sherpa</option>
+												</select>
+											</div>
+											<div class="d-flex justify-content-between">
+												<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalSelector" data-bs-dismiss="modal">
+													Back
+												</button>
+												<button type="submit" class="btn btn-primary">Saved</button>
+											</div>
+										</form>
+										
 									</div>
 								</div>
 							</div>
 						</div>
-					</div>
-			
-					<!-- Modal para ingresar texto -->
-					<div class="modal fade" id="modalIngresarTexto" tabindex="-1" aria-labelledby="modalIngresarTextoLabel" aria-hidden="true">
-						<div class="modal-dialog">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h5 class="modal-title" id="modalIngresarTextoLabel">Enter Observation</h5>
-									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-								</div>
-								<div class="modal-body">
-									<form id="formIngresarTexto" action="{% url 'saveCustomerObservationACA' %}" method="POST">
-										{% csrf_token %}
-										<input type="hidden" name="obamacare_id" value="{{ obamacare.id }}">
-										<input type="hidden" name="way" value="{{way}}">
-										<div class="mb-3">
-											<label for="textoIngresado" class="form-label">Text:</label>
-											<textarea class="form-control" id="textoIngresado" name="textoIngresado" rows="4" required></textarea>
-										</div>
-										<div class="mb-3">
-											<label for="observaciones" class="form-label">Typification:</label>
-											<select class="form-select"  name="observaciones[]" id="observaciones" multiple required>
-												<option value="1095-A">1095-A</option>
-												<option value="AUDITED">Audited</option>
-												<option value="ACTIVE">Active</option>
-												<option value="CANCEL">Cancel</option>
-												<option value="PLAN CHANGE">Plan Change</option>
-												<option value="AGENT CHANGE">Agent Change</option>
-												<option value="T/C CHANGE">T/C Change</option>
-												<option value="CARRIER">Carrier</option>
-												<option value="APPOINTMENTS">Appointments</option>
-												<option value="SATISFIED CUSTOMER">Satisfied Customer</option>
-												<option value="CORRECTION">Correction</option>
-												<option value="PAYMENT ERROR CORRECTION">Payment Error Correction</option>
-												<option value="PORTAL CREATION">Portal/Member ID/Brochure Creation</option>
-												<option value="DEMOGRAPHIC DATA">Demographic Data</option>
-												<option value="DOCUMENTS IN SHERPA">Documents in Sherpa</option>
-												<option value="DOCUMENTS RECEIVED">Documents Received</option>
-												<option value="ID CARD SEND">ID Card Send</option>
-												<option value="DENTIST LISTING">Dentist listing</option>
-												<option value="OPTOMETER LISTING">Optometer Listing</option>
-												<option value="PLAN EXPLANATION">Plan Explanation</option>
-												<option value="OUT OF SERVICE">Out of Service</option>
-												<option value="HEALTHSAFE ID">HEALTHSAFE ID</option>
-												<option value="ID MEMBER">ID Member</option>
-												<option value="ID SUPERVISOR">ID Supervisor</option>
-												<option value="CARRIER SUP CALL">Carrier Supervisor Call</option>
-												<option value="EFFECTIVE MANAGEMENT">Effective Management</option>
-												<option value="WELCOME MESSAGE">Welcome Message</option>
-												<option value="FOLLOW-UP CALL">Follow-up call</option>
-												<option value="INFORMATIVE MESSAGE">Informative Message</option>
-												<option value="MARKET CALL">Market Call</option>
-												<option value="NO ANSWER">No Answer</option>
-												<option value="OTHER PARTY">Other Party</option>
-												<option value="DENTAL PAYMENT UHC">Dental Payment via UHC</option>
-												<option value="VISION PAYMENT UHC">Vision Payment via UHC</option>
-												<option value="CARRIER ACA PORTAL">Carrier ACA Portal</option>
-												<option value="CARD RECEIPT">Card Receipt</option>
-												<option value="RECOVERED">Recovered</option>
-												<option value="REFERAL">Referal</option>
-												<option value="ROLLED OVER">Rolled Over</option>
-												<option value="PREMIUM PAYMENT">Premium Payment</option>
-												<option value="PCP">PCP</option>
-												<option value="REQUEST DOCUMENTS">Request Documents</option>
-												<option value="SUPPLEMENTARY">Supplemental</option>
-												<option value="TRANSFER">Transfer</option>
-												<option value="UHC ID READY">UHC ID Ready</option>
-												<option value="CALL BACK">Call Back</option>
-												<option value="INFORMATIVE CALLS ACA SUP">Informative Calls ACA/Supplementaries</option>
-												<option value="HANGS UP">Hangs Up</option>
-											</select>
-										</div>
-										<div class="mb-3">
-											<label for="textoIngresado" class="form-label">Typification the Call:</label>
-											<select class="form-select"  name="typeCall" >
-												<option></option>
-												<option value="INBOUND" >Inbound </option>
-												<option value="OUTBOUND" >Outbound </option>
-												<option value="WHATSAPP" >WhatsApp</option>
-												<option value="TXT MESSAGE" >Txt Message</option>
-												<option value="SHERPA" >Sherpa</option>
-											</select>
-										</div>
-										<div class="d-flex justify-content-between">
-											<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalSelector" data-bs-dismiss="modal">
-												Back
-											</button>
-											<button type="submit" class="btn btn-primary">Saved</button>
-										</div>
-									</form>
-									
+
+						<!-- Modal para ingresar ticket de agent a customer -->
+						<div class="modal fade" id="AgentTicketAssignment" tabindex="-1" aria-labelledby="AgentTicketAssignmentLabel" aria-hidden="true">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title" id="AgentTicketAssignmentLabel">Enter Ticket</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										<form id="formIngresarTexto" action="{% url 'agentTicketAssignment' %}" method="POST">
+											{% csrf_token %}
+											<input type="hidden" name="obamacare_id" value="{{ obamacare.id }}">
+											<input type="hidden" name="way" value="{{way}}">
+											<div class="mb-3">
+												<label for="textoIngresado" class="form-label">Text:</label>
+												<textarea class="form-control" id="textoIngresado" name="textoIngresado" rows="4" required style="resize: none;"></textarea>
+											</div>
+											<div class="mb-3">
+												<label for="agent_customer" class="form-label">Agent to assign:</label>
+												<select class="form-select"  name="agent_customer" id="agent_customer" >
+													<option value="no_valid" disabled selected>Please Select</option>
+													{% for user  in users %}												
+														<option value="{{user.id}}">{{user.first_name}} {{user.last_name}}</option>
+													{% endfor %}
+												</select>
+											</div>
+											<div class="d-flex justify-content-between">
+												<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-dismiss="modal">
+													Back
+												</button>
+												<button type="submit" class="btn btn-primary">Saved</button>
+											</div>
+										</form>
+										
+									</div>
 								</div>
 							</div>
 						</div>
-					</div>
 
-					<!-- Modal para ingresar ticket de agent a customer -->
-					<div class="modal fade" id="AgentTicketAssignment" tabindex="-1" aria-labelledby="AgentTicketAssignmentLabel" aria-hidden="true">
-						<div class="modal-dialog">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h5 class="modal-title" id="AgentTicketAssignmentLabel">Enter Ticket</h5>
-									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						<!-- Modal para ingresar ticket de agent a customer -->
+						<div class="modal fade" id="modalComplaint" tabindex="-1" aria-labelledby="modalComplaintLabel" aria-hidden="true">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title" id="AgentTicketAssignmentLabel">Enter Information</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										<form id="formIngresarTexto" action="{% url 'preComplaint'  %}" method="POST">
+											{% csrf_token %}
+											<input type="hidden" name="obamacare_id" value="{{ obamacare.id }}">
+											<div class="mb-3">
+												<label for="nameAgent" class="form-label">Name Agent:</label>
+												<input type="text" id="nameAgent" class="form-control" name="nameAgent" required>
+											</div>
+											<div class="mb-3">
+												<label for="npnAgent" class="form-label">NPN (SI APLICA):</label>
+												<input type="number" id="npnAgent" class="form-control" name="npnAgent" >
+											</div>
+											<div class="d-flex justify-content-between">
+												<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-dismiss="modal">
+													Back
+												</button>
+												<button type="submit" class="btn btn-primary">Saved</button>
+											</div>
+										</form>
+										
+									</div>
 								</div>
-								<div class="modal-body">
-									<form id="formIngresarTexto" action="{% url 'agentTicketAssignment' %}" method="POST">
-										{% csrf_token %}
-										<input type="hidden" name="obamacare_id" value="{{ obamacare.id }}">
-										<input type="hidden" name="way" value="{{way}}">
-										<div class="mb-3">
-											<label for="textoIngresado" class="form-label">Text:</label>
-											<textarea class="form-control" id="textoIngresado" name="textoIngresado" rows="4" required style="resize: none;"></textarea>
+							</div>
+						</div>
+
+						<!-- Modal para SMS TEMPLATE -->
+						<div class="modal fade" id="modalSMS" tabindex="-1" aria-labelledby="modalSMSLabel" aria-hidden="true">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title" id="SMS"> Select a template</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										<form id="smsForm" action="{% url 'smstemplate'  %}"  enctype="multipart/form-data" method="POST">
+											{% csrf_token %}
+											<label for="nameAgent" class="form-label">Select Option:</label>
+											<input type="hidden" name="idClient" value="{{obamacare.client.id}}">
+											<input type="hidden" name="way" value="{{way}}">
+											<div class="mb-3">
+												<select class="form-select"  name="sms" id="sms" required>
+													<option value="" selected disabled ></OPtion>
+													{% for item in smsTemplateAll %}
+														<option value="{{item.id}}">{{item.identification}}</option>
+													{% endfor %}
+												</select>
+											</div>
+											<div  id="welcome-fields" class="mb-3" style="display: none;">
+												<input type="file" class="filepond" name="filepond">									
+											</div>
+											<div class="d-flex justify-content-between">
+												<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-dismiss="modal"> Back </button>
+												<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalViewSMS" data-bs-dismiss="modal"> View SMS </button>
+												<button type="submit" class="btn btn-primary">SEND</button>
+											</div>
+										</form>
+										
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Modal para ver template sms send -->
+						<div class="modal fade" id="modalViewSMS" tabindex="-1" aria-labelledby="modalViewSMSLabel" aria-hidden="true">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title" id="modalIngresarTextoLabel">View SMS</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+
+										{% for item in smsTemplate %}
+											<div class="mb-1">
+												<label class="form-label"> <strong>SMS # </strong> {{forloop.counter}}: {{item.contentTemplate.identification}} <strong>Date: </strong> {{item.created_at|date:'m/d/Y'}} </label>
+											</div>
+										{% endfor %}
+										
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Modal para ingresar citas medicas -->
+						<div class="modal fade" id="modalAppointment" tabindex="-1" aria-labelledby="modalAppointmentLabel" aria-hidden="true">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title" id="modalAppointmentLabel">Enter Appointment</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										<form id="saveAppointment" action="{% url 'saveAppointment' obamacare.id %}" method="POST">
+											{% csrf_token %}
+											<input type="hidden" name="way" value="{{way}}">
+											<div class="mb-3">
+												<label for="appointment" class="form-label">Text:</label>
+												<textarea class="form-control" id="appointment" name="appointment" rows="4" required></textarea>
+											</div>
+											<div class="mb-3">
+												<label for="dateAppointment" class="form-label">Date of Appointment:</label>
+												<input type="text" class="form-control" name="dateAppointment" id="dateAppointment" required >
+											</div>
+											<div class="mb-3">
+												<label for="timeAppointment" class="form-label">Appointment Time:</label>
+												<input type="time" class="form-control" name="timeAppointment" id="timeAppointment" required >
+											</div>
+											<button type="submit" class="btn btn-primary">Send</button>
+										</form>
+										
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Modal para ingresar fecha de recordatorio de pago -->
+						<div class="modal fade" id="modalPaymentsDate" tabindex="-1" aria-labelledby="modalPaymentsDateLabel" aria-hidden="true">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title" id="modalAppointmentLabel">Enter Collection Message Date</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										<form id="paymentDateObama" action="{% url 'paymentDateObama' obamacare.id %}" method="POST">
+											{% csrf_token %}
+											<div class="mb-3">
+												<label for="paymentDate" class="form-label">Collection reminder date:</label>
+												<input type="text" class="form-control" name="paymentDate" id="paymentDate" required >
+												{% if paymentDateObama %}
+													<label for="">📌 Collection date: <strong>{{paymentDateObama.payment_date}}</strong> </label>
+												{% endif %}
+											</div>
+											<div class="d-flex justify-content-between">
+												<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalSelector" data-bs-dismiss="modal">
+													Back
+												</button>
+												<button type="submit" class="btn btn-primary">Saved</button>
+											</div>
+										</form>
+										
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Modal para ingresar Document -->
+						<div class="modal fade" id="modalDocument" tabindex="-1" aria-labelledby="modalDocumentLabel" aria-hidden="true">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title" id="modalIngresarTextoLabel">Upload Document </h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										<div class="card">
+											<div class="card-body">
+												<form  method="POST" enctype="multipart/form-data">
+													{% csrf_token %}
+													<input type="file" id="pdfUploader" name="documents" multiple>
+													<div id="fileNamesContainer"></div>												
+													<button id="loadDocument" class="btn" data-upload-url="{% url 'saveDocumentClient' obamacare.id way %}" > <i class="fa-solid fa-floppy-disk"></i></button>
+												</form>
+											</div>
 										</div>
-										<div class="mb-3">
-											<label for="agent_customer" class="form-label">Agent to assign:</label>
-											<select class="form-select"  name="agent_customer" id="agent_customer" >
-												<option value="no_valid" disabled selected>Please Select</option>
-												{% for user  in users %}												
-													<option value="{{user.id}}">{{user.first_name}} {{user.last_name}}</option>
+
+										<div id="loader" class="loader-overlay">
+											<div class="loader"></div>
+											<p>Uploading files, please wait...</p>
+										</div>
+										
+									</div>
+								</div>
+							</div>
+						</div>
+				
+						<!-- Modal para ver las observaciones -->
+						<div class="modal fade" id="modalVerTexto" tabindex="-1" aria-labelledby="modalVerTextoLabel" aria-hidden="true">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title" id="modalVerTextoLabel">Saved Remarks</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										{% if obsCustomer %}
+											<ul class="list-group">
+												{% for observation in obsCustomer %}
+													<li class="list-group-item">
+														📌 <strong>{{ observation.agent.first_name }} {{ observation.agent.last_name }}:</strong> {{ observation.content }} <strong>Date:</strong> {{ observation.created_at }}
+													</li>
 												{% endfor %}
-											</select>
-										</div>
-										<div class="d-flex justify-content-between">
-											<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-dismiss="modal">
-												Back
-											</button>
-											<button type="submit" class="btn btn-primary">Saved</button>
-										</div>
-									</form>
-									
+											</ul>
+										{% else %}
+											<p>There are no saved remarks.</p>
+										{% endif %}
+									</div>
 								</div>
 							</div>
 						</div>
-					</div>
 
-					<!-- Modal para ingresar ticket de agent a customer -->
-					<div class="modal fade" id="modalComplaint" tabindex="-1" aria-labelledby="modalComplaintLabel" aria-hidden="true">
-						<div class="modal-dialog">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h5 class="modal-title" id="AgentTicketAssignmentLabel">Enter Information</h5>
-									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-								</div>
-								<div class="modal-body">
-									<form id="formIngresarTexto" action="{% url 'preComplaint'  %}" method="POST">
-										{% csrf_token %}
-										<input type="hidden" name="obamacare_id" value="{{ obamacare.id }}">
-										<div class="mb-3">
-											<label for="nameAgent" class="form-label">Name Agent:</label>
-											<input type="text" id="nameAgent" class="form-control" name="nameAgent" required>
-										</div>
-										<div class="mb-3">
-											<label for="npnAgent" class="form-label">NPN (SI APLICA):</label>
-											<input type="number" id="npnAgent" class="form-control" name="npnAgent" >
-										</div>
-										<div class="d-flex justify-content-between">
-											<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-dismiss="modal">
-												Back
-											</button>
-											<button type="submit" class="btn btn-primary">Saved</button>
-										</div>
-									</form>
-									
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- Modal para SMS TEMPLATE -->
-					<div class="modal fade" id="modalSMS" tabindex="-1" aria-labelledby="modalSMSLabel" aria-hidden="true">
-						<div class="modal-dialog">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h5 class="modal-title" id="SMS"> Select a template</h5>
-									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-								</div>
-								<div class="modal-body">
-									<form id="smsForm" action="{% url 'smstemplate'  %}"  enctype="multipart/form-data" method="POST">
-										{% csrf_token %}
-										<label for="nameAgent" class="form-label">Select Option:</label>
-										<input type="hidden" name="idClient" value="{{obamacare.client.id}}">
-										<input type="hidden" name="way" value="{{way}}">
-										<div class="mb-3">
-											<select class="form-select"  name="sms" id="sms" required>
-												<option value="" selecci ></OPtion>
-												<option value="1">DOCUMENT</option>
-												<option value="2">FOLLOW-UP</option>
-												<option value="3">RENOVATION</option>
-												<option value="4">CARD</option>
-												<option value="5">FOLLOW-UP 2</option>
-												<option value="6">WELCOME</option>
-											</select>
-										</div>
-										<div  id="welcome-fields" class="mb-3" style="display: none;">
-											<input type="file" class="filepond" name="filepond">									
-										</div>
-										<div class="d-flex justify-content-between">
-											<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-dismiss="modal"> Back </button>
-											<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalViewSMS" data-bs-dismiss="modal"> View SMS </button>
-											<button type="submit" class="btn btn-primary">SEND</button>
-										</div>
-									</form>
-									
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- Modal para ver template sms send -->
-					<div class="modal fade" id="modalViewSMS" tabindex="-1" aria-labelledby="modalViewSMSLabel" aria-hidden="true">
-						<div class="modal-dialog">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h5 class="modal-title" id="modalIngresarTextoLabel">View SMS</h5>
-									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-								</div>
-								<div class="modal-body">
-
-									{% for item in smsTemplate %}
-										<div class="mb-1">
-											<label class="form-label"> <strong>SMS # </strong> {{forloop.counter}}: {{item.contentTemplate.identification}} <strong>Date: </strong> {{item.created_at|date:'m/d/Y'}} </label>
-										</div>
-									{% endfor %}
-									
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- Modal para ingresar citas medicas -->
-					<div class="modal fade" id="modalAppointment" tabindex="-1" aria-labelledby="modalAppointmentLabel" aria-hidden="true">
-						<div class="modal-dialog">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h5 class="modal-title" id="modalAppointmentLabel">Enter Appointment</h5>
-									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-								</div>
-								<div class="modal-body">
-									<form id="saveAppointment" action="{% url 'saveAppointment' obamacare.id %}" method="POST">
-										{% csrf_token %}
-										<input type="hidden" name="way" value="{{way}}">
-										<div class="mb-3">
-											<label for="appointment" class="form-label">Text:</label>
-											<textarea class="form-control" id="appointment" name="appointment" rows="4" required></textarea>
-										</div>
-										<div class="mb-3">
-											<label for="dateAppointment" class="form-label">Date of Appointment:</label>
-											<input type="text" class="form-control" name="dateAppointment" id="dateAppointment" required >
-										</div>
-										<div class="mb-3">
-											<label for="timeAppointment" class="form-label">Appointment Time:</label>
-											<input type="time" class="form-control" name="timeAppointment" id="timeAppointment" required >
-										</div>
-										<button type="submit" class="btn btn-primary">Send</button>
-									</form>
-									
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- Modal para ingresar fecha de recordatorio de pago -->
-					<div class="modal fade" id="modalPaymentsDate" tabindex="-1" aria-labelledby="modalPaymentsDateLabel" aria-hidden="true">
-						<div class="modal-dialog">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h5 class="modal-title" id="modalAppointmentLabel">Enter Collection Message Date</h5>
-									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-								</div>
-								<div class="modal-body">
-									<form id="paymentDateObama" action="{% url 'paymentDateObama' obamacare.id %}" method="POST">
-										{% csrf_token %}
-										<div class="mb-3">
-											<label for="paymentDate" class="form-label">Collection reminder date:</label>
-											<input type="text" class="form-control" name="paymentDate" id="paymentDate" required >
-											{% if paymentDateObama %}
-												<label for="">📌 Collection date: <strong>{{paymentDateObama.payment_date}}</strong> </label>
-											{% endif %}
-										</div>
-										<div class="d-flex justify-content-between">
-											<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalSelector" data-bs-dismiss="modal">
-												Back
-											</button>
-											<button type="submit" class="btn btn-primary">Saved</button>
-										</div>
-									</form>
-									
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- Modal para ingresar Document -->
-					<div class="modal fade" id="modalDocument" tabindex="-1" aria-labelledby="modalDocumentLabel" aria-hidden="true">
-						<div class="modal-dialog">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h5 class="modal-title" id="modalIngresarTextoLabel">Upload Document </h5>
-									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-								</div>
-								<div class="modal-body">
-									<div class="card">
-										<div class="card-body">
-											<form  method="POST" enctype="multipart/form-data">
-												{% csrf_token %}
-												<input type="file" id="pdfUploader" name="documents" multiple>
-												<div id="fileNamesContainer"></div>												
-												<button id="loadDocument" class="btn" data-upload-url="{% url 'saveDocumentClient' obamacare.id way %}" > <i class="fa-solid fa-floppy-disk"></i></button>
-											</form>
-										</div>
+						<!-- Modal para ver las Accion Required -->
+						<div class="modal fade" id="modalAccionRequired" tabindex="-1" aria-labelledby="modalAccionRequired" aria-hidden="true">
+							<div class="modal-dialog modal-lg">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title" id="modalAccionRequired">Actions required</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 									</div>
 
-									<div id="loader" class="loader-overlay">
-										<div class="loader"></div>
-										<p>Uploading files, please wait...</p>
-									</div>
-									
-								</div>
-							</div>
-						</div>
-					</div>
-			
-					<!-- Modal para ver las observaciones -->
-					<div class="modal fade" id="modalVerTexto" tabindex="-1" aria-labelledby="modalVerTextoLabel" aria-hidden="true">
-						<div class="modal-dialog">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h5 class="modal-title" id="modalVerTextoLabel">Saved Remarks</h5>
-									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-								</div>
-								<div class="modal-body">
-									{% if obsCustomer %}
-										<ul class="list-group">
-											{% for observation in obsCustomer %}
-												<li class="list-group-item">
-													📌 <strong>{{ observation.agent.first_name }} {{ observation.agent.last_name }}:</strong> {{ observation.content }} <strong>Date:</strong> {{ observation.created_at }}
-												</li>
-											{% endfor %}
-										</ul>
-									{% else %}
-										<p>There are no saved remarks.</p>
-									{% endif %}
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- Modal para ver las Accion Required -->
-					<div class="modal fade" id="modalAccionRequired" tabindex="-1" aria-labelledby="modalAccionRequired" aria-hidden="true">
-						<div class="modal-dialog modal-lg">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h5 class="modal-title" id="modalAccionRequired">Actions required</h5>
-									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-								</div>
-
-								<div class="modal-body">
-									<div class="table-responsive" >
-										<table id="actionRequiredTable" class="table table-hover" >
-											<thead>
-												<tr>
-													<th scope="col">Action</th>
-													<th scope="col">State</th>
-												</tr>
-											</thead>
-											<tbody>
-												{% for accionRequired in accionRequired %}
-													{%if  not accionRequired.date_completed%}
-														<tr class="">
-															<td scope="row">{{accionRequired.clave}}</td>
-															<td>
-																<label class="switch">
-																	<input id="checkbox_{{ accionRequired.id }}" value="{{accionRequired.id}}" type="checkbox" onchange="toogleActionRequired(this)" >
-																	<span class="slider round"></span>
-																</label>
-															</td>
-														</tr>
-													{% endif %}
-													{% if request.user.role == 'Admin' or request.user.role == 'S' %}
-														{%if  accionRequired.date_completed%}
+									<div class="modal-body">
+										<div class="table-responsive" >
+											<table id="actionRequiredTable" class="table table-hover" >
+												<thead>
+													<tr>
+														<th scope="col">Action</th>
+														<th scope="col">State</th>
+													</tr>
+												</thead>
+												<tbody>
+													{% for accionRequired in accionRequired %}
+														{%if  not accionRequired.date_completed%}
 															<tr class="">
 																<td scope="row">{{accionRequired.clave}}</td>
 																<td>
 																	<label class="switch">
-																		<input disabled id="checkbox_{{ accionRequired.id }}" value="{{accionRequired.id}}" type="checkbox" checked >
+																		<input id="checkbox_{{ accionRequired.id }}" value="{{accionRequired.id}}" type="checkbox" onchange="toogleActionRequired(this)" >
 																		<span class="slider round"></span>
 																	</label>
 																</td>
-															</tr>													
+															</tr>
 														{% endif %}
-													{% endif %}
-												{% endfor %}
-											</tbody>
-										</table>
+														{% if request.user.role == 'Admin' or request.user.role == 'S' %}
+															{%if  accionRequired.date_completed%}
+																<tr class="">
+																	<td scope="row">{{accionRequired.clave}}</td>
+																	<td>
+																		<label class="switch">
+																			<input disabled id="checkbox_{{ accionRequired.id }}" value="{{accionRequired.id}}" type="checkbox" checked >
+																			<span class="slider round"></span>
+																		</label>
+																	</td>
+																</tr>													
+															{% endif %}
+														{% endif %}
+													{% endfor %}
+												</tbody>
+											</table>
+										</div>
 									</div>
-								</div>
 
 
-							</div>
-						</div>
-					</div>
-		
-					<!-- Modal para ver las consent -->
-					<div class="modal fade" id="verConsent" tabindex="-1" aria-labelledby="verConsentLabel" aria-hidden="true">
-						<div class="modal-dialog">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h5 class="modal-title" id="verConsentLabel">Saved Consent</h5>
-									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-								</div>
-								<div class="modal-body">
-									{% if consent %}
-										<ul class="list-group">
-											{% for consents in consent %}											
-												<li class="list-group-item">
-													<strong>Consent #{{forloop.counter}}:</strong> <a href="{{ consents.pdf.url }} " target="_blank" >View  <i class="lni lni-display"></i></a> 
-												</li>
-											{% endfor %}
-										</ul>
-									{% else %}
-										<p>No consent.</p>
-									{% endif %}
 								</div>
 							</div>
 						</div>
-					</div>
-
-					<!-- Modal para ver las consent -->
-					<div class="modal fade" id="verComplaint" tabindex="-1" aria-labelledby="verComplaintLabel" aria-hidden="true">
-						<div class="modal-dialog">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h5 class="modal-title" id="verConsentLabel">View Complaint</h5>
-									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-								</div>
-								<div class="modal-body">
-									{% if complaint %}
-										<ul class="list-group">
-											{% for item in complaint %}											
-												<li class="list-group-item">
-													<strong>Complaint #{{forloop.counter}}:</strong> <a href="{{ item.pdf.url }} " target="_blank" >View  <i class="lni lni-display"></i></a> 
-												</li>
-											{% endfor %}
-										</ul>
-									{% else %}
-										<p>No Complaint.</p>
-									{% endif %}
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- Modal para ver las Income -->
-					<div class="modal fade" id="verIncomeLetter" tabindex="-1" aria-labelledby="verIncomeLetter" aria-hidden="true">
-						<div class="modal-dialog">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h5 class="modal-title" id="verIncomeLetter">Saved Income Letter</h5>
-									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-								</div>
-								<div class="modal-body">
-									{% if income %}
-										<ul class="list-group">
-											{% for incomes in income %}											
-												<li class="list-group-item">
-													<strong>Letter Income #{{forloop.counter}}:</strong> <a href="{{ incomes.pdf.url }}" target="_blank" >View  <i class="lni lni-display"></i></a> 
-												</li>
-											{% endfor %}
-											<hr>
-											{% if incomeffm %}
-												{% for item in incomeffm %}
+			
+						<!-- Modal para ver las consent -->
+						<div class="modal fade" id="verConsent" tabindex="-1" aria-labelledby="verConsentLabel" aria-hidden="true">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title" id="verConsentLabel">Saved Consent</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										{% if consent %}
+											<ul class="list-group">
+												{% for consents in consent %}											
 													<li class="list-group-item">
-														<strong>Letter Income FFM #{{forloop.counter}}:</strong> <a href="{{ item.pdf.url }}" target="_blank" >View  <i class="lni lni-display"></i></a> 
+														<strong>Consent #{{forloop.counter}}:</strong> <a href="{{ consents.pdf.url }} " target="_blank" >View  <i class="lni lni-display"></i></a> 
 													</li>
 												{% endfor %}
-											{% endif %}
-										</ul>
-										{% if not incomeffm %}
-											{% if obamacare.ffm %}										
+											</ul>
+										{% else %}
+											<p>No consent.</p>
+										{% endif %}
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Modal para ver las consent -->
+						<div class="modal fade" id="verComplaint" tabindex="-1" aria-labelledby="verComplaintLabel" aria-hidden="true">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title" id="verConsentLabel">View Complaint</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										{% if complaint %}
+											<ul class="list-group">
+												{% for item in complaint %}											
+													<li class="list-group-item">
+														<strong>Complaint #{{forloop.counter}}:</strong> <a href="{{ item.pdf.url }} " target="_blank" >View  <i class="lni lni-display"></i></a> 
+													</li>
+												{% endfor %}
+											</ul>
+										{% else %}
+											<p>No Complaint.</p>
+										{% endif %}
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Modal para ver las Income -->
+						<div class="modal fade" id="verIncomeLetter" tabindex="-1" aria-labelledby="verIncomeLetter" aria-hidden="true">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title" id="verIncomeLetter">Saved Income Letter</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										{% if income %}
+											<ul class="list-group">
+												{% for incomes in income %}											
+													<li class="list-group-item">
+														<strong>Letter Income #{{forloop.counter}}:</strong> <a href="{{ incomes.pdf.url }}" target="_blank" >View  <i class="lni lni-display"></i></a> 
+													</li>
+												{% endfor %}
 												<hr>
-												<div class="d-flex order-actions">
-													<!-- Botón principal del dropdown -->
-													<button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-														L.I
-													</button>
-													<!-- Lista del dropdown -->
-													<ul class="dropdown-menu">
-														<li>
-															<form action="{% url 'ILFFM' obamacare.id %}" method="get" target="_blank">
-																<input type="hidden" name="lenguaje" value="en">
-																<button type="submit" class="dropdown-item"> English</button>
-															</form>
+												{% if incomeffm %}
+													{% for item in incomeffm %}
+														<li class="list-group-item">
+															<strong>Letter Income FFM #{{forloop.counter}}:</strong> <a href="{{ item.pdf.url }}" target="_blank" >View  <i class="lni lni-display"></i></a> 
 														</li>
-														<li>
-															<form action="{% url 'ILFFM' obamacare.id %}" method="get" target="_blank">                                         <input type="hidden" name="lenguaje" value="en">
-																<input type="hidden" name="lenguaje" value="es">
-																<button type="submit" class="dropdown-item"> Spanish</button>
-															</form>
-														</li>
-													</ul>
-												</div>
+													{% endfor %}
+												{% endif %}
+											</ul>
+											{% if not incomeffm %}
+												{% if obamacare.ffm %}										
+													<hr>
+													<div class="d-flex order-actions">
+														<!-- Botón principal del dropdown -->
+														<button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+															L.I
+														</button>
+														<!-- Lista del dropdown -->
+														<ul class="dropdown-menu">
+															<li>
+																<form action="{% url 'ILFFM' obamacare.id %}" method="get" target="_blank">
+																	<input type="hidden" name="lenguaje" value="en">
+																	<button type="submit" class="dropdown-item"> English</button>
+																</form>
+															</li>
+															<li>
+																<form action="{% url 'ILFFM' obamacare.id %}" method="get" target="_blank">                                         <input type="hidden" name="lenguaje" value="en">
+																	<input type="hidden" name="lenguaje" value="es">
+																	<button type="submit" class="dropdown-item"> Spanish</button>
+																</form>
+															</li>
+														</ul>
+													</div>
+												{% endif %}
 											{% endif %}
-										{% endif %}
-									{% else %}
-										<p>No Income.</p>
-									{% endif %}
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- Modal para ver las Document -->
-					<div class="modal fade" id="verDocument" tabindex="-1" aria-labelledby="verDocument" aria-hidden="true">
-						<div class="modal-dialog">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h5 class="modal-title" id="verDocument">Saved documents</h5>
-									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-								</div>
-								<div class="modal-body">
-									{% if document or documentObama%}
-										<ul class="list-group">
-
-											{% if document %} <h5>Documents Consent</h5> {% endif %}
-
-											{% for documents in document %}													
-												<li class="list-group-item">
-													<strong>Documents Consent #{{forloop.counter}}:</strong> <a href="{{ documents.file.url }}" target="_blank" >View  <i class="lni lni-display"></i></a> 
-												</li>
-											{% endfor %}
-
-											{% if document and documentObama %} <hr> {% endif %}
-
-											{% if documentObama %} <h5>Documents Upload CRM</h5> {% endif %}
-
-											{% for documents in documentObama %}															
-												<li class="list-group-item">
-													<strong>{{documents.name}}:</strong> <a href="{{ documents.file.url }}" target="_blank" >View  <i class="lni lni-display"></i></a> 
-												</li>
-											{% endfor %}
-
-										</ul>
-									{% else %}
-										<p>No Documents.</p>
-									{% endif %}
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- Modal para ver las Appointment -->
-					<div class="modal fade" id="verAppointment" tabindex="-1" aria-labelledby="verAppointment" aria-hidden="true">
-						<div class="modal-dialog">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h5 class="modal-title" id="verAppointment">Saved quotes</h5>
-									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-								</div>
-								<div class="modal-body">
-									{% if apppointment %}
-										<ul class="list-group">
-											{% for apppointments in apppointment %}
-												<li class="list-group-item">
-													📌 Agent <strong>{{ apppointments.agent_create.first_name }} {{ apppointments.agent_create.last_name }}</strong> created an appointment for client <strong> {{obamacare.client.first_name}} {{obamacare.client.last_name}}  </strong> 
-													for the following condition: <strong>{{ apppointments.appointment}}</strong>, on the date: <strong>{{ apppointments.dateAppointment|date:'m/d/Y'}}</strong> and at the time: <strong>{{ apppointments.timeAppointment}} </strong>
-												</li>
-											{% endfor %}
-										</ul>
-									{% else %}
-										<p>There are no saved remarks.</p>
-									{% endif %}
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- Modal para ver los pagos -->
-					<div class="modal fade" id="modalPayments" tabindex="-1" aria-labelledby="modalPayments" aria-hidden="true">
-						<div class="modal-dialog">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h5 class="modal-title" id="verAppointment">Enter Payments</h5>
-									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-								</div>
-								<div class="modal-body">
-									<div class="table-responsive" >
-										<table id="paymentsTable" class="table table-striped table-hover table-bordered shadow-sm centerAllExceptFirst">
-											<thead>
-												<tr>
-													<th>Month</th>
-													{% if companyInsurance != 'LAPEIRA & ASSOCIATES LLC' and user.role in 'Admin,Supervisor'%}
-													<th>Oneil</th>
-													<th>Lapeira</th>
-													{% else %}
-													<th>Lapeira</th>
-													{% endif %}
-													<th>Carrier</th>
-													<th>Sherpa</th>
-												</tr>
-											</thead>
-											<tbody>
-												{% for month, values in paymentsSummary.items %}
-												<tr>
-													<td>{{ month }}</td>
-													{% if companyInsurance != 'LAPEIRA & ASSOCIATES LLC' and user.role in 'Admin,Supervisor' %}
-													<td>
-														{% if values.oneil == 0 %}❌
-														{% elif values.oneil > 0 %}✅
-														{% elif values.oneil < 0 %} <img src="{% static 'assets/images/icons/minus.png' %}" width="25px">
-														{% else %}{{ values.oneil }}
-														{% endif %}
-													</td>
-													<td>
-														{% if values.lapeira == 0 %}❌
-														{% elif values.lapeira > 0 %}✅
-														{% elif values.lapeira < 0 %} <img src="{% static 'assets/images/icons/minus.png' %}" width="25px">
-														{% endif %}
-													</td>
-													{% else %}
-													<td>
-														{% if values.lapeira == 0 %}❌
-														{% elif values.lapeira > 0 %}✅
-														{% elif values.lapeira < 0 %} <img src="{% static 'assets/images/icons/minus.png' %}" width="25px">
-														{% endif %}
-													</td>
-													{% endif %}
-													<td>
-														{% if values.carrier%}✅
-														{% else %}❌
-														{% endif %}
-													</td>
-													<td>
-														{% if values.sherpa%}✅
-														{% else %}❌
-														{% endif %}
-													</td>
-												</tr>
-												{% endfor %}
-											</tbody>
-										</table>
-									</div>
-									
-								</div>
-								<div class="modal-footer">
-									<button type="button" class="btn btn-primery" data-bs-toggle="modal" data-bs-target="#modalChildEnterPaymentsOneil">
-										Enter Payments Oneil
-									</button>
-									<button type="button" class="btn btn-primery" data-bs-toggle="modal" data-bs-target="#modalChildEnterPaymentsCarrier">
-										Enter Payments Carrier
-									</button>
-									<button type="button" class="btn btn-primery" data-bs-toggle="modal" data-bs-target="#modalChildEnterPaymentsSherpa">
-										Enter Payments Sherpa
-									</button>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- Modal para ingresar payments Oneil -->
-					<div class="modal fade" id="modalChildEnterPaymentsOneil" tabindex="-1" aria-labelledby="modalChildEnterPaymentsOneil" aria-hidden="true">
-						<div class="modal-dialog">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h5 class="modal-title">Enter Payments Oneil</h5>
-									<button type="button" class="btn-primary" data-bs-dismiss="modal" aria-label="Close"></button>
-								</div>
-								<div class="modal-body">
-									<form id="formPaymentsOneil">
-										<div class="mb-3">
-											<label for="" class="form-label">Month</label>
-											<input type="month" class="form-control" name="coverageMonth" required>
-										</div>
-										<div class="mb-3">
-											<label for="" class="form-label">PayDay</label>
-											<input type="date" class="form-control" name="payday" required>
-										</div>
-										{% if companyInsurance != 'LAPEIRA & ASSOCIATES LLC' and user.role in 'Admin,Supervisor' %}	
-										<div class="mb-3">
-											<label for="" class="form-label">Insurance Company</label>
-											<select class="form-select" name="insuranceCompany" required>
-												<option value='' disabled selected>Select one</option>
-												<option value="{{companyInsurance}}">{{companyInsurance}}</option>
-												<option value="LAPEIRA & ASSOCIATES LLC">LAPEIRA & ASSOCIATES LLC</option>
-											</select>
-										</div>
-										{% endif %}
-										<div class="mb-3">
-											<label for="" class="form-label">Payable</label>
-											<select class="form-select" name="payable" required>
-												<option value='' disabled selected>Select one</option>
-												<option value="1">Paid</option>
-												<option value="-1">Not Pay</option>
-											</select>
-										</div>
-										<button type="submit" class="btn btn-primary">Save</button>
-									</form>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- Modal para ingresar payments Carrier -->
-					<div class="modal fade" id="modalChildEnterPaymentsCarrier" tabindex="-1" aria-labelledby="modalChildEnterPaymentsCarrier" aria-hidden="true">
-						<div class="modal-dialog">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h5 class="modal-title">Enter Payments Carrier</h5>
-									<button type="button" class="btn-primary" data-bs-dismiss="modal" aria-label="Close"></button>
-								</div>
-								<div class="modal-body">
-									<form id="formPaymentsCarrier">
-										<div class="mb-3">
-											<label for="" class="form-label">Month</label>
-											<input type="month" class="form-control" name="coverageMonth" required>
-										</div>
-										<div class="mb-3">
-											<label for="" class="form-label">Status</label>
-											<select class="form-select" name="status" required>
-												<option value='' disabled selected>Select one</option>
-												<option value="Active">Active</option>
-												<option value="Inactive">Inactive</option>
-											</select>
-										</div>
-										<button type="submit" class="btn btn-primary">Save</button>
-									</form>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- Modal para ingresar payments Sherpa -->
-					<div class="modal fade" id="modalChildEnterPaymentsSherpa" tabindex="-1" aria-labelledby="modalChildEnterPaymentsSherpa" aria-hidden="true">
-						<div class="modal-dialog">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h5 class="modal-title">Enter Payments Sherpa</h5>
-									<button type="button" class="btn-primary" data-bs-dismiss="modal" aria-label="Close"></button>
-								</div>
-								<div class="modal-body">
-									<form id="formPaymentsSherpa">
-										<div class="mb-3">
-											<label for="" class="form-label">Month</label>
-											<input type="month" class="form-control" name="coverageMonth" required>
-										</div>
-										<div class="mb-3">
-											<label for="" class="form-label">Status</label>
-											<select class="form-select" name="status" required>
-												<option value='' disabled selected>Select one</option>
-												<option value="Active">Active</option>
-												<option value="Inactive">Inactive</option>
-											</select>
-										</div>
-										<button type="submit" class="btn btn-primary">Save</button>
-									</form>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- Modal para ingresar las accion required -->
-					<div class="modal fade" id="modalActionrequired" tabindex="-1" aria-labelledby="modalActionrequired" aria-hidden="true">
-						<div class="modal-dialog">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h5 class="modal-title" id="Actionrequired">Enter Action required</h5>
-									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-								</div>
-								<div class="modal-body">
-									<form id="formIngresarTexto" action="{% url 'saveAccionRequired'  %}" method="POST">
-										{% csrf_token %}
-										<input type="hidden" name="plan_id" value="{{ obamacare.id }}">
-										<div class="mb-3">
-											<label for="description" class="form-label">Typification the Call:</label>
-											<select class="form-select"  id="description" name="description" >
-												<option></option>
-												{% for list_drow in description %}
-													<option value="{{ list_drow.description }}">{{ list_drow.description|title }}</option>
-												{% endfor %}
-											</select>
-										</div>
-										<div class="d-flex justify-content-between">
-											<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalSelector" data-bs-dismiss="modal">
-												Back
-											</button>
-											<button type="submit" class="btn btn-primary">Saved</button>
-										</div>
-									</form>
-									
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<div id="missingDocuments" style="display: none;">
-						{% if not letterCard.letters %} <p style="line-height: 0.6;">❌ <b>Letters</b></p> {% endif %}
-						{% if not letterCard.card %} <p style="line-height: 0.6;">❌ <b>Card</b></p> {% endif %}
-						{% if not userCarrier.username_carrier %} <p style="line-height: 0.6;">❌ <b>Username Carrier</b></p> {% endif %}
-						{% if not obamacare.status == 'ACTIVE' %} <p style="line-height: 0.6;">❌ <b>Status</b></p> {% endif %}
-						{% if not obamacare.doc_migration %} <p style="line-height: 0.6;">❌ <b>Migration Document</b></p> {% endif %}
-						{% if not obamacare.doc_income %} <p style="line-height: 0.6;">❌ <b>Income Document</b></p> {% endif %}
-						{% if obamacare.policyNumber == '' or obamacare.policyNumber == None or obamacare.policyNumber == 'None' %}
-							<p style="line-height: 0.6;">❌ <b>Policy Number</b></p>
-						{% endif %}
-						{% if not apppointment %} <p style="line-height: 0.6;">❌ <b>Apppointment</b></p> {% endif %}
-					</div>
-					
-				</div>	
-
-            </div>			
-        </div>
-    </div>
-</div>
-
-{% if smsIsActive %}
-	<!-- Chat UI -->
-	<div {% if userPreference.darkMode %} class='dark-mode'{% endif %}>
-		<button class="floating-chat-button flex-grow-1" onclick="toggleChat()">
-			<i class="lni lni-comments-alt"></i>
-			{% if chat.is_message_unread %}<span class="alert-count">{{ chat.unread_messages }}</span>{% endif %}
-		</button>
-		
-		<div class="floating-chat-container" id="chatContainer">
-			<div class="floating-chat-header">
-				<span class="client-name">{{contact.name}} <br>{{contact.formatted_phone_number}}</span>
-				<div class="chat-actions">
-					{% if secretKey %}
-					<button id="buttonSendSecretKey" class="tooltip-container"><span class="tooltip-text">Send Secret Key</span><i class="bx bx-key me-1"></i></button>
-					{% else %}
-					<button id="buttonCreateSecretKey" class="tooltip-container"><span class="tooltip-text">Create Secret Key</span><i class="bx bx-key me-1"></i></button>
-					{% endif %}
-				</div>
-			</div>
-			<div class="floating-chat-body" id="chat-content">
-				{% if not messages %}
-					<div class="d-flex justify-content-center align-items-center" id="buttonStartChat">
-						<div class="dropdown">
-							<button class="btn btn-primary dropdown-toggle custom-dropdown" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-								🌍 Select Language
-							</button>
-							<ul class="dropdown-menu animate-dropdown" aria-labelledby="languageDropdown">
-								<li><a class="dropdown-item" href="#" onclick="setLanguage('english')">🇺🇸 English</a></li>
-								<li><a class="dropdown-item" href="#" onclick="setLanguage('spanish')">🇪🇸 Español</a></li>
-							</ul>
-						</div>
-					</div>
-				{% else %}
-					{% for message in messages %}
-						{%if message.sender_type == 'Client'%}
-							<div class="chat-content-leftside">
-								<div class="d-flex">
-									<svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-										stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user">
-										<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-										<circle cx="12" cy="7" r="4"></circle>
-									</svg>
-									<div class="flex-grow-1 ms-2">
-										<p class="mb-0 chat-time">{{obamacare.client.first_name}}, {{message.created_at|date:"g:i A"}}</p>
-										{% if message.file %}
-										<p class="chat-left-msg">
-											<img class="img-responsive" src="{{ message.file.file.url }}" alt="">
-										</p>
 										{% else %}
-										<p class="chat-left-msg" style="white-space: pre-wrap;">{{message.message_content}}</p>
+											<p>No Income.</p>
 										{% endif %}
 									</div>
 								</div>
 							</div>
-						{%elif message.sender_type == 'Agent'%}
-							<div class="chat-content-rightside">
-								<div class="d-flex ms-auto">
-									<div class="flex-grow-1 me-2">
-										<p class="mb-0 chat-time text-end">{{message.sender.username}}, {{ message.created_at|date:"m:H - d/m" }}</p>
-										{% if message.file %}
-										<p class="chat-left-msg">
-											<img class="img-responsive" src="{{ message.file.file.url }}" alt="">
-										</p>
+						</div>
+
+						<!-- Modal para ver las Document -->
+						<div class="modal fade" id="verDocument" tabindex="-1" aria-labelledby="verDocument" aria-hidden="true">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title" id="verDocument">Saved documents</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										{% if document or documentObama%}
+											<ul class="list-group">
+
+												{% if document %} <h5>Documents Consent</h5> {% endif %}
+
+												{% for documents in document %}													
+													<li class="list-group-item">
+														<strong>Documents Consent #{{forloop.counter}}:</strong> <a href="{{ documents.file.url }}" target="_blank" >View  <i class="lni lni-display"></i></a> 
+													</li>
+												{% endfor %}
+
+												{% if document and documentObama %} <hr> {% endif %}
+
+												{% if documentObama %} <h5>Documents Upload CRM</h5> {% endif %}
+
+												{% for documents in documentObama %}															
+													<li class="list-group-item">
+														<strong>{{documents.name}}:</strong> <a href="{{ documents.file.url }}" target="_blank" >View  <i class="lni lni-display"></i></a> 
+													</li>
+												{% endfor %}
+
+											</ul>
 										{% else %}
-										<p class="chat-right-msg">{{message.message_content|linebreaksbr}}</p>
+											<p>No Documents.</p>
 										{% endif %}
 									</div>
 								</div>
 							</div>
-						{% endif %}
-					{% endfor %}
-				{% endif %}
-			</div>
-			<div class="floating-chat-footer">
-				<input {% if not contact.is_active %}disabled{% endif %} type="text" id="messageContent" placeholder="Type a message...">
-				<button id="sendMessage">Send</button>
+						</div>
+
+						<!-- Modal para ver las Appointment -->
+						<div class="modal fade" id="verAppointment" tabindex="-1" aria-labelledby="verAppointment" aria-hidden="true">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title" id="verAppointment">Saved quotes</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										{% if apppointment %}
+											<ul class="list-group">
+												{% for apppointments in apppointment %}
+													<li class="list-group-item">
+														📌 Agent <strong>{{ apppointments.agent_create.first_name }} {{ apppointments.agent_create.last_name }}</strong> created an appointment for client <strong> {{obamacare.client.first_name}} {{obamacare.client.last_name}}  </strong> 
+														for the following condition: <strong>{{ apppointments.appointment}}</strong>, on the date: <strong>{{ apppointments.dateAppointment|date:'m/d/Y'}}</strong> and at the time: <strong>{{ apppointments.timeAppointment}} </strong>
+													</li>
+												{% endfor %}
+											</ul>
+										{% else %}
+											<p>There are no saved remarks.</p>
+										{% endif %}
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Modal para ver los pagos -->
+						<div class="modal fade" id="modalPayments" tabindex="-1" aria-labelledby="modalPayments" aria-hidden="true">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title" id="verAppointment">Enter Payments</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										<div class="table-responsive" >
+											<table id="paymentsTable" class="table table-striped table-hover table-bordered shadow-sm centerAllExceptFirst">
+												<thead>
+													<tr>
+														<th>Month</th>
+														{% if companyInsurance != 'LAPEIRA & ASSOCIATES LLC' and user.role in 'Admin,Supervisor'%}
+														<th>Oneil</th>
+														<th>Lapeira</th>
+														{% else %}
+														<th>Lapeira</th>
+														{% endif %}
+														<th>Carrier</th>
+														<th>Sherpa</th>
+													</tr>
+												</thead>
+												<tbody>
+													{% for month, values in paymentsSummary.items %}
+													<tr>
+														<td>{{ month }}</td>
+														{% if companyInsurance != 'LAPEIRA & ASSOCIATES LLC' and user.role in 'Admin,Supervisor' %}
+														<td>
+															{% if values.oneil == 0 %}❌
+															{% elif values.oneil > 0 %}✅
+															{% elif values.oneil < 0 %} <img src="{% static 'assets/images/icons/minus.png' %}" width="25px">
+															{% else %}{{ values.oneil }}
+															{% endif %}
+														</td>
+														<td>
+															{% if values.lapeira == 0 %}❌
+															{% elif values.lapeira > 0 %}✅
+															{% elif values.lapeira < 0 %} <img src="{% static 'assets/images/icons/minus.png' %}" width="25px">
+															{% endif %}
+														</td>
+														{% else %}
+														<td>
+															{% if values.lapeira == 0 %}❌
+															{% elif values.lapeira > 0 %}✅
+															{% elif values.lapeira < 0 %} <img src="{% static 'assets/images/icons/minus.png' %}" width="25px">
+															{% endif %}
+														</td>
+														{% endif %}
+														<td>
+															{% if values.carrier%}✅
+															{% else %}❌
+															{% endif %}
+														</td>
+														<td>
+															{% if values.sherpa%}✅
+															{% else %}❌
+															{% endif %}
+														</td>
+													</tr>
+													{% endfor %}
+												</tbody>
+											</table>
+										</div>
+										
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-primery" data-bs-toggle="modal" data-bs-target="#modalChildEnterPaymentsOneil">
+											Enter Payments Oneil
+										</button>
+										<button type="button" class="btn btn-primery" data-bs-toggle="modal" data-bs-target="#modalChildEnterPaymentsCarrier">
+											Enter Payments Carrier
+										</button>
+										<button type="button" class="btn btn-primery" data-bs-toggle="modal" data-bs-target="#modalChildEnterPaymentsSherpa">
+											Enter Payments Sherpa
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Modal para ingresar payments Oneil -->
+						<div class="modal fade" id="modalChildEnterPaymentsOneil" tabindex="-1" aria-labelledby="modalChildEnterPaymentsOneil" aria-hidden="true">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title">Enter Payments Oneil</h5>
+										<button type="button" class="btn-primary" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										<form id="formPaymentsOneil">
+											<div class="mb-3">
+												<label for="" class="form-label">Month</label>
+												<input type="month" class="form-control" name="coverageMonth" required>
+											</div>
+											<div class="mb-3">
+												<label for="" class="form-label">PayDay</label>
+												<input type="date" class="form-control" name="payday" required>
+											</div>
+											{% if companyInsurance != 'LAPEIRA & ASSOCIATES LLC' and user.role in 'Admin,Supervisor' %}	
+											<div class="mb-3">
+												<label for="" class="form-label">Insurance Company</label>
+												<select class="form-select" name="insuranceCompany" required>
+													<option value='' disabled selected>Select one</option>
+													<option value="{{companyInsurance}}">{{companyInsurance}}</option>
+													<option value="LAPEIRA & ASSOCIATES LLC">LAPEIRA & ASSOCIATES LLC</option>
+												</select>
+											</div>
+											{% endif %}
+											<div class="mb-3">
+												<label for="" class="form-label">Payable</label>
+												<select class="form-select" name="payable" required>
+													<option value='' disabled selected>Select one</option>
+													<option value="1">Paid</option>
+													<option value="-1">Not Pay</option>
+												</select>
+											</div>
+											<button type="submit" class="btn btn-primary">Save</button>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Modal para ingresar payments Carrier -->
+						<div class="modal fade" id="modalChildEnterPaymentsCarrier" tabindex="-1" aria-labelledby="modalChildEnterPaymentsCarrier" aria-hidden="true">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title">Enter Payments Carrier</h5>
+										<button type="button" class="btn-primary" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										<form id="formPaymentsCarrier">
+											<div class="mb-3">
+												<label for="" class="form-label">Month</label>
+												<input type="month" class="form-control" name="coverageMonth" required>
+											</div>
+											<div class="mb-3">
+												<label for="" class="form-label">Status</label>
+												<select class="form-select" name="status" required>
+													<option value='' disabled selected>Select one</option>
+													<option value="Active">Active</option>
+													<option value="Inactive">Inactive</option>
+												</select>
+											</div>
+											<button type="submit" class="btn btn-primary">Save</button>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Modal para ingresar payments Sherpa -->
+						<div class="modal fade" id="modalChildEnterPaymentsSherpa" tabindex="-1" aria-labelledby="modalChildEnterPaymentsSherpa" aria-hidden="true">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title">Enter Payments Sherpa</h5>
+										<button type="button" class="btn-primary" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										<form id="formPaymentsSherpa">
+											<div class="mb-3">
+												<label for="" class="form-label">Month</label>
+												<input type="month" class="form-control" name="coverageMonth" required>
+											</div>
+											<div class="mb-3">
+												<label for="" class="form-label">Status</label>
+												<select class="form-select" name="status" required>
+													<option value='' disabled selected>Select one</option>
+													<option value="Active">Active</option>
+													<option value="Inactive">Inactive</option>
+												</select>
+											</div>
+											<button type="submit" class="btn btn-primary">Save</button>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Modal para ingresar las accion required -->
+						<div class="modal fade" id="modalActionrequired" tabindex="-1" aria-labelledby="modalActionrequired" aria-hidden="true">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title" id="Actionrequired">Enter Action required</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										<form id="formIngresarTexto" action="{% url 'saveAccionRequired'  %}" method="POST">
+											{% csrf_token %}
+											<input type="hidden" name="plan_id" value="{{ obamacare.id }}">
+											<div class="mb-3">
+												<label for="description" class="form-label">Typification the Call:</label>
+												<select class="form-select"  id="description" name="description" >
+													<option></option>
+													{% for list_drow in description %}
+														<option value="{{ list_drow.description }}">{{ list_drow.description|title }}</option>
+													{% endfor %}
+												</select>
+											</div>
+											<div class="d-flex justify-content-between">
+												<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalSelector" data-bs-dismiss="modal">
+													Back
+												</button>
+												<button type="submit" class="btn btn-primary">Saved</button>
+											</div>
+										</form>
+										
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div id="missingDocuments" style="display: none;">
+							{% if not letterCard.letters %} <p style="line-height: 0.6;">❌ <b>Letters</b></p> {% endif %}
+							{% if not letterCard.card %} <p style="line-height: 0.6;">❌ <b>Card</b></p> {% endif %}
+							{% if not userCarrier.username_carrier %} <p style="line-height: 0.6;">❌ <b>Username Carrier</b></p> {% endif %}
+							{% if not obamacare.status == 'ACTIVE' %} <p style="line-height: 0.6;">❌ <b>Status</b></p> {% endif %}
+							{% if not obamacare.doc_migration %} <p style="line-height: 0.6;">❌ <b>Migration Document</b></p> {% endif %}
+							{% if not obamacare.doc_income %} <p style="line-height: 0.6;">❌ <b>Income Document</b></p> {% endif %}
+							{% if obamacare.policyNumber == '' or obamacare.policyNumber == None or obamacare.policyNumber == 'None' %}
+								<p style="line-height: 0.6;">❌ <b>Policy Number</b></p>
+							{% endif %}
+							{% if not apppointment %} <p style="line-height: 0.6;">❌ <b>Apppointment</b></p> {% endif %}
+						</div>
+						
+					</div>	
+
+				</div>			
 			</div>
 		</div>
 	</div>
-{% endif %}
+
+	{% if smsIsActive %}
+		<!-- Chat UI -->
+		<div {% if userPreference.darkMode %} class='dark-mode'{% endif %}>
+			<button class="floating-chat-button flex-grow-1" onclick="toggleChat()">
+				<i class="lni lni-comments-alt"></i>
+				{% if chat.is_message_unread %}<span class="alert-count">{{ chat.unread_messages }}</span>{% endif %}
+			</button>
+			
+			<div class="floating-chat-container" id="chatContainer">
+				<div class="floating-chat-header">
+					<span class="client-name">{{contact.name}} <br>{{contact.formatted_phone_number}}</span>
+					<div class="chat-actions">
+						{% if secretKey %}
+						<button id="buttonSendSecretKey" class="tooltip-container"><span class="tooltip-text">Send Secret Key</span><i class="bx bx-key me-1"></i></button>
+						{% else %}
+						<button id="buttonCreateSecretKey" class="tooltip-container"><span class="tooltip-text">Create Secret Key</span><i class="bx bx-key me-1"></i></button>
+						{% endif %}
+					</div>
+				</div>
+				<div class="floating-chat-body" id="chat-content">
+					{% if not messages %}
+						<div class="d-flex justify-content-center align-items-center" id="buttonStartChat">
+							<div class="dropdown">
+								<button class="btn btn-primary dropdown-toggle custom-dropdown" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+									🌍 Select Language
+								</button>
+								<ul class="dropdown-menu animate-dropdown" aria-labelledby="languageDropdown">
+									<li><a class="dropdown-item" href="#" onclick="setLanguage('english')">🇺🇸 English</a></li>
+									<li><a class="dropdown-item" href="#" onclick="setLanguage('spanish')">🇪🇸 Español</a></li>
+								</ul>
+							</div>
+						</div>
+					{% else %}
+						{% for message in messages %}
+							{%if message.sender_type == 'Client'%}
+								<div class="chat-content-leftside">
+									<div class="d-flex">
+										<svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+											stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user">
+											<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+											<circle cx="12" cy="7" r="4"></circle>
+										</svg>
+										<div class="flex-grow-1 ms-2">
+											<p class="mb-0 chat-time">{{obamacare.client.first_name}}, {{message.created_at|date:"g:i A"}}</p>
+											{% if message.file %}
+											<p class="chat-left-msg">
+												<img class="img-responsive" src="{{ message.file.file.url }}" alt="">
+											</p>
+											{% else %}
+											<p class="chat-left-msg" style="white-space: pre-wrap;">{{message.message_content}}</p>
+											{% endif %}
+										</div>
+									</div>
+								</div>
+							{%elif message.sender_type == 'Agent'%}
+								<div class="chat-content-rightside">
+									<div class="d-flex ms-auto">
+										<div class="flex-grow-1 me-2">
+											<p class="mb-0 chat-time text-end">{{message.sender.username}}, {{ message.created_at|date:"m:H - d/m" }}</p>
+											{% if message.file %}
+											<p class="chat-left-msg">
+												<img class="img-responsive" src="{{ message.file.file.url }}" alt="">
+											</p>
+											{% else %}
+											<p class="chat-right-msg">{{message.message_content|linebreaksbr}}</p>
+											{% endif %}
+										</div>
+									</div>
+								</div>
+							{% endif %}
+						{% endfor %}
+					{% endif %}
+				</div>
+				<div class="floating-chat-footer">
+					<input {% if not contact.is_active %}disabled{% endif %} type="text" id="messageContent" placeholder="Type a message...">
+					<button id="sendMessage">Send</button>
+				</div>
+			</div>
+		</div>
+	{% endif %}
 
 {% endblock %}
 {% block end_js %}
@@ -1580,10 +1591,41 @@
 		var chat_name = '{{ contact.name }}'
 		var	is_message_unread = '{{chat.is_message_unread}}'.toLowerCase() === "true";
 	</script>
+	
 	<script src="{% static 'assets/js/sms/scripts.js' %}"></script>
 
 	{% comment %} Swalert para avisar cuando se envio el SMS template {% endcomment %}
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script src="{% static 'assets/js/modals/confirmationSMSAutomatic.js' %}"></script>
+
+	{% if temporalyURL %}
+		<script>
+			function copyCurrentURL() {
+				// Obtener la URL actual
+				const URL = '{{temporalyURL|safe}}';
+				
+				// Copiar al portapapeles
+				navigator.clipboard.writeText(URL).then(() => {
+					// Mostrar mensaje de éxito
+					const successMessage = document.querySelector('.success-message');
+					successMessage.style.display = 'block';
+					
+					// Cambiar el texto del botón temporalmente
+					const button = document.querySelector('.copy-button');
+					const originalContent = button.innerHTML;
+					button.innerHTML = '<i class="fas fa-check"></i> "Copiado!" ';
+					
+					// Restaurar después de 2 segundos
+					setTimeout(() => {
+						successMessage.style.display = 'none';
+						button.innerHTML = originalContent;
+					}, 2000);
+				}).catch(err => {
+					console.error('Error al copiar:', err);
+					alert('"No se pudo copiar el link. Por favor, inténtalo de nuevo."');
+				});
+			}
+		</script>
+	{% endif %}
 	
 {% endblock %}

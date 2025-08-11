@@ -869,7 +869,17 @@ def smstemplate(request):
 
     template = ContentTemplate.objects.filter(id = sms).first()
 
-    if validation != 6:
+    if validation == 6:
+        
+        validationSms = True
+        sendTemplate(request, client.phone_number, agentFirstName)
+
+    elif validation in (7,8,9,10):
+
+        validationSms = True
+        sendTemplateStatic(request, client.phone_number, template.identification)
+
+    else: 
 
         context = {
             "name_client": client.first_name,
@@ -891,12 +901,7 @@ def smstemplate(request):
 
         validationSms = True
 
-    else:
 
-        validationSms = True
-
-        sendTemplate(request, client.phone_number, agentFirstName)
-    
     if validationSms:
 
         SmsTemplate.objects.create(
@@ -977,6 +982,62 @@ def sendTemplate(request, to_number, nameTemplate):
 
         threading.Timer(180.0, eliminarImagenS3).start()
 
+#Funcion para enviar template static
+def sendTemplateStatic(request, to_number, nameTemplate):
+    imagen_url = None
+
+    if request.method == 'POST':
+
+        # Cargar imagen base
+        imagen_base_path = os.path.join(settings.BASE_DIR, 'static', 'assets', 'images', 'template-images-static', f'{nameTemplate}.jpg')
+        base = Image.open(imagen_base_path).convert("RGBA")
+
+        # Guardar imagen combinada en memoria
+        output = BytesIO()
+        base.save(output, format='PNG')
+        output.seek(0)
+
+        # Subir imagen combinada a S3
+        s3 = boto3.client(
+            's3',
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            region_name=settings.AWS_S3_REGION_NAME
+        )
+
+        bucket = settings.AWS_STORAGE_BUCKET_NAME
+        timestamp = int(time.time())
+        filename = f'temp-template/combinado_{timestamp}.png'
+
+        s3.upload_fileobj(output, bucket, filename, ExtraArgs={'ContentType': 'image/png'})
+
+        # Generar URL prefirmada válida por 3 minutos
+        imagen_url = s3.generate_presigned_url(
+            'get_object',
+            Params={'Bucket': bucket, 'Key': filename},
+            ExpiresIn=180
+        )
+
+        # Enviar SMS con Telnyx
+        telnyx.api_key = settings.TELNYX_API_KEY
+        messageContent = f'¡Bienvenidos! Aquí está tu información personalizada.'
+
+        telnyx.Message.create(
+            from_='+17869848427',
+            to=f'+{to_number}',
+            text=messageContent,
+            media_urls=[imagen_url]
+        )
+
+        # Borrar la imagen del bucket después de 3 minutos
+        def eliminarImagenS3():
+            try:
+                s3.delete_object(Bucket=bucket, Key=filename)
+                print(f"Imagen en S3 eliminada: {filename}")
+            except Exception as e:
+                print(f"Error al eliminar imagen en S3: {e}")
+
+        threading.Timer(180.0, eliminarImagenS3).start()
 
 
 

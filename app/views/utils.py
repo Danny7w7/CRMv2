@@ -18,6 +18,8 @@ from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from io import BytesIO
 from django.test.client import RequestFactory
+from dateutil.relativedelta import relativedelta
+from datetime import datetime
 
 # Django utilities
 from django.http import HttpResponse, JsonResponse
@@ -1366,8 +1368,6 @@ def generarPDFCompleto(output_pdf_path):
 
 #Ultimos 6 mese
 def chartSixMonths():
-    from datetime import datetime
-    from dateutil.relativedelta import relativedelta
     
     now = timezone.now().date()
     
@@ -1421,8 +1421,6 @@ def chartSixMonths():
 
 #Ultimo año
 def chartAllData():
-    from collections import defaultdict
-    from datetime import datetime
     
     # Obtener todos los registros de ObamaCare
     obamacare_records = ObamaCare.objects.filter(

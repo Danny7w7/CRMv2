@@ -189,7 +189,8 @@ urlpatterns = [
 
     path('customerTypification/', tableReports.customerTypification, name='customerTypification'),
 
-
+    path('customerStep/', tableReports.customerStep, name='customerStep'),
+    
     #<---------------------------Payments Reports--------------------------->
     path('paymentsReports/', tableReports.paymentsReports, name='paymentsReports'),
     path('paymentsReportsSupp/', tableReports.paymentsReportsSupp, name='paymentsReportsSupp'),
@@ -199,6 +200,7 @@ urlpatterns = [
     path('salesPerformance/', charts.salesPerformance, name='salesPerformance'),
     path('chart6Week/', charts.chart6Week, name='chart6Week'), 
     path('averageCustomer/', charts.averageCustomer, name='averageCustomer'),
+    path('mixSale/', charts.mixSale, name='mixSale'),
 
     
     #<---------------------------Supervisor Panel--------------------------->
@@ -231,6 +233,7 @@ urlpatterns = [
     path('manageAgentAssignments/', dbExcel.manageAgentAssignments, name='manageAgentAssignments'),
     path('bd/', dbExcel.commentDB, name='bd'),
     path('reportBd/', dbExcel.reportBd, name='reportBd'),
+    path('saveCommentAjax', dbExcel.saveCommentAjax, name='saveCommentAjax'),
 
 
     #<---------------------------Consent---------------------------> 

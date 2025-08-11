@@ -24,7 +24,7 @@ from app.views.enterData.forms import countDigits
 from ...forms import *
 from ..sms import get_last_message_for_chats
 from ..decoratorsCompany import *
-from ..consents import getCompanyPerAgent
+from ..consents import generateTemporaryToken, getCompanyPerAgent
   
 
 @login_required(login_url='/login') 
@@ -298,6 +298,8 @@ def editObama(request ,obamacare_id, way):
     incomeffm = IncomeLetterFFM.objects.filter(obamacare = obamacare_id)
     complaint = Complaint.objects.filter(obamacare = obamacare_id).exclude(pdf='')
     smsTemplate = SmsTemplate.objects.select_related('contentTemplate').filter(obamacare = obamacare_id)
+    smsTemplateAll = ContentTemplate.objects.filter(company = company_id)    
+    temporalyURL = f"{request.build_absolute_uri('/viewConsent/')}{obamacare_id}?token={generateTemporaryToken(obamacare.client , 'obamacare')}&lenguaje={'es'}"
 
     if request.method == 'POST':
         action = request.POST.get('action')
@@ -532,6 +534,8 @@ def editObama(request ,obamacare_id, way):
         'incomeffm':incomeffm,
         'complaint':complaint,
         'smsTemplate': smsTemplate,
+        'smsTemplateAll' : smsTemplateAll,
+        'temporalyURL' : temporalyURL,
         #SMS Blue
         'contact':contact,
         'chat':chat,

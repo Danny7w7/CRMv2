@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Consent Form</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'assets/css/styleCopyLinkConsent.css' %}" />
     <style>
         .form-container {
             max-width: 800px;
@@ -73,85 +74,26 @@
             touch-action: none; /* Disable default touch gestures */
         }
 
-        /* Floating Container */
-
-        .floating-container {
-            position: fixed;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            z-index: 1000;
-        }
-
-        .copy-button {
-            background-color: #00ff08;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-        }
-
-        .copy-button:hover {
-            background-color: #48aa4d;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-        }
-
-        .copy-button:active {
-            transform: translateY(0);
-        }
-
-        .success-message {
-            color: #00ff08;
-            margin-top: 10px;
-            font-size: 14px;
-            display: none;
-        }
-
-        .input-verde-sombra {
-            border: 2px solid rgb(0, 255, 0);
-            color: rgb(0, 255, 0);
-            box-shadow: 0 0 8px rgb(22, 107, 1); /* Sombra negra alrededor del input */
-        }
-
-        .custom-link {
-            color: black;
-        }
-        .custom-link:hover {
-            color: red; /* Cambia el color al pasar el mouse */
-        }
-
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
 </head>
 <body data-user-role="{{ request.user.role }}" data-username="{{ request.user.username }}">
+
     {% if temporalyURL %}
-    <!-- Div flotante -->
-    <div class="floating-container">
-        <button class="copy-button" onclick="copyCurrentURL()">
-            <i class="fas fa-link"></i>
-            Copy Link
-        </button>
-        <div class="success-message">¡Link copiado!</div>
-    </div>
+        <!-- Div flotante -->
+        <div class="floating-container">
+            <button class="copy-button" onclick="copyCurrentURL()">
+                <i class="fas fa-link"></i>
+                Copy Link
+            </button>
+            <div class="success-message">¡Link copiado!</div>
+        </div>
     {% endif %}
 
     <div class="form-container roboto-medium color-blue">
+
         <h2 class="text-center mb-4 roboto-black color-blue">
            {% trans "AGENTE EN REGISTRO" %}</h2>
         <h6 class="text-center mb-4 roboto-medium color-blue container">{% blocktrans %}AUTORIZACION DE ENTREGA INFORMACIÓN PARA ENROLAMIENTO EN EL MERCADO DE SALUD{% endblocktrans %}</h6>
@@ -572,6 +514,7 @@
             </div>
 
         </form>
+
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -580,37 +523,35 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 
  
-{% if temporalyURL %}
-    <script>
-        function copyCurrentURL() {
-            // Obtener la URL actual
-            const URL = '{{temporalyURL|safe}}';
-            
-            // Copiar al portapapeles
-            navigator.clipboard.writeText(URL).then(() => {
-                // Mostrar mensaje de éxito
-                const successMessage = document.querySelector('.success-message');
-                successMessage.style.display = 'block';
+    {% if temporalyURL %}
+        <script>
+            function copyCurrentURL() {
+                // Obtener la URL actual
+                const URL = '{{temporalyURL|safe}}';
                 
-                // Cambiar el texto del botón temporalmente
-                const button = document.querySelector('.copy-button');
-                const originalContent = button.innerHTML;
-                button.innerHTML = '<i class="fas fa-check"></i> {% trans "Copiado!" %}';
-                
-                // Restaurar después de 2 segundos
-                setTimeout(() => {
-                    successMessage.style.display = 'none';
-                    button.innerHTML = originalContent;
-                }, 2000);
-            }).catch(err => {
-                console.error('Error al copiar:', err);
-                alert('{% trans "No se pudo copiar el link. Por favor, inténtalo de nuevo." %}');
-            });
-        }
-    </script>
-{% endif %}
-
-
+                // Copiar al portapapeles
+                navigator.clipboard.writeText(URL).then(() => {
+                    // Mostrar mensaje de éxito
+                    const successMessage = document.querySelector('.success-message');
+                    successMessage.style.display = 'block';
+                    
+                    // Cambiar el texto del botón temporalmente
+                    const button = document.querySelector('.copy-button');
+                    const originalContent = button.innerHTML;
+                    button.innerHTML = '<i class="fas fa-check"></i> {% trans "Copiado!" %}';
+                    
+                    // Restaurar después de 2 segundos
+                    setTimeout(() => {
+                        successMessage.style.display = 'none';
+                        button.innerHTML = originalContent;
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Error al copiar:', err);
+                    alert('{% trans "No se pudo copiar el link. Por favor, inténtalo de nuevo." %}');
+                });
+            }
+        </script>
+    {% endif %}
 
 </body>
 </html>

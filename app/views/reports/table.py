@@ -1515,3 +1515,78 @@ def paymentsReportsSupp(request):
         'start_date':start_date,
         'end_date':end_date
     })
+
+@login_required(login_url='/login') 
+@company_ownership_required_sinURL
+def customerStep(request):
+
+    company_id = request.company_id
+    company_filter = {'company_id': company_id} if not request.user.is_superuser else {}
+    startDatePost = None
+    endDatePost = None
+
+    now = timezone.now()
+    startDate = timezone.make_aware(
+        datetime.datetime(now.year, now.month, 1, 0, 0, 0, 0)
+    )
+    endDate = timezone.make_aware(
+        datetime.datetime(now.year, now.month + 1, 1, 0, 0, 0, 0) - timezone.timedelta(microseconds=1)
+    )
+
+    obama = ObamaCare.objects.select_related('client', 'agent').prefetch_related(
+        'letterscard_set__agent_create',
+        'appointmentclient_set__agent_create', 
+        'usercarrier_set__agent_create',
+        'paymentdate_set__agent_create',
+        'documentobamasupp_set__agent_create'
+    ).filter(is_active=True, **company_filter)
+
+    if request.user.role not in ('S','Admin'):
+
+        user = Users.objects.filter(id = request.user.id).first()
+        nameUser = f"{user.first_name} {user.last_name}"
+
+        obama = obama.filter(is_active=True, profiling = nameUser ,**company_filter)
+    
+    obama = obama.filter(created_at__range=(startDate, endDate))
+
+
+    if request.method == 'POST':
+
+        startDatePost = request.POST['start_date']
+        endDatePost = request.POST['end_date']
+
+        startDate = timezone.make_aware(
+            datetime.datetime.strptime(startDatePost, '%Y-%m-%d').replace(hour=0, minute=0, second=0, microsecond=0)
+        )
+        endDate = timezone.make_aware(
+            datetime.datetime.strptime(endDatePost, '%Y-%m-%d').replace(hour=23, minute=59, second=59, microsecond=999999)
+        )
+
+        obama = ObamaCare.objects.select_related('client', 'agent').prefetch_related(
+            'letterscard_set__agent_create',
+            'appointmentclient_set__agent_create', 
+            'usercarrier_set__agent_create',
+            'paymentdate_set__agent_create',
+            'documentobamasupp_set__agent_create'
+        ).filter(is_active=True, **company_filter)
+
+        if request.user.role not in ('S','Admin'):
+
+            user = Users.objects.filter(id = request.user.id).first()
+            nameUser = f"{user.first_name} {user.last_name}"
+
+            obama = obama.filter(is_active=True, profiling = nameUser ,**company_filter)
+
+        obama = obama.filter(created_at__range=(startDate, endDate))
+    
+    context = {
+        'obama': obama,
+        'startDate' : startDatePost,
+        'endDate' : endDatePost
+    }  
+
+    return render(request, 'customerReports/customerStep.html', context)
+
+
+

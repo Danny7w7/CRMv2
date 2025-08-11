@@ -8,8 +8,9 @@ from datetime import timedelta, datetime
 # Django utilities
 from django.core.files.base import ContentFile
 from django.core.signing import BadSignature, Signer
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
+from django.views.decorators.csrf import csrf_exempt
 
 # Django core libraries
 from django.contrib.auth.models import AnonymousUser
@@ -26,6 +27,7 @@ from weasyprint import HTML
 # Application-specific imports
 from app.models import *
 from ..alertWebsocket import websocketAlertGeneric
+from app.utils import enviar_email, uploadTempUrl
 
 def consetMedicare(request, client_id, language):
 
@@ -818,60 +820,21 @@ def redirect_with_token(request, view_name, *args, **kwargs):
     query_params = urlencode({'token': token})
     return redirect(f'{url}?{query_params}')
 
-
-# views.py
-from django.http import JsonResponse
-from django.views.decorators.http import require_http_methods
-from django.views.decorators.csrf import csrf_exempt
-from django.core.mail import EmailMessage
-from django.conf import settings
-import json
-import logging
-
-logger = logging.getLogger(__name__)
-
-import logging
-from django.shortcuts import render
-from django.http import JsonResponse
-from django.views.decorators.http import require_http_methods
-from django.views.decorators.csrf import csrf_exempt
-from django.core.mail import EmailMessage
-from django.conf import settings
-from django.utils import timezone
-
-logger = logging.getLogger(__name__)
-from app.utils import enviar_email, generateWeeklyPdf, uploadTempUrl
-
-from django.views.decorators.csrf import csrf_exempt
-
 @csrf_exempt
 def sendConsentForm(request):
-    """
-    Vista para enviar el formulario de consentimiento por correo electrónico
-    """
-    now = datetime.now()
+
     try:
-        logger.info('Recibida petición de envío de formulario de consentimiento')
-        
-        # Obtener datos del formulario
-        first_name = request.POST.get('first_name', '')
-        last_name = request.POST.get('last_name', '')
-        phone = request.POST.get('phone', '')
-        agent = request.POST.get('agent', '')
-        
-        logger.info(f'Datos recibidos: {first_name} {last_name}, {phone}, {agent}')
+
+        now = datetime.now()        
         
         # Obtener el archivo PDF
         pdf_file = request.FILES.get('pdf_file')
         
         if not pdf_file:
-            logger.error('No se encontró el archivo PDF en la petición')
             return JsonResponse({
                 'success': False,
                 'error': 'No se encontró el archivo PDF'
             }, status=400)
-        
-        logger.info(f'Archivo PDF recibido: {pdf_file.name}, tamaño: {pdf_file.size} bytes')
         
         # Leer el contenido del PDF
         pdf_content = pdf_file.read()
@@ -906,17 +869,6 @@ def sendConsentForm(request):
             nombre_archivo=f'Consent {pdf_file.name}'
         )
         
-        # Opcional: Verificar si el email se envió correctamente
-        if email_enviado:
-            print("✅ Email del reporte enviado correctamente")
-            logger.info("Email del reporte enviado correctamente")
-        else:
-            print("❌ Error al enviar el email del reporte")
-            logger.error("Error al enviar el email del reporte")
-        
-       
-        logger.info('Intentando enviar email...')
-        
         
         return JsonResponse({
             'success': True,
@@ -924,15 +876,15 @@ def sendConsentForm(request):
         })
         
     except Exception as e:
-        logger.error(f'Error general al enviar formulario de consentimiento: {str(e)}', exc_info=True)
+        #logger.error(f'Error general al enviar formulario de consentimiento: {str(e)}', exc_info=True)
         return JsonResponse({
             'success': False,
             'error': f'Error interno del servidor: {str(e)}'
         }, status=500)
-
 
 def consentL(request):
     """Vista para mostrar el formulario de consentimiento"""
     response = render(request, 'consent/consentL.html')
     response["Content-Security-Policy"] = "frame-ancestors https://lapeirainsurance.com"
     return response
+

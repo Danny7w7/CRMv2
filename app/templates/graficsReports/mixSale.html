@@ -1,0 +1,103 @@
+{% extends "dashboard/index.html" %}
+{% load static %}
+{% block head %}
+    <title>Mix Sale Chart</title>
+	<!--plugins-->
+	<link href="{% static "assets/plugins/simplebar/css/simplebar.css" %}" rel="stylesheet" />
+	<link href="{% static "assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" %}" rel="stylesheet" />
+	<link href="{% static "assets/plugins/metismenu/css/metisMenu.min.css" %}" rel="stylesheet" />
+	<link href="{% static "assets/plugins/datatable/css/dataTables.bootstrap5.min.css" %}" rel="stylesheet" />
+	<!-- loader-->
+	<link href="{% static "assets/css/pace.min.css" %}" rel="stylesheet" />
+	<script src="{% static "assets/js/pace.min.js" %}"></script>
+	<!-- Bootstrap CSS -->
+	<link href="{% static "assets/css/bootstrap.min.css" %}" rel="stylesheet">
+	<link href="{% static "assets/css/bootstrap-extended.css" %}" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&amp;display=swap" rel="stylesheet">
+	<link href="{% static "assets/css/app.css" %}" rel="stylesheet">
+	<link href="{% static "assets/css/icons.css" %}" rel="stylesheet">
+	<!-- Theme Style CSS -->
+	<link rel="stylesheet" href="{% static "assets/css/dark-theme.css" %}" />
+	<link rel="stylesheet" href="{% static "assets/css/semi-dark.css" %}" />
+	<link rel="stylesheet" href="{% static "assets/css/header-colors.css" %}" />
+	<link rel="stylesheet" href="{% static "assets/css/mixSales.css" %}" />
+
+{% endblock %}
+{% block page_content %}
+
+<h4 class="mb-0 text-uppercase">Mix Sales</h4>
+<hr/>
+
+<div class="card">
+    <div class="card-body">
+		<div id="charts-wrapper"></div>
+    </div>
+</div>
+
+<hr>
+
+<!-- Gráfico de semanas -->
+<div class="card">
+    <div class="card-body">
+        <div id="chart-semanas"></div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+		 <div class="tables-container" id="tablesContainer">
+            <!-- Las tablas se generarán dinámicamente -->
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- Gráfico de 6 meses -->
+<div class="card">
+    <div class="card-body">
+        <div id="chart-6-meses"></div>
+    </div>
+</div>
+
+<hr>
+
+<!-- Gráfico histórico completo -->
+<div class="card">
+    <div class="card-body">
+        <div id="chart-historico"></div>
+    </div>
+</div>
+
+
+       
+
+
+
+{% endblock %}
+{% block end_js %}
+	<!-- Bootstrap JS -->
+	<script src="{% static "assets/js/bootstrap.bundle.min.js" %}"></script>
+	<!--plugins-->
+	<script src="{% static "assets/js/jquery.min.js" %}"></script>
+	<script src="{% static "assets/plugins/simplebar/js/simplebar.min.js" %}"></script>
+	<script src="{% static "assets/plugins/metismenu/js/metisMenu.min.js" %}"></script>
+	<script src="{% static "assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js" %}"></script>
+	<script src="{% static "assets/plugins/datatable/js/jquery.dataTables.min.js" %}"></script>
+	<script src="{% static "assets/plugins/datatable/js/dataTables.bootstrap5.min.js" %}"></script>
+	<script src="{% static "assets/plugins/apexcharts-bundle/js/apexcharts.min.js" %}"></script>
+	<script src="{% static "assets/plugins/apexcharts-bundle/js/apex-custom.js" %}"></script>
+
+	<!--app JS-->
+	<script src="{% static 'assets/js/app.js' %}"></script>
+
+	<script>
+		const chartsAgentsData = {{ charts6WeekAgent|safe }};
+		const chartsWeekPreviusData = {{ chartsWeekPrevius_json|safe }};
+		const chartSixMonthsAgentsData = {{ chartSixMonthsAgents_json|safe }};
+		const chartAllDataAgentsData = {{ chartAllDataAgents_json|safe }};
+	</script>
+
+	<script src="{% static 'assets/js/chart/mixSales.js' %}"></script>	
+
+{% endblock %}

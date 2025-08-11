@@ -1,14 +1,10 @@
 # Standard Python libraries
 import datetime
-import io
-import random
 
 # Django utilities
 from django.http import JsonResponse, HttpResponse
 from django.utils.timezone import make_aware
 from django.utils.dateparse import parse_date
-from django.core.files.base import ContentFile
-from django.template.loader import render_to_string
 
 # Django core libraries
 from django.contrib import messages
@@ -16,12 +12,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
-# Third-party libraries
-from weasyprint import HTML 
-
 # Application-specific imports
 from app.models import *
-from app.views.consents import getIPClient
 from ...alertWebsocket import websocketAlertGeneric
 
 
@@ -248,6 +240,7 @@ def saveDocumentClient(request, obamacare_id, way):
 
 @login_required(login_url='/login')
 def saveDocumentClientSupp(request, supp_id):
+
     if request.method == "POST":
         supp = get_object_or_404(Supp, id=supp_id)
         client = get_object_or_404(Clients, id = supp.client.id)
