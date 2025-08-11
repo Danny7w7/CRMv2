@@ -300,6 +300,7 @@ def commentDB(request):
     company_id = request.company_id  # Obtener company_id desde request    
     # Definir el filtro de compañía (será un diccionario vacío si es superusuario)
     company_filter = {'excel_metadata__company': company_id} if not request.user.is_superuser else {}
+    company_filter2 = {'company': company_id} if not request.user.is_superuser else {}
 
     roleAuditar = ['S', 'Admin']
     filterBd = None
@@ -311,10 +312,10 @@ def commentDB(request):
     # Filtra los registros dependiendo del rol del usuario
     if request.user.role in roleAuditar:
         bd = BdExcel.objects.filter(**company_filter)
-        bdName = ExcelFileMetadata.objects.filter(**company_filter)
+        bdName = ExcelFileMetadata.objects.filter(**company_filter2)
     else:
         bd = BdExcel.objects.filter(agent_id=request.user.id, is_sold = False, **company_filter)
-        bdName = ExcelFileMetadata.objects.filter(**company_filter)
+        bdName = ExcelFileMetadata.objects.filter(**company_filter2)
 
     if request.method == 'POST':        
 
