@@ -25,7 +25,7 @@ MODULE_PATHS = {
     'LIFE INSURANCE': [ 'formCreateClientLife','clientLifeInsurance','editLife','alert','ticketAsing','editTicket','editAlert','formCreateAlert','ConsentLifeInsurance','validatePhone','blockSocialSecurityLife','agentTicketAssignment'],
     'MEDICARE': [ 'formCreateClientMedicare','editClientMedicare','alert','ticketAsing','editTicket','editAlert','formCreateAlert','clientMedicare','consetMedicare','validatePhone','blockSocialSecurityMedicare','agentTicketAssignment'],
     'FINALL EXPENSES': [ 'formCreateFinalExpenses','clientFinallExpenses','alert','ticketAsing','editTicket','editAlert','formCreateAlert','agentTicketAssignment','editFinallExpenses','clientFinallExpenses','toggleFinallExpenses'],
-    'SMS': [ 'smsBlue','chatSms','sendCreateSecretKey','sendSecretKey','deleteContact','sendMessage','startChat','stripe-webhook','payment','readAllMessages','smstemplate','sendTemplate','sendTemplateStatic'],
+    'SMS': [ 'smsBlue','chatSms','sendCreateSecretKey','sendSecretKey','deleteContact','sendMessage','startChat','stripe-webhook','payment','readAllMessages','smstemplate','sendTemplate','sendTemplateStatic','adminSms'],
     'WHATSAPP': [ 'whatsappBlue','chatWatsapp','whatsappReply','sendWhatsapp','sendWhatsappConversation','deleteContactWhatsApp','template'],
     'SALE REPORTS': [ 'sale', 'sale6Week','detalleAgente','weekSalesWiew','downloadPdf','reports','downloadAccionRequired','paymentClients'],
     'CUSTOMER REPORTS': [ 'customerPerformance', 'typification','customerTypification','toggleTypification','get_observation_detail','customerStep'],
