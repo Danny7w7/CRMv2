@@ -818,7 +818,7 @@ def adminSms(request):
     company_id = request.company_id  # Obtener company_id desde request
     company_filter = {'company': company_id}
 
-    now = datetime.datetime.now()
+    now = datetime.now()
     seven_days_ago = now - timedelta(days=6)
 
     # Obtener usuarios de la compañia
