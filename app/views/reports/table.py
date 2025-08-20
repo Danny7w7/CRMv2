@@ -81,7 +81,7 @@ def sale(request):
 def saleObamaAgent(request, company_id, start_date=None, end_date=None):
 
     # Obtener los IDs de ObamaCare que están en CustomerRedFlag
-    excluded_obama_ids = CustomerRedFlag.objects.values('obamacare_id')
+    excluded_obama_ids = CustomerRedFlag.objects.filter(date_completed__isnull=True).values('obamacare_id')
 
     if request.user.is_superuser:
         # Definir la consulta base para Supp, utilizando `select_related` para obtener el nombre completo del agente (User)
@@ -150,7 +150,8 @@ def saleObamaAgent(request, company_id, start_date=None, end_date=None):
     return agents_sales
 
 def saleObamaAgentUsa(request, company_id, start_date=None, end_date=None):
-    excluded_obama_ids = CustomerRedFlag.objects.values('obamacare_id')
+    
+    excluded_obama_ids = CustomerRedFlag.objects.filter(date_completed__isnull=True).values('obamacare_id')
 
     base_queryset = ObamaCare.objects.visible_for_user(request.user).filter(is_active=True).exclude(
         id__in=Subquery(excluded_obama_ids)
