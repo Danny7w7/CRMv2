@@ -482,7 +482,7 @@ def saleClientStatusObama(request, company_id, start_date=None, end_date=None):
 
     company_filter = {'company': company_id} if not request.user.is_superuser else {}
     # Obtener los IDs de ObamaCare que están en CustomerRedFlag
-    excluded_obama_ids = CustomerRedFlag.objects.values('obamacare')
+    excluded_obama_ids = CustomerRedFlag.objects.filter(date_completed__isnull=True).values('obamacare')
 
     # Consulta para Registered
     sales_query_registered = ObamaCare.objects.select_related('agent','client').annotate(
@@ -826,7 +826,7 @@ def table6Week(request):
     company_filter = {'company': company_id} if not request.user.is_superuser else {}
 
     # Obtener los IDs de ObamaCare que están en CustomerRedFlag
-    excluded_obama_ids = CustomerRedFlag.objects.values('obamacare')
+    excluded_obama_ids = CustomerRedFlag.objects.filter(date_completed__isnull=True).values('obamacare')
 
     users = Users.objects.filter(role__in=userRoles, is_active=True,  **company_filter).exclude(username__in=excludedUsernames)
 
@@ -977,7 +977,7 @@ def weekSalesSummary(request, week_number):
     company_id = request.user.company
     company_filter = {'company': company_id} if not request.user.is_superuser else {}
 
-    excluded_obama_ids = CustomerRedFlag.objects.values('obamacare')
+    excluded_obama_ids = CustomerRedFlag.objects.filter(date_completed__isnull=True).values('obamacare')
 
     sales_data = defaultdict(lambda: defaultdict(lambda: {"ACA": 0, "SUPP": 0}))
     client_data = defaultdict(lambda: {"clientes_obama": [], "clientes_supp": []})
