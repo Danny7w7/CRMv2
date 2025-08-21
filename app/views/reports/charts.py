@@ -25,7 +25,7 @@ def chart6WeekSale(request):
     company_filter = {'company': company_id} if not request.user.is_superuser else {}
 
     # Obtener la fecha actual
-    today = datetime.datetime.today()
+    today = datetime.today()
 
     # Calcular el domingo anterior (inicio de la semana actual)
     startOfCurrentWeek = today - timedelta(days=today.weekday() + 1)
