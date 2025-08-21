@@ -9,7 +9,7 @@ import datetime
 from django.utils.timezone import make_aware
 from collections import defaultdict
 from django.db.models import Subquery
-from app.models import CustomerRedFlag, ObamaCare, Supp, ClientsAssure, ClientsLifeInsurance 
+from app.models import CustomerRedFlag, ObamaCare, Supp, ClientsAssure, ClientsLifeInsurance, Users 
 from django.template.loader import render_to_string
 from weasyprint import HTML
 from django.conf import settings
@@ -78,7 +78,7 @@ def weekSalesSummarySms(week_number):
 
     excludedUsernames = ['Calidad01', 'mariluz', 'MariaCaTi', 'CarmenR', 'tv', 'zohiraDuarte', 'vladimirDeLaHoz']
 
-    excluded_obama_ids = CustomerRedFlag.objects.values('obamacare')
+    excluded_obama_ids = CustomerRedFlag.objects.filter(date_completed__isnull=True).values('obamacare')
 
     sales_data = defaultdict(lambda: defaultdict(lambda: {"ACA": 0, "SUPP": 0}))
     client_data = defaultdict(lambda: {"clientes_obama": [], "clientes_supp": []})
@@ -141,6 +141,17 @@ def weekSalesSummarySms(week_number):
                 'estatus': sale.status,
                 'policy_type': 'LIFE INSURANCE'
             })
+        
+    all_agents = Users.objects.filter(
+        is_active=True,
+        company=2
+    ).exclude(username__in=excludedUsernames)
+
+    for agent in all_agents:
+        agent_name = agent.get_full_name()
+        if agent_name not in sales_data:
+            sales_data[agent_name] = defaultdict(lambda: {"ACA": 0, "SUPP": 0})
+            client_data[agent_name] = {"clientes_obama": [], "clientes_supp": []}
 
     week_days_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
     rango_fechas = f"{startOfWeek.strftime('%d/%m')} - {endOfWeek.strftime('%d/%m')}"
