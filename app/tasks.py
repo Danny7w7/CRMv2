@@ -159,15 +159,15 @@ def reportBoosLapeira():
 
     # 3. Enviar por Telnyx MMS
     telnyx.api_key = settings.TELNYX_API_KEY
-    recipient = ['+13052199932','+13052190572']
-    for item in recipient:
-        telnyx.Message.create(
-            from_='+17869848427',
-            to=item,
-            text='Reporte de la semana actual generado automáticamente.',
-            subject='Reporte PDF',
-            media_urls=[url_temporal]
-        )
+    # recipient = ['+13052199932','+13052190572']
+    # for item in recipient:
+    telnyx.Message.create(
+        from_='+17869848427',
+        to='+17863034781',
+        text='Reporte de la semana actual generado automáticamente.',
+        subject='Reporte PDF',
+        media_urls=[url_temporal]
+    )
    
 @shared_task
 def saveImageFromUrlTask(messageId, payload, contactId, companyId):
