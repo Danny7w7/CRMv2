@@ -48,7 +48,7 @@ def toggleTypification(request, typifications_id):
     # Redirigir de nuevo a la página actual con un parámetro de éxito
     return redirect('typification')
 
-def toggleTicketStatus(ticket_id):
+def toggleTicketStatus(request, ticket_id):
     
     # Obtener el cliente por su ID
     ticket = get_object_or_404(AgentTicketAssignment, id=ticket_id)
