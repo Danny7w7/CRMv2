@@ -144,7 +144,8 @@ def weekSalesSummarySms(week_number):
         
     all_agents = Users.objects.filter(
         is_active=True,
-        company=2
+        company=2,
+        role__in=['C','A']
     ).exclude(username__in=excludedUsernames)
 
     for agent in all_agents:
