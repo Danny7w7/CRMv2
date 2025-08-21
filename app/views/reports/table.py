@@ -442,12 +442,15 @@ def salesBonusAgent(request, company_id, start_date=None, end_date=None):
     agents = Users.objects.filter(filtro_company)
     ventasAgentes = []
 
+    # Obtener los IDs de ObamaCare que están en CustomerRedFlag
+    excluded_obama_ids = CustomerRedFlag.objects.filter(date_completed__isnull=True).values('obamacare_id')
+
     for agente in agents:
         row = {
             'id': agente.id,  # Agregar el id del agente aquí
             'nombre': agente.get_full_name() if hasattr(agente, 'get_full_name') else agente.username,
-            'obamacare': ObamaCare.objects.filter(Q(agent=agente) & Q(status_color=3) & filtro_fecha & filtro_company & Q(is_active = True)).count(),
-            'obamacarePendiente': ObamaCare.objects.filter(Q(agent=agente), Q(status_color__in = [1,2]),filtro_fecha, filtro_company & Q(is_active=True)).count(),
+            'obamacare': ObamaCare.objects.filter(Q(agent=agente) & Q(status_color=3) & filtro_fecha & filtro_company & Q(is_active = True)).exclude( id__in=Subquery(excluded_obama_ids)).count(),
+            'obamacarePendiente': ObamaCare.objects.filter(Q(agent=agente), Q(status_color__in = [1,2]),filtro_fecha, filtro_company & Q(is_active=True)).exclude( id__in=Subquery(excluded_obama_ids)).count(),
             'supp': Supp.objects.filter(Q(agent=agente), Q(status_color=3), filtro_fecha, filtro_company & Q(is_active=True)).count(),
             'suppPendiente': Supp.objects.filter(Q(agent=agente), Q(status_color__in = [1,2]), filtro_fecha, filtro_company & Q(is_active=True)).count(),
             'medicare': Medicare.objects.filter(Q(agent=agente), Q(status_color=3), filtro_fecha, filtro_company & Q(is_active=True)).count(),
