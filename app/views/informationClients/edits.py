@@ -757,6 +757,12 @@ def editSupp(request, supp_id):
     if supp.client.date_birth:
         old = hoy.year - supp.client.date_birth.year - ((hoy.month, hoy.day) < (supp.client.date_birth.month, supp.client.date_birth.day)) 
 
+    
+    if company_id == 1:
+        agentUsa = USAgent.objects.all().prefetch_related("company")
+    else:
+        agentUsa = USAgent.objects.filter(company = request.user.company).prefetch_related("company")
+
 
     if request.method == 'POST':
 
@@ -890,6 +896,7 @@ def editSupp(request, supp_id):
         'paymentDateSupp' : paymentDateSupp,
         'users' : users,
         'documentSupp' : documentSupp,
+        'agentUsa' : agentUsa,
         #SMS Blue
         'contact':contact,
         'chat':chat,
