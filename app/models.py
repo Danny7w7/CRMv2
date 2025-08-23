@@ -312,7 +312,7 @@ class OptionMedicare(models.Model):
 
 class ObamaCare(models.Model):
     agent = models.ForeignKey(Users, on_delete=models.CASCADE,related_name='agent_sale_aca')
-    client = models.ForeignKey(Clients, on_delete=models.CASCADE)
+    client = models.ForeignKey(Clients, on_delete=models.CASCADE,null=True)
     agent_usa = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True) 
     taxes = models.IntegerField()
