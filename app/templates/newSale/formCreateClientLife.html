@@ -66,8 +66,9 @@
 							<label for="agent_usa" class="form-label font-weight-bold">Agente USA</label>
 							<select class="form-select" id="agent_usa" aria-label="Default select example" name="agent_usa" required>
 								<option value="no_valid" disabled selected>Please Select</option>
-								<option value="GINA PAOLA LAPEIRA - NPN 19944280">GINA PAOLA LAPEIRA - NPN 19944280</option>
-								<option value="LUIS EDUARDO LAPEIRA - NPN 20556081">LUIS EDUARDO LAPEIRA - NPN 20556081</option>
+								{% for agentUsa in agentUsa %}
+									<option  value="{{agentUsa.name}}">{{agentUsa.name}}</option>
+								{% endfor %}
 							</select>
 						</div>
 						<div class="col-12 col-lg-4">

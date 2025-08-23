@@ -63,61 +63,54 @@
                         <td>
                             <button type="button" class="btn btn-outline-secondary" data-bs-toggle="dropdown" aria-expanded="false">Select action</button>
                             <ul class="dropdown-menu">
-                                {% if client.type_sales == "ACA" %}
-                                    <!-- Solo mostrar ACA/SUPP si tiene ACA -->
+
+                                {% if client.type_sales == "NO POLICY" %}
                                     <li>
-                                        <form method="POST" action="{% url 'updateTypeSales' client.id %}">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="type_sales" value="ACA/SUPLEMENTARIO">
-                                            <button type="submit" class="dropdown-item">ADD SUPP</button>
-                                            <input type="hidden" name="route" id="SUPP" value="SUPP">
-                                        </form>
-                                    </li> 
-                                    <li>
-                                        <form method="POST" action="{% url 'updateTypeSales' client.id %}">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="route" id="DEPEND" value="DEPEND">
-                                            <button type="submit" class="dropdown-item">ADD DEPENDENTS</button>
-                                        </form>
-                                    </li>                                                                      
-                                {% elif client.type_sales == "SUPLEMENTARIO" or client.type_sales == "NO POLICY" %}
-                                    <!-- Mostrar SUPP y ACA/SUPP si tiene SUPP -->
-                                    <li>
-                                        <form method="POST" action="{% url 'updateTypeSales' client.id %}">
+                                        <form method="POST" action="{% url 'updateTypeSales' client.id %}" class="typeSalesForm">
                                             {% csrf_token %}
                                             <input type="hidden" name="type_sales" value="ACA">
                                             <button type="submit" class="dropdown-item">ADD ACA</button>
-                                            <input type="hidden" name="route" id="ACA" value="ACA">
+                                            <input type="hidden" name="route" value="ACA">
                                         </form>
                                     </li>
                                     <li>
-                                        <form method="POST" action="{% url 'updateTypeSales' client.id %}">
+                                        <form method="POST" action="{% url 'updateTypeSales' client.id %}" class="typeSalesForm">
                                             {% csrf_token %}
                                             <input type="hidden" name="type_sales" value="SUPLEMENTARIO">
-                                            <button type="submit" class="dropdown-item">ADD. SUPP</button>
-                                            <input type="hidden" name="route" id="SUPP" value="SUPP">
+                                            <button type="submit" class="dropdown-item">ADD SUPP</button>
+                                            <input type="hidden" name="route" value="SUPP">
                                         </form>
-                                    </li>                                
-                                {% elif client.type_sales == "ACA/SUPLEMENTARIO" %}
-                                    <!-- Solo mostrar ACA/SUPP si ya tiene ACA/SUPP -->
+                                    </li>
+                                {% else %}
                                     <li>
-                                        <form method="POST" action="{% url 'updateTypeSales' client.id %}">
+                                        <form method="POST" action="{% url 'updateTypeSales' client.id %}" class="typeSalesForm">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="type_sales" value="ACA">
+                                            <button type="submit" class="dropdown-item">ADD ACA</button>
+                                            <input type="hidden" name="route" value="ACA">
+                                        </form>
+                                    </li>
+                                    <li>
+                                        <form method="POST" action="{% url 'updateTypeSales' client.id %}" class="typeSalesForm">
                                             {% csrf_token %}
                                             <input type="hidden" name="type_sales" value="ACA/SUPLEMENTARIO">
                                             <button type="submit" class="dropdown-item">ADD SUPP</button>
-                                            <input type="hidden" name="route" id="SUPP" value="SUPP">
+                                            <input type="hidden" name="route" value="SUPP">
                                         </form>
-                                    </li> 
+                                    </li>
                                     <li>
-                                        <form method="POST" action="{% url 'updateTypeSales' client.id %}">
+                                        <form method="POST" action="{% url 'updateTypeSales' client.id %}" class="typeSalesForm">
                                             {% csrf_token %}
-                                            <input type="hidden" name="route" id="DEPEND" value="DEPEND">
+                                            <input type="hidden" name="route" value="DEPEND">
                                             <button type="submit" class="dropdown-item">ADD DEPENDENTS</button>
                                         </form>
-                                    </li>   
+                                    </li>
                                 {% endif %}
                             </ul>
                         </td>
+
+
+                       
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -153,4 +146,6 @@
 	</script>
 	<!--app JS-->
 	<script src="{% static "assets/js/app.js" %}"></script>
+    <script src="{% static "assets/js/validations/duplicidadClient.js" %}"></script>
+
 {% endblock %}

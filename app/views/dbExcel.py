@@ -133,30 +133,35 @@ def saveData(request):
                 if header:
                     mapping[model_field] = header
 
-        # Recuperar los datos cargados previamente desde la sesión
+        # Recuperar datos desde la sesión
         uploaded_data = request.session.get('uploaded_data')
         metadata_id = request.session.get('metadata_id')
         if not uploaded_data or not metadata_id:
-            return render(request, 'addExcelsDB/uploadExcel.html', {'error': 'No se encontraron datos para procesar.'})
+            return render(request, 'addExcelsDB/uploadExcel.html', {
+                'error': 'No se encontraron datos para procesar.'
+            })
 
-        # Recuperar el registro de ExcelFileMetadata
+        # Recuperar metadata del archivo
         excel_metadata = ExcelFileMetadata.objects.get(id=metadata_id)
 
-        # Convertir el diccionario de vuelta a un DataFrame
+        # Reconstruir DataFrame
         df = pd.DataFrame(uploaded_data)
 
-        # Inicializar una lista para errores
-        errors = []
-        valid_data = []  # Datos válidos para guardar
+        # Estructuras auxiliares
+        errors = []      # Errores de filas
+        saved_count = 0  # Contador de guardados
 
         # Validar cada fila
         for index, row in df.iterrows():
             row_errors = {}
             data = {}
+            phone_valid = True
+
             for model_field, header in mapping.items():
                 if header in df.columns:
                     value = row[header]
-                    # Validaciones por campo del modelo
+
+                    # Validaciones
                     if model_field == 'first_name' and not isinstance(value, str):
                         row_errors[model_field] = 'Debe ser una cadena de texto.'
                     elif model_field == 'last_name' and value is not None and not isinstance(value, str):
@@ -166,6 +171,7 @@ def saveData(request):
                             value = int(value)
                         except (ValueError, TypeError):
                             row_errors[model_field] = 'Debe ser un número entero.'
+                            phone_valid = False  # 🚨 si el phone es inválido, no guardamos la fila
                     elif model_field == 'zipCode':
                         try:
                             value = int(value)
@@ -179,30 +185,28 @@ def saveData(request):
 
                     data[model_field] = value
 
+            # --- Guardado condicional ---
+            if phone_valid:  
+                BdExcel.objects.create(excel_metadata=excel_metadata, **data)
+                saved_count += 1
+            else:
+                row_errors['phone'] = "Fila descartada: phone inválido, no se guardó."
+
+            # Guardamos errores (sean fatales o no)
             if row_errors:
                 errors.append({'row': index + 1, 'errors': row_errors})
-            else:
-                # Agregar datos válidos para guardarlos más tarde
-                valid_data.append(data)
 
-        # Si hay errores, mostrarlos al usuario
-        if errors:
-            return render(request, 'addExcelsDB/mapHeaders.html', {
-                'headers': request.session['uploaded_headers'],
-                'model_fields': [field.name for field in BdExcel._meta.fields if field.name not in ('id','agent_id' ,'excel_metadata')],
-                'errors': errors
-            })
-
-        # Guardar los datos válidos
-        for data in valid_data:
-            BdExcel.objects.create(excel_metadata=excel_metadata, **data)
-
-        # Limpiar los datos de la sesión
+        # Limpiar sesión
         request.session.pop('uploaded_data', None)
         request.session.pop('uploaded_headers', None)
         request.session.pop('metadata_id', None)
 
-        return render(request, 'addExcelsDB/success.html', {'message': 'Datos guardados exitosamente.'})
+        # 🚀 SIEMPRE vamos a success.html
+        return render(request, 'addExcelsDB/success.html', {
+            'message': f"Se guardaron {saved_count} registros correctamente.",
+            'errors': errors  # Lista con filas y errores para mostrar en la vista
+        })
+
     else:
         return redirect('addExcelsDB/uploadExcel')
 

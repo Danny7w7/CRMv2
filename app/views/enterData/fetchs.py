@@ -208,7 +208,7 @@ def fetchDependent(request, client_id):
             obamacare = None
             if 'ACA' in type_police:
                 # Buscar un plan ObamaCare para el cliente
-                obamacare = ObamaCare.objects.filter(client=client).first()
+                obamacare = ObamaCare.objects.filter(client=client, is_active = True).order_by('-created_at').first()
 
             # Crear o actualizar Dependent
             if dependent_id:
@@ -221,10 +221,14 @@ def fetchDependent(request, client_id):
                     'sex': dep_data.get('sexDependent'),
                     'kinship': dep_data.get('kinship'),
                     'type_police': type_police,
-                    'obamacare': obamacare
                 }.items():
                     setattr(dependent, attr, value)
                 dependent.save()
+
+                dependent.obamacare.clear()
+                if obamacare:
+                    dependent.obamacare.add(obamacare)
+
             else:
                 dependent = Dependents.objects.create(
                     client=client,
@@ -235,8 +239,10 @@ def fetchDependent(request, client_id):
                     sex=dep_data.get('sexDependent'),
                     kinship=dep_data.get('kinship'),
                     type_police=type_police,
-                    obamacare=obamacare
                 )
+
+                if obamacare:
+                    dependent.obamacare.add(obamacare)
 
             dependents_to_add.append(dependent)
             updated_dependents_ids.append(dependent.id)

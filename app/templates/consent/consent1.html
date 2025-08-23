@@ -199,9 +199,8 @@
                     <div class="bg-morado p-3 rounded">
                         <label class="form-label">{% blocktrans %}Aplicante (s) Adicional (es) (Nombre Completo, Fecha Nacimiento, Sexo, Status, Parentesco, Aplica){% endblocktrans %}</label>
                         <div class="mb-3">
-                            <textarea disabled class="form-control" name="applicants" id="inputApplicants" rows="5" >
-                                {% for dependent in dependents %}{{dependent.name}}, {{dependent.date_birth}}, {{dependent.sex}}, {{dependent.migration_status}}, {{dependent.kinship}}, {{dependent.apply}} {% endfor %}
-                            </textarea>
+                            <textarea disabled class="form-control" name="applicants" id="inputApplicants" rows="5" >{% for dependent in dependents %}{{dependent.name}}, {{dependent.date_birth}}, {{dependent.sex}}, {{dependent.migration_status}}, {{dependent.kinship}}, {{dependent.apply}}
+{% endfor %} </textarea>
                         </div>
                     </div>
                 </div>
@@ -294,16 +293,9 @@
                         <label class="form-label">{% trans "Agente Autorizado de Registro" %}<span class="text-danger">*</span></label>
                         <select name="agent_usa" id="selectAgent" class="form-select">
                             <option value="no_valid">Please Select</option>
-                            <option {% if obamacare.agent_usa == 'GINA PAOLA LAPEIRA - NPN 19944280' %}selected{% endif %} value="GINA PAOLA LAPEIRA - NPN 19944280">GINA PAOLA LAPEIRA - NPN 19944280</option>
-                            <option {% if obamacare.agent_usa == 'LUIS EDUARDO LAPEIRA - NPN 20556081' %}selected{% endif %} value="LUIS EDUARDO LAPEIRA - NPN 20556081">LUIS EDUARDO LAPEIRA - NPN 20556081</option>
-                            <option {% if obamacare.agent_usa == 'DANIEL SANTIAGO LAPEIRA ACEVEDO - NPN 19904958' %}selected{% endif %} value="DANIEL SANTIAGO LAPEIRA ACEVEDO - NPN 19904958">DANIEL SANTIAGO LAPEIRA ACEVEDO - NPN 19904958</option>
-                            <option {% if obamacare.agent_usa == 'ZOHIRA RAQUEL DUARTE AGUILAR - NPN 19582295' %}selected{% endif %} value="ZOHIRA RAQUEL DUARTE AGUILAR - NPN 19582295">ZOHIRA RAQUEL DUARTE AGUILAR - NPN 19582295</option>
-                            <option {% if obamacare.agent_usa == 'DANIESKA LOPEZ SEQUEIRA - NPN 20134539' %}selected{% endif %} value="DANIESKA LOPEZ SEQUEIRA - NPN 20134539">DANIESKA LOPEZ SEQUEIRA - NPN 20134539</option>
-                            <option {% if obamacare.agent_usa == 'VLADIMIR DE LA HOZ FONTALVO - NPN 19915005' %}selected{% endif %} value="VLADIMIR DE LA HOZ FONTALVO - NPN 19915005">VLADIMIR DE LA HOZ FONTALVO - NPN 19915005</option>
-                            <option {% if obamacare.agent_usa == 'FRANK JOSE LOPEZ SEQUEIRA - NPN 21226603' %}selected{% endif %} value="FRANK JOSE LOPEZ SEQUEIRA - NPN 21226603">FRANK JOSE LOPEZ SEQUEIRA - NPN 21226603</option>
-                            <option {% if obamacare.agent_usa == 'BORJA G CANTON HERRERA - NPN 20673324' %}selected{% endif %} value="BORJA G CANTON HERRERA - NPN 20673324">BORJA G CANTON HERRERA - NPN 20673324</option>
-                            <option {% if obamacare.agent_usa == 'RODRIGO G CANTON - NPN 20670005' %}selected{% endif %} value="RODRIGO G CANTON - NPN 20670005">RODRIGO G CANTON - NPN 20670005</option>
-                            <option {% if obamacare.agent_usa == 'EVELYN BEATRIZ HERRERA - NPN 20671818' %}selected{% endif %} value="EVELYN BEATRIZ HERRERA - NPN 20671818">EVELYN BEATRIZ HERRERA - NPN 20671818</option>
+                            {% for agentUsa in agentUsa %}
+                                <option {% if obamacare.agent_usa == agentUsa.name %}selected{% endif %} value="{{agentUsa.name}}">{{agentUsa.name}}</option>
+                            {% endfor %}
                         </select>
                         <small class="text-muted">{% trans "TELÉFONO" %}: 1.855.963.6900</small>
                     </div>

@@ -1,4 +1,5 @@
 # Django core libraries
+import datetime
 from django.shortcuts import get_object_or_404, redirect
  
 # Application-specific imports
@@ -11,9 +12,13 @@ def toggleObamaStatus(request, obamacare_id):
     # Cambiar el estado de is_active (True a False o viceversa)
     obama.is_active = not obama.is_active
     obama.save()  # Guardar los cambios en la base de datos
-    
-    # Redirigir de nuevo a la página actual con un parámetro de éxito
-    return redirect('clientObamacare')
+
+    fechaLimite =  datetime.datetime(2025, 10, 31, 23, 59, 59, tzinfo=timezone.get_current_timezone())
+
+    if obama.created_at > fechaLimite:
+        return redirect('clientObamacare')
+    else:
+        return redirect('clientObamacarePass')
 
 def toggleSuppStatus(request, supp_id):
     # Obtener el cliente por su ID

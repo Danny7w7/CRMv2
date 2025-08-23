@@ -3,6 +3,8 @@ import calendar
 import datetime
 import json
 from itertools import chain
+import re
+from datetime import datetime, date
 
 #libreria de paises
 import urllib.request
@@ -16,6 +18,7 @@ from collections import defaultdict
 # Django core libraries
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_http_methods
 
 # Application-specific imports
 from app.models import *
@@ -30,7 +33,12 @@ from ..consents import generateTemporaryToken, getCompanyPerAgent
 @login_required(login_url='/login') 
 def formEditClient(request, client_id):
     
-    client = get_object_or_404(Clients, id=client_id)        
+    client = get_object_or_404(Clients, id=client_id)     
+
+    if request.user.is_superuser:
+        agentUsa = USAgent.objects.all().prefetch_related("company")
+    else:
+        agentUsa = USAgent.objects.filter(company = request.user.company).prefetch_related("company")   
 
     if request.method == 'POST':
 
@@ -57,7 +65,8 @@ def formEditClient(request, client_id):
 
     context = {
         'form': form, 
-        'client': client
+        'client': client,
+        'agentUsa' : agentUsa
     }
 
     return render(request, 'edit/formEditClient.html', context)
@@ -92,6 +101,10 @@ def editClientMedicare(request, medicare_id):
     # Buscar el cliente
     medicare = get_object_or_404(Medicare.objects.select_related('agent'), id=medicare_id)
 
+    if request.user.is_superuser:
+        agentUsa = USAgent.objects.all().prefetch_related("company")
+    else:
+        agentUsa = USAgent.objects.filter(company = request.user.company).prefetch_related("company")
     
     social_number = medicare.social_security  # Campo real del modelo
     # Asegurarse de que social_number no sea None antes de formatear
@@ -163,8 +176,8 @@ def editClientMedicare(request, medicare_id):
         'consent': consent,
         'obsCustomer': obsCus,
         'list_drow': list_drow,
-        'old' : old
-
+        'old' : old,
+        'agentUsa' : agentUsa
     }
 
     return render(request, 'edit/editClientMedicare.html', context)
@@ -222,12 +235,17 @@ def editObama(request ,obamacare_id, way):
     company_id = request.user.company.id
 
     obamacare = ObamaCare.objects.select_related('agent', 'client').filter(id=obamacare_id).first()
-    dependents = Dependents.objects.select_related('obamacare').filter(obamacare=obamacare)
+    dependents = Dependents.objects.prefetch_related('obamacare').filter(obamacare=obamacare)
     letterCard = LettersCard.objects.filter(obamacare = obamacare_id).first()
     apppointment = AppointmentClient.objects.select_related('obamacare','agent_create').filter(obamacare = obamacare_id)
     userCarrier = UserCarrier.objects.filter(obamacare = obamacare_id).first()
     accionRequired = CustomerRedFlag.objects.filter(obamacare = obamacare)    
     paymentDateObama = PaymentDate.objects.filter(obamacare = obamacare).first()
+
+    if company_id == 1:
+        agentUsa = USAgent.objects.all().prefetch_related("company")
+    else:
+        agentUsa = USAgent.objects.filter(company = request.user.company).prefetch_related("company")
         
     if letterCard and letterCard.letters and letterCard.card: 
         newLetterCard = True
@@ -300,6 +318,23 @@ def editObama(request ,obamacare_id, way):
     smsTemplate = SmsTemplate.objects.select_related('contentTemplate').filter(obamacare = obamacare_id)
     smsTemplateAll = ContentTemplate.objects.filter(company = company_id)    
     temporalyURL = f"{request.build_absolute_uri('/viewConsent/')}{obamacare_id}?token={generateTemporaryToken(obamacare.client , 'obamacare')}&lenguaje={'es'}"
+
+    fechaLimite =  datetime.datetime(2025, 10, 31, 23, 59, 59, tzinfo=timezone.get_current_timezone())
+
+    
+    currentYear = datetime.datetime.now().year
+    currentDate = datetime.datetime.now().date()
+
+    if currentDate >= date(currentYear, 11, 1):
+        # Si ya estamos en nov o después, el próximo período es del año siguiente
+        startDate = date(currentYear + 1, 11, 1)
+        endDate = date(currentYear + 2, 10, 31)
+    else:
+        # Si estamos antes de nov, el próximo período comienza este año
+        startDate = date(currentYear, 11, 1)
+        endDate = date(currentYear + 1, 10, 31)
+
+    renovation = ObamaCare.objects.filter(is_active = True, company = request.user.company, client = obamacare.client, created_at__gte = startDate,  created_at__lte = endDate )
 
     if request.method == 'POST':
         action = request.POST.get('action')
@@ -458,7 +493,10 @@ def editObama(request ,obamacare_id, way):
                     dateCard = dateCard )
 
             if way == 1:
-                return redirect('clientObamacare')
+                if obamacare.created_at > fechaLimite:
+                    return redirect('clientObamacare')
+                else:
+                    return redirect('clientObamacarePass')
             else:
                 return redirect('clientAccionRequired')
 
@@ -481,7 +519,10 @@ def editObama(request ,obamacare_id, way):
                 )
             
             if way == 1:
-                return redirect('clientObamacare')
+                if obamacare.created_at > fechaLimite:
+                    return redirect('clientObamacare')
+                else:
+                    return redirect('clientObamacarePass')
             else:
                 return redirect('clientAccionRequired')      
         
@@ -536,6 +577,9 @@ def editObama(request ,obamacare_id, way):
         'smsTemplate': smsTemplate,
         'smsTemplateAll' : smsTemplateAll,
         'temporalyURL' : temporalyURL,
+        'fechaLimite' : fechaLimite,
+        'renovation' : renovation,
+        'agentUsa' : agentUsa,
         #SMS Blue
         'contact':contact,
         'chat':chat,
@@ -825,10 +869,14 @@ def editSupp(request, supp_id):
     else:
         contact = Contacts.objects.filter(phone_number=supp.client.phone_number, company_id=company_id).first()
 
-    chats = Chat.objects.filter(contact=contact)
-    messages = Messages.objects.filter(chat_id=chats[0].id)
-    secretKey = SecretKey.objects.filter(contact_id=contact.id).first()
-    chat = get_last_message_for_chats(chats)[0]
+    chat = Chat.objects.filter(contact=contact)
+    if chat:
+        messages = Messages.objects.filter(chat_id=chat[0].id)
+        secretKey = SecretKey.objects.filter(contact_id=contact.id).first()
+        chat = get_last_message_for_chats(chat)[0]
+    else:
+        messages = None
+        secretKey = None
 
 
     context = {
@@ -864,6 +912,11 @@ def editAssure(request, assure_id):
     list_drow = DropDownList.objects.filter(profiling_supp__isnull=False)
     paymentDateAssure = PaymentDate.objects.filter(assure = assure_id).first()
     users = Users.objects.filter(role='SUPP', company = company_id, is_active = True)
+
+    if request.user.is_superuser:
+        agentUsa = USAgent.objects.all().prefetch_related("company")
+    else:
+        agentUsa = USAgent.objects.filter(company = request.user.company).prefetch_related("company")
 
     # Obtener todos los dependientes asociados a este Supp
     dependents = DependentsAssure.objects.filter(client = assure_id)
@@ -1023,6 +1076,7 @@ def editAssure(request, assure_id):
         'old' : old,
         'paymentDateAssure' : paymentDateAssure,
         'users' : users,
+        'agentUsa' : agentUsa,
         #SMS Blue
         'contact':contact,
         'chat':chat,
@@ -1044,6 +1098,11 @@ def editLife(request, client_id):
     paymentDateLife = PaymentDate.objects.filter(life_insurance = client_id).first()
     list_drow = DropDownList.objects.filter(profiling_supp__isnull=False)
     consent = Consents.objects.filter(lifeInsurance = client_id )
+
+    if request.user.is_superuser:
+        agentUsa = USAgent.objects.all().prefetch_related("company")
+    else:
+        agentUsa = USAgent.objects.filter(company = request.user.company).prefetch_related("company")
 
     action = request.POST.get('action')
 
@@ -1183,6 +1242,7 @@ def editLife(request, client_id):
         'list_drow': list_drow,
         'old' : old,
         'paymentDateLife':paymentDateLife,
+        'agentUsa' : agentUsa,
         #SMS Blue
         'contact':contact,
         'chat':chat,
@@ -1383,6 +1443,212 @@ def editFinallExpenses(request, finallExpenses_id):
 
         return redirect('clientFinallExpenses')            
 
-
     return render(request, 'edit/editFinallExpenses.html', {'finalExpenses':finalExpenses})
     
+@require_http_methods(["POST"])
+def saveRenovation(request):
+
+    try:
+        
+        # Obtener datos originales
+        originalClientId = request.POST.get('originalClientId')
+        clientIstancia = Clients.objects.get(id=originalClientId)
+        
+        # DATOS DEL CLIENTE
+        clientData = {
+            'first_name': request.POST.get('first_name', '').strip(),
+            'last_name': request.POST.get('last_name', '').strip(),
+            'email': request.POST.get('email', '').strip(),
+            'address': request.POST.get('address', '').strip(),
+            'zipcode': request.POST.get('zipcode', '').strip(),
+            'city': request.POST.get('city', '').strip(),
+            'state': request.POST.get('state', '').strip(),
+            'county': request.POST.get('county', '').strip(),
+            'sex': request.POST.get('sex', '').strip(),
+            'migration_status': request.POST.get('migration_status', '').strip(),
+            'apply': request.POST.get('apply', '').strip(),
+            'agent_usa': request.POST.get('agent_usa', '').strip()
+        }
+        
+        # DATOS DEL PLAN OBAMACARE
+        obamacareData = {
+            'agent_usa_obamacare': request.POST.get('agent_usa_obamacare', '').strip(),
+            'taxes': request.POST.get('taxes', '').strip(),
+            'carrier': request.POST.get('carrier', '').strip(),
+            'work': request.POST.get('work', '').strip(),
+            'subsidy': request.POST.get('subsidy', '').strip(),
+            'doc_income': request.POST.get('doc_income', '').strip(),
+            'doc_migration': request.POST.get('doc_migration', '').strip(),
+            'plan_name': request.POST.get('plan_name', '').strip(),
+            'premium': request.POST.get('premium', '').strip(),
+            'observation': request.POST.get('observation', '').strip()
+        }
+        
+        # DATOS DE DEPENDIENTES
+        dependents_data = []
+        
+        # Buscar todos los campos que empiecen con 'renovation_dependent_'
+        dependent_fields = {}
+        for key, value in request.POST.items():
+            if key.startswith('renovation_dependent_'):
+                # Extraer el tipo de campo y el ID del dependiente
+                # Formato esperado: renovation_dependent_[campo]_[dependent_id]
+                parts = key.split('_')
+                if len(parts) >= 4:
+                    field_type = parts[2]  # name, apply, sex, etc.
+                    dependent_id = '_'.join(parts[3:])  # Puede ser un ID complejo
+                    
+                    if dependent_id not in dependent_fields:
+                        dependent_fields[dependent_id] = {}
+                    
+                    dependent_fields[dependent_id][field_type] = value.strip()
+        
+        # Procesar cada dependiente encontrado
+        for dependent_id, fields in dependent_fields.items():
+            dependent_info = {
+                'dependent_id': dependent_id,
+                'name': fields.get('name', ''),
+                'apply': fields.get('apply', ''),
+                'sex': fields.get('sex', ''),
+                'kinship': fields.get('kinship', ''),
+                'birth': fields.get('birth', ''),
+                'age': fields.get('age', ''),
+                'policy': fields.get('policy', ''),
+                'migration': fields.get('migration', ''),
+                'index': fields.get('index', ''),
+                'is_existing': 'id' in fields,  # Si tiene 'id' es un dependiente existente
+                'original_id': fields.get('id', '') if 'id' in fields else None
+            }
+            dependents_data.append(dependent_info)
+        
+        # VALIDACIONES BÁSICAS
+        validation_errors = []
+        
+        # Validar cliente
+        if not clientData['first_name']:
+            validation_errors.append('El nombre es requerido')
+        if not clientData['last_name']:
+            validation_errors.append('El apellido es requerido')
+        if not clientData['email']:
+            validation_errors.append('El email es requerido')
+        elif not re.match(r'^[^\s@]+@[^\s@]+\.[^\s@]+$', clientData['email']):
+            validation_errors.append('El formato del email no es válido')
+        
+        # Validar obamacare
+        if not obamacareData['plan_name']:
+            validation_errors.append('El nombre del plan es requerido')
+        if not obamacareData['premium']:
+            validation_errors.append('La prima es requerida')
+        
+        # Validar dependientes
+        for i, dependent in enumerate(dependents_data):
+            if dependent['name'] and not dependent['sex']:
+                validation_errors.append(f'El sexo del dependiente #{i+1} es requerido')
+            if dependent['name'] and not dependent['migration']:
+                validation_errors.append(f'El estatus migratorio del dependiente #{i+1} es requerido')
+        
+        if validation_errors:
+            return JsonResponse({
+                'success': False,
+                'errors': validation_errors,
+                'message': 'Por favor corrija los errores en el formulario'
+            }, status=400)
+        
+        #formateo de fecha para guardalar como se debe en BD ya que la obtengo USA
+        fecha_str = request.POST.get('date_birth')  # Formato MM/DD/YYYY
+        # Conversión solo si los valores no son nulos o vacíos
+        if fecha_str not in [None, '']:
+            dateNew = datetime.datetime.strptime(fecha_str, '%m/%d/%Y').date()
+        else:
+            dateNew = None
+
+        # Actualizar Client
+        Clients.objects.filter(id=originalClientId).update(
+            agent_usa=clientData['agent_usa'],
+            first_name=clientData['first_name'],
+            last_name=clientData['last_name'],
+            email=clientData['email'],
+            address=clientData['address'],
+            zipcode=clientData['zipcode'],
+            city=clientData['city'],
+            state=clientData['state'],
+            county=clientData['county'],
+            sex=clientData['sex'],
+            date_birth=dateNew,
+            apply=clientData['apply'],
+            migration_status=clientData['migration_status']
+        )        
+
+        fecha_deseada = datetime.datetime(2025, 11, 1, 16, 15, 2, 361874)
+        saveObama = ObamaCare.objects.create(
+            agent_usa=obamacareData['agent_usa_obamacare'],
+            taxes=obamacareData['taxes'],
+            carrier=obamacareData['carrier'],
+            work=obamacareData['work'],
+            subsidy=obamacareData['subsidy'],
+            doc_income=obamacareData['doc_income'],
+            doc_migration=obamacareData['doc_migration'],
+            plan_name=obamacareData['plan_name'],
+            premium=obamacareData['premium'],
+            observation=obamacareData['observation'],
+            profiling='PENDING',
+            status='IN PROGRESS',
+            status_color = 1,
+            agent = request.user,
+            client = clientIstancia,
+            is_active = True,
+            company = request.user.company            
+        )
+
+        #ESTO SE TENIE QUE BORRAR EL PRIMERO DE NOVIEMBRE
+        ObamaCare.objects.filter(id=saveObama.id).update(
+            created_at = fecha_deseada
+        )
+        
+        for dep in dependents_data:
+            # Validar datos antes de convertir
+            birthDate = dep['birth'] or None
+
+            if birthDate not in [None, '']:
+                dateNew = datetime.datetime.strptime(birthDate, '%m/%d/%Y').date()
+            else:
+                dateNew = None
+
+            existingDep = Dependents.objects.filter(
+                client=originalClientId,
+                name=dep['name'],
+                apply=dep['apply'],
+                sex=dep['sex'],
+                kinship=dep['kinship'],
+                date_birth=dateNew,
+                migration_status=dep['migration'],
+                type_police='ACA'
+            ).first()
+
+            if existingDep:
+                existingDep.obamacare.add(saveObama)  
+
+            else:
+                newDep = Dependents.objects.create(
+                    client_id=originalClientId,
+                    name=dep['name'],
+                    apply=dep['apply'],
+                    sex=dep['sex'],
+                    policyNumber=dep['policy'],
+                    kinship=dep['kinship'],
+                    date_birth=dateNew,
+                    migration_status=dep['migration'],
+                    type_police='ACA'
+                )
+                newDep.obamacare.add(saveObama)
+        
+        return redirect('editObama', saveObama.id ,1 )
+    
+    except Exception as e:
+        print(e)
+        return render(request, "auth/404.html", {"message": "Error al guardar, revisar formulario."})
+        
+
+
+
+

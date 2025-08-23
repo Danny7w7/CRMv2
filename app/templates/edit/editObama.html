@@ -153,6 +153,7 @@
 		<div class="col-xl-10 mx-auto">
 			<div class="card">
 				<div class="card-body p-4">
+
 					<form class="row g-3 needs-validation" method="POST">
 						<h4>Client</h4>						
 							<div class="col-12 col-lg-4">
@@ -258,16 +259,9 @@
 								{% else %}
 									<select class="form-select" id="agent_usa" aria-label="Default select example" name="agent_usa" required >
 										<option value="" disabled selected>Please Select</option>
-										<option {% if obamacare.client.agent_usa == "GINA PAOLA LAPEIRA - NPN 19944280" %}selected{% endif %} value="GINA PAOLA LAPEIRA - NPN 19944280">GINA PAOLA LAPEIRA - NPN 19944280</option>
-										<option {% if obamacare.client.agent_usa == "LUIS EDUARDO LAPEIRA - NPN 20556081" %}selected{% endif %} value="LUIS EDUARDO LAPEIRA - NPN 20556081">LUIS EDUARDO LAPEIRA - NPN 20556081</option>
-										<option {% if obamacare.client.agent_usa == "DANIEL SANTIAGO LAPEIRA ACEVEDO - NPN 19904958" %}selected{% endif %} value="DANIEL SANTIAGO LAPEIRA ACEVEDO - NPN 19904958">DANIEL SANTIAGO LAPEIRA ACEVEDO - NPN 19904958</option>
-										<option {% if obamacare.client.agent_usa == "ZOHIRA RAQUEL DUARTE AGUILAR - NPN 19582295" %}selected{% endif %} value="ZOHIRA RAQUEL DUARTE AGUILAR - NPN 19582295">ZOHIRA RAQUEL DUARTE AGUILAR - NPN 19582295</option>
-										<option {% if obamacare.client.agent_usa == "DANIESKA LOPEZ SEQUEIRA - NPN 20134539" %}selected{% endif %} value="DANIESKA LOPEZ SEQUEIRA - NPN 20134539">DANIESKA LOPEZ SEQUEIRA - NPN 20134539</option>
-										<option {% if obamacare.client.agent_usa == "VLADIMIR DE LA HOZ FONTALVO - NPN 19915005" %}selected{% endif %} value="VLADIMIR DE LA HOZ FONTALVO - NPN 19915005">VLADIMIR DE LA HOZ FONTALVO - NPN 19915005</option>
-										<option {% if obamacare.client.agent_usa == "FRANK JOSE LOPEZ SEQUEIRA - NPN 21226603" %}selected{% endif %} value="FRANK JOSE LOPEZ SEQUEIRA - NPN 21226603">FRANK JOSE LOPEZ SEQUEIRA - NPN 21226603</option>
-										<option {% if obamacare.client.agent_usa == "BORJA G CANTON HERRERA - NPN 20673324" %}selected{% endif %} >BORJA G CANTON HERRERA - NPN 20673324</option>
-										<option {% if obamacare.client.agent_usa == "RODRIGO G CANTON - NPN 20670005" %}selected{% endif %} value="RODRIGO G CANTON - NPN 20670005">RODRIGO G CANTON - NPN 20670005</option>
-										<option {% if obamacare.client.agent_usa == "EVELYN BEATRIZ HERRERA - NPN 20671818" %}selected{% endif %} value="EVELYN BEATRIZ HERRERA - NPN 20671818">EVELYN BEATRIZ HERRERA - NPN 20671818</option>
+										{% for agentUsa in agentUsa %}
+											<option {% if obamacare.client.agent_usa == agentUsa.name %}selected{% endif %}  value="{{agentUsa.name}}">{{agentUsa.name}}</option>
+										{% endfor %}
 									</select>
 
 								{% endif %}							
@@ -279,12 +273,12 @@
 							{% endif %}
 						
 						{% for dependent in dependents %}
-							<div class="col-12 col-lg-6">
+							<div class="col-12 col-lg-5">
 								<label class="form-label">Name of Dependent #{{ forloop.counter }}</label>
 								<input type="hidden" name="dependentId_{{ dependent.id }}" value="{{ dependent.id }}">
 								<input type="text" class="form-control" name="nameDependent_{{ dependent.id }}" value="{{ dependent.name }}" required >
 							</div>
-							<div class="col-12 col-lg-1">
+							<div class="col-12 col-lg-2">
 								<label class="form-label">Apply</label>
 								<select class="form-select" name="applyDependent_{{ dependent.id }}" required>
 									<option value="" disabled selected>Please Select</option>
@@ -351,16 +345,9 @@
 								{% else %}
 									<select class="form-select" id="agent_usa_obamacare"  aria-label="Default select example" name="agent_usa_obamacare">
 										<option value="no_valid">Please Select</option>
-										<option {% if obamacare.agent_usa == 'GINA PAOLA LAPEIRA - NPN 19944280' %}selected{% endif %} value="GINA PAOLA LAPEIRA - NPN 19944280">GINA PAOLA LAPEIRA - NPN 19944280</option>
-										<option {% if obamacare.agent_usa == 'LUIS EDUARDO LAPEIRA - NPN 20556081' %}selected{% endif %} value="LUIS EDUARDO LAPEIRA - NPN 20556081">LUIS EDUARDO LAPEIRA - NPN 20556081</option>
-										<option {% if obamacare.agent_usa == 'DANIEL SANTIAGO LAPEIRA ACEVEDO - NPN 19904958' %}selected{% endif %} value="DANIEL SANTIAGO LAPEIRA ACEVEDO - NPN 19904958">DANIEL SANTIAGO LAPEIRA ACEVEDO - NPN 19904958</option>
-										<option {% if obamacare.agent_usa == 'ZOHIRA RAQUEL DUARTE AGUILAR - NPN 19582295' %}selected{% endif %} value="ZOHIRA RAQUEL DUARTE AGUILAR - NPN 19582295">ZOHIRA RAQUEL DUARTE AGUILAR - NPN 19582295</option>
-										<option {% if obamacare.agent_usa == 'DANIESKA LOPEZ SEQUEIRA - NPN 20134539' %}selected{% endif %} value="DANIESKA LOPEZ SEQUEIRA - NPN 20134539">DANIESKA LOPEZ SEQUEIRA - NPN 20134539</option>
-										<option {% if obamacare.agent_usa == 'VLADIMIR DE LA HOZ FONTALVO - NPN 19915005' %}selected{% endif %} value="VLADIMIR DE LA HOZ FONTALVO - NPN 19915005">VLADIMIR DE LA HOZ FONTALVO - NPN 19915005</option>
-										<option {% if obamacare.agent_usa == 'FRANK JOSE LOPEZ SEQUEIRA - NPN 21226603' %}selected{% endif %} value="FRANK JOSE LOPEZ SEQUEIRA - NPN 21226603">FRANK JOSE LOPEZ SEQUEIRA - NPN 21226603</option>
-										<option {% if obamacare.agent_usa == 'BORJA G CANTON HERRERA - NPN 20673324' %}selected{% endif %} value="BORJA G CANTON HERRERA - NPN 20673324">BORJA G CANTON HERRERA - NPN 20673324</option>
-										<option {% if obamacare.agent_usa == 'RODRIGO G CANTON - NPN 20670005' %}selected{% endif %} value="RODRIGO G CANTON - NPN 20670005">RODRIGO G CANTON - NPN 20670005</option>
-										<option {% if obamacare.agent_usa == 'EVELYN BEATRIZ HERRERA - NPN 20671818' %}selected{% endif %} value="EVELYN BEATRIZ HERRERA - NPN 20671818">EVELYN BEATRIZ HERRERA - NPN 20671818</option>
+										{% for agentUsa in agentUsa %}
+											<option {% if obamacare.agent_usa == agentUsa.name %}selected{% endif %}  value="{{agentUsa.name}}">{{agentUsa.name}}</option>
+										{% endfor %}
 									</select>
 								{% endif %}
 							</div>
@@ -550,7 +537,11 @@
 									<button type="submit" name="action" value="save_obamacare" id="enviar" class="btn btn-primary px-4"  >Submit</button>
 									<button type="submit" name="action" id="enviar2" value="save_observation_agent" class="btn btn-primary px-4" style="display: none;">Submits</button>
 									{% if way == 1 %}
-										<a href="{% url 'clientObamacare' %}" class="btn btn-light px-4">Back</a>								
+										{% if obamacare.created_at > fechaLimite %}
+											<a href="{% url 'clientObamacare' %}" class="btn btn-light px-4">Backssss</a>
+										{% else %}	
+											<a href="{% url 'clientObamacarePass' %}" class="btn btn-light px-4">Back</a>								
+										{% endif %}
 									{% elif way == 2 %}
 										<a href="{% url 'clientAccionRequired' %}" class="btn btn-light px-4">Back</a>
 									{% endif %}
@@ -563,6 +554,7 @@
 							</div>
 						{% csrf_token %}	
 					</form>
+					
 					<hr>
 
 					<div id="password-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
@@ -616,11 +608,21 @@
 								See Observations
 							</button>
 							{% if accionRequired %}
-								<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalAccionRequired">
+								<button type="button" class="btn btn-danger me-2" data-bs-toggle="modal" data-bs-target="#modalAccionRequired">
 									See Accion Required
 								</button>
 							{% endif %}
-							
+
+							{% comment %} {% if renovation %}
+								<p class="text-success fw-bold">Ya esta renovado</p>
+							{% else %}
+								{% if obamacare.created_at < fechaLimite %}
+								<!-- Botón para abrir el modal -->
+								<a class="btn btn-success px-4" data-bs-toggle="modal" data-bs-target="#renovationModal">Renovations</a>	
+									
+								{% endif %}		
+							{% endif %} {% endcomment %}
+
 						</div>
 
 						<!-- Modal de selección inicial -->
@@ -1434,6 +1436,238 @@
 							</div>
 						</div>
 
+						<!-- Modal de Renovación -->
+						<div class="modal fade" id="renovationModal" tabindex="-1" aria-labelledby="renovationModalLabel" aria-hidden="true">
+							<div class="modal-dialog modal-xl modal-dialog-scrollable">
+								<div class="modal-content">
+									
+									<div class="modal-header bg-success text-white">
+										<h5 class="modal-title" id="renovationModalLabel">
+											<i class="bi bi-arrow-repeat me-2"></i>Renovación de Cliente
+										</h5>
+										<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									
+									<div class="modal-body">
+										<!-- Formulario de Renovación -->
+										<form class="row g-3 needs-validation" method="POST" action="{% url 'saveRenovation' %}" id="renovationForm">
+											{% csrf_token %}
+											
+											<!-- Campo oculto para identificar que es una renovación -->
+											<input type="hidden" name="originalClientId" value="{{obamacare.client.id}}">
+											<input type="hidden" name="passObamacareId" value="{{obamacare.id}}">
+											
+											<h4 class="text-success border-bottom pb-2">Cliente</h4>
+											
+											<div class="col-12 col-lg-4">
+												<label for="renovation_first_name" class="form-label">First Name</label>
+												<input type="text" class="form-control" name="first_name" id="renovation_first_name" placeholder="First Name" value="{{obamacare.client.first_name}}" required>
+											</div>
+											<div class="col-12 col-lg-4">
+												<label for="renovation_last_name" class="form-label">Last Name</label>
+												<input type="text" class="form-control" name="last_name" id="renovation_last_name" placeholder="Last Name" value="{{obamacare.client.last_name}}" required>
+											</div>
+											<div class="col-12 col-lg-4">
+												<label for="renovation_phone_number" class="form-label">Phone Number</label>
+												<input type="number" class="form-control" name="phone_number" id="renovation_phone_number" placeholder="Phone Number" value="{{obamacare.client.phone_number}}" required>
+											</div>
+											
+											<div class="col-12 col-lg-3">
+												<label for="renovation_email" class="form-label">E-mail Address</label>
+												<input type="email" class="form-control" name="email" id="renovation_email" placeholder="Enter Email Address" value="{{obamacare.client.email}}" required>
+											</div>
+											<div class="col-12 col-lg-3">
+												<label for="renovation_address" class="form-label">Address</label>
+												<input type="text" class="form-control" name="address" id="renovation_address" placeholder="Address" value="{{obamacare.client.address}}" required>
+											</div>
+											<div class="col-12 col-lg-2">
+												<label for="renovation_zipcode" class="form-label">Zip Code</label>
+												<input type="text" maxlength="5" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="form-control" name="zipcode" id="renovation_zipcode" value="{{obamacare.client.zipcode}}" required>
+											</div>
+											<div class="col-12 col-lg-2">
+												<label for="renovation_city" class="form-label">City</label>
+												<input type="text" class="form-control" name="city" id="renovation_city" value="{{obamacare.client.city}}" required>
+											</div>
+											<div class="col-12 col-lg-2">
+												<label for="renovation_state" class="form-label font-weight-bold">State</label>
+												<input type="text" class="form-control" name="state" id="renovation_state" value="{{obamacare.client.state}}" required>
+											</div>
+											
+											<div class="col-12 col-lg-3">
+												<label for="renovation_county" class="form-label">County</label>
+												<input type="text" class="form-control" name="county" id="renovation_county" value="{{obamacare.client.county}}" required>
+											</div>
+											<div class="col-12 col-lg-2">
+												<label for="renovation_sex" class="form-label">Sex</label>
+												<select class="form-select" name="sex" id="renovation_sex" required>
+													<option value="" disabled>Please Select</option>
+													<option value="M" {% if obamacare.client.sex == "M" %}selected{% endif %}>MALE</option>
+													<option value="F" {% if obamacare.client.sex == "F" %}selected{% endif %}>FEMALE</option>
+												</select>
+											</div>
+											<div class="col-12 col-lg-2">
+												<label for="renovation_old" class="form-label">Age</label>
+												<input type="number" class="form-control" name="old" id="renovation_old" placeholder="Age" value="{{old}}" readonly>
+											</div>
+
+											<div class="col-12 col-lg-3">
+												<label for="renovation_date_birth" class="form-label">Date Birth</label>
+												<input type="text" class="form-control flatpickr-date" name="date_birth" id="renovation_date_birth" value="{{ obamacare.client.date_birth|date:'m/d/Y' }}" required>
+											</div>
+
+											<div class="col-12 col-lg-2">
+												<label for="renovation_apply" class="form-label">Apply</label>
+												<select class="form-select" id="renovation_apply" name="apply" required>
+													<option value="" disabled>Please Select</option>
+													<option value="True" {% if obamacare.client.apply %}selected{% endif %}>SI</option>
+													<option value="False" {% if not obamacare.client.apply %}selected{% endif %}>NO</option>
+												</select>
+											</div>
+											
+											<div class="col-12 col-lg-6">
+												<label for="renovation_migration_status" class="form-label">Migration Status</label>
+												<select class="form-select" id="renovation_migration_status" name="migration_status" required>
+													<option value="" disabled>Please Select</option>
+													<option value="EMPLOYMENT AUTHORIZATION" {% if obamacare.client.migration_status == "EMPLOYMENT AUTHORIZATION" %}selected{% endif %}>Employment Authorization</option>
+													<option value="NOTICE OF ACTION" {% if obamacare.client.migration_status == "NOTICE OF ACTION" %}selected{% endif %}>Notice of Action (i-797)</option>
+													<option value="REFUGEE" {% if obamacare.client.migration_status == "REFUGEE" %}selected{% endif %}>Refugee</option>
+													<option value="ASYLUM" {% if obamacare.client.migration_status == "ASYLUM" %}selected{% endif %}>Asylum</option>
+													<option value="TPS" {% if obamacare.client.migration_status == "TPS" %}selected{% endif %}>Temporary Protection Status (TPS)</option>
+													<option value="DOMESTIC VIOLENCE" {% if obamacare.client.migration_status == "DOMESTIC VIOLENCE" %}selected{% endif %}>Domestic Violence</option>
+													<option value="PERMANENT RESIDENT" {% if obamacare.client.migration_status == "PERMANENT RESIDENT" %}selected{% endif %}>Permanent Resident (Green Card)</option>
+													<option value="CONDITIONAL RESIDENT" {% if obamacare.client.migration_status == "CONDITIONAL RESIDENT" %}selected{% endif %}>Conditional Resident</option>
+													<option value="PAROLE" {% if obamacare.client.migration_status == "PAROLE" %}selected{% endif %}>Parole</option>
+													<option value="US CITIZEN" {% if obamacare.client.migration_status == "US CITIZEN" %}selected{% endif %}>US Citizen (Driver's License)</option>
+													<option value="STUDENT VISA" {% if obamacare.client.migration_status == "STUDENT VISA" %}selected{% endif %}>Student Visa (I-20)</option>
+													<option value="CURRENTLY IN PROCESS" {% if obamacare.client.migration_status == "CURRENTLY IN PROCESS" %}selected{% endif %}>Currently In Process</option>
+												</select>
+											</div>
+											
+											
+											<div class="col-12 col-lg-6">
+												<label for="renovation_agent_usa" class="form-label font-weight-bold">Agente USA</label>
+												<select class="form-select" id="renovation_agent_usa" name="agent_usa" required>
+													<option value="" disabled>Please Select</option>
+													{% for agentUsa in agentUsa %}
+														<option {% if obamacare.client.agent_usa == agentUsa.name %}selected{% endif %} value="{{agentUsa.name}}">{{agentUsa.name}}</option>
+													{% endfor %}
+												</select>
+											</div>
+
+											<!-- Sección de Dependientes (si existen) -->
+											<div id="renovationDependents">
+												<!-- Aquí se cargarán los dependientes dinámicamente -->
+											</div>
+
+											<hr>
+											<h4 class="text-success border-bottom pb-2">Plan de Renovación</h4>
+											
+											<div class="col-12 col-lg-6">
+												<label for="renovation_agent_usa_obamacare" class="form-label font-weight-bold">Agente USA Plan</label>
+												<select class="form-select" id="renovation_agent_usa_obamacare" name="agent_usa_obamacare" required>
+													<option value="">Please Select</option>
+													{% for agentUsa in agentUsa %}
+														<option {% if obamacare.agent_usa == agentUsa.name %}selected{% endif %} value="{{agentUsa.name}}">{{agentUsa.name}}</option>
+													{% endfor %}
+												</select>
+											</div>
+											
+											<div class="col-12 col-lg-2">
+												<label for="renovation_taxes" class="form-label">Taxes</label>
+												<input type="number" class="form-control" id="renovation_taxes" name="taxes" value="{{ obamacare.taxes }}" required>
+											</div>
+											
+											<div class="col-12 col-lg-4">
+												<label for="renovation_carrier" class="form-label">Carrier</label>
+												<select class="form-select" id="renovation_carrier" name="carrier" required>
+													<option value="" disabled>Please Select</option>
+													<option value="AETNA" {% if obamacare.carrier == "AETNA" %}selected{% endif %}>AETNA</option>
+													<option value="AMBETTER" {% if obamacare.carrier == "AMBETTER" %}selected{% endif %}>AMBETTER</option>
+													<option value="ANTHEM" {% if obamacare.carrier == "ANTHEM" %}selected{% endif %}>ANTHEM</option>
+													<option value="AVMED" {% if obamacare.carrier == "AVMED" %}selected{% endif %}>AVMED</option>
+													<option value="BLUE CROSS" {% if obamacare.carrier == "BLUE CROSS" %}selected{% endif %}>BLUE CROSS</option>
+													<option value="BRIGHT" {% if obamacare.carrier == "BRIGHT" %}selected{% endif %}>BRIGHT</option>
+													<option value="CARE SOURCE" {% if obamacare.carrier == "CARE SOURCE" %}selected{% endif %}>CARE SOURCE</option>
+													<option value="CIGNA" {% if obamacare.carrier == "CIGNA" %}selected{% endif %}>CIGNA</option>
+													<option value="FLORIDA BLUE" {% if obamacare.carrier == "FLORIDA BLUE" %}selected{% endif %}>FLORIDA BLUE</option>
+													<option value="FRIDAY" {% if obamacare.carrier == "FRIDAY" %}selected{% endif %}>FRIDAY</option>
+													<option value="MEDICA" {% if obamacare.carrier == "MEDICA" %}selected{% endif %}>MEDICA</option>
+													<option value="MOLINA" {% if obamacare.carrier == "MOLINA" %}selected{% endif %}>MOLINA</option>
+													<option value="OSCAR" {% if obamacare.carrier == "OSCAR" %}selected{% endif %}>OSCAR</option>
+													<option value="UNITED" {% if obamacare.carrier == "UNITED" %}selected{% endif %}>UNITED</option>
+													<option value="CHRISTUS HEALTH" {% if obamacare.carrier == "CHRISTUS HEALTH" %}selected{% endif %}>CHRISTUS HEALTH</option>
+													<option value="US HEALTH AND LIFE" {% if obamacare.carrier == "US HEALTH AND LIFE" %}selected{% endif %}>US HEALTH AND LIFE</option>
+													<option value="MODA" {% if obamacare.carrier == "MODA" %}selected{% endif %}>MODA</option>
+													<option value="PROVIDENCE" {% if obamacare.carrier == "PROVIDENCE" %}selected{% endif %}>PROVIDENCE</option>
+													<option value="AERIHEALTH CARITAS" {% if obamacare.carrier == "AERIHEALTH CARITAS" %}selected{% endif %}>AERIHEALTH CARITAS</option>
+													<option value="HEALTH FRIST" {% if obamacare.carrier == "HEALTH FRIST" %}selected{% endif %}>HEALTH FRIST</option>
+													<option value="WELLPOINT" {% if obamacare.carrier == "WELLPOINT" %}selected{% endif %}>WELLPOINT</option>
+												</select>
+											</div>
+											
+											<div class="col-12 col-lg-2">
+												<label for="renovation_work" class="form-label font-weight-bold">Work</label>
+												<select class="form-select" id="renovation_work" name="work" required>
+													<option value="" disabled>Please Select</option>
+													<option value="W2" {% if obamacare.work == "W2" %}selected{% endif %}>W2</option>
+													<option value="1099" {% if obamacare.work == "1099" %}selected{% endif %}>1099</option>
+												</select>
+											</div>
+											
+											<div class="col-12 col-lg-2">
+												<label for="renovation_subsidy" class="form-label">Subsidy</label>
+												<input type="number" step="0.01" class="form-control" id="renovation_subsidy" name="subsidy" value="{{ obamacare.subsidy }}">
+											</div>
+																							
+											<div class="col-12 col-lg-2">
+												<label for="renovation_doc_income" class="form-label">Income Doc</label>
+												<select class="form-select" id="renovation_doc_income" name="doc_income" required>
+													<option value="" disabled>Please Select</option>
+													<option value="True" {% if obamacare.doc_income %}selected{% endif %}>YES</option>
+													<option value="False" {% if not obamacare.doc_income %}selected{% endif %}>NO</option>
+												</select>
+											</div>
+											
+											<div class="col-12 col-lg-2">
+												<label for="renovation_doc_migration" class="form-label">Immigration Doc</label>
+												<select class="form-select" id="renovation_doc_migration" name="doc_migration" required>
+													<option value="" disabled>Please Select</option>
+													<option value="True" {% if obamacare.doc_migration %}selected{% endif %}>YES</option>
+													<option value="False" {% if not obamacare.doc_migration %}selected{% endif %}>NO</option>
+												</select>
+											</div>
+											
+											<div class="col-12 col-lg-4">
+												<label for="renovation_plan_name" class="form-label">Plan Name</label>
+												<input type="text" class="form-control" id="renovation_plan_name" name="plan_name" value="{{ obamacare.plan_name }}" required>
+											</div>
+											
+											<div class="col-12 col-lg-3">
+												<label for="renovation_premium" class="form-label">Premium</label>
+												<input type="number" step="0.01" class="form-control" id="renovation_premium" name="premium" value="{{ obamacare.premium }}" required>
+											</div>												
+											
+											<div class="col-12">
+												<label for="renovation_observation" class="form-label">Observation</label>
+												<textarea class="form-control" id="renovation_observation" name="observation" rows="3" style="resize: none" placeholder="Observaciones para la renovación..."></textarea>
+											</div>
+											
+										</form>
+									</div>
+									
+									<div class="modal-footer bg-light">
+										<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+											<i class="bi bi-x-circle me-2"></i>Cancelar
+										</button>
+										<button type="submit" form="renovationForm" class="btn btn-success">
+											<i class="bi bi-check-circle me-2"></i>Guardar Renovación
+										</button>
+									</div>
+
+								</div>
+							</div>
+						</div>
+
 						<div id="missingDocuments" style="display: none;">
 							{% if not letterCard.letters %} <p style="line-height: 0.6;">❌ <b>Letters</b></p> {% endif %}
 							{% if not letterCard.card %} <p style="line-height: 0.6;">❌ <b>Card</b></p> {% endif %}
@@ -1580,6 +1814,8 @@
 	<script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.min.js"></script>
 
 	<script src="{% static 'assets/js/validations/saveDocumentObama.js' %}"></script>
+	<script src="{% static "assets/js/validations/duplicidadClient.js" %}"></script>
+	<script src="{% static "assets/js/alerts/renovations.js" %}"></script>
 
 	<!-- Scripts SMS's -->
 	<script>
@@ -1597,6 +1833,35 @@
 	{% comment %} Swalert para avisar cuando se envio el SMS template {% endcomment %}
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script src="{% static 'assets/js/modals/confirmationSMSAutomatic.js' %}"></script>
+	
+	<script src="{% static 'assets/js/modals/modalRenovations.js' %}"></script>
+	
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			const existingDependents = [
+				{% for dependent in dependents %}
+				{
+					id: '{{ dependent.id }}',
+					name: '{{ dependent.name }}',
+					apply: '{{ dependent.apply }}',
+					sex: '{{ dependent.sex }}',
+					kinship: '{{ dependent.kinship }}',
+					date_birth: '{{ dependent.date_birth|date:"m/d/Y" }}', // ← Cambiado aquí
+					policy_number: '{{ dependent.policyNumber|default_if_none:"" }}',
+					migration_status: '{{ dependent.migration_status }}'
+				}{% if not forloop.last %},{% endif %}
+				{% endfor %}
+			];
+			
+			$('#renovationModal').on('shown.bs.modal', function() {
+				setTimeout(() => {
+					if (existingDependents.length > 0) {
+						loadExistingDependents(existingDependents);
+					}
+				}, 100);
+			});
+		});
+	</script>
 
 	{% if temporalyURL %}
 		<script>

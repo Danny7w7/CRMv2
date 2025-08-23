@@ -1,8 +1,10 @@
 # Django core libraries
 from django.contrib.auth.decorators import login_required
-from django.db.models import Subquery, OuterRef, Exists
+from django.db.models import Subquery, OuterRef
 from django.db.models.functions import Substr
 from django.shortcuts import render
+from datetime import datetime, date
+import json
 
 # Application-specific imports
 from app.models import *
@@ -10,10 +12,13 @@ from ..decoratorsCompany import *
 
 @login_required(login_url='/login')
 @company_ownership_required_sinURL
-def clientObamacare(request):
+def clientObamacarePass(request):
 
     company_id = request.company_id  # Obtener company_id desde request
 
+    fechaLimite =  datetime(2025, 10, 31, 23, 59, 59, tzinfo=timezone.get_current_timezone())
+
+    #Excluir los que tenga observaciones malas de customer
     # Rango de fechas del mes actual
     now = timezone.now()
     start_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
@@ -28,21 +33,75 @@ def clientObamacare(request):
 
     if request.user.is_superuser:
 
-        obamaCare = ObamaCare.objects.select_related('agent','client').annotate(
+        obamaCare = ObamaCare.objects.select_related('agent','client').filter(created_at__lte=fechaLimite).annotate(
             truncated_agent_usa=Substr('agent_usa', 1, 8),
             has_observation=Subquery(obs.values('typification')[:1])).exclude(
                 id__in=CustomerRedFlag.objects.filter(date_completed__isnull=True).values_list(
                     'obamacare_id', flat=True)).order_by('-created_at')           
 
     elif request.user.role == 'Admin':         
-        obamaCare = ObamaCare.objects.visible_for_user(request.user).select_related('agent','client').only(
+        obamaCare = ObamaCare.objects.visible_for_user(request.user).select_related('agent','client').filter(created_at__lte=fechaLimite).only(
             'agent_usa', 'agent__first_name', 'agent__last_name', 'client__first_name', 'client__last_name',
                 'client__phone_number', 'status', 'status_color', 'profiling','created_at', 'is_active').annotate(
                     has_observation=Subquery(obs.values('typification')[:1])
                         ).exclude(id__in=CustomerRedFlag.objects.filter(date_completed__isnull=True).values_list(
                             'obamacare_id', flat=True)).order_by('-created_at')    
     else:
-        obamaCare = ObamaCare.objects.select_related('agent', 'client').only(
+        obamaCare = ObamaCare.objects.select_related('agent', 'client').filter(created_at__lte=fechaLimite).only(
+            'agent_usa', 'agent__first_name', 'agent__last_name', 'client__first_name', 'client__last_name',
+                'client__phone_number', 'status', 'status_color', 'profiling','created_at', 'is_active').annotate(
+                    truncated_agent_usa=Substr('agent_usa', 1, 8),
+                    has_observation=Subquery(obs.values('typification')[:1])).filter(is_active = True, company = company_id).exclude(
+                        id__in=CustomerRedFlag.objects.filter(date_completed__isnull=True).values_list(
+                            'obamacare_id', flat=True)).order_by('-created_at')  
+        
+    context = {
+        'obamacares': obamaCare,
+        'company_id' : company_id
+    }    
+
+    return render(request, 'informationClient/clientObamacare.html', context)
+
+@login_required(login_url='/login')
+@company_ownership_required_sinURL
+def clientObamacare(request):
+
+    company_id = request.company_id  # Obtener company_id desde request
+
+    # Rango de fechas límite (zonas horarias incluidas)
+    startDate_dt = datetime(2025, 11, 1, 0, 0, 0, tzinfo=timezone.get_current_timezone())
+    endDate_dt   = datetime(2026, 10, 31, 23, 59, 59, tzinfo=timezone.get_current_timezone())
+
+    #Excluir los que tenga observaciones malas de customer
+    # Rango de fechas del mes actual
+    now = timezone.now()
+    start_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    end_month = (start_month + timezone.timedelta(days=32)).replace(day=1)
+
+    obs = ObservationCustomer.objects.filter(
+        obamacare=OuterRef('pk'),
+        is_active=True,
+        created_at__gte=start_month,
+        created_at__lt=end_month
+    )
+
+    if request.user.is_superuser:
+
+        obamaCare = ObamaCare.objects.select_related('agent','client').filter(created_at__range=(startDate_dt, endDate_dt)).annotate(
+            truncated_agent_usa=Substr('agent_usa', 1, 8),
+            has_observation=Subquery(obs.values('typification')[:1])).exclude(
+                id__in=CustomerRedFlag.objects.filter(date_completed__isnull=True).values_list(
+                    'obamacare_id', flat=True)).order_by('-created_at')           
+
+    elif request.user.role == 'Admin':         
+        obamaCare = ObamaCare.objects.visible_for_user(request.user).select_related('agent','client').filter(created_at__range=(startDate_dt, endDate_dt)).only(
+            'agent_usa', 'agent__first_name', 'agent__last_name', 'client__first_name', 'client__last_name',
+                'client__phone_number', 'status', 'status_color', 'profiling','created_at', 'is_active').annotate(
+                    has_observation=Subquery(obs.values('typification')[:1])
+                        ).exclude(id__in=CustomerRedFlag.objects.filter(date_completed__isnull=True).values_list(
+                            'obamacare_id', flat=True)).order_by('-created_at')    
+    else:
+        obamaCare = ObamaCare.objects.select_related('agent', 'client').filter(created_at__range=(startDate_dt, endDate_dt)).only(
             'agent_usa', 'agent__first_name', 'agent__last_name', 'client__first_name', 'client__last_name',
                 'client__phone_number', 'status', 'status_color', 'profiling','created_at', 'is_active').annotate(
                     truncated_agent_usa=Substr('agent_usa', 1, 8),
@@ -153,24 +212,84 @@ def clientMedicare(request):
 @login_required(login_url='/login')   
 @company_ownership_required_sinURL 
 def tableAlert(request):
-
-    roleAuditar = ['S', 'C',  'AU']
+    
+    roleAuditar = ['S', 'C', 'AU']
     company_id = request.company_id
 
     if request.user.is_superuser:
-        alert = ClientAlert.objects.select_related('agent').annotate(
+        alert = ClientAlert.objects.select_related('agent', 'company').annotate(
             truncated_contect=Substr('content', 1, 20))    
     elif request.user.role in roleAuditar:
-        alert = ClientAlert.objects.select_related('agent').annotate(
-            truncated_contect=Substr('content', 1, 20)).filter(is_active = True, company = company_id)
+        alert = ClientAlert.objects.select_related('agent', 'company').annotate(
+            truncated_contect=Substr('content', 1, 20)).filter(is_active=True, company=company_id)
     elif request.user.role == 'Admin':
-        alert = ClientAlert.objects.select_related('agent').annotate(
-            truncated_contect=Substr('content', 1, 20)).filter(company = company_id)
+        alert = ClientAlert.objects.select_related('agent', 'company').annotate(
+            truncated_contect=Substr('content', 1, 20)).filter(company=company_id)
     elif request.user.role == 'A':
-        alert = ClientAlert.objects.select_related('agent').annotate(
-            truncated_contect=Substr('content', 1, 20)).filter(agent = request.user.id, is_active = True, company = company_id)
+        alert = ClientAlert.objects.select_related('agent', 'company').annotate(
+            truncated_contect=Substr('content', 1, 20)).filter(agent=request.user.id, is_active=True, company=company_id)
     
-    return render(request, 'informationClient/alert.html', {'alertC':alert})
+    # Convertir alertas a formato de eventos para FullCalendar
+    events = []
+    for alertClient in alert:
+        # Combinar fecha y hora si ambos campos existen
+        if hasattr(alertClient, 'time') and alertClient.time:           
+            
+            # Verificar si datetime es un objeto datetime o date
+            if isinstance(alertClient.datetime, datetime):
+                alert_date = alertClient.datetime.date()
+            elif isinstance(alertClient.datetime, date):
+                alert_date = alertClient.datetime
+            else:
+                # Fallback: intentar convertir a date
+                alert_date = alertClient.datetime
+                
+            alert_time = alertClient.time
+            combined_datetime = datetime.combine(alert_date, alert_time)
+            start_time = combined_datetime.isoformat()
+        else:
+            # Usar solo el datetime original
+            if hasattr(alertClient.datetime, 'isoformat'):
+                start_time = alertClient.datetime.isoformat()
+            else:               
+                if isinstance(alertClient.datetime, date):
+                    start_time = datetime.combine(alertClient.datetime, datetime.min.time()).isoformat()
+                else:
+                    start_time = str(alertClient.datetime)
+            
+        event = {
+            'id': alertClient.id,
+            'title': f"{alertClient.name_client} - {alertClient.truncated_contect}",
+            'start': start_time,
+            'description': f"Agent: {alertClient.agent.first_name} {alertClient.agent.last_name}",
+            'extendedProps': {
+                'agent_name': f"{alertClient.agent.first_name} {alertClient.agent.last_name}",
+                'client_name': alertClient.name_client,
+                'content': alertClient.content,
+                'is_active': alertClient.is_active,
+                'company_name': alertClient.company.company_name if hasattr(alertClient, 'company') else '',
+                'time': alertClient.time.strftime('%H:%M') if hasattr(alertClient, 'time') and alertClient.time else '',
+                'datetime': alertClient.datetime.strftime('%Y-%m-%d %H:%M') if hasattr(alertClient.datetime, 'strftime') else str(alertClient.datetime),
+                'edit_url': f"/editAlert/{alertClient.id}/",  # Ajusta según tu URL
+                'toggle_url': f"/toggleAlert/{alertClient.id}/"  # Ajusta según tu URL
+            }
+        }
+        
+        # Agregar color basado en el estado
+        if hasattr(alertClient, 'is_active'):
+            event['backgroundColor'] = '#28a745' if alertClient.is_active else '#dc3545'
+            event['borderColor'] = '#28a745' if alertClient.is_active else '#dc3545'
+        
+        events.append(event)
+    
+    context = {
+        'alertC': alert,
+        'events_json': json.dumps(events),
+        'user_role': request.user.role,
+        'is_superuser': request.user.is_superuser
+    }
+    
+    return render(request, 'informationClient/alert.html', context)
 
 @login_required(login_url='/login')   
 @company_ownership_required_sinURL 

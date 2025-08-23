@@ -72,6 +72,11 @@ def consent(request, obamacare_id):
     obamacare = ObamaCare.objects.select_related('client', 'agent').get(id=obamacare_id)
     temporalyURL = None
 
+    if request.user.is_superuser:
+        agentUsa = USAgent.objects.all().prefetch_related("company")
+    else:
+        agentUsa = USAgent.objects.filter(company = request.user.company).prefetch_related("company")
+
     typeToken = 'obamacare'
    
     language = request.GET.get('lenguaje', 'es')  # Idioma predeterminado si no se pasa
@@ -134,8 +139,10 @@ def consent(request, obamacare_id):
         'contact':contact,
         'company':getCompanyPerAgent(obamacare.agent_usa),
         'temporalyURL': temporalyURL,
-        'supps': supps
+        'supps': supps,
+        'agentUsa' : agentUsa
     }
+
     return render(request, 'consent/consent1.html', context)
 
 def complaint(request, obamacare_id,validationUniq):

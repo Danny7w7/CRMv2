@@ -343,7 +343,7 @@ class ObamaCare(models.Model):
 
 class Dependents(models.Model):  
     client = models.ForeignKey(Clients, on_delete=models.CASCADE)
-    obamacares = models.ManyToManyField( 'ObamaCare', related_name='dependents_many')
+    obamacare = models.ManyToManyField( 'ObamaCare', related_name='dependents_many')
     name = models.CharField(max_length=200)
     apply = models.CharField(max_length=200)
     sex = models.CharField(max_length=1)

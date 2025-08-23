@@ -57,12 +57,15 @@ def formCreateClient(request):
 
     if company_id == 1:
         companies = Companies.objects.filter(is_active = True)
+        agentUsa = USAgent.objects.all().prefetch_related("company")
     else:
         companies = None
+        agentUsa = USAgent.objects.filter(company = request.user.company).prefetch_related("company")
 
     context = {
         'user' : user,
-        'companies' : companies
+        'companies' : companies,
+        'agentUsa' : agentUsa
     }
 
     if request.method == 'POST':
@@ -230,6 +233,11 @@ def formCreateClientLife(request):
 
     user = Users.objects.select_related('company').filter(company = company_id).first()
 
+    if request.user.is_superuser:
+        agentUsa = USAgent.objects.all().prefetch_related("company")
+    else:
+        agentUsa = USAgent.objects.filter(company = request.user.company).prefetch_related("company")
+
     if company_id == 1:
         companies = Companies.objects.filter(is_active = True)
     else:
@@ -238,7 +246,8 @@ def formCreateClientLife(request):
     context = {
         'user' : user,
         'companies' : companies,
-        'show_modal': False
+        'show_modal': False,
+        'agentUsa' : agentUsa
     }
 
     if request.method == 'POST':
@@ -306,6 +315,11 @@ def formCreateClientMedicare(request):
     company_id = request.company_id  # Obtener company_id desde request
     user = Users.objects.select_related('company').filter(company = company_id).first()
 
+    if request.user.is_superuser:
+        agentUsa = USAgent.objects.all().prefetch_related("company")
+    else:
+        agentUsa = USAgent.objects.filter(company = request.user.company).prefetch_related("company")
+
     if company_id == 1:
         company = Companies.objects.filter(is_active = True)
     else:
@@ -313,7 +327,8 @@ def formCreateClientMedicare(request):
 
     context = {
         'user' : user,
-        'company' : company
+        'company' : company,
+        'agentUsa' : agentUsa
     }
 
     if request.method == 'POST':
@@ -384,6 +399,11 @@ def formCreatePlan(request ,client_id):
     company_id = request.company_id  # Obtener company_id desde request
     company = Companies.objects.filter(id = company_id).first()
 
+    if company_id == 1:
+        agentUsa = USAgent.objects.all().prefetch_related("company")
+    else:
+        agentUsa = USAgent.objects.filter(company = request.user.company).prefetch_related("company")
+
     type_sale = request.GET.get('type_sale')
     aca_plan = ObamaCare.objects.filter(client=client).first()
     supplementary_plan = Supp.objects.filter(client=client)
@@ -397,12 +417,19 @@ def formCreatePlan(request ,client_id):
         'supplementary_plan_data': supplementary_plan,
         'dependents': dependents,
         'type_sale':type_sale,
-        'company': company
+        'company': company,
+        'agentUsa' : agentUsa
     })
 
 @login_required(login_url='/login') 
 @company_ownership_required_sinURL
 def formCreatePlanAssure(request ,client_id):   
+
+    if request.user.is_superuser:
+        agentUsa = USAgent.objects.all().prefetch_related("company")
+    else:
+        agentUsa = USAgent.objects.filter(company = request.user.company).prefetch_related("company")
+
     if request.method == 'POST':    
         client = get_object_or_404(ClientsAssure, id=client_id)
 
@@ -476,7 +503,11 @@ def formCreatePlanAssure(request ,client_id):
                 "gentilicio": gentilicio
             })
 
-    return render(request, 'forms/formCreatePlanAssure.html', {'paises': paises})
+    context = {
+        'agentUsa' : agentUsa,
+        'paises': paises
+    }
+    return render(request, 'forms/formCreatePlanAssure.html', context )
 
 @login_required(login_url='/login')
 @company_ownership_required_sinURL
@@ -484,6 +515,11 @@ def formAddObama(request, client_id):
 
     type_sales = request.session.get('type_sales')
     client = Clients.objects.get(id=client_id)
+
+    if request.user.is_superuser:
+        agentUsa = USAgent.objects.all().prefetch_related("company")
+    else:
+        agentUsa = USAgent.objects.filter(company = request.user.company).prefetch_related("company")
 
     if request.method == 'POST':
         company_id = request.company_id  # Obtener company_id desde request
@@ -505,14 +541,19 @@ def formAddObama(request, client_id):
 
             return redirect('select_client')  # Cambia a tu página de éxito            
         
-    return render(request, 'forms/formAddObama.html')
+    return render(request, 'forms/formAddObama.html',{'agentUsa':agentUsa})
 
 @login_required(login_url='/login')
 @company_ownership_required_sinURL
 def formAddSupp(request,client_id):
 
     type_sales = request.session.get('type_sales')
-    client = Clients.objects.get(id=client_id)    
+    client = Clients.objects.get(id=client_id)   
+
+    if request.user.is_superuser:
+        agentUsa = USAgent.objects.all().prefetch_related("company")
+    else:
+        agentUsa = USAgent.objects.filter(company = request.user.company).prefetch_related("company") 
 
     if request.method == 'POST':
         company_id = request.company_id  # Obtener company_id desde request
@@ -542,7 +583,7 @@ def formAddSupp(request,client_id):
 
             return redirect('select_client' )  # Cambia a tu página de éxito           
         
-    return render(request, 'forms/formAddSupp.html')
+    return render(request, 'forms/formAddSupp.html',{'agentUsa':agentUsa})
 
 @login_required(login_url='/login')
 @company_ownership_required_sinURL
@@ -631,7 +672,7 @@ def addDepend(request):
     # Convertir las observaciones a una cadena (por ejemplo, separada por comas o saltos de línea)
     typification_text = ", ".join(observations)  # Puedes usar "\n".join(observations) si prefieres saltos de línea
 
-    obama = ObamaCare.objects.get(client_id=client_id)
+    obama = ObamaCare.objects.filter(client_id=client_id, is_active = True).order_by('-created_at').first()
     client = Clients.objects.get(id=client_id)
 
     if nameDependent.strip():  # Validar que el texto no esté vacío
@@ -643,9 +684,11 @@ def addDepend(request):
             migration_status=migrationStatusDependent,
             type_police=typification_text, # Guardamos las observaciones en el campo 'typification'
             sex=sexDependent,
-            obamacare = obama,
             kinship=kinship
         )
+
+        if obama:
+            dependent.obamacare.add(obama)
     
     # Asociar el Dependent solo a las pólizas seleccionadas en observations
         for observation in observations:

@@ -31,6 +31,32 @@
 
 				<h1>{{ message }}</h1>
 				<a href="{% url 'uploadExcel' %}" class="btn btn-light px-4">Subir otro archsssivo</a>
+
+				{% if errors %}
+					<h5 class="mt-4">⚠️ Registros con errores (no se guardaron):</h5>
+					<div class="table-responsive">
+						<table class="table table-striped table-bordered">
+							<thead class="table-dark">
+								<tr>
+									<th class="center-all">Fila</th>
+									<th class="center-all">Campo</th>
+									<th class="center-all">Error</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for error in errors %}
+									{% for field, msg in error.errors.items %}
+										<tr>
+											<td class="center-all">{{ error.row }}</td>
+											<td class="center-all">{{ field }}</td>
+											<td>{{ msg }}</td>
+										</tr>
+									{% endfor %}
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				{% endif %}
 								
 			</div>
 		</div>

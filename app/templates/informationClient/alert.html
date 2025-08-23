@@ -20,47 +20,59 @@
 	<link rel="stylesheet" href="{% static "assets/css/dark-theme.css" %}" />
 	<link rel="stylesheet" href="{% static "assets/css/semi-dark.css" %}" />
 	<link rel="stylesheet" href="{% static "assets/css/header-colors.css" %}" />
+
+
+	<!--plugins-->
+	<link href="{% static "assets/plugins/fullcalendar/css/main.min.css" %}" rel="stylesheet" />
+
 {% endblock %}
 {% block page_content %}
-<h6 class="mb-0 text-uppercase">Alert</h6>
+<h6 class="mb-0 text-uppercase">Alert calendar</h6>
+
 <hr/>
+
 <div class="card">
     <div class="card-body">
-        <div class="table-responsive">
-            <table id="tableClient" class="table table-striped table-bordered">
-                <thead>
-                    <tr>
-                        <th>Agent COL</th>
-                        <th>Name Client</th>
-						<th>Date</th>
-						<th>Obs</th>
-						{% if request.user.role == 'Admin' %} <th>Is Active</th> {% endif %}
-						{% if request.user.is_superuser %} <th>Company</th> {% endif %}
-						<th>Option</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for alertClient in alertC %}
-                    <tr>
-                        <td>{{alertClient.agent.first_name}} {{alertClient.agent.last_name}}</td>
-                        <td>{{alertClient.name_client}}</td>
-                        <td>{{alertClient.datetime}}</td>
-						<td>{{alertClient.truncated_contect}}</td> 
-						{% if request.user.role == 'Admin' %} <td>{{alertClient.is_active}}</td> {% endif %}		
-						{% if request.user.is_superuser %} <td>{{alertClient.company.company_name}}</td> {% endif %}				
-						<td>
-							<div class="d-flex order-actions">
-								<a href="{% url 'editAlert' alertClient.id %}" class=""><i class='bx bxs-edit'></i></a>
-								<a href="{% url 'toggleAlert' alertClient.id %}" class="ms-3"><i class='bx bxs-trash'></i></a>
-							</div>
-						</td> 
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+		<div class="table-responsive">
+			<div id='calendar'></div>
+		</div>
+    </div>
+</div>
+
+<!-- Modal para mostrar detalles del evento -->
+<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eventModalLabel">Detalles de la Alerta</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Cliente:</strong> <span id="modal-client-name"></span></p>
+                <p><strong>Agente:</strong> <span id="modal-agent-name"></span></p>
+                <p><strong>Fecha:</strong> <span id="modal-date"></span></p>
+                <p><strong>Hora:</strong> <span id="modal-time"></span></p>
+                <p><strong>Observación:</strong> <span id="modal-content"></span></p>
+                {% if user_role == 'Admin' %}
+                <p><strong>Estado:</strong> <span id="modal-status"></span></p>
+                {% endif %}
+                {% if is_superuser %}
+                <p><strong>Empresa:</strong> <span id="modal-company"></span></p>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <a href="#" id="edit-link" class="btn btn-primary">
+                    <i class='bx bxs-edit'></i> Editar
+                </a>
+                <a href="#" id="toggle-link" class="btn btn-danger">
+                    <i class='bx bxs-trash'></i> Toggle
+                </a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
         </div>
     </div>
 </div>
+
 {% endblock %}
 {% block end_js %}
 	<!-- Bootstrap JS -->
@@ -77,4 +89,19 @@
 	</script>
 	<!--app JS-->
 	<script src="{% static "assets/js/app.js" %}"></script>
+
+	<script src="{% static "assets/plugins/fullcalendar/js/main.min.js"%}"></script>
+	<script src="{% static "assets/plugins/fullcalendar/js/configurationCalendario.js"%}"></script>
+	
+
+
+	<script>
+    // Inicializar el calendario con los datos de Django
+    window.initCalendar(
+        {{ events_json|safe }},
+        "{{ user_role }}",
+        {{ is_superuser|yesno:"true,false" }}
+    );
+</script>
+
 {% endblock %}

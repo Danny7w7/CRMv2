@@ -82,6 +82,9 @@ urlpatterns = [
 
     #<---------------------------Information Client--------------------------->
     path('clientObamacare/', table.clientObamacare, name='clientObamacare'),
+    path('clientObamacarePass/', table.clientObamacarePass, name='clientObamacarePass'),
+    path('saveRenovation/', edits.saveRenovation, name='saveRenovation'),
+
     path('toggleObamaStatus/<obamacare_id>/', toggles.toggleObamaStatus, name='toggleObamaStatus'),
     path('editObama/<int:obamacare_id>/<int:way>/', edits.editObama, name='editObama'),
     path('blockSocialSecurity/', fetchInformations.blockSocialSecurity, name='blockSocialSecurity'),
