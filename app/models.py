@@ -343,7 +343,6 @@ class ObamaCare(models.Model):
 
 class Dependents(models.Model):  
     client = models.ForeignKey(Clients, on_delete=models.CASCADE)
-    obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null=True)  # Relación de muchos a uno
     obamacares = models.ManyToManyField( 'ObamaCare', related_name='dependents_many')
     name = models.CharField(max_length=200)
     apply = models.CharField(max_length=200)
@@ -541,6 +540,7 @@ class ClientAlert(models.Model):
     name_client = models.CharField(max_length=255)
     phone_number = models.BigIntegerField()
     datetime = models.DateField()
+    time = models.TimeField()
     content = models.TextField()
     is_active = models.BooleanField(default=True)  
     company = models.ForeignKey(Companies, on_delete=models.CASCADE)
