@@ -834,9 +834,9 @@ def table6Week(request):
     users = Users.objects.filter(role__in=userRoles, is_active=True,  **company_filter).exclude(username__in=excludedUsernames)
 
     # Filtrar todas las ventas realizadas en las últimas 6 semanas
-    obamaSales = ObamaCare.objects.filter(created_at__range=[startDate, endOfCurrentWeek],  **company_filter).exclude( id__in=Subquery(excluded_obama_ids))
-    suppSales = Supp.objects.filter(created_at__range=[startDate, endOfCurrentWeek],  **company_filter)
-    assureSales = ClientsAssure.objects.filter(created_at__range=[startDate, endOfCurrentWeek],  **company_filter)
+    obamaSales = ObamaCare.objects.filter(created_at__range=[startDate, endOfCurrentWeek], is_active = True ,**company_filter).exclude( id__in=Subquery(excluded_obama_ids))
+    suppSales = Supp.objects.filter(created_at__range=[startDate, endOfCurrentWeek], is_active = True , **company_filter)
+    assureSales = ClientsAssure.objects.filter(created_at__range=[startDate, endOfCurrentWeek], is_active = True , **company_filter)
         
     # Agregar el conteo de pólizas activas para las últimas 6 semanas
     activeObamaPolicies = ObamaCare.objects.filter(status='Active', created_at__range=[startDate, endOfCurrentWeek],is_active = True,  **company_filter).exclude( id__in=Subquery(excluded_obama_ids))

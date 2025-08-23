@@ -220,7 +220,7 @@ def enviar_pdf_por_email():
     # ✅ Enviar el email
     send_email_with_pdf(
         subject="Reporte de Ventas - Últimas 6 Semanas",
-        receiver_email=['luis4007@gmail.com','ginapao2310@hotmail.com'], # ✅ solo para el texto del cuerpo
+        receiver_email=['luis4007@gmail.com','ginapao2310@hotmail.com','it.bluestream2@gmail.com'], # ✅ solo para el texto del cuerpo
         pdf_content=pdf_bytes  # ✅ nombre del parámetro como te lo dejé
     )
 

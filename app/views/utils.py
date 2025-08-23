@@ -22,13 +22,13 @@ from dateutil.relativedelta import relativedelta
 from datetime import datetime
 
 # Django utilities
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.template.loader import render_to_string
 from datetime import date, timedelta
 from collections import defaultdict
 from django.utils import timezone
 from weasyprint import HTML, CSS
-from django.db.models import Count, Case, When, Q, BooleanField
+from django.db.models import Count, Case, When, Q, BooleanField, Subquery
 from django.template import Engine, Context
 from matplotlib.ticker import MaxNLocator
 
@@ -368,12 +368,13 @@ def get_customer_details(company_id):
     })
 
     # ObamaCare
+    excluded_obama_ids = CustomerRedFlag.objects.filter(date_completed__isnull=True).values('obamacare')
     obamacare_qs = ObamaCare.objects.filter(
         is_active=True,
         company_id=company_id,
         client__isnull=False,
         created_at__gte=fecha_corte
-    ).select_related("client", "agent")
+    ).select_related("client", "agent").exclude(id__in=Subquery(excluded_obama_ids))
 
     for record in obamacare_qs:
         cliente = record.client
