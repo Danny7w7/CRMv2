@@ -377,7 +377,7 @@
 									<option value="US HEALTH AND LIFE" {% if obamacare.carrier == "US HEALTH AND LIFE" %}selected{% endif %} >US HEALTH AND LIFE</option>
 									<option value="MODA" {% if obamacare.carrier == "MODA" %}selected{% endif %} >MODA</option>
 									<option value="PROVIDENCE" {% if obamacare.carrier == "PROVIDENCE" %}selected{% endif %} >PROVIDENCE</option>
-									<option value="AERIHEALTH CARITAS" {% if obamacare.carrier == "AERIHEALTH CARITAS" %}selected{% endif %} >AERIHEALTH CARITAS</option>
+									<option value="AMERIHEALTH CARITAS" {% if obamacare.carrier == "AMERIHEALTH CARITAS" %}selected{% endif %} >AMERIHEALTH CARITAS</option>
 									<option value="HEALTH FRIST" {% if obamacare.carrier == "HEALTH FRIST" %}selected{% endif %} >HEALTH FRIST</option>
 									<option value="WELLPOINT" {% if obamacare.carrier == "WELLPOINT" %}selected{% endif %} >WELLPOINT</option>
 								</select>
@@ -613,7 +613,7 @@
 								</button>
 							{% endif %}
 
-							{% comment %} {% if renovation %}
+							{% if renovation %}
 								<p class="text-success fw-bold">Ya esta renovado</p>
 							{% else %}
 								{% if obamacare.created_at < fechaLimite %}
@@ -621,7 +621,7 @@
 								<a class="btn btn-success px-4" data-bs-toggle="modal" data-bs-target="#renovationModal">Renovations</a>	
 									
 								{% endif %}		
-							{% endif %} {% endcomment %}
+							{% endif %}
 
 						</div>
 
@@ -1599,7 +1599,7 @@
 													<option value="US HEALTH AND LIFE" {% if obamacare.carrier == "US HEALTH AND LIFE" %}selected{% endif %}>US HEALTH AND LIFE</option>
 													<option value="MODA" {% if obamacare.carrier == "MODA" %}selected{% endif %}>MODA</option>
 													<option value="PROVIDENCE" {% if obamacare.carrier == "PROVIDENCE" %}selected{% endif %}>PROVIDENCE</option>
-													<option value="AERIHEALTH CARITAS" {% if obamacare.carrier == "AERIHEALTH CARITAS" %}selected{% endif %}>AERIHEALTH CARITAS</option>
+													<option value="AMERIHEALTH CARITAS" {% if obamacare.carrier == "AMERIHEALTH CARITAS" %}selected{% endif %}>AMERIHEALTH CARITAS</option>
 													<option value="HEALTH FRIST" {% if obamacare.carrier == "HEALTH FRIST" %}selected{% endif %}>HEALTH FRIST</option>
 													<option value="WELLPOINT" {% if obamacare.carrier == "WELLPOINT" %}selected{% endif %}>WELLPOINT</option>
 												</select>
