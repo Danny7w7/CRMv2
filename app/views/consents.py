@@ -72,8 +72,10 @@ def consent(request, obamacare_id):
     obamacare = ObamaCare.objects.select_related('client', 'agent').get(id=obamacare_id)
     temporalyURL = None
 
-    agentUsa = USAgent.objects.all().prefetch_related("company")
-
+    if request.user.is_superuser:
+        agentUsa = USAgent.objects.all().prefetch_related("company")
+    else:
+        agentUsa = USAgent.objects.filter(company = obamacare.company).prefetch_related("company")
 
     typeToken = 'obamacare'
    
