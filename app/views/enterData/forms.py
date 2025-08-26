@@ -140,6 +140,10 @@ def formCreateAssure(request):
     company_id = request.company_id  # Obtener company_id desde request
 
     user = Users.objects.select_related('company').filter(company = company_id).first()
+    if request.user.is_superuser:
+        agentUsa = USAgent.objects.all().prefetch_related("company")
+    else:
+        agentUsa = USAgent.objects.filter(company = request.user.company).prefetch_related("company")
 
 
     paises = []  # Inicializa la lista por si hay error
@@ -168,7 +172,8 @@ def formCreateAssure(request):
     context = {
         'user' : user,
         'companies' : companies,
-        'paises' : paises
+        'paises' : paises,
+        'agentUsa' : agentUsa
     }
 
     if request.method == 'POST':
