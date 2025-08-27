@@ -216,8 +216,16 @@ def generate_base64_chart(nombre, semanas, data):
                              ha='center', va='bottom', fontsize=8)
 
     if "Total" in data:
-        ax1.plot(x, data["Total"], color="black", marker="o", linestyle="--", linewidth=2, label="Total")
-        for i, val in enumerate(data["Total"]):
+
+        totalActivos = [
+            sum(vals) for vals in zip(
+                data.get("Act ACA", [0] * len(x)),
+                data.get("Act Supp", [0] * len(x)),
+            )
+        ]
+
+        ax1.plot(x, totalActivos, color="black", marker="o", linestyle="--", linewidth=2, label="Total Activos")
+        for i, val in enumerate(totalActivos):
             ax1.annotate(f'{val}',
                          xy=(x[i], val),
                          xytext=(0, 10),

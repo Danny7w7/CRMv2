@@ -37,13 +37,22 @@
 				{% csrf_token %}
 				<div class="col-md-3">
 					<label for="start_date">Start date:</label>
-					<input type="date" name="start_date" id="start_date" class="form-control" value="{{ startDate }}">
+					<input type="date" required name="start_date" id="start_date" class="form-control" value="{{ startDate }}">
 				</div>
 				<div class="col-md-3">
 					<label for="end_date">End date:</label>
-					<input type="date" name="end_date" id="end_date" class="form-control" value="{{ endDate }}">
+					<input type="date" required name="end_date" id="end_date" class="form-control" value="{{ endDate }}">
 				</div>
-				<div class="col-md-4 align-self-end mt-2">
+				<div class="col-md-3">
+					<label for="end_date">Agent:</label>
+					<select  class="form-select" name="agent" id="agent">
+						<option disabled selected>Please Select</option>
+						{% for item in agent %}
+							<option {% if item == agentPost %}selected{% endif %} value="{{item}}">{{item}}</option>
+						{% endfor %}
+					</select>
+				</div>
+				<div class="col-md-3 align-self-end mt-2">
 					<button type="submit" class="btn btn-primary">Filter</button>
 					<a href="{% url 'customerStep' %}" class="btn btn-secondary">Reset</a>
 				</div>

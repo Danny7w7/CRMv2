@@ -83,9 +83,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-
-
-
 function validateSelects() {
     const idsSelectWithValidation = ['apply', 'work', 'migration_status', 'selectAgent']
     let isValid = true;
@@ -108,8 +105,6 @@ function validateSelects() {
     }
     return true;
 }
-
-
 
 const dropzone = document.getElementById("dropzone");
 const fileInput = document.getElementById("fileInput");
@@ -185,8 +180,6 @@ function addFileToList(file) {
     fileList.appendChild(listItem);
 }
 
-
-
 // Obtener elementos del DOM
 const inputName = document.getElementById('inputName');
 const inputLastName = document.getElementById('inputLastName');
@@ -222,8 +215,6 @@ selectAgent.addEventListener('change', function () {
 
     updateCarrierByAgent(selectedText);
 });
-
-
 
 // Función para actualizar el contenido de un span
 function changeSpan(id, text) {
@@ -271,7 +262,6 @@ function updateCarrierByAgent(agent) {
         changeCarrierSpans(''); // Default value if no match
     }
 }
-
 
 document.addEventListener("DOMContentLoaded", function () {
     const revisarButton = document.getElementById("revisar");
@@ -360,7 +350,7 @@ document.addEventListener("DOMContentLoaded", function () {
  * Función que escucha cambios en inputs basado en un array de IDs
  * @param {string[]} inputIds - Array con los IDs de los inputs a escuchar
  * @param {Function} callback - Función que se ejecutará cuando cambie algún input
- */
+*/
 function listenToInputChanges(inputIds, callback) {
   // Validar parámetros
   if (!Array.isArray(inputIds)) {

@@ -7,7 +7,52 @@ document.addEventListener('DOMContentLoaded', function() {
     initFormEvents();
     updateDynamicText();
     initFileUpload();
+    initAdditionalCoverageToggle(); // Nueva función para manejar cobertura adicional
 });
+
+// Nueva función para manejar la visibilidad de cobertura adicional
+function initAdditionalCoverageToggle() {
+    const ncaSelect = document.getElementById('nca');
+    const additionalCoverageDiv = document.querySelector('.coberturaA').closest('.row');
+    const needsDescriptionDiv = document.querySelector('.necesidadesCobertura').closest('.row');
+    
+    // Ocultar los divs inicialmente
+    if (additionalCoverageDiv) {
+        additionalCoverageDiv.style.display = 'none';
+    }
+    if (needsDescriptionDiv) {
+        needsDescriptionDiv.style.display = 'none';
+    }
+    
+    // Agregar event listener al select
+    if (ncaSelect) {
+        ncaSelect.addEventListener('change', function() {
+            const showDivs = this.value === 'True';
+            
+            if (additionalCoverageDiv) {
+                additionalCoverageDiv.style.display = showDivs ? 'block' : 'none';
+            }
+            if (needsDescriptionDiv) {
+                needsDescriptionDiv.style.display = showDivs ? 'block' : 'none';
+            }
+            
+            // Si se ocultan los divs, limpiar las selecciones
+            if (!showDivs) {
+                // Desmarcar todos los checkboxes de cobertura adicional
+                const coverageCheckboxes = document.querySelectorAll('.bg-lila input[type="checkbox"]');
+                coverageCheckboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                
+                // Limpiar el textarea de necesidades
+                const needsTextarea = document.getElementById('inputApplicants');
+                if (needsTextarea) {
+                    needsTextarea.value = '';
+                }
+            }
+        });
+    }
+}
 
 // Inicializar pad de firma
 function initSignaturePad() {
@@ -237,6 +282,26 @@ async function generatePDFBlob() {
     addText(`Autoriza contacto por: ${contactMethods.join(', ')}`);
     yPosition += 5;
 
+    // Consentimiento de mensajes de texto
+    addText('CONSENTIMIENTO DE MENSAJES DE TEXTO', 12, true);
+    if (formData.consentAccepted) {
+        addText('Al suministrar su número de teléfono, usted está de acuerdo en recibir mensajes de texto automatizados de Lapeira & Associates LLC con información respecto a opciones de seguro médico, beneficios, productos de seguros, actualizaciones de pólizas, primas, solicitudes y asuntos relacionados para ayudarme o recordarme de cualquier acción necesaria para mantener mi póliza al día. Usted está de acuerdo con nuestros Términos de Uso Terms of Use y nuestra Política de Privacidad. Su autorización no es condición para compra. Responda HELP para ayuda. Rates de msg & data pueden aplicar. Hasta 5 msgs/mes. Responda STOP para opt-out en cualquier momento.');
+    }
+    yPosition += 5;
+
+    // Cobertura adicional (nueva sección)
+    addText('COBERTURA ADICIONAL', 12, true);
+    addText(`Necesita cobertura adicional: ${formData.needsAdditionalCoverage ? 'SÍ' : 'NO'}`);
+    
+    if (formData.needsAdditionalCoverage && formData.additionalCoverageTypes.length > 0) {
+        addText(`Tipos de cobertura solicitados: ${formData.additionalCoverageTypes.join(', ')}`);
+    }
+    
+    if (formData.coverageNeeds) {
+        addText(`Descripción de necesidades: ${formData.coverageNeeds}`);
+    }
+    yPosition += 5;
+
     // Aplicantes adicionales
     if (formData.additionalApplicants) {
         addText('APLICANTES ADICIONALES', 12, true);
@@ -436,8 +501,15 @@ function getCookie(name) {
     return cookieValue;
 }
 
-// Obtener datos del formulario
+// Obtener datos del formulario (modificada para incluir cobertura adicional)
 function getFormData() {
+    // Obtener tipos de cobertura adicional seleccionados
+    const additionalCoverageTypes = [];
+    const coverageCheckboxes = document.querySelectorAll('.bg-lila input[type="checkbox"]:checked');
+    coverageCheckboxes.forEach(checkbox => {
+        additionalCoverageTypes.push(checkbox.name);
+    });
+
     return {
         firstName: document.getElementById('inputName').value,
         lastName: document.getElementById('inputLastName').value,
@@ -459,7 +531,13 @@ function getFormData() {
         contactPhone: document.getElementById('Telefono').checked,
         contactSMS: document.getElementById('Sms').checked,
         contactEmail: document.getElementById('Emails').checked,
-        contactWhatsapp: document.getElementById('Whatsapp').checked
+        contactWhatsapp: document.getElementById('Whatsapp').checked,
+        // Nuevos campos para cobertura adicional
+        needsAdditionalCoverage: document.getElementById('nca').value === 'True',
+        additionalCoverageTypes: additionalCoverageTypes,
+        coverageNeeds: document.getElementById('inputApplicants') ? document.getElementById('inputApplicants').value : '',
+        // Consentimiento de mensajes de texto
+        consentAccepted: document.getElementById('consentChek').checked
     };
 }
 
@@ -467,7 +545,7 @@ function getFormData() {
 function validateForm() {
     const requiredFields = [
         'inputName', 'inputLastName', 'inputPhone', 'inputDateBirth',
-        'inputTaxes', 'selectAgent'
+        'inputTaxes', 'selectAgent', 'nca'
     ];
 
     for (let fieldId of requiredFields) {
@@ -476,6 +554,18 @@ function validateForm() {
             field.focus();
             return false;
         }
+    }
+
+    // Validar consentimiento de mensajes de texto
+    const consentCheckbox = document.getElementById('consentChek');
+    if (!consentCheckbox.checked) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Consentimiento requerido',
+            text: 'Debe aceptar el consentimiento de mensajes de texto para continuar.'
+        });
+        consentCheckbox.focus();
+        return false;
     }
 
     // Validar que al menos un método de contacto esté seleccionado
@@ -620,4 +710,3 @@ function initFileUpload() {
         });
     }
 }
-    

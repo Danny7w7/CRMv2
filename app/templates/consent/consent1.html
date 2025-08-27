@@ -74,6 +74,17 @@
             touch-action: none; /* Disable default touch gestures */
         }
 
+        /* Restaura la opacidad del input para que no se vea gris */
+        #consentChek:disabled {
+        opacity: 1; 
+        cursor: default; 
+        }
+
+        /* Restaura la opacidad del label asociado */
+        .form-check-input:disabled ~ .form-check-label {
+        opacity: 1;
+        }
+
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -123,7 +134,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="bg-lila p-3 rounded">
-                        <label class="form-label">Email</label>
+                        <label class="form-label">Email <span class="text-danger">*</span> </label>
                         <input id="inputEmail" name="email" type="email" class="form-control" value="{{obamacare.client.email}}">
                         <p id="errorEmail" style="color: red; display: none;">{% blocktrans %}Email no valido.{% endblocktrans %}</p>
                     </div>
@@ -133,7 +144,7 @@
             <div class="row mb-3">
                 <div class="col">
                     <div class="bg-morado p-3 rounded">
-                        <label class="form-label">{% blocktrans %}Acepto a ser contactado por mi broker, mi carrier, y/o el mercado de salud vía:{% endblocktrans %}</label>
+                        <label class="form-label">{% blocktrans %}Acepto a ser contactado por mi broker, mi carrier, y/o el mercado de salud vía:{% endblocktrans %} <span class="text-danger">*</span> </label>
                         <div class="row">
                             <div class="col-6">
                                 <div class="form-check">
@@ -159,6 +170,23 @@
                     </div>
                 </div>
             </div>
+
+            <div class="row mb-3">
+                <div class="col">
+                    <div class="bg-rosa p-3 rounded">
+                        <label class="form-label">{% blocktrans %}Al suministrar su número de teléfono, usted está de acuerdo en recibir mensajes de texto automatizados de Lapeira & Associates LLC con información respecto a opciones de seguro médico, beneficios, productos de seguros, actualizaciones de pólizas, primas, solicitudes y asuntos relacionados para ayudarme o recordarme de cualquier acción necesaria para mantener mi póliza al día. Usted está de acuerdo con nuestros Términos de Uso Terms of Use y nuestra Política de Privacidad. Su autorización no es condición para compra. Responda HELP para ayuda. Rates de msg & data pueden aplicar. Hasta 5 msgs/mes. Responda STOP para opt-out en cualquier momento.{% endblocktrans %}</label>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-check">
+                                    <input id="consentChek" class="form-check-input contactMethod" type="checkbox" name="consentChek" checked disabled required />
+                                    <label class="form-check-label" for="">{% trans "ACEPTO" %} <span class="text-danger">*</span> </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
 
             {% if supps %}
                 <div class="row mb-3">
@@ -213,23 +241,23 @@
                         <div class="row">
                             <div class="col-12 mb-3">
                                 <input id="inputAddress" name="address" class="form-control" value="{{obamacare.client.address}}">
-                                <small>{% trans "Direccion" %}</small>
+                                <small>{% trans "Direccion" %} <span class="text-danger">*</span></small>
                             </div>
                             <div class="col-12 mb-3">
                                 <input id="inputApto" class="form-control">
-                                <small>{% trans "Apto" %}</small>
+                                <small>{% trans "Apto" %}<span class="text-danger">*</span></small>
                             </div>
                             <div class="col-6 mb-3">
                                 <input id="inputCity" class="form-control" value="{{obamacare.client.city}}">
-                                <small>{% trans "Ciudad" %}</small>
+                                <small>{% trans "Ciudad" %}<span class="text-danger">*</span></small>
                             </div>
                             <div class="col-6 mb-3">
                                 <input id="inputState" class="form-control" value="{{obamacare.client.state}}">
-                                <small>{% trans "Estado" %}</small>
+                                <small>{% trans "Estado" %}<span class="text-danger">*</span></small>
                             </div>
                             <div class="col-12">
                                 <input id="inputZipcode" name="zipcode" class="form-control" value="{{obamacare.client.zipcode}}">
-                                <small>ZipCode</small>
+                                <small>ZipCode<span class="text-danger">*</span></small>
                             </div>
                         </div>
                     </div>
@@ -337,7 +365,7 @@
                         <li>{% blocktrans %}Completar una aplicación para búsqueda de eligibilidad y enrolamiento en el Mercado de Salud Federal, o en programas de gobierno tales como Medicaid y CHIP, en los sitios de Enrolamiento Directo del Mercado de Salud, o enrolamiento en programas del mercado de salud que ayudan a aplicar a crédito fiscales o enrolamiento de productos de seguros en planes a nivel estatal.{% endblocktrans %}</li>
                         <li>{% blocktrans %}Proveer mantenimiento de mi cuenta en el Mercado de Salud Federal, asistencia en enrolamiento, información sobre los beneficios de los planes, nuevos productos, beneficios de nuevos productos, y asesoría en los pagos de transacciones si es necesario.{% endblocktrans %}</li>
                         <li>{% blocktrans %}Apoyar si es necesario en responder inquietudes del Mercado de Salud Federal en lo referente a mi aplicación.{% endblocktrans %}</li>
-                        <li>{% blocktrans %}Consentimiento de comunicación (Cumplimiento TCPA): Yo,{% endblocktrans %} <span id="textName2" class="roboto-black">{{obamacare.client.first_name}} {{obamacare.client.last_name}}</span> {% blocktrans %}, doy mi consentimiento para recibir comunicaciones de{% endblocktrans %} <span class="roboto-black" id="textCarrier3">{{company}}</span> {% blocktrans %}con respecto a opciones de seguro de salud, beneficios, productos de seguros, actualizaciones de pólizas, primas, solicitudes y asuntos relacionados a través de llamadas telefónicas, correos electrónicos, mensajes SMS y otras formas de comunicación para ayudarme o recordarme cualquier acción necesaria para mantener mi póliza en buen estado. Entiendo que dichas comunicaciones pueden involucrar el uso de sistemas automatizados o mensajes de voz pregrabados de{% endblocktrans %} <span class="roboto-black" id="textCarrier4">{{company}}</span> {% blocktrans %}en el número proporcionado. Al proporcionar mi información de contacto con mi firma electrónica, cuando hago clic en el botón "enviar", acepto los Términos de Uso de{% endblocktrans %} <span class="roboto-black" id="textCarrier5">{{company}}</span> {% blocktrans %} {% endblocktrans %}. {% blocktrans %}Este consentimiento incluye aceptar resolver cualquier reclamo de la Ley de Protección al Consumidor de Teléfonos mediante arbitraje. Esto aplica incluso si su número está en una lista de no llamar. Aceptar estas llamadas o textos no es un requisito para comprar bienes o servicios de nosotros. Al recibir un mensaje de texto, puede responder <span class="roboto-black">SI</span> para recibir actualizaciones e información sobre su póliza de{% endblocktrans %} <span class="roboto-black" id="textCarrier6">{{company}}</span> {% blocktrans %}También puede responder <span class="roboto-black">AYUDA</span> para obtener ayuda. Pueden aplicarse tarifas de mensajes y datos. Hasta 5 mensajes/mes. Responda <span class="roboto-black">ALTO</span> para cancelar en cualquier momento. Para obtener más información sobre nuestras Políticas de Privacidad, haga clic aquí:{% endblocktrans %} <a href="https://lapeirainsurance.com/privacy-policy/">https://lapeirainsurance.com/privacy-policy/</a>. {% blocktrans %}Para obtener más información sobre nuestros Términos de Uso, haga clic aquí:{% endblocktrans %} <a href="https://lapeirainsurance.com/terms-of-use/">https://lapeirainsurance.com/terms-of-use/</a>.
+                        <li>{% blocktrans %}Consentimiento de comunicación (Cumplimiento TCPA): Yo,{% endblocktrans %} <span id="textName2" class="roboto-black">{{obamacare.client.first_name}} {{obamacare.client.last_name}}</span> {% blocktrans %}, doy mi consentimiento para recibir comunicaciones de{% endblocktrans %} <span class="roboto-black" id="textCarrier3">{{company}}</span> {% blocktrans %}con respecto a opciones de seguro de salud, beneficios, productos de seguros, actualizaciones de pólizas, primas, solicitudes y asuntos relacionados a través de llamadas telefónicas, correos electrónicos, mensajes SMS y otras formas de comunicación para ayudarme o recordarme cualquier acción necesaria para mantener mi póliza en buen estado. Entiendo que dichas comunicaciones pueden involucrar el uso de sistemas automatizados o mensajes de voz pregrabados de{% endblocktrans %} <span class="roboto-black" id="textCarrier4">{{company}}</span> {% blocktrans %}en el número proporcionado. Al proporcionar mi información de contacto con mi firma electrónica, cuando hago clic en el botón "enviar", acepto los Términos de Uso de{% endblocktrans %} <span class="roboto-black" id="textCarrier5">{{company}}</span> {% blocktrans %} {% endblocktrans %}. {% blocktrans %}Este consentimiento incluye aceptar resolver cualquier reclamo de la Ley de Protección al Consumidor de Teléfonos mediante arbitraje. Esto aplica incluso si su número está en una lista de no llamar. Aceptar estas llamadas o textos no es un requisito para comprar bienes o servicios de nosotros. Al recibir un mensaje de texto, puede responder {% endblocktrans %} <span class="roboto-black">{% trans "SI" %}</span> {% blocktrans %} para recibir actualizaciones e información sobre su póliza de{% endblocktrans %} <span class="roboto-black" id="textCarrier6">{{company}}</span> {% blocktrans %}También puede responder  {% endblocktrans %} <span class="roboto-black">{% trans "AYUDA" %}</span> {% blocktrans %} para obtener ayuda. Pueden aplicarse tarifas de mensajes y datos. Hasta 5 mensajes/mes. Responda {% endblocktrans %} <span class="roboto-black">{% trans "ALTO" %}</span> {% blocktrans %} para cancelar en cualquier momento. Para obtener más información sobre nuestras Políticas de Privacidad, haga clic aquí:{% endblocktrans %} <a href="https://lapeirainsurance.com/privacy-policy/">https://lapeirainsurance.com/privacy-policy/</a>. {% blocktrans %}Para obtener más información sobre nuestros Términos de Uso, haga clic aquí:{% endblocktrans %} <a href="https://lapeirainsurance.com/terms-of-use/">https://lapeirainsurance.com/terms-of-use/</a>.
                         </li>
                     </ol>
                     <p class="roboto-light">{% blocktrans %}Entiendo que mi Agente de Registro no utilizará o compartirá mi información de identificación personal (PII) para ningún propósito excepto los aquí listados en esta autorización. Entiendo que esta autorización será válida hasta que sea revocada por mi en cualquier momento. Para revocar esta autorización, debo hacerlo por escrito y enviarlo a la persona correspondiente a través del correo electrónico: client@lapeira.com.{% endblocktrans %}</p>
@@ -460,7 +488,7 @@
                         <li>{% blocktrans %}Completar una aplicación para búsqueda de eligibilidad y enrolamiento en el Mercado de Salud Federal, o en programas de gobierno tales como Medicaid y CHIP, en los sitios de Enrolamiento Directo del Mercado de Salud, o enrolamiento en programas del mercado de salud que ayudan a aplicar a crédito fiscales o enrolamiento de productos de seguros en planes a nivel estatal.{% endblocktrans %}</li>
                         <li>{% blocktrans %}Proveer mantenimiento de mi cuenta en el Mercado de Salud Federal, asistencia en enrolamiento, información sobre los beneficios de los planes, nuevos productos, beneficios de nuevos productos, y asesoría en los pagos de transacciones si es necesario.{% endblocktrans %}</li>
                         <li>{% blocktrans %}Apoyar si es necesario en responder inquietudes del Mercado de Salud Federal en lo referente a mi aplicación.{% endblocktrans %}</li>
-                        <li>{% blocktrans %}Contactarme vía telefónica o por cualquier medio electrónico o escrito para ayudarme y asistirme en cualquier acción necesaria para mantener mi póliza en buen estado.{% endblocktrans %}</li>
+                        <li>{% blocktrans %}Consentimiento de comunicación (Cumplimiento TCPA): Yo,{% endblocktrans %} <span id="textName2" class="roboto-black">{{obamacare.client.first_name}} {{obamacare.client.last_name}}</span> {% blocktrans %}, doy mi consentimiento para recibir comunicaciones de{% endblocktrans %} <span class="roboto-black" id="textCarrier3">{{company}}</span> {% blocktrans %}con respecto a opciones de seguro de salud, beneficios, productos de seguros, actualizaciones de pólizas, primas, solicitudes y asuntos relacionados a través de llamadas telefónicas, correos electrónicos, mensajes SMS y otras formas de comunicación para ayudarme o recordarme cualquier acción necesaria para mantener mi póliza en buen estado. Entiendo que dichas comunicaciones pueden involucrar el uso de sistemas automatizados o mensajes de voz pregrabados de{% endblocktrans %} <span class="roboto-black" id="textCarrier4">{{company}}</span> {% blocktrans %}en el número proporcionado. Al proporcionar mi información de contacto con mi firma electrónica, cuando hago clic en el botón "enviar", acepto los Términos de Uso de{% endblocktrans %} <span class="roboto-black" id="textCarrier5">{{company}}</span> {% blocktrans %} {% endblocktrans %}. {% blocktrans %}Este consentimiento incluye aceptar resolver cualquier reclamo de la Ley de Protección al Consumidor de Teléfonos mediante arbitraje. Esto aplica incluso si su número está en una lista de no llamar. Aceptar estas llamadas o textos no es un requisito para comprar bienes o servicios de nosotros. Al recibir un mensaje de texto, puede responder {% endblocktrans %} <span class="roboto-black">{% trans "SI" %}</span> {% blocktrans %} para recibir actualizaciones e información sobre su póliza de{% endblocktrans %} <span class="roboto-black" id="textCarrier6">{{company}}</span> {% blocktrans %}También puede responder  {% endblocktrans %} <span class="roboto-black">{% trans "AYUDA" %}</span> {% blocktrans %} para obtener ayuda. Pueden aplicarse tarifas de mensajes y datos. Hasta 5 mensajes/mes. Responda {% endblocktrans %} <span class="roboto-black">{% trans "ALTO" %}</span> {% blocktrans %} para cancelar en cualquier momento. Para obtener más información sobre nuestras Políticas de Privacidad, haga clic aquí:{% endblocktrans %} <a href="https://lapeirainsurance.com/privacy-policy/">https://lapeirainsurance.com/privacy-policy/</a>. {% blocktrans %}Para obtener más información sobre nuestros Términos de Uso, haga clic aquí:{% endblocktrans %} <a href="https://lapeirainsurance.com/terms-of-use/">https://lapeirainsurance.com/terms-of-use/</a>.
                     </ol>
                     <p class="roboto-light">{% blocktrans %}Entiendo que mi Agente de Registro no utilizará o compartirá mi información de identificación personal (PII) para ningún propósito excepto los aquí listados en esta autorización. Entiendo que esta autorización será válida hasta que sea revocada por mi en cualquier momento. Para revocar esta autorización, debo hacerlo por escrito y enviarlo a la persona correspondiente a través del correo electrónico: client@lapeira.com.{% endblocktrans %}</p>
                     <p class="roboto-light">{% blocktrans %}Entiendo que la información que yo le suministre a mi Agente de Registro se va a utilizar ÚNICAMENTE para asistirme en verificar mi elegibilidad y mi aplicacion o enrolamiento en el mercado de salud federal (Marketplace). Esta aprobación incluye la búsqueda de una aplicacion activa utilizando la páginas web aprobadas para el enrolamiento clásico directo (DE) o el Enhanced Direct Enrollment (EDE). Así mismo, entiendo que no tengo que compatir otra informacion adicional excepto la que es requerida para mi enrolamiento o verificacion de eligibilidad en el mercado de salud federal (Marketplace){% endblocktrans %}</p>

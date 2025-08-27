@@ -1528,6 +1528,7 @@ def customerStep(request):
     company_filter = {'company_id': company_id} if not request.user.is_superuser else {}
     startDatePost = None
     endDatePost = None
+    agentPost = None
 
     now = timezone.now()
     startDate = timezone.make_aware(
@@ -1537,6 +1538,7 @@ def customerStep(request):
         datetime.datetime(now.year, now.month + 1, 1, 0, 0, 0, 0) - timezone.timedelta(microseconds=1)
     )
 
+    agent = ObamaCare.objects.values_list('profiling', flat=True).filter(created_at__range=(startDate, endDate)).distinct()
     obama = ObamaCare.objects.select_related('client', 'agent').prefetch_related(
         'letterscard_set__agent_create',
         'appointmentclient_set__agent_create', 
@@ -1559,6 +1561,7 @@ def customerStep(request):
 
         startDatePost = request.POST['start_date']
         endDatePost = request.POST['end_date']
+        agentPost = request.POST['agent']
 
         startDate = timezone.make_aware(
             datetime.datetime.strptime(startDatePost, '%Y-%m-%d').replace(hour=0, minute=0, second=0, microsecond=0)
@@ -1583,11 +1586,16 @@ def customerStep(request):
             obama = obama.filter(is_active=True, profiling = nameUser ,**company_filter)
 
         obama = obama.filter(created_at__range=(startDate, endDate))
+
+        if agentPost:
+            obama = obama.filter(profiling = agentPost)
     
     context = {
         'obama': obama,
         'startDate' : startDatePost,
-        'endDate' : endDatePost
+        'endDate' : endDatePost,
+        'agent' : agent,
+        'agentPost' : agentPost
     }  
 
     return render(request, 'customerReports/customerStep.html', context)

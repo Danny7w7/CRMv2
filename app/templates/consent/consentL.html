@@ -112,7 +112,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="bg-lila p-3 rounded">
-                        <label class="form-label">Email</label>
+                        <label class="form-label">Email<span class="text-danger">*</span></label>
                         <input id="inputEmail" name="email" type="email" class="form-control">
                         <p id="errorEmail" style="color: red; display: none;">Email no valido.</p>
                     </div>
@@ -122,7 +122,7 @@
             <div class="row mb-3">
                 <div class="col">
                     <div class="bg-morado p-3 rounded">
-                        <label class="form-label">Acepto a ser contactado por mi broker, mi carrier, y/o el mercado de salud vía:</label>
+                        <label class="form-label">Acepto a ser contactado por mi broker, mi carrier, y/o el mercado de salud vía:<span class="text-danger">*</span></label>
                         <div class="row">
                             <div class="col-6">
                                 <div class="form-check">
@@ -148,6 +148,22 @@
                     </div>
                 </div>
             </div>
+
+            <div class="row mb-3">
+                <div class="col">
+                    <div class="bg-rosa p-3 rounded">
+                        <label class="form-label">Al suministrar su número de teléfono, usted está de acuerdo en recibir mensajes de texto automatizados de Lapeira & Associates LLC con información respecto a opciones de seguro médico, beneficios, productos de seguros, actualizaciones de pólizas, primas, solicitudes y asuntos relacionados para ayudarme o recordarme de cualquier acción necesaria para mantener mi póliza al día. Usted está de acuerdo con nuestros Términos de Uso Terms of Use y nuestra Política de Privacidad. Su autorización no es condición para compra. Responda HELP para ayuda. Rates de msg & data pueden aplicar. Hasta 5 msgs/mes. Responda STOP para opt-out en cualquier momento.</label>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-check">
+                                    <input id="consentChek" class="form-check-input contactMethod" type="checkbox" name="consentChek" required />
+                                    <label class="form-check-label" for="">ACEPTO <span class="text-danger">*</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             
             <div class="row mb-3">
                 <div class="col-md-6">
@@ -158,6 +174,95 @@
                             <option value="True">SI</option>
                             <option value="False">NO</option>
                         </select>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="bg-info p-3 rounded">
+                        <label class="form-label">¿Necesita cobertura adicional?<span class="text-danger">*</span></label>
+                        <select name="nca" class="form-select" id="nca">
+                            <option disabled value="no_valid" selected>Please Select</option>
+                            <option value="True">SI</option>
+                            <option value="False">NO</option>
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row mb-3">
+                <div class="col">
+                    <div class="bg-lila coberturaA p-3 rounded">
+                        <label class="form-label">COBERTURA ADICIONAL:</label>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-check">
+                                    <input id="d+v" class="form-check-input contactMethod" type="checkbox" name="d+v" />
+                                    <label class="form-check-label" for="">DENTAL + VISION</label>
+                                </div>
+                                <div class="form-check">
+                                    <input id="ACCIDENTE" class="form-check-input contactMethod" type="checkbox" name="ACCIDENTE" />
+                                    <label class="form-check-label" for="">ACCIDENTE</label>
+                                </div>
+                                <div class="form-check">
+                                    <input id="SEGURO DE VIDA" class="form-check-input contactMethod" type="checkbox" name="SEGURO DE VIDA" />
+                                    <label class="form-check-label" for="">SEGURO DE VIDA</label>
+                                </div>
+                                 <div class="form-check">
+                                    <input id="AUTO" class="form-check-input contactMethod" type="checkbox" name="AUTO" />
+                                    <label class="form-check-label" for="">AUTO</label>
+                                </div>
+                                <div class="form-check">
+                                    <input id="RESPONSABILIDAD COMERCIAL" class="form-check-input contactMethod" type="checkbox" name="RESPONSABILIDAD COMERCIAL" />
+                                    <label class="form-check-label" for="">RESPONSABILIDAD COMERCIAL</label>
+                                </div>
+                                <div class="form-check">
+                                    <input id="FIANZA" class="form-check-input contactMethod" type="checkbox" name="FIANZA" />
+                                    <label class="form-check-label" for="">FIANZA</label>
+                                </div>
+                                <div class="form-check">
+                                    <input id="OTRO" class="form-check-input contactMethod" type="checkbox" name="OTRO" />
+                                    <label class="form-check-label" for="">OTRO</label>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-check">
+                                    <input id="CANCER" class="form-check-input contactMethod" type="checkbox" name="CANCER" />
+                                    <label class="form-check-label" for="">CANCER</label>
+                                </div>
+                                <div class="form-check">
+                                    <input id="MEDICINA A CORTO PLAZO" class="form-check-input contactMethod" type="checkbox" name="MEDICINA A CORTO PLAZO" />
+                                    <label class="form-check-label" for="">MEDICINA A CORTO PLAZO</label>
+                                </div>
+                                <div class="form-check">
+                                    <input id="GASTOS FINALES" class="form-check-input contactMethod" type="checkbox" name="GASTOS FINALES" />
+                                    <label class="form-check-label" for="">GASTOS FINALES</label>
+                                </div>
+                                <div class="form-check">
+                                    <input id="SEGURO DE HOGAR" class="form-check-input contactMethod" type="checkbox" name="SEGURO DE HOGAR" />
+                                    <label class="form-check-label" for="">SEGURO DE HOGAR</label>
+                                </div>
+                                <div class="form-check">
+                                    <input id="ENFERMEDAD CRÍTICA" class="form-check-input contactMethod" type="checkbox" name="ENFERMEDAD CRÍTICA" />
+                                    <label class="form-check-label" for="">ENFERMEDAD CRÍTICA</label>
+                                </div>
+                                <div class="form-check">
+                                    <input id="PLANES DE DESCUENTO DE SALUD" class="form-check-input contactMethod" type="checkbox" name="PLANES DE DESCUENTO DE SALUD" />
+                                    <label class="form-check-label" for="">PLANES DE DESCUENTO DE SALUD</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col">
+                    <div class="bg-secondary necesidadesCobertura p-3 rounded">
+                        <label class="form-label">DESCRIBA LAS NECESIDADES DEL CLIENTE EN MATERIA DE COBERTURA COMPLEMENTARIA</label>
+                        <div class="mb-3">
+                            <textarea class="form-control" name="necesidades" id="inputApplicants" rows="5"></textarea>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -180,23 +285,23 @@
                         <div class="row">
                             <div class="col-12 mb-3">
                                 <input id="inputAddress" name="address" class="form-control">
-                                <small>Direccion</small>
+                                <small>Direccion<span class="text-danger">*</span></small>
                             </div>
                             <div class="col-12 mb-3">
                                 <input id="inputApto" class="form-control">
-                                <small>Apto</small>
+                                <small>Apto<span class="text-danger">*</span></small>
                             </div>
                             <div class="col-6 mb-3">
                                 <input id="inputCity" class="form-control">
-                                <small>Ciudad</small>
+                                <small>Ciudad<span class="text-danger">*</span></small>
                             </div>
                             <div class="col-6 mb-3">
                                 <input id="inputState" class="form-control">
-                                <small>Estado</small>
+                                <small>Estado<span class="text-danger">*</span></small>
                             </div>
                             <div class="col-12">
                                 <input id="inputZipcode" name="zipcode" class="form-control">
-                                <small>ZipCode</small>
+                                <small>ZipCode<span class="text-danger">*</span></small>
                             </div>
                         </div>
                     </div>
