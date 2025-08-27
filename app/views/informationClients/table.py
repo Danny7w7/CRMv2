@@ -150,7 +150,7 @@ def clientAccionRequired(request):
                 CustomerRedFlag.objects.filter(obamacare=OuterRef('id'), date_completed__isnull=True
                     ).values('clave')[:1] )).filter( id__in=CustomerRedFlag.objects.filter(
                         date_completed__isnull=True ).values_list('obamacare', flat=True
-                            ), is_active = True, agent_id = request.user.id, company = company_id ).order_by('-created_at')
+                            ), is_active = True, company = company_id ).order_by('-created_at')
 
 
     return render(request, 'informationClient/clientAccionRequired.html', {'obamacares':obamaCare})
