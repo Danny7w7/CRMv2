@@ -284,6 +284,7 @@ async function generatePDFBlob() {
 
     // Consentimiento de mensajes de texto
     addText('CONSENTIMIENTO DE MENSAJES DE TEXTO', 12, true);
+    addText(`Acepta recibir mensajes de texto automatizados de Lapeira & Associates LLC: ${formData.consentAccepted ? 'SÍ' : 'NO'}`);
     if (formData.consentAccepted) {
         addText('Al suministrar su número de teléfono, usted está de acuerdo en recibir mensajes de texto automatizados de Lapeira & Associates LLC con información respecto a opciones de seguro médico, beneficios, productos de seguros, actualizaciones de pólizas, primas, solicitudes y asuntos relacionados para ayudarme o recordarme de cualquier acción necesaria para mantener mi póliza al día. Usted está de acuerdo con nuestros Términos de Uso Terms of Use y nuestra Política de Privacidad. Su autorización no es condición para compra. Responda HELP para ayuda. Rates de msg & data pueden aplicar. Hasta 5 msgs/mes. Responda STOP para opt-out en cualquier momento.');
     }
