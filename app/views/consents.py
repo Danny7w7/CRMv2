@@ -892,6 +892,6 @@ def sendConsentForm(request):
 def consentL(request):
     """Vista para mostrar el formulario de consentimiento"""
     response = render(request, 'consent/consentL.html')
-    response["Content-Security-Policy"] = "frame-ancestors https://lapeirainsurance.com"
+    response["Content-Security-Policy"] = "frame-ancestors https://lapeirainsurance.com https://truinsurancegroup.com/"
     return response
 
