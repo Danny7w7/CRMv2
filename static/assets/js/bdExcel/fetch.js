@@ -39,8 +39,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         icon: 'success',
                         confirmButtonText: 'OK'
                     }).then(() => {
-                        // Recargar la página para mostrar los cambios
-                        location.reload();
                     });
                 } else {
                     Swal.fire({
