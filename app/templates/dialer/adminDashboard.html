@@ -1,0 +1,175 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campaign Manager</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{% static 'assets/css/dialer/adminDashboard.css' %}" rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="display-4 fw-bold text-primary">
+                        <i class="fas fa-bullhorn me-3"></i>Campaign Manager
+                    </h1>
+                    <button class="btn btn-primary btn-custom" data-bs-toggle="modal" data-bs-target="#createCampaignModal">
+                        <i class="fas fa-plus me-2"></i>New Campaign
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" id="campaignsContainer">
+            <!-- Las campañas se generarán dinámicamente aquí -->
+        </div>
+    </div>
+
+    <!-- Modal Table Generic -->
+    <div class="modal fade" id="modalTable" tabindex="-1" role="dialog" aria-labelledby="modalTable" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTable">Errors</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive" id="tableContainer">
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para ver detalles de campaña -->
+    <div class="modal fade" id="campaignModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header campaign-header">
+                    <h5 class="modal-title" id="modalCampaignName">Campaign Details</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>General Statistics</h6>
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="row text-center">
+                                        <div class="col-4">
+                                            <h3 class="text-primary" id="modalTotalContacts">0</h3>
+                                            <small>Total Contacts</small>
+                                        </div>
+                                        <div class="col-4">
+                                            <h3 class="text-success" id="modalMarkedContacts">0</h3>
+                                            <small>Marked</small>
+                                        </div>
+                                        <div class="col-4">
+                                            <h3 class="text-info" id="modalSuccessRate">0%</h3>
+                                            <small>Success Rate</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Marking Progress</h6>
+                            <div class="progress mb-3" style="height: 30px;">
+                                <div class="progress-bar bg-success" id="modalProgressBar" style="width: 0%">
+                                    <span id="modalProgressText">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal fade" id="modalSelectHeaders" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog" aria-labelledby="modalTitleSelectHeaders" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <form id="formSelectHeaders" method="POST">
+                {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalTitleSelectHeaders">Select Headers</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Name</label>
+                            <select class="form-select" name="name">
+                                <option selected>Select one</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Phone Number</label>
+                            <select class="form-select" name="phoneNumber">
+                                <option selected>Select one</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Address</label>
+                            <select class="form-select" name="address">
+                                <option selected>Select one</option>
+                            </select>
+                        </div>
+                        <input type="hidden" name="campaignIdFinally" id="campaignIdFinally">
+                        
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+
+    <!-- Modal para crear campaña -->
+    <div class="modal fade" id="createCampaignModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header campaign-header">
+                    <h5 class="modal-title">Create Campaign</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id='formCreateCampaign' method="POST">
+                        <div class="row">
+                            {% csrf_token %}
+                            <div class="col-6">
+                                <label for="campaignName" class="form-label">Campaign Name</label>
+                                <input type="text" class="form-control" name="name" id="campaignName" placeholder="Enter campaign name" required>
+                            </div>
+                            <div class="col-6">
+                                <label for="campaignDescription" class="form-label">Description</label>
+                                <textarea class="form-control" name="description" id="campaignDescription" rows="1" placeholder="Enter campaign description" required></textarea>
+                            </div>
+                            <div class="col d-flex justify-content-center">
+                                <button type="submit" class="btn btn-primary mt-3">Create Campaign</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="{% static 'assets/js/dialer/adminDashboard.js' %}"></script>
+</body>
+</html>

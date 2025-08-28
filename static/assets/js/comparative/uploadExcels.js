@@ -58,7 +58,6 @@ function setupFormSendHeaderListener(formId) {
   
       if (response.ok) {
         const data = await response.json()
-        console.log(data);
         Swal.fire({
           icon: 'success',
           title: 'Éxito',
@@ -91,8 +90,6 @@ document.getElementById('uploadForm').addEventListener('submit', async (event) =
 
   const form = event.target;
   const formData = new FormData(form);
-  console.log(form)
-  console.log(formData)
 
   const response = await fetch('/headerProcessor/', {
     method: 'POST',
@@ -100,7 +97,6 @@ document.getElementById('uploadForm').addEventListener('submit', async (event) =
   });
 
   const data = await response.json();
-  console.log(data);
   populateSelects(`${data.modalId}SelectHeader`, data.headers);
   showModal(`modal${data.modalId}`); // Pasamos el ID dinámicamente
   setupFormSendHeaderListener(`${data.modalId}Form`);

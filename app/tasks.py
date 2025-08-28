@@ -2,10 +2,11 @@ import logging
 import os
 import requests
 import telnyx
+import time
 
 from django.conf import settings
 from django.core.files.base import ContentFile
-from django.db.models import Q
+from django.db.models import OuterRef, Subquery, Q
 
 from celery import shared_task
 from datetime import datetime, date
@@ -19,6 +20,53 @@ from app.utils import enviar_email, generateWeeklyPdf, uploadTempUrl
 from app.views.utils import *
 
 logger = get_task_logger(__name__)
+
+@shared_task
+def dial_leads_task(campaign_id, timeout=60, variableRingingSimultanious=5):
+    start_time = time.time()
+
+    # Subquery para obtener el último outcome de cada lead
+    latest_call = Call.objects.filter(contact=OuterRef('pk')).order_by('-started_at')
+    latest_requires_callback = Subquery(
+        latest_call.values('outcome__requiresCallback')[:1]
+    )
+
+    leads = LeadsDialer.objects.filter(campaign_id=campaign_id).annotate(
+        lastRequiresCallback=latest_requires_callback
+    ).filter(
+        Q(lastRequiresCallback=True) | Q(lastRequiresCallback__isnull=True)
+    )
+
+    for lead in leads:
+        # Timeout para evitar bucle infinito
+        while Call.objects.filter(status='ringing').count() >= variableRingingSimultanious:
+            if time.time() - start_time > timeout:
+                break
+            time.sleep(1)
+
+        agentsAvailable = Agent.objects.filter(status='available')
+        if not agentsAvailable or time.time() - start_time > timeout:
+            break
+
+        callData = telnyx.Call.create(
+            connection_id="2715575536108701048",
+            to=f"+{lead.phone_number}",
+            from_="+17542767904",
+            answering_machine_detection="premium",
+            webhook_url=f"{settings.DOMAIN}/dialer/webhooks/",
+            webhook_url_method="POST",
+        )
+
+        Call.objects.create(
+            telnyx_call_control_id=callData.call_control_id,
+            contact=lead,
+            status="ringing"
+        )
+
+        lead.attempts += 1
+        lead.save()
+
+        time.sleep(0.5)
 
 @shared_task
 def my_daily_task():

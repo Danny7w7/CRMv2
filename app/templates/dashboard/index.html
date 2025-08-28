@@ -227,6 +227,20 @@
 								{% endif %}							
 							</ul>
 						</li>
+						<li>
+							<a class="has-arrow" href="javascript:;">
+								<div class="parent-icon"> <i class="fadeIn animated bx bx-phone-call"></i></div>
+								<div class="menu-title">Dialer</div>
+							</a>
+							<ul>
+								{% if request.user.is_superuser or request.user.role == 'S' %}
+								<li> <a href="{% url 'campaigns' %}"><i class='bx bx-radio-circle'></i>Campaing Manager</a>
+								</li>
+								{% endif %}
+								<li> <a href="{% url 'agentDashboard' %}"><i class='bx bx-radio-circle'></i>Agent Dashboard</a>
+								</li>
+							</ul>
+						</li>
 					{% endif %}
 
 				{% endif %}

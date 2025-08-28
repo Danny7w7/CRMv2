@@ -26,6 +26,7 @@ from .views.reports import table as tableReports
 from .views.reports import charts, download
 from .views.users import users, companies
 from .views import dbExcel, quality, consents, sms, utils, supervisorPanel, whatsApp, comparativeReports, leadConector, book
+from .views.dialer import agentDialer, adminDialer, dialerLogic
 
 
 urlpatterns = [
@@ -166,7 +167,27 @@ urlpatterns = [
     path('payment/<str:type>/<int:company_id>/', sms.payment_type, name='payment'),
 
     path('adminSms/', sms.adminSms, name='adminSms'),
+
     path('smstemplate/', sms.smstemplate, name='smstemplate'),
+
+
+    #<---------------------------Dialer--------------------------->
+    path('dialer/agentDashboard/', agentDialer.agentDashboard, name='agentDashboard'),
+
+    # path('dialer/adminDashboard/', adminDialer.adminDashboard, name='adminDashboard'),
+    path('dialer/adminDashboard/campaigns/', adminDialer.campaigns, name='campaigns'),
+    # path('dialer/adminDashboard/campaigns/details/<int:campaign_id>/', adminDialer.campaignDetail, name='campaignDetail'),
+
+    #Json endpoints for dialer logic
+    path('dialer/adminDashboard/campaigns/create/', adminDialer.createCampaigns, name='createCampaigns'),
+    path('dialer/adminDashboard/campaigns/getList/', adminDialer.getListCampaigns, name='getListCampaigns'),
+    path('dialer/adminDashboard/campaigns/processExcelForDialer/', adminDialer.processExcelForDialer, name='processExcelForDialer'),    
+    path('dialer/agentDashboard/changeStatus/<int:agent_id>/', agentDialer.changeStatus, name='changeStatus'),
+    path('dialer/agentDashboard/getStats/', agentDialer.getStats, name='getStats'),
+    path('dialer/agentDashboard/tipification/', agentDialer.typifyCall, name='typifyCall'),
+    path('dialer/iniciateCalls/<int:campaign_id>/', dialerLogic.iniciateCalls, name='iniciateCalls'),
+    path('dialer/tranferCallToAgent/', dialerLogic.endpointTranferCallToAgent, name='tranferCallToAgent'),
+    path('dialer/webhooks/', dialerLogic.webhooksTelnyx, name='webhooks'),
 
 
     #<---------------------------Sales Reports--------------------------->

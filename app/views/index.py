@@ -18,6 +18,9 @@ from .decoratorsCompany import *
 
 @login_required(login_url='/login') 
 def index(request):
+    import redis
+    r = redis.Redis(host='localhost', port=6379, db=0)
+    print(r.ping())
 
     obama = countSalesObama(request)
     supp = countSalesSupp(request)

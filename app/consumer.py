@@ -216,3 +216,37 @@ class WhatsAppConsumer(AsyncWebsocketConsumer):
             'fecha': event['fecha'],
             'sender': sender,  # Incluimos el campo sender en la respuesta JSON
         }))
+
+class CallAlertConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        # El agente se identifica por la URL: ws://.../ws/call-alert/{agent_id}/
+        self.agent_id = self.scope['url_route']['kwargs']['agent_id']
+        self.group_name = f'call_alert_agent_{self.agent_id}'
+
+        # Unirse al grupo único del agente
+        await self.channel_layer.group_add(
+            self.group_name,
+            self.channel_name
+        )
+
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        # Salir del grupo al desconectarse
+        await self.channel_layer.group_discard(
+            self.group_name,
+            self.channel_name
+        )
+
+    async def call_answered(self, event):
+        await self.send(text_data=json.dumps({
+            'type': 'call_answered',
+            'clientName': event['clientName'],
+            'clientPhone': event['clientPhone'],
+            'clientAddress': event['clientAddress'],
+            'clientZipCode': event['clientZipCode'],
+            'lastCall': event['lastCall'],
+            'attempts': event['attempts'],
+            'status': event['status'],
+            'callId': event['callId'],
+        }))

@@ -27,12 +27,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY_DJANGO')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True if os.getenv('DEBUG') == '1' else False
 
-CSRF_TRUSTED_ORIGINS = ['https://crm.lapeira.com', 'https://www.crm.lapeira.com']
-ALLOWED_HOSTS = ['crm.lapeira.com', 'www.crm.lapeira.com']
-
-TELNYX_API_KEY = os.getenv('TELNYX_API_KEY')
+# CSRF_TRUSTED_ORIGINS = ['https://crm.lapeira.com', 'https://www.crm.lapeira.com']
+ALLOWED_HOSTS = ['*']
 
 #Configuration to use own user model
 AUTH_USER_MODEL = 'app.Users'  
@@ -106,15 +104,12 @@ CHANNEL_LAYERS = {
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASS'),
+        'NAME': 'CRM_2025',
+        'USER': 'root',
+        'PASSWORD': '',
         'HOST': os.getenv('DB_HOST'),
         'PORT': os.getenv('DB_PORT'),
         'OPTIONS': {
@@ -188,12 +183,13 @@ else:
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 # Configuración de Celery
-CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Usamos Redis como broker
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
+CELERY_WORKER_POOL = 'solo'
 
 # Celery Result Backend
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/0'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -226,6 +222,17 @@ DEFAULT_FROM_EMAIL = SENDER_EMAIL_ADDRESS
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 DOMAIN = os.getenv('DOMAIN')
 STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET')
+
+# Telnyx Configuration
+TELNYX_API_KEY = os.getenv('TELNYX_API_KEY')
+TELNYX_CONNECTION_ID = os.getenv('TELNYX_CONNECTION_ID')
+
+TELNYX_SIP_DOMAIN = os.getenv('TELNYX_SIP_DOMAIN')
+TELNYX_SIP_USERNAME = os.getenv('TELNYX_SIP_USERNAME')
+TELNYX_SIP_CONNECTION_ID = os.getenv('TELNYX_SIP_CONNECTION_ID')
+
+# Para desarrollo local con ngrok
+BASE_URL = os.getenv('BASE_URL')
 
 #Twilio
 ACCOUNT_SID = os.getenv('ACCOUNT_SID')

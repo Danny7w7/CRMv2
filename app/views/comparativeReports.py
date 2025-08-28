@@ -26,7 +26,7 @@ def processExcel(request):
         try:
             # Detect file extension
             fileExtension = uploadedFile.name.split('.')[-1].lower()
-            
+
             if fileExtension in ['xlsx', 'xls']:
                 dataFrame = pd.read_excel(uploadedFile)
             elif fileExtension == 'csv':
