@@ -29,8 +29,8 @@ SECRET_KEY = os.getenv('SECRET_KEY_DJANGO')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True if os.getenv('DEBUG') == '1' else False
 
-# CSRF_TRUSTED_ORIGINS = ['https://crm.lapeira.com', 'https://www.crm.lapeira.com']
-ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = ['https://crm.lapeira.com', 'https://www.crm.lapeira.com']
+ALLOWED_HOSTS = ['crm.lapeira.com', 'www.crm.lapeira.com']
 
 #Configuration to use own user model
 AUTH_USER_MODEL = 'app.Users'  
