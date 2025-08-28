@@ -27,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY_DJANGO')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True if os.getenv('DEBUG') == '1' else False
+DEBUG = True
 
 CSRF_TRUSTED_ORIGINS = ['https://crm.lapeira.com', 'https://www.crm.lapeira.com']
 ALLOWED_HOSTS = ['crm.lapeira.com', 'www.crm.lapeira.com']
