@@ -391,22 +391,28 @@
 					<li class="menu-label">Admin</li>
 
 					{% if request.user|has_module:"COMPARATIVE" %}
-						{% if request.user.is_staff %}
+						{% if request.user.is_staff or request.user.is_superuser or request.user.role == 'S' or request.user.role == 'C' %}
 							<li>
 								<a class="has-arrow" href="javascript:;">
 									<div class="parent-icon"> <i class="lni lni-files"></i> </div>
 									<div class="menu-title">Comparative Excels</div>
 								</a>
 								<ul>
+									{% if request.user.is_staff or request.user.is_superuser %}
 									<li>
 										<a href="{% url 'uploadReports'  %}"><i class='bx bx-radio-circle'></i>Upload Reports</a>
 									</li>
+									{% endif %}
+									{% if request.user.is_staff or request.user.is_superuser or request.user.role == 'C' %}
 									<li>
 										<a href="{% url 'paymentsReports'  %}"><i class='bx bx-radio-circle'></i>Payments Report ACA</a>
 									</li>
+									{% endif %}
+									{% if request.user.is_staff or request.user.is_superuser %}
 									<li>
 										<a href="{% url 'paymentsReportsSupp'  %}"><i class='bx bx-radio-circle'></i>Payments Report Supp</a>
 									</li>
+									{% endif %}
 								</ul>
 							</li>
 						{% endif %}
