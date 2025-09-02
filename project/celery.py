@@ -16,7 +16,7 @@ app.conf.update(
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
 # Carga tareas de todas las aplicaciones registradas en Django.
-app.autodiscover_tasks()
+app.autodiscover_tasks(['app'])
 
 from celery.schedules import crontab
 
