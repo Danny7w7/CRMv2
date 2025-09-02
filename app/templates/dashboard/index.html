@@ -387,7 +387,7 @@
 					</li>
 				{% endif %}
 
-				{% if request.user.role == 'Admin' or request.user.is_staff %}
+				{% if request.user.role == 'Admin' or request.user.is_staff or request.user.role == 'S' or request.user.role == 'C' %}
 					<li class="menu-label">Admin</li>
 
 					{% if request.user|has_module:"COMPARATIVE" %}
