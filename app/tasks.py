@@ -22,7 +22,7 @@ from app.views.utils import *
 logger = get_task_logger(__name__)
 
 @shared_task
-def dial_leads_task(campaign_id, timeout=60, variableRingingSimultanious=5):
+def dial_leads_task(campaign_id, timeout=60):
     start_time = time.time()
 
     # Subquery para obtener el último outcome de cada lead
@@ -40,13 +40,13 @@ def dial_leads_task(campaign_id, timeout=60, variableRingingSimultanious=5):
     campaign = Campaign.objects.get(id=campaign_id)
 
     for lead in leads:
+        agentsAvailable = Agent.objects.filter(status='available')
         # Timeout para evitar bucle infinito
-        while Call.objects.filter(status='ringing').count() >= campaign.max_concurrent_calls:
+        while Call.objects.filter(status='ringing').count() >= campaign.max_concurrent_calls*agentsAvailable.count():
             if time.time() - start_time > timeout:
                 break
             time.sleep(1)
 
-        agentsAvailable = Agent.objects.filter(status='available')
         if not agentsAvailable or time.time() - start_time > timeout:
             break
 
