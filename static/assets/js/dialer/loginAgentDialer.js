@@ -61,7 +61,7 @@ async function loginToCampaign(campaignId) {
         const response = await fetch('/api/dialer/agentDashboard/campaign/login/', {
             method: 'POST',
             body: JSON.stringify({
-                campaign: campaignId,
+                campaign_id: campaignId,
                 timestamp: new Date().toISOString()
             })
         });

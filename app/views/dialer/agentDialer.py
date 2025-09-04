@@ -36,7 +36,7 @@ def loginCampaign(request):
     campaign_id = data.get('campaign_id')
     try:
         agent = request.user.agent
-        campaign = Campaign.objects.filter(is_active = True, campaign_id=campaign_id).first()
+        campaign = Campaign.objects.get(id=campaign_id)
         agent.current_campaign = campaign
         agent.save()
     except AttributeError:
@@ -48,12 +48,11 @@ def agentDashboard(request):
     if request.user.agent.current_campaign:
         try:
             agent = request.user.agent
-            campaign = Campaign.objects.get(id=agent.current_campaign.id)
             tipifications = CallOutcome.objects.all()
 
             context = {
                 'agent': agent,
-                'campaign': campaign,
+                'campaign': agent.current_campaign,
                 'tipifications': tipifications
             }
         except AttributeError:
