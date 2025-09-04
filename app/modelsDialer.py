@@ -8,11 +8,6 @@ from django.db import models
 from .models import Users
 
 
-class DialerConfig(models.Model):
-    maxConcurrentCalls = models.IntegerField(default=3)
-    
-    class Meta:
-        db_table = 'dialer_configs'
 
 class Campaign(models.Model):
     name = models.CharField(max_length=200)
@@ -20,7 +15,6 @@ class Campaign(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
     max_concurrent_calls = models.IntegerField(default=3)  # Para no superar 5 CPS
-    campaign = models.OneToOneField(DialerConfig, on_delete=models.CASCADE, null=True, blank=True)
     
     def __str__(self):
         return self.name
