@@ -10,9 +10,6 @@ from django.utils import timezone
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 
-# Application-specific imports
-from app.models import Agent
-
 
 logger = logging.getLogger('django')
 
@@ -253,6 +250,7 @@ class CallAlertConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def update_agent_status(self, user_id):
+        from app.models import Agent
         try:
             agent = Agent.objects.get(id=user_id)
             agent.current_campaign = None
