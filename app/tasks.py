@@ -37,9 +37,11 @@ def dial_leads_task(campaign_id, timeout=60, variableRingingSimultanious=5):
         Q(lastRequiresCallback=True) | Q(lastRequiresCallback__isnull=True)
     )
 
+    campaign = Campaign.objects.get(id=campaign_id)
+
     for lead in leads:
         # Timeout para evitar bucle infinito
-        while Call.objects.filter(status='ringing').count() >= variableRingingSimultanious:
+        while Call.objects.filter(status='ringing').count() >= campaign.max_concurrent_calls:
             if time.time() - start_time > timeout:
                 break
             time.sleep(1)
