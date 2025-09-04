@@ -53,7 +53,7 @@ def dial_leads_task(campaign_id, timeout=60, variableRingingSimultanious=5):
             to=f"+{lead.phone_number}",
             from_="+17542767904",
             answering_machine_detection="premium",
-            webhook_url=f"{settings.DOMAIN}/dialer/webhooks/",
+            webhook_url=f"{settings.DOMAIN}/api/dialer/webhooks/",
             webhook_url_method="POST",
         )
 
