@@ -38,7 +38,7 @@ MODULE_PATHS = {
     'BOOK': ['uploadBook','bookList','bookPages','saveTime','toggleBook','bookReport']
 }
 
-EXCLUDED_VIEWS = ['index','toggleDarkMode' ,'motivationalPhrase','login','logout','viewConsent','consetMedicare','formCreateUser', 'addNumbersUsers','incomeLetter','ConsentLifeInsurance','complaint', 'sms','whatsappReply','url_temporal', 'obtainLeadsByGoHighLevel','consentL','sendConsentForm','enviar_email','uploadTempUrl', 'agentDashboard', 'campaigns', 'campaigns', 'createCampaigns', 'getListCampaigns', 'processExcelForDialer', 'changeStatus', 'getStats', 'typifyCall', 'iniciateCalls', 'tranferCallToAgent', 'webhooks', 'selectCampaign']  # Puedes agregar más si lo necesitas
+EXCLUDED_VIEWS = ['index','toggleDarkMode' ,'motivationalPhrase','login','logout','viewConsent','consetMedicare','formCreateUser', 'addNumbersUsers','incomeLetter','ConsentLifeInsurance','complaint', 'sms','whatsappReply','url_temporal', 'obtainLeadsByGoHighLevel','consentL','sendConsentForm','enviar_email','uploadTempUrl', 'agentDashboard', 'campaigns', 'campaigns', 'createCampaigns', 'getListCampaigns', 'processExcelForDialer', 'changeStatus', 'getStats', 'typifyCall', 'iniciateCalls', 'tranferCallToAgent', 'webhooks', 'selectCampaign', 'configCampaigns', 'loginCampaign']  # Puedes agregar más si lo necesitas
 
 class ModuleAccessMiddleware:
     def __init__(self, get_response):
