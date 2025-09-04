@@ -29,25 +29,25 @@ app.conf.beat_schedule = {
         'task': 'app.tasks.smsPayment',
         'schedule': crontab(minute=33, hour=9),  # Ejecutar a las 9:33 AM todos los días
     },
-    'run-sms-report-task': {
-        'task': 'app.tasks.reportBoosLapeira',
-        'schedule': crontab(minute=2, hour=7, day_of_week='0,2-6'),  # Ejecutar a las 7 AM todos los días
-    },
-    'run-sms-reportTwo-task': {
-        'task': 'app.tasks.enviar_pdf_por_email',
-        'schedule': crontab(minute=1, hour=16, day_of_week='6'),  # Ejecutar a las 4PM todo los sabado
-    },
-    'run-sms-reportThree-task': {
-        'task': 'app.tasks.reportCustomerWeek',
-        'schedule': crontab(minute=2, hour=16, day_of_week='6'),  # Ejecutar a las 4PM todo los sabado
-    },
-    'run-sms-reportFour-task': {
-        'task': 'app.tasks.report6Week',
-        'schedule': crontab(minute=4, hour=16, day_of_week='6'),  # Ejecutar a las 4PM todo los sabado
-    },
-    'run-sms-reportFive-task': {
-        'task': 'app.tasks.allReports',
-        'schedule': crontab(minute=8, hour=16, day_of_week='6'),  # Ejecutar a las 4PM todo los sabado
-    },
+    # 'run-sms-report-task': {
+    #     'task': 'app.tasks.reportBoosLapeira',
+    #     'schedule': crontab(minute=2, hour=7, day_of_week='0,2-6'),  # Ejecutar a las 7 AM todos los días
+    # },
+    # 'run-sms-reportTwo-task': {
+    #     'task': 'app.tasks.enviar_pdf_por_email',
+    #     'schedule': crontab(minute=1, hour=16, day_of_week='6'),  # Ejecutar a las 4PM todo los sabado
+    # },
+    # 'run-sms-reportThree-task': {
+    #     'task': 'app.tasks.reportCustomerWeek',
+    #     'schedule': crontab(minute=2, hour=16, day_of_week='6'),  # Ejecutar a las 4PM todo los sabado
+    # },
+    # 'run-sms-reportFour-task': {
+    #     'task': 'app.tasks.report6Week',
+    #     'schedule': crontab(minute=4, hour=16, day_of_week='6'),  # Ejecutar a las 4PM todo los sabado
+    # },
+    # 'run-sms-reportFive-task': {
+    #     'task': 'app.tasks.allReports',
+    #     'schedule': crontab(minute=8, hour=16, day_of_week='6'),  # Ejecutar a las 4PM todo los sabado
+    # },
 
 }
