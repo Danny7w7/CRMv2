@@ -85,6 +85,7 @@ class CalendarManager {
     setModalContent(event, props) {
         const elements = {
             'modal-client-name': props.client_name,
+            'modal-client-phone' : props.client_phone,
             'modal-agent-name': props.agent_name,
             'modal-date': props.datetime || new Date(event.start).toLocaleDateString(),
             'modal-time': props.time || new Date(event.start).toLocaleTimeString(),
@@ -138,6 +139,7 @@ class CalendarManager {
         
         const tooltipText = [
             `Cliente: ${props.client_name}`,
+            `Phone: ${props.client_phone}`,
             `Agente: ${props.agent_name}`,
             `Fecha: ${props.datetime || startDate.toLocaleDateString()}`,
             `Hora: ${props.time || startDate.toLocaleTimeString()}`,

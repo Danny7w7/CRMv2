@@ -265,6 +265,7 @@ def tableAlert(request):
             'extendedProps': {
                 'agent_name': f"{alertClient.agent.first_name} {alertClient.agent.last_name}",
                 'client_name': alertClient.name_client,
+                'client_phone': alertClient.phone_number,
                 'content': alertClient.content,
                 'is_active': alertClient.is_active,
                 'company_name': alertClient.company.company_name if hasattr(alertClient, 'company') else '',

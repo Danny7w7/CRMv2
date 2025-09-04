@@ -21,7 +21,6 @@
 	<link rel="stylesheet" href="{% static "assets/css/semi-dark.css" %}" />
 	<link rel="stylesheet" href="{% static "assets/css/header-colors.css" %}" />
 
-
 	<!--plugins-->
 	<link href="{% static "assets/plugins/fullcalendar/css/main.min.css" %}" rel="stylesheet" />
 
@@ -49,6 +48,7 @@
             </div>
             <div class="modal-body">
                 <p><strong>Cliente:</strong> <span id="modal-client-name"></span></p>
+				<p><strong>Phone:</strong> <span id="modal-client-phone"></span></p>
                 <p><strong>Agente:</strong> <span id="modal-agent-name"></span></p>
                 <p><strong>Fecha:</strong> <span id="modal-date"></span></p>
                 <p><strong>Hora:</strong> <span id="modal-time"></span></p>
@@ -84,9 +84,7 @@
 	<script src="{% static "assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js" %}"></script>
 	<script src="{% static "assets/plugins/datatable/js/jquery.dataTables.min.js" %}"></script>
 	<script src="{% static "assets/plugins/datatable/js/dataTables.bootstrap5.min.js" %}"></script>
-	<script>
-		$(document).ready(function() {$('#tableClient').DataTable();} );
-	</script>
+
 	<!--app JS-->
 	<script src="{% static "assets/js/app.js" %}"></script>
 
@@ -96,12 +94,12 @@
 
 
 	<script>
-    // Inicializar el calendario con los datos de Django
-    window.initCalendar(
-        {{ events_json|safe }},
-        "{{ user_role }}",
-        {{ is_superuser|yesno:"true,false" }}
-    );
-</script>
+    	// Inicializar el calendario con los datos de Django
+		window.initCalendar(
+			{{ events_json|safe }},
+			"{{ user_role }}",
+			{{ is_superuser|yesno:"true,false" }}
+		);
+	</script>
 
 {% endblock %}
