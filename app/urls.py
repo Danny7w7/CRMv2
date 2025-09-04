@@ -173,21 +173,24 @@ urlpatterns = [
 
     #<---------------------------Dialer--------------------------->
     path('dialer/agentDashboard/', agentDialer.agentDashboard, name='agentDashboard'),
+    path('dialer/selectCampaign/', agentDialer.selectCampaign, name='selectCampaign'),
 
     # path('dialer/adminDashboard/', adminDialer.adminDashboard, name='adminDashboard'),
     path('dialer/adminDashboard/campaigns/', adminDialer.campaigns, name='campaigns'),
     # path('dialer/adminDashboard/campaigns/details/<int:campaign_id>/', adminDialer.campaignDetail, name='campaignDetail'),
 
     #Json endpoints for dialer logic
-    path('dialer/adminDashboard/campaigns/create/', adminDialer.createCampaigns, name='createCampaigns'),
-    path('dialer/adminDashboard/campaigns/getList/', adminDialer.getListCampaigns, name='getListCampaigns'),
-    path('dialer/adminDashboard/campaigns/processExcelForDialer/', adminDialer.processExcelForDialer, name='processExcelForDialer'),    
-    path('dialer/agentDashboard/changeStatus/<int:agent_id>/', agentDialer.changeStatus, name='changeStatus'),
-    path('dialer/agentDashboard/getStats/', agentDialer.getStats, name='getStats'),
-    path('dialer/agentDashboard/tipification/', agentDialer.typifyCall, name='typifyCall'),
-    path('dialer/iniciateCalls/<int:campaign_id>/', dialerLogic.iniciateCalls, name='iniciateCalls'),
-    path('dialer/tranferCallToAgent/', dialerLogic.endpointTranferCallToAgent, name='tranferCallToAgent'),
-    path('dialer/webhooks/', dialerLogic.webhooksTelnyx, name='webhooks'),
+    path('api/dialer/adminDashboard/campaigns/create/', adminDialer.createCampaigns, name='createCampaigns'),
+    path('api/dialer/adminDashboard/campaigns/configure/', adminDialer.configCampaigns, name='configCampaigns'),
+    path('api/dialer/adminDashboard/campaigns/getList/', adminDialer.getListCampaigns, name='getListCampaigns'),
+    path('api/dialer/adminDashboard/campaigns/processExcelForDialer/', adminDialer.processExcelForDialer, name='processExcelForDialer'),    
+    path('api/dialer/agentDashboard/campaign/login/', agentDialer.loginCampaign, name='loginCampaign'),
+    path('api/dialer/agentDashboard/changeStatus/<int:agent_id>/', agentDialer.changeStatus, name='changeStatus'),
+    path('api/dialer/agentDashboard/getStats/', agentDialer.getStats, name='getStats'),
+    path('api/dialer/agentDashboard/tipification/', agentDialer.typifyCall, name='typifyCall'),
+    path('api/dialer/iniciateCalls/<int:campaign_id>/', dialerLogic.iniciateCalls, name='iniciateCalls'),
+    path('api/dialer/tranferCallToAgent/', dialerLogic.endpointTranferCallToAgent, name='tranferCallToAgent'),
+    path('api/dialer/webhooks/', dialerLogic.webhooksTelnyx, name='webhooks'),
 
 
     #<---------------------------Sales Reports--------------------------->

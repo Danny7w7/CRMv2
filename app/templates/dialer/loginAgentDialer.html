@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Campaign - Call Center</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="login-container fade-in">
+        <div class="login-card">
+            <div class="login-header">
+                <i class="fas fa-headset"></i>
+                <h2>Call Center Dashboard</h2>
+                <p>Select your campaign to start</p>
+            </div>
+            
+            <div class="login-body">
+                <form id="campaignForm">
+                    <!-- Agent Info -->
+                    <div class="agent-info">
+                        <div class="agent-avatar">{{ agent.user.first_name.0 }}{{ agent.user.last_name.0 }}</div>
+                        <div>
+                            <div class="fw-bold">{{ agent.user.first_name }} {{ agent.user.last_name }}</div>
+                            <small class="text-muted">Agent ID: {{ agent.id }}</small>
+                        </div>
+                    </div>
+
+                    <!-- Campaign Selection -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-bullhorn"></i>
+                            Select Campaign
+                        </label>
+
+                        {% for campaign in campaigns %}                        
+                        <div class="campaign-option" data-campaign="{{campaign.id}}">
+                            <div class="campaign-name">{{ campaign.name }}</div>
+                            <div class="campaign-description">{{ campaign.description }}</div>
+                            <div class="campaign-stats">
+                                <span><i class="fas fa-users"></i> {{ campaign.total_leads }} leads</span>
+                                <span><i class="fas fa-chart-line"></i> {{ campaign.conversion_rate }}% conversion</span>
+                                <span><i class="fas fa-clock"></i> {{ campaign.status }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <button type="submit" class="login-btn" id="loginBtn" disabled>
+                        <i class="fas fa-sign-in-alt me-2"></i>
+                        Start Session
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

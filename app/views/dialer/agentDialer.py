@@ -5,35 +5,62 @@ from collections import defaultdict
 
 # Django utilities
 from django.http import HttpResponseBadRequest, JsonResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.utils.timezone import now
 
 # Django core libraries
 from django.views.decorators.http import require_POST, require_GET
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-from django.db.models import Avg
+from django.db.models import Avg, Count
 
 # Third-party imports
 
 # Application-specific imports
 from app.modelsDialer import *
 
-@login_required(login_url='/login') 
-def agentDashboard(request):
+@login_required(login_url='/login')
+def selectCampaign(request):
+    campaigns = Campaign.objects.filter(is_active=True).annotate(total_leads=Count('contacts'))
+    agent = Agent.objects.get(user=request.user)
+    context = {
+        'campaigns': campaigns,
+        'agent': agent
+    }
+    return render(request, 'dialer/loginAgentDialer.html', context)
+
+@csrf_exempt
+@require_POST
+def loginCampaign(request):
+    data = json.loads(request.body)
+    campaign_id = data.get('campaign_id')
     try:
         agent = request.user.agent
-        campaign = Campaign.objects.filter(is_active = True).first()
-        tipifications = CallOutcome.objects.all()
-
-        context = {
-            'agent': agent,
-            'campaign': campaign,
-            'tipifications': tipifications
-        }
+        campaign = Campaign.objects.filter(is_active = True, campaign_id=campaign_id).first()
+        agent.current_campaign = campaign
+        agent.save()
     except AttributeError:
-        return HttpResponseBadRequest("You are not an agent.", status=403)
-    return render(request, 'dialer/agentDashboard.html', context)
+        return HttpResponseBadRequest("Error of authentication.")
+    return JsonResponse({'message': 'Current Campaign updated'})
+
+@login_required(login_url='/login')
+def agentDashboard(request):
+    if request.user.agent.current_campaign:
+        try:
+            agent = request.user.agent
+            campaign = Campaign.objects.get(id=agent.current_campaign.id)
+            tipifications = CallOutcome.objects.all()
+
+            context = {
+                'agent': agent,
+                'campaign': campaign,
+                'tipifications': tipifications
+            }
+        except AttributeError:
+            return HttpResponseBadRequest("You are not an agent.", status=403)
+        return render(request, 'dialer/agentDashboard.html', context)
+    else:
+        return redirect('selectCampaign')
 
 @csrf_exempt
 @require_POST

@@ -1,8 +1,18 @@
+# Standard Python libraries
 import json
-import re
-from channels.generic.websocket import AsyncWebsocketConsumer
 import logging
+import re
+
+# Django utilities
 from django.utils import timezone
+
+# Django core libraries
+from channels.db import database_sync_to_async
+from channels.generic.websocket import AsyncWebsocketConsumer
+
+# Application-specific imports
+from app.models import Agent
+
 
 logger = logging.getLogger('django')
 
@@ -237,6 +247,20 @@ class CallAlertConsumer(AsyncWebsocketConsumer):
             self.group_name,
             self.channel_name
         )
+
+        if self.scope['user'].is_authenticated:
+            await self.update_agent_status(self.scope['user'].id)
+
+    @database_sync_to_async
+    def update_agent_status(self, user_id):
+        try:
+            agent = Agent.objects.get(id=user_id)
+            agent.current_campaign = None
+            agent.last_login = timezone.now()
+            agent.status = 'busy'
+            agent.save()
+        except Agent.DoesNotExist:
+            pass
 
     async def call_answered(self, event):
         await self.send(text_data=json.dumps({

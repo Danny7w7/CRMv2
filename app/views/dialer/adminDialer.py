@@ -1,10 +1,23 @@
+# Standard Python libraries
+import json
+import re
+
+# Django utilities
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.shortcuts import render
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_GET, require_POST
+
+# Django core libraries
 from django.contrib.auth.decorators import login_required
-import pandas as pd
-from app.modelsDialer import *
-import re
 from django.db.models import Count, Q
+
+# Third-party imports
+import pandas as pd
+
+# Application-specific imports
+from app.modelsDialer import *
 
 
 @login_required(login_url='/login') 
@@ -43,6 +56,7 @@ def getListCampaigns(request):
                 'id': campaign.id,
                 'name': campaign.name,
                 'description': campaign.description or "",
+                'maxConcurrentCalls': campaign.max_concurrent_calls,
                 'totalContacts': campaign.total_contacts,
                 'markedContacts': campaign.marked_contacts,
                 'status': status,
@@ -106,6 +120,19 @@ def processExcelForDialer(request):
         'success':rowsSuccess.to_dict(orient='records'),
         'errors':rowsErrors.to_dict(orient='records')
     })
+
+@require_POST
+@csrf_exempt
+def configCampaigns(request):
+    data = json.loads(request.body)
+    campaign_id = data.get('campaignId')
+    max_concurrent_calls = data.get('maxConcurrentCallsPerAgent')
+
+    campaign = Campaign.objects.get(id=campaign_id)
+    campaign.max_concurrent_calls = max_concurrent_calls
+    campaign.save()
+
+    return JsonResponse({'message': 'Campaign updated successfully'})
 
 def parsePhoneNumber(phoneNumber: str) -> int:
     # Ensure input is string

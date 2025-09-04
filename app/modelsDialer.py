@@ -1,6 +1,11 @@
-from django.db import models
-from .models import Users
+# Standard Python libraries
 import uuid
+
+# Django core libraries
+from django.db import models
+
+# Application-specific imports
+from .models import Users
 
 
 class DialerConfig(models.Model):
@@ -53,6 +58,7 @@ class Agent(models.Model):
     sip_password = models.CharField(max_length=100, blank=True, null=True)
     user = models.OneToOneField(Users, on_delete=models.CASCADE)
     status = models.CharField(max_length=20, choices=AGENT_STATUS, default='offline')
+    current_campaign = models.ForeignKey(Campaign, null=True, blank=True, on_delete=models.SET_NULL)
     current_call = models.ForeignKey('Call', null=True, blank=True, on_delete=models.SET_NULL, related_name='current_call')
     last_call = models.DateTimeField(auto_now=True)
     last_login = models.DateTimeField(auto_now=True)

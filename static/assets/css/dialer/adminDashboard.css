@@ -54,6 +54,17 @@ body {
     transform: scale(1.05);
 }
 
+.btn-config {
+    background: linear-gradient(45deg, #6c757d, #495057);
+    border: none;
+    color: white;
+}
+
+.btn-config:hover {
+    background: linear-gradient(45deg, #5a6268, #343a40);
+    transform: scale(1.05);
+}
+
 .file-upload-area {
     border: 2px dashed #dee2e6;
     border-radius: 10px;

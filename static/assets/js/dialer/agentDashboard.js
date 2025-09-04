@@ -122,7 +122,7 @@ function transferCall() {
     if (isCallActive) {
         const extension = prompt('Ingrese la extensión para transferir:');
         if (extension) {
-            fetchData(`/dialer/tranferCallToAgent/`, {
+            fetchData(`/api/dialer/tranferCallToAgent/`, {
                 method: 'POST',
                 body: { newAgentId: extension}
             })
@@ -148,7 +148,7 @@ function saveNotes() {
 }
 
 function updateStats() {
-    fetchData('/dialer/agentDashboard/getStats/')
+    fetchData('/api/dialer/agentDashboard/getStats/')
     .then(data => {
         document.getElementById('totalCalls').textContent = data.callToday;
         document.getElementById('successCalls').textContent = data.callCompleted;
@@ -248,7 +248,7 @@ function updateStatus() {
         const statusValue = selectedStatus.value;
         const statusText = selectedStatus.nextElementSibling.textContent.trim();
 
-        fetchData(`/dialer/agentDashboard/changeStatus/${agent_id}/`, {
+        fetchData(`/api/dialer/agentDashboard/changeStatus/${agent_id}/`, {
             method: 'POST',
             body: { status: statusValue}
         })
@@ -436,7 +436,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function sendTipification(typification) {
-    fetchData(`/dialer/agentDashboard/tipification/`, {
+    fetchData(`/api/dialer/agentDashboard/tipification/`, {
         method: 'POST',
         body: { 
             controlCallId: controlCallId,

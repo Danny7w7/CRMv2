@@ -1,7 +1,7 @@
 let campaigns = [];
 
 function getListCampaigns() {
-    fetch('/dialer/adminDashboard/campaigns/getList/', {
+    fetch('/api/dialer/adminDashboard/campaigns/getList/', {
         method: 'GET'
     })
     .then(response => response.json())
@@ -105,10 +105,15 @@ function renderCampaigns() {
                                 })" id="markBtn-${campaign.id}">
                                     <i class="fas fa-phone me-2"></i>Dial
                                 </button>
-                                <button class="btn btn-view btn-custom" onclick="viewCampaign(${
+                                <button class="btn btn-view btn-custom me-2" onclick="viewCampaign(${
                                     campaign.id
                                 })">
                                     <i class="fas fa-eye me-2"></i>View
+                                </button>
+                                <button class="btn btn-config btn-custom" onclick="configCampaign(${
+                                    campaign.id
+                                })">
+                                    <i class="fas fa-cog me-2"></i>Config
                                 </button>
                             </div>
                             <div class="mt-3">
@@ -245,6 +250,41 @@ function viewCampaign(campaignId) {
     modal.show();
 }
 
+function configCampaign(campaignId) {
+    getListCampaigns()
+    const campaign = campaigns.find((c) => c.id === campaignId);
+
+    // Actualizar contenido del modal
+    document.getElementById("modalConfigureCampaignName").textContent = `Configure Campaign: ${campaign.name}`;
+    document.getElementById("campaignMaxCurrentCallPerAgent").value = campaign.maxConcurrentCalls;
+    document.getElementById("campaignIdConfig").value = campaign.id;
+
+    // Mostrar modal
+    showOrHideModal('campaignConfigModal', show=true);
+}
+
+function sendConfigCampaign(campaignId, maxConcurrentCallsPerAgent) {
+    fetch('/api/dialer/adminDashboard/campaigns/configure/', {
+        method: 'POST',
+        body: JSON.stringify({
+            campaignId: campaignId,
+            maxConcurrentCallsPerAgent: maxConcurrentCallsPerAgent
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        showOrHideModal('campaignConfigModal', show=false);
+        Swal.fire({
+            title: "Campaign Configured",
+            text: "Your campaign has been configured successfully!",
+            icon: "success"
+        });
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
 // Manejo de archivos
 function handleFileSelect(event, campaignId) {
     const files = event.target.files;
@@ -307,7 +347,7 @@ function uploadFile(file, campaignId) {
 
 function createCampaign(form) {
     formData = new FormData(form);
-    fetch('/dialer/adminDashboard/campaigns/create/', {
+    fetch('/api/dialer/adminDashboard/campaigns/create/', {
     method: 'POST',
         body: formData
     })
@@ -370,7 +410,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const buttonId = event.submitter?.id || '';
             
             if (buttonId.includes('markBtn')) {
-                fetch(`/dialer/iniciateCalls/${campaignId}/`, {
+                fetch(`/api/dialer/iniciateCalls/${campaignId}/`, {
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -411,6 +451,14 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
     });
+
+    const formConfigCampaign = document.getElementById('formConfigCampaign');
+    formConfigCampaign.addEventListener('submit', function (event) {
+        event.preventDefault();
+        const campaignId = document.getElementById("campaignIdConfig").value
+        const maxConcurrentCallsPerAgent = document.getElementById("campaignMaxCurrentCallPerAgent").value
+        sendConfigCampaign(campaignId, maxConcurrentCallsPerAgent);
+    });
 });
 
 function modifyValueInput(inputId, value) {
@@ -429,7 +477,7 @@ function sendExcel(campaignId, formId) {
     formData.append('inputFile', inputFile.files[0]);
     formData.append('campaignId', campaignId);
 
-    fetch('/dialer/adminDashboard/campaigns/processExcelForDialer/', {
+    fetch('/api/dialer/adminDashboard/campaigns/processExcelForDialer/', {
         method: 'POST',
         body: formData
     })

@@ -164,6 +164,34 @@
             </div>
         </div>
     </div>
+    
+
+    <!-- Modal para configurar la campaña -->
+    <div class="modal fade" id="campaignConfigModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header campaign-header">
+                    <h5 class="modal-title" id="modalConfigureCampaignName"></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id='formConfigCampaign' method="POST">
+                        <div class="row">
+                            {% csrf_token %}
+                            <div class="col-6">
+                                <label for="campaignMaxCurrentCallPerAgent" class="form-label">Max Current Calls per Agent</label>
+                                <input type="number" min="1" max="15" class="form-control" name="maxCurrentCallPerAgent" id="campaignMaxCurrentCallPerAgent" placeholder="Enter max current calls per agent" required>
+                            </div>
+                            <input type="hidden" name="campaignIdConfig" id="campaignIdConfig">
+                            <div class="col d-flex justify-content-center">
+                                <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
