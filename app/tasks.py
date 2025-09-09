@@ -40,14 +40,13 @@ def dial_leads_task(campaign_id, timeout=60):
     campaign = Campaign.objects.get(id=campaign_id)
 
     for lead in leads:
-        agentsAvailable = Agent.objects.filter(status='available')
         # Timeout para evitar bucle infinito
-        while Call.objects.filter(status='ringing').count() >= campaign.max_concurrent_calls*agentsAvailable.count():
+        while Call.objects.filter(status='ringing').count() >= Campaign.objects.get(id=campaign_id).max_concurrent_calls*Agent.objects.filter(status='available', current_campaign=campaign).count():
             if time.time() - start_time > timeout:
                 break
             time.sleep(1)
 
-        if not agentsAvailable or time.time() - start_time > timeout:
+        if not Agent.objects.filter(status='available', current_campaign=campaign) or time.time() - start_time > timeout:
             break
 
         callData = telnyx.Call.create(

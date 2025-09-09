@@ -57,9 +57,9 @@ def webhooksTelnyx(request):
         call.answered_at = datetime.now()
         agent = getAvailableAgent()
         call.agent = agent
-        updateContactedLead(call.contact)
-        sendClientData(agent, call.contact, call)
         transferCallToAgent(callControlId, agent)
+        sendClientData(agent, call.contact, call)
+        updateContactedLead(call.contact)
         call.save()
     elif eventType == 'call.hangup':
         if call.answered_at == None:
@@ -158,11 +158,17 @@ def endpointTranferCallToAgent(request):
     
 def transferCallToAgent(callControlId, agent):
     call = telnyx.Call.retrieve(callControlId)
-    call.transfer(
-        to=f"sip:{agent.sip_username}@sip.telnyx.com",
-        sip_auth_username=agent.sip_username,
-        sip_auth_password=agent.sip_password,
-    )
+    try:
+        call.transfer(
+            to=f"sip:{agent.sip_username}@sip.telnyx.com",
+            sip_auth_username=agent.sip_username,
+            sip_auth_password=agent.sip_password,
+        )
+    except Exception as e:
+        agent.status = 'available'
+        agent.save()
+
+        print(f"Error al transferir la llamada: {str(e)}")
 
 def secondsBetweenTimes(startTime, endTime):
     difference = endTime - startTime
