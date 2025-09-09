@@ -30,15 +30,16 @@ MODULE_PATHS = {
     'SALE REPORTS': [ 'sale', 'sale6Week','detalleAgente','weekSalesWiew','downloadPdf','reports','downloadAccionRequired','paymentClients'],
     'CUSTOMER REPORTS': [ 'customerPerformance', 'typification','customerTypification','toggleTypification','get_observation_detail','customerStep'],
     'GRAPHICAL REPORTS': [ 'averageCustomer', 'salesPerformance','chart6Week'],
-    'QUALITY': [ 'formCreateControl', 'control','createQuality','formCreateQuestionControl','toggleQuestionControl'],
+    'QUALITY': [ 'formCreateControl', 'control','createQuality','formCreateQuestionControl','toggleQuestionControl','formOE','tableOE','tableOEDetail'],
     'BD': [ 'uploadExcel', 'manageAgentAssignments','reportBd','bd','processAndSave','saveData','saveCommentAjax'],
     'COMPARATIVE': [ 'uploadReports','processExcel','headerProcessor', 'paymentsReports', 'paymentsReportsSupp'],
     'TEAM MANAGEMENT': [ 'customerAssginments'],
     'QUOTATION': [ 'marketplace','obtenerCountyfips','obtenerLatLon'],
-    'BOOK': ['uploadBook','bookList','bookPages','saveTime','toggleBook','bookReport']
+    'BOOK': ['uploadBook','bookList','bookPages','saveTime','toggleBook','bookReport'],
+    'DIALER': [ 'typifyCall', 'iniciateCalls', 'tranferCallToAgent', 'webhooks', 'selectCampaign', 'configCampaigns', 'loginCampaign', 'agentDashboard', 'campaigns', 'campaigns', 'createCampaigns', 'getListCampaigns', 'processExcelForDialer', 'changeStatus', 'getStats',]
 }
 
-EXCLUDED_VIEWS = ['index','toggleDarkMode' ,'motivationalPhrase','login','logout','viewConsent','consetMedicare','formCreateUser', 'addNumbersUsers','incomeLetter','ConsentLifeInsurance','complaint', 'sms','whatsappReply','url_temporal', 'obtainLeadsByGoHighLevel','consentL','sendConsentForm','enviar_email','uploadTempUrl', 'agentDashboard', 'campaigns', 'campaigns', 'createCampaigns', 'getListCampaigns', 'processExcelForDialer', 'changeStatus', 'getStats', 'typifyCall', 'iniciateCalls', 'tranferCallToAgent', 'webhooks', 'selectCampaign', 'configCampaigns', 'loginCampaign']  # Puedes agregar más si lo necesitas
+EXCLUDED_VIEWS = ['index','toggleDarkMode' ,'motivationalPhrase','login','logout','viewConsent','consetMedicare','formCreateUser', 'addNumbersUsers','incomeLetter','ConsentLifeInsurance','complaint', 'sms','whatsappReply','url_temporal', 'obtainLeadsByGoHighLevel','consentL','sendConsentForm','enviar_email','uploadTempUrl','cignaSuplemental']  # Puedes agregar más si lo necesitas
 
 class ModuleAccessMiddleware:
     def __init__(self, get_response):

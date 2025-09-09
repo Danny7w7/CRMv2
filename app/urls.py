@@ -40,6 +40,7 @@ urlpatterns = [
 
     #<---------------------------DashBoard--------------------------->
     path('', index.index, name='index'), #Home
+    path('tableStatusSale/', index.tableStatusSale, name='tableStatusSale'),
     path('weeklyLiveView/',tv.weeklyLiveView,name='weeklyLiveView'), # Vista Semanal TV con Sidebard
     path('monthLiveView/',tv.monthLiveView,name='monthLiveView'), # Vista Mensual TV con Sidebard
 
@@ -252,6 +253,9 @@ urlpatterns = [
 
     path('formAsignationQuestionControl/', quality.formAsignationQuestionControl, name='formAsignationQuestionControl'),
 
+    path('formOE/', quality.formOE, name='formOE'),
+    path('tableOE/', quality.tableOE, name='tableOE'),
+    path("tableOE/detail/<int:agent_id>/", quality.tableOEDetail, name="tableOEDetail"),
 
     #<---------------------------Excel---------------------------> 
     path('uploadExcel/', dbExcel.uploadExcel, name='uploadExcel'),    

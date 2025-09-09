@@ -7,7 +7,7 @@ from django.template.loader import render_to_string
 
 # Django core libraries
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
+from django.db.models import Sum, Count
 from django.shortcuts import redirect, render
 
 # Third-party libraries
@@ -226,3 +226,109 @@ def formAsignationQuestionControl(request):
                 )
     
     return render (request, 'quality/formAsignationQuestionControl.html', context)
+
+@login_required(login_url='/login')  
+@company_ownership_required_sinURL
+def formOE(request):
+
+    company_id = request.company_id
+
+    if request.user.is_superuser:
+        user = Users.objects.all()
+        clients = Clients.objects.all()
+    else:
+        user = Users.objects.filter(company = company_id, is_active = True)
+        clients = Clients.objects.filter(company = company_id, is_active = True)
+
+    eo = DropDownList.objects.exclude(errores_omision__isnull=True).values_list('errores_omision','id')
+
+    if request.method == 'POST':
+
+        agentID = request.POST.get('agent')
+        clientIDs = request.POST.get('client')
+
+        usersID = Users.objects.filter(id=agentID).first()
+        clientID = Clients.objects.filter(id=clientIDs).first()
+        companyID = Companies.objects.filter(id=company_id).first()
+
+        for key, value in request.POST.items():
+            if key.startswith("question_"):  # ejemplo: question_5
+                eo_id = key.split("_")[1]   # "5"
+                eo_obj = DropDownList.objects.get(id=eo_id)
+
+                # Crear registro en ErroresOmision
+                ErroresOmision.objects.create(
+                    agentCreated=request.user,
+                    agent=usersID,
+                    client=clientID,
+                    eoID=eo_obj,
+                    eo=value,
+                    company=companyID
+                )        
+
+    context = {
+        'users': user,
+        'client': clients,
+        'eo': eo
+    }
+
+    return render (request, 'quality/formOE.html', context)
+
+@login_required(login_url='/login')  
+@company_ownership_required_sinURL
+def tableOE(request):
+
+    company_id = request.company_id
+
+    if request.user.is_superuser:        
+        eo = ErroresOmision.objects.values(
+            'agent_id','agent__first_name','agent__last_name' ,'eo', 'eoID__errores_omision', 'company__company_name' ).annotate(total=Count('id'))
+    else:
+        eo = ErroresOmision.objects.filter(company = company_id).values( 
+            'agent_id','agent__first_name','agent__last_name' ,'eo', 'eoID__errores_omision', 'company__company_name' ).annotate(total=Count('id'))
+
+    if request.method == 'POST':
+
+        startDatePost = request.POST['start_date']
+        endDatePost = request.POST['end_date']
+
+        startDate = timezone.make_aware(
+            datetime.datetime.strptime(startDatePost, '%Y-%m-%d').replace(hour=0, minute=0, second=0, microsecond=0)
+        )
+        endDate = timezone.make_aware(
+            datetime.datetime.strptime(endDatePost, '%Y-%m-%d').replace(hour=23, minute=59, second=59, microsecond=999999)
+        )
+
+        eo = eo.filter(created_at__range=(startDate, endDate))
+
+    # Limpiar los caracteres '\r' de la descripción
+    for item in eo:
+        if item['eoID__errores_omision']:
+            item['eoID__errores_omision'] = item['eoID__errores_omision'].strip()
+
+    return render(request, 'quality/tableOE.html',{'eo':eo})
+
+
+from django.http import JsonResponse
+
+@login_required(login_url='/login')
+@company_ownership_required_sinURL
+def tableOEDetail(request, agent_id):
+    company_id = request.company_id
+
+    if request.user.is_superuser:
+        qs = ErroresOmision.objects.filter(agent_id=agent_id)
+    else:
+        qs = ErroresOmision.objects.filter(agent_id=agent_id, company=company_id)
+
+    data = []
+    for eo in qs:
+        data.append({
+            "created_at": eo.created_at.strftime("%Y-%m-%d %H:%M"),
+            "question": eo.eoID.errores_omision if eo.eoID else "",
+            "answer": eo.eo,
+            "client": f"{eo.client.first_name} {eo.client.last_name}",
+        })
+
+    return JsonResponse({"data": data})
+

@@ -9,6 +9,8 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q
 from django.db.models.functions import Coalesce
 from django.shortcuts import render
+from django.http import JsonResponse
+
 
 # Application-specific imports
 from app.models import *
@@ -18,15 +20,11 @@ from .decoratorsCompany import *
 
 @login_required(login_url='/login') 
 def index(request):
-    import redis
-    r = redis.Redis(host='localhost', port=6379, db=0)
-    print(r.ping())
 
     obama = countSalesObama(request)
     supp = countSalesSupp(request)
     chartOne = chartSaleIndex(request)
-    tableStatusAca = tableStatusObama(request)
-    tableStatusSup = tableStatusSupp(request)
+    tableStatusAca, tableStatusSup = tableStatusSale(request)
 
     # Asegúrate de que chartOne sea un JSON válido
     chartOne_json = json.dumps(chartOne)
@@ -35,7 +33,7 @@ def index(request):
         'obama':obama,
         'supp':supp,
         'chartOne':chartOne_json,
-        'tableStatusObama':tableStatusAca,
+        'tableStatusAca':tableStatusAca,
         'tableStatusSup':tableStatusSup
     }      
 
@@ -185,67 +183,55 @@ def countSalesSupp(request):
     return dicts
 
 @company_ownership_required_sinURL
-def tableStatusObama(request):
+def tableStatusSale(request):
 
-    # Obtener la fecha y hora actual
+    # Fechas por defecto (mes actual)
     now = timezone.now()
     current_month = now.month
     current_year = now.year
-
-    # Obtener el primer y último día del mes actual (con zona horaria)
     start_of_month = timezone.make_aware(datetime(current_year, current_month, 1), timezone.get_current_timezone())
     end_of_month = timezone.make_aware(datetime(current_year, current_month + 1, 1), timezone.get_current_timezone()) if current_month < 12 else timezone.make_aware(datetime(current_year + 1, 1, 1), timezone.get_current_timezone())
 
+    # Si vienen en el request, usar las fechas seleccionadas
+    start_date = request.GET.get("start_date")
+    end_date = request.GET.get("end_date")
+
+    if start_date and end_date:
+        start_of_month = timezone.make_aware(datetime.strptime(start_date, "%Y-%m-%d"))
+        end_of_month = timezone.make_aware(datetime.strptime(end_date, "%Y-%m-%d")) + timezone.timedelta(days=1) 
+
     roleAuditar = ['S', 'C', 'AU', 'Admin']
-
-    company_id = request.company_id  # Obtener company_id desde request
-    # Base query con filtro de compañía
+    company_id = request.company_id  
     company_filter = {} if request.user.is_superuser else {'company': company_id}
-
-    # Obtener los IDs de ObamaCare que están en CustomerRedFlag
     excluded_obama_ids = list(CustomerRedFlag.objects.values_list('obamacare', flat=True))
 
-    # Construcción de la consulta basada en el rol del usuario
     if request.user.role in roleAuditar:
+        resultObama = ObamaCare.objects.filter(
+            created_at__gte=start_of_month, created_at__lt=end_of_month,
+            is_active=True, **company_filter
+        ).exclude(id__in=excluded_obama_ids).values("profiling").annotate(count=Count("profiling")).order_by("profiling")
 
-        # Realizamos la consulta y agrupamos por el campo 'profiling'
-        result = ObamaCare.objects.filter(created_at__gte=start_of_month, created_at__lt=end_of_month,is_active = True, **company_filter).exclude(id__in=excluded_obama_ids).values('profiling').annotate(count=Count('profiling')).order_by('profiling')
-    
-    elif request.user.role in ['A','SUPP']:
-        
-        # Realizamos la consulta y agrupamos por el campo 'profiling'
-        result = ObamaCare.objects.filter(created_at__gte=start_of_month, created_at__lt=end_of_month, is_active = True, **company_filter).exclude(id__in=excluded_obama_ids).values('profiling').filter(agent=request.user.id).annotate(count=Count('profiling')).order_by('profiling')
-    
+        resultSupp = Supp.objects.filter(
+            created_at__gte=start_of_month, created_at__lt=end_of_month,
+            is_active=True, **company_filter
+        ).values("status").annotate(count=Count("status")).order_by("status")
+    else:
+        resultObama = ObamaCare.objects.filter(
+            created_at__gte=start_of_month, created_at__lt=end_of_month,
+            is_active=True, agent=request.user.id, **company_filter
+        ).exclude(id__in=excluded_obama_ids).values("profiling").annotate(count=Count("profiling")).order_by("profiling")
 
-    return result
+        resultSupp = Supp.objects.filter(
+            created_at__gte=start_of_month, created_at__lt=end_of_month,
+            is_active=True, agent=request.user.id, **company_filter
+        ).values("status").annotate(count=Count("status")).order_by("status")
 
-@company_ownership_required_sinURL
-def tableStatusSupp(request):
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        return JsonResponse({
+            "obama": list(resultObama),
+            "supp": list(resultSupp),
+        })
 
-    # Obtener la fecha y hora actual
-    now = timezone.now()
-    current_month = now.month
-    current_year = now.year
+    return resultObama, resultSupp
 
-    # Obtener el primer y último día del mes actual (con zona horaria)
-    start_of_month = timezone.make_aware(datetime(current_year, current_month, 1), timezone.get_current_timezone())
-    end_of_month = timezone.make_aware(datetime(current_year, current_month + 1, 1), timezone.get_current_timezone()) if current_month < 12 else timezone.make_aware(datetime(current_year + 1, 1, 1), timezone.get_current_timezone())
 
-    # Roles con acceso ampliado
-    roleAuditar = ['S', 'C', 'AU', 'Admin']
-
-    company_id = request.company_id  # Obtener company_id desde request
-    # Base query con filtro de compañía
-    company_filter = {} if request.user.is_superuser else {'company': company_id}
-
-    # Construcción de la consulta basada en el rol del usuario
-    if request.user.role in roleAuditar:
-        # Realizamos la consulta y agrupamos por el campo 'profiling'
-        result = Supp.objects.filter(created_at__gte=start_of_month, created_at__lt=end_of_month,is_active = True, **company_filter).values('status').annotate(count=Count('status')).order_by('status')
-
-    elif request.user.role in ['A','SUPP']:
-
-        # Realizamos la consulta y agrupamos por el campo 'profiling'
-        result = Supp.objects.filter(created_at__gte=start_of_month, created_at__lt=end_of_month, is_active = True, **company_filter).values('status').filter(agent=request.user.id).annotate(count=Count('status')).order_by('status')
-
-    return result

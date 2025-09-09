@@ -555,6 +555,7 @@ class DropDownList(models.Model):
     clave = models.TextField(null=True)  
     description = models.TextField(null=True) 
     service_company = models.TextField(null=True) 
+    errores_omision = models.TextField(null=True)
 
     class Meta:
         db_table = 'drop_down_list'
@@ -969,6 +970,18 @@ class QuestionTracking(models.Model):
     class Meta:
         db_table = 'question_tracking'
 
+class ErroresOmision(models.Model):
+
+    agentCreated = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='agente_creacion')
+    agent = models.ForeignKey(Users, on_delete=models.CASCADE,  related_name='agente_asignacion')
+    client = models.ForeignKey(Clients, on_delete=models.CASCADE)
+    eoID = models.ForeignKey(DropDownList, on_delete=models.CASCADE)
+    eo = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'errores_omision'
 
 from .modelsSMS import *
 from .modelsWhatsapp import *
