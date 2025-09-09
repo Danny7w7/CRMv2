@@ -2,7 +2,7 @@
 import datetime
 
 # Django utilities
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
 
 # Django core libraries
@@ -307,9 +307,6 @@ def tableOE(request):
             item['eoID__errores_omision'] = item['eoID__errores_omision'].strip()
 
     return render(request, 'quality/tableOE.html',{'eo':eo})
-
-
-from django.http import JsonResponse
 
 @login_required(login_url='/login')
 @company_ownership_required_sinURL

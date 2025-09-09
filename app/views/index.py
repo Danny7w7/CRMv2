@@ -7,7 +7,6 @@ from app.tasks import *
 # Django core libraries
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q
-from django.db.models.functions import Coalesce
 from django.shortcuts import render
 from django.http import JsonResponse
 
@@ -15,7 +14,7 @@ from django.http import JsonResponse
 # Application-specific imports
 from app.models import *
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from .decoratorsCompany import *
 
 @login_required(login_url='/login') 
