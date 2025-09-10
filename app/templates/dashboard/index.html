@@ -198,42 +198,42 @@
 							{% endif %}						
 						</ul>
 					</li>
-				{% endif %}
+				{% endif %}				
 
-				{% if smsIsActive or whatsAppIsActive %}
-
-					{% if request.user|has_module:"SMS" or request.user|has_module:"WHATSAPP" %}
-					
-						<li class="menu-label">Applications</li>
-						<li {% if request.path == chat_url %}class='mm-active'{% endif %}>
-							<a class="has-arrow" href="javascript:;">
-								<div class="parent-icon"> <i class="fadeIn animated bx bx-line-chart"></i></div>
-								<div class="menu-title">Communications</div>
-							</a>
-							<ul>
-								{% if request.user|has_module:"SMS" %}
-									{% if smsIsActive %}
-										<li {% if request.path == chat_url %}class='mm-active'{% endif %}> 
-											<a aria-expanded="true" href="{% url 'smsBlue' %}"><i class='bx bx-radio-circle'></i>SMS Blue</a>
-										</li>
-									{% endif %}	
+				{% if request.user|has_module:"SMS" or request.user|has_module:"WHATSAPP" or request.user|has_module:"DIALER" %}
+				
+					<li class="menu-label">Applications</li>
+					<li {% if request.path == chat_url %}class='mm-active'{% endif %}>
+						<a class="has-arrow" href="javascript:;">
+							<div class="parent-icon"> <i class="fadeIn animated bx bx-line-chart"></i></div>
+							<div class="menu-title">Communications</div>
+						</a>
+						<ul>
+							{% if request.user|has_module:"SMS" %}
+								{% if smsIsActive %}
+									<li {% if request.path == chat_url %}class='mm-active'{% endif %}> 
+										<a aria-expanded="true" href="{% url 'smsBlue' %}"><i class='bx bx-radio-circle'></i>SMS Blue</a>
+									</li>
 								{% endif %}	
-								{% if request.user|has_module:"WHATSAPP" %}
-									{% if whatsAppIsActive %}						
-										<li {% if request.path == whatsapp_url %}class='mm-active'{% endif %}> 
-											<a aria-expanded="true" href="{% url 'whatsappBlue' %}"><i class='bx bx-radio-circle'></i>WHATSAPP Blue</a>
-										</li>	
-									{% endif %}	
-								{% endif %}							
-							</ul>
-						</li>
+							{% endif %}	
+							{% if request.user|has_module:"WHATSAPP" %}
+								{% if whatsAppIsActive %}						
+									<li {% if request.path == whatsapp_url %}class='mm-active'{% endif %}> 
+										<a aria-expanded="true" href="{% url 'whatsappBlue' %}"><i class='bx bx-radio-circle'></i>WHATSAPP Blue</a>
+									</li>	
+								{% endif %}	
+							{% endif %}							
+						</ul>
+					</li>
+
+					{% if request.user|has_module:"DIALER" %}
 						<li>
 							<a class="has-arrow" href="javascript:;">
 								<div class="parent-icon"> <i class="fadeIn animated bx bx-phone-call"></i></div>
 								<div class="menu-title">Dialer</div>
 							</a>
 							<ul>
-								{% if request.user.is_superuser or request.user.role == 'S' %}
+								{% if request.user.role == 'Admin' or request.user.role == 'S' %}
 								<li> <a href="{% url 'campaigns' %}"><i class='bx bx-radio-circle'></i>Campaing Manager</a>
 								</li>
 								{% endif %}
@@ -241,9 +241,9 @@
 								</li>
 							</ul>
 						</li>
-					{% endif %}
+					{% endif %}	
 
-				{% endif %}
+				{% endif %}				
 
 				{% if request.user|has_module:"SALE REPORTS" or request.user|has_module:"CUSTOMER REPORTS" %}
 
