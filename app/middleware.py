@@ -30,7 +30,7 @@ MODULE_PATHS = {
     'SALE REPORTS': [ 'sale', 'sale6Week','detalleAgente','weekSalesWiew','downloadPdf','reports','downloadAccionRequired','paymentClients'],
     'CUSTOMER REPORTS': [ 'customerPerformance', 'typification','customerTypification','toggleTypification','get_observation_detail','customerStep'],
     'GRAPHICAL REPORTS': [ 'averageCustomer', 'salesPerformance','chart6Week'],
-    'QUALITY': [ 'formCreateControl', 'control','createQuality','formCreateQuestionControl','toggleQuestionControl','formOE','tableOE','tableOEDetail'],
+    'QUALITY': [ 'formCreateControl', 'control','createQuality','formCreateQuestionControl','toggleQuestionControl','formOE','tableOE','tableOEDetail','formAsignationQuestionControl'],
     'BD': [ 'uploadExcel', 'manageAgentAssignments','reportBd','bd','processAndSave','saveData','saveCommentAjax'],
     'COMPARATIVE': [ 'uploadReports','processExcel','headerProcessor', 'paymentsReports', 'paymentsReportsSupp'],
     'TEAM MANAGEMENT': [ 'customerAssginments'],
