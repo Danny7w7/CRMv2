@@ -39,7 +39,7 @@ MODULE_PATHS = {
     'DIALER': [ 'typifyCall', 'iniciateCalls', 'tranferCallToAgent', 'webhooks', 'selectCampaign', 'configCampaigns', 'loginCampaign', 'agentDashboard', 'campaigns', 'campaigns', 'createCampaigns', 'getListCampaigns', 'processExcelForDialer', 'changeStatus', 'getStats',]
 }
 
-EXCLUDED_VIEWS = ['index','toggleDarkMode' ,'motivationalPhrase','login','logout','viewConsent','consetMedicare','formCreateUser', 'addNumbersUsers','incomeLetter','ConsentLifeInsurance','complaint', 'sms','whatsappReply','url_temporal', 'obtainLeadsByGoHighLevel','consentL','sendConsentForm','enviar_email','uploadTempUrl','cignaSuplemental','tableStatusSale']  # Puedes agregar más si lo necesitas
+EXCLUDED_VIEWS = ['index', 'weeklyLiveViewTV', 'monthLiveViewTV', 'toggleDarkMode' ,'motivationalPhrase','login','logout','viewConsent','consetMedicare','formCreateUser', 'addNumbersUsers','incomeLetter','ConsentLifeInsurance','complaint', 'sms','whatsappReply','url_temporal', 'obtainLeadsByGoHighLevel','consentL','sendConsentForm','enviar_email','uploadTempUrl','cignaSuplemental','tableStatusSale']  # Puedes agregar más si lo necesitas
 
 class ModuleAccessMiddleware:
     def __init__(self, get_response):

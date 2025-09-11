@@ -25,8 +25,8 @@ def weeklyLiveView(request):
     context = {
         'weeklySales': getSalesForWeekly(company_id)
     }
-    if request.user.role == 'TV': return render(request, 'dashboard/weeklyLiveViewTV.html', context)
-    else: return render(request, 'dashboard/weeklyLiveView.html', context)
+    if request.user.role == 'TV': return render(request, 'tv/weeklyLiveViewTV.html', context)
+    else: return render(request, 'tv/weeklyLiveView.html', context)
 
 def getSalesForWeekly(company_id):
     # Obtener la fecha de hoy y calcular el inicio de la semana (asumiendo que empieza el lunes)
@@ -281,5 +281,5 @@ def monthLiveView(request):
         'toggle': True
     }
     
-    if request.user.role == 'TV': return render(request, 'dashboard/monthLiveViewTV.html', context)
-    else: return render(request, 'dashboard/monthLiveView.html', context)
+    if request.user.role == 'TV': return render(request, 'tv/monthLiveViewTV.html', context)
+    else: return render(request, 'tv/monthLiveView.html', context)
