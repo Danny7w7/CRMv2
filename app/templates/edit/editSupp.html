@@ -390,7 +390,7 @@
 						<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#AgentTicketAssignment">
 							Ticket
 						</button>
-						{% if request.user.role == 'SUPP' or request.user.role == 'Admin' %}
+						{% if request.user.role == 'SUPP' or request.user.role == 'Admin' and supps.carrier == 'CIGNA' %}
 							<a href="{% url 'cignaSuplemental' supps.id %}" class="btn btn-primary me-2">Autorizacion Cigna</a>						
 						{% endif %}
 						<button type="button" class="btn btn-secondary me-2" data-bs-toggle="modal" data-bs-target="#modalVerTexto">
