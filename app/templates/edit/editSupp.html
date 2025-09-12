@@ -345,7 +345,7 @@
 							<button type="submit" name="action" id="enviar2" value="save_supp_agent" class="btn btn-primary px-4" style="display: none;">Submits</button>                            
 							<a href="{% url 'clientSupp' %}" class="btn btn-light px-4">Back</a>
 							<a class="btn btn-light px-4" data-bs-toggle="modal" data-bs-target="#verDocument">Document</a>
-							{% if request.user.role == 'SUPP' or request.user.role == 'Admin' %}
+							{% if request.user.role == 'SUPP' or request.user.role == 'Admin' and supps.carrier == 'CIGNA' %}
 								<a class="btn btn-light px-4" data-bs-toggle="modal" data-bs-target="#verCignaSuplemental">View Cigna Suplemental</a>
 							{% endif %}
                         </div>
@@ -386,7 +386,7 @@
 							Ticket
 						</button>
 						{% if request.user.role == 'SUPP' or request.user.role == 'Admin' and supps.carrier == 'CIGNA' %}
-							<a href="{% url 'cignaSuplemental' supps.id %}" class="btn btn-primary me-2">Autorizacion Cigna</a>						
+							<a href="{% url 'cignaSuplemental' supps.id %}" target="_blank" class="btn btn-primary me-2">Autorizacion Cigna</a>						
 						{% endif %}
 						<button type="button" class="btn btn-secondary me-2" data-bs-toggle="modal" data-bs-target="#modalVerTexto">
 							See Observations
