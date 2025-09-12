@@ -983,6 +983,21 @@ class ErroresOmision(models.Model):
     class Meta:
         db_table = 'errores_omision'
 
+class CignaSuplemental(models.Model):
+
+    pdf = models.FileField(
+        upload_to='CignaSuplemental',
+        storage=S3Boto3Storage(),
+        null=True)
+    supp = models.ForeignKey(Supp, on_delete=models.CASCADE)
+    signature = models.FileField( upload_to='SignatureCignaSuplemental', storage=S3Boto3Storage(), null=True)
+    is_active = models.BooleanField(default=True) 
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'cigna_suplemental'
+
+
 from .modelsSMS import *
 from .modelsWhatsapp import *
 from .modelsDialer import *

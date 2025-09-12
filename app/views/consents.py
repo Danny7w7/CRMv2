@@ -895,3 +895,116 @@ def consentL(request):
     response["Content-Security-Policy"] = "frame-ancestors https://lapeirainsurance.com https://truinsurancegroup.com/"
     return response
 
+def cignaSuplemental(request, supp_id):
+    temporalyURL = None
+    typeToken = 'obamacare'
+    supp = Supp.objects.select_related('client', 'agent').get(id=supp_id)
+
+    # Validar acceso
+    if isinstance(request.user, AnonymousUser):
+        result = validateTemporaryToken(request, typeToken)
+        is_valid_token, *note = result
+        if not is_valid_token:
+            return HttpResponse(note)
+    elif request.user.is_authenticated:
+        temporalyURL = request.build_absolute_uri(
+            f"/cignaSuplemental/{supp_id}/?token={generateTemporaryToken(supp.client, typeToken)}"
+        )
+    else:
+        return HttpResponse('Acceso denegado. Por favor, inicie sesión o use un enlace válido.')
+
+    if request.method == 'POST':
+        # ✅ Capturar todos los datos del formulario
+        uno = request.POST.get('uno')
+        dos = request.POST.get('dos')
+        tres = request.POST.get('tres')
+        cuatro = request.POST.get('cuatro')
+        cinco = request.POST.get('cinco')
+        seis = request.POST.get('seis')
+        siete = request.POST.get('siete')
+        ocho = request.POST.get('ocho')
+        phoneFinancial = request.POST.get('phoneFinancial')
+        addressFinancial = request.POST.get('addressFinancial')
+        numberRouting = request.POST.get('numberRouting')
+        accountNumber = request.POST.get('accountNumber')
+        dateWithdrawal = request.POST.get('dateWithdrawal')
+        monthly = request.POST.get('monthly')
+        quarterly = request.POST.get('quarterly')
+        semiAnnually = request.POST.get('semiAnnually')
+        annually = request.POST.get('annually')
+        personalChecking = request.POST.get('personalChecking')
+        personalSavings = request.POST.get('personalSavings')
+        corporate = request.POST.get('corporate')
+        nueve = request.POST.get('nueve')
+        diez = request.POST.get('diez')
+        once = request.POST.get('once')
+        doce = request.POST.get('doce')
+        nameEmployer = request.POST.get('nameEmployer')
+        nameDepositor = request.POST.get('nameDepositor')
+
+        # ✅ Crear el registro en BD
+        cignaS = CignaSuplemental.objects.create(supp=supp)
+
+        # ✅ Procesar la firma
+        signature_data = request.POST.get('signature')
+        format, imgstr = signature_data.split(';base64,')
+        ext = format.split('/')[-1]
+        image = ContentFile(base64.b64decode(imgstr), name=f'firma.{ext}')
+        cignaS.signature = image
+        cignaS.save()
+
+        # ✅ Preparar contexto
+        id_complaint = f"{supp.id:08d}"
+        current_date = datetime.now().strftime("%A, %B %d, %Y %I:%M")
+        context = {
+            'supp': supp,
+            'ip': getIPClient(request),
+            'cignaS': cignaS,
+            'id_complaint': id_complaint,
+            # 🔽 Incluimos todos los campos del formulario en el contexto
+            'uno': uno, 'dos': dos, 'tres': tres, 'cuatro': cuatro,
+            'cinco': cinco, 'seis': seis, 'siete': siete, 'ocho': ocho,
+            'phoneFinancial': phoneFinancial, 'addressFinancial': addressFinancial,
+            'numberRouting': numberRouting, 'accountNumber': accountNumber,
+            'dateWithdrawal': dateWithdrawal, 'monthly': monthly,
+            'quarterly': quarterly, 'semiAnnually': semiAnnually, 'annually': annually,
+            'personalChecking': personalChecking, 'personalSavings': personalSavings,
+            'corporate': corporate, 'nueve': nueve, 'diez': diez,
+            'once': once, 'doce': doce, 'nameEmployer': nameEmployer, 'nameDepositor': nameDepositor,
+        }
+
+        # ✅ Renderizar template y generar PDF
+        html_content = render_to_string('consent/templateCignaSuplemental.html', context)
+        pdf_file = HTML(string=html_content).write_pdf()
+        pdf_io = io.BytesIO(pdf_file)
+        pdf_io.seek(0)
+
+        pdf_name = f'Consent Cigna Suplemental {supp.client.first_name}_{supp.client.last_name}#{supp.client.phone_number} {current_date}.pdf'
+        cignaS.pdf.save(pdf_name, ContentFile(pdf_io.read()), save=True)
+
+        # ✅ Notificar
+        websocketAlertGeneric(
+            request,
+            'send_alert',
+            'signedConsent',
+            'success',
+            'Signed consent',
+            f'The client {supp.client.first_name} {supp.client.last_name} successfully signed the consent form.',
+            'Go to client information',
+            f'/editSupp/{supp.id}',
+            supp.agent.id,
+            supp.agent.username
+        )
+
+        deactivateTemporaryToken(request)
+        return render(request, 'consent/endView.html')
+
+    # GET → mostrar formulario
+    context = {
+        'temporalyURL': temporalyURL,
+        'supp': supp
+    }
+    return render(request, 'consent/cignaSuplemental.html', context)
+
+
+

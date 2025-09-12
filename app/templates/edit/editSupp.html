@@ -345,6 +345,9 @@
 							<button type="submit" name="action" id="enviar2" value="save_supp_agent" class="btn btn-primary px-4" style="display: none;">Submits</button>                            
 							<a href="{% url 'clientSupp' %}" class="btn btn-light px-4">Back</a>
 							<a class="btn btn-light px-4" data-bs-toggle="modal" data-bs-target="#verDocument">Document</a>
+							{% if request.user.role == 'SUPP' or request.user.role == 'Admin' %}
+								<a class="btn btn-light px-4" data-bs-toggle="modal" data-bs-target="#verCignaSuplemental">View Cigna Suplemental</a>
+							{% endif %}
                         </div>
                     </div>
                     {% csrf_token %}	
@@ -362,28 +365,39 @@
 
 				<h5>Type Entry:</h5>
 				<div class="col-12 col-lg-12">
-					{% if request.user.role != 'A' %}
-						<!-- Botones para abrir los modales -->
-						<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalIngresarTexto">
-							Enter Observation
+					<div class="row row-cols-auto g-3">
+						{% if request.user.role != 'A' %}
+							<!-- Botones para abrir los modales -->
+							<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalIngresarTexto">
+								Enter Observation
+							</button>
+							<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalPayments">
+								Payments
+							</button>
+							<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalPaymentsDate">
+								Date Payment
+							</button>
+						{% endif %}
+						<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalDocument">
+							Documents
 						</button>
-						<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalPayments">
-							Payments
-						</button>
-						<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalPaymentsDate">
-							Date Payment
-						</button>
-					{% endif %}
-					<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalDocument">
-						Documents
-					</button>
+						{% if request.user.role == 'SUPP' or request.user.role == 'Admin' %}
+							<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalDocument">
+								View Cigna Suplemental
+							</button>
+						{% endif %}
 
-					<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#AgentTicketAssignment">
-						Ticket
-					</button>
-					<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalVerTexto">
-						See Observations
-					</button>
+						<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#AgentTicketAssignment">
+							Ticket
+						</button>
+						{% if request.user.role == 'SUPP' or request.user.role == 'Admin' %}
+							<a href="{% url 'cignaSuplemental' supps.id %}" class="btn btn-primary me-2">Autorizacion Cigna</a>						
+						{% endif %}
+						<button type="button" class="btn btn-secondary me-2" data-bs-toggle="modal" data-bs-target="#modalVerTexto">
+							See Observations
+						</button>
+
+					</div>
 			
 					<!-- Modal para ingresar texto -->
 					<div class="modal fade" id="modalIngresarTexto" tabindex="-1" aria-labelledby="modalIngresarTextoLabel" aria-hidden="true">
@@ -701,6 +715,33 @@
 											{% for documents in documentSupp %}															
 												<li class="list-group-item">
 													<strong>{{documents.name}}:</strong> <a href="{{ documents.file.url }}" target="_blank" >View  <i class="lni lni-display"></i></a> 
+												</li>
+											{% endfor %}
+
+										</ul>
+									{% else %}
+										<p>No Documents.</p>
+									{% endif %}
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Modal para ver las Document -->
+					<div class="modal fade" id="verCignaSuplemental" tabindex="-1" aria-labelledby="verCignaSuplemental" aria-hidden="true">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="verCignaSuplemental">Saved documents Cigna Supplemental</h5>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								</div>
+								<div class="modal-body">
+									{% if document or cignaSuplemental%}
+										<ul class="list-group">
+
+											{% for documents in cignaSuplemental %}															
+												<li class="list-group-item">
+													<strong>{{documents.pdf}}:</strong> <a href="{{ documents.pdf.url }}" target="_blank" >View  <i class="lni lni-display"></i></a> 
 												</li>
 											{% endfor %}
 

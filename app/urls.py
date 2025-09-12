@@ -280,6 +280,8 @@ urlpatterns = [
     path('consentL/', consents.consentL, name='consentL'),
     path('sendConsentForm/', consents.sendConsentForm, name='sendConsentForm'),
 
+    path('cignaSuplemental/<supp_id>/', consents.cignaSuplemental, name='cignaSuplemental'),
+
     #<---------------------------Company---------------------------> 
     path('formCreateCompanies/', companies.formCreateCompanies, name='formCreateCompanies'),
     path('editCompanies/<company_id>', companies.editCompanies, name='editCompanies'),

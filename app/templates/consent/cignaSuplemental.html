@@ -1,0 +1,331 @@
+{% load i18n %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cancer Insurance Pre‑Authorization Agreement for EFT</title>
+    <link rel="stylesheet" href="{% static 'assets/css/styleCopyLinkConsent.css' %}" />
+    <style>
+        :root {
+        --ink: #111;
+        --ink-light: #333;
+        --border: #222;
+        --muted: #666;
+        --accent: #0b0b0b;
+        --gap: 8px;
+        }
+        @page {
+        size: Letter; /* 8.5 x 11 in */
+        margin: 0.5in;
+        }
+        * { box-sizing: border-box; }
+        html, body {
+        background: #fff;
+        color: var(--ink);
+        font-family: "Times New Roman", Times, serif;
+        line-height: 1.25;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        }
+        .page {
+        width: 8.5in;
+        min-height: 11in;
+        margin: 0 auto;
+        padding: 0.5in;
+        border: 1px solid #ddd;
+        }
+        h1 {
+        font-size: 16px;
+        text-align: center;
+        letter-spacing: 0.2px;
+        margin: 0 0 8px 0;
+        text-transform: uppercase;
+        }
+        .subtitle {
+        text-align: center;
+        font-size: 11px;
+        color: var(--muted);
+        margin-bottom: 10px;
+        }
+        .bar {
+        display: flex;
+        justify-content: space-between;
+        font-size: 10px;
+        margin-bottom: 10px;
+        }
+        .panel {
+        border: 1px solid var(--border);
+        padding: 10px;
+        margin-bottom: 10px;
+        }
+        .panel h2 {
+        font-size: 12px;
+        margin: 0 0 6px 0;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        }
+        .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--gap);
+        }
+        .grid-3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: var(--gap);
+        }
+        .grid-4 {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--gap);
+        }
+        .row { display: grid; grid-template-columns: 1.2fr 2.8fr; gap: 6px; align-items: center; }
+        label { font-size: 11px; color: var(--ink-light); }
+        input[type="text"], input[type="date"], input[type="number"], .underline {
+        width: 100%;
+        border: none;
+        border-bottom: 1px solid var(--border);
+        padding: 2px 0 1px;
+        font: inherit;
+        color: var(--ink);
+        background: transparent;
+        }
+        .choices, .checklist { display: grid; gap: 6px; }
+        .checkline { display: flex; align-items: center; gap: 6px; }
+        .checkline input { width: 12px; height: 12px; }
+        .muted { color: var(--muted); font-size: 10px; }
+        .note { font-size: 11px; }
+        .small { font-size: 10px; }
+        .foot {
+        display: flex; justify-content: space-between; gap: 8px; margin-top: 10px; font-size: 11px;
+        }
+        .sig-grid { 
+            display: grid; 
+            grid-template-columns: 1.5fr 1.2fr 0.8fr;
+            gap: 16px;
+            margin-top: 10px; 
+            align-items: flex-end;
+        }
+        .sig {
+        display: grid; gap: 4px;
+        }
+        .sig .line { height: 1px; background: var(--border); }
+        .caps { text-transform: uppercase; }
+        .tight { margin-top: 6px; }
+        .divider { height: 1px; background: var(--border); margin: 8px 0; }
+        .panel.center {
+        text-align: center;
+        }
+        .panel.center img {
+        display: inline-block;
+        margin: 0 auto;
+        }
+        .signature-pad {
+            border: 2px solid rgba(0,0,0,0.1);
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        canvas {
+            border: 2px solid red; /* Para visualizar mejor los bordes */
+            border-radius: 8px;
+            background: #fff;
+            touch-action: none; /* Disable default touch gestures */
+        }
+         
+        .btn-classic {
+            background-color: #000000;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-classic:hover {
+            background-color: #4d4d4d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+        }
+    </style>
+</head>
+<body>
+
+    {% if temporalyURL %}
+        <!-- Div flotante -->
+        <div class="floating-container">
+            <button class="copy-button" onclick="copyCurrentURL()">
+                <i class="fas fa-link"></i>
+                Copy Link
+            </button>
+            <div class="success-message">¡Link copiado!</div>
+        </div>
+    {% endif %}
+
+
+    <div class="page">
+
+        <h1>CIGNA SUPPLEMENTAL BENEFITS</h1>
+
+        <form method="POST" id="signatureForm">
+            {% csrf_token %}
+
+            <div class="panel">
+                <h2>Online Pre‑Authorization Agreement for Electronic Funds Transfer</h2>
+                <div class="grid-2">
+                    <div class="checklist">
+                        <label class="checkline"><input type="checkbox" name="uno" /> CIGNA National Health Insurance Company</label>
+                        <label class="checkline"><input type="checkbox" name="dos" /> Loyal American Life Insurance Company</label>
+                        <label class="checkline"><input type="checkbox" name="tres" /> Sterling Life Insurance Company</label>
+                        <label class="checkline"><input type="checkbox" name="cuatro" /> Continental General Insurance Company</label>
+                    </div>
+                    <div class="checklist">
+                        <label class="checkline"><input type="checkbox" name="cinco" /> American Retirement Life Insurance Company</label>
+                        <label class="checkline"><input type="checkbox" name="seis" /> CIGNA Health and Life Insurance Company</label>
+                        <label class="checkline"><input type="checkbox" name="siete" /> Provident American Life &amp; Health Insurance Company</label>
+                        <div class="muted">Administering Medicare Supplement and Supplemental Health for</div>
+                        <label class="checkline"><input type="checkbox" name="ocho" /> Great American Life Insurance Company<sup>®</sup></label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="grid-2">
+                    <div class="row"><label>Insured’s Name</label><input type="text" name="name" value="{{supp.client.first_name}} {{supp.client.last_name}}" readonly></div>
+                    <div class="row"><label>Policy Number (if Available)</label><input type="text" name="policy" value="{% if supp.policyNumber is not none %} {{ supp.policyNumber}} {% endif %}" {% if supp.policyNumber is not none %}readonly{% endif %}></div>
+                </div>
+                <div class="grid-2 tight">
+                    <div class="row"><label>Financial Institution Name and Telephone Number</label><input name="phoneFinancial" type="text" required ></div>
+                    <div class="row"><label>Financial Institution Address</label><input type="text" name="addressFinancial" required ></div>
+                </div>
+                <div class="grid-2 tight">
+                    <div class="row"><label>9 Digit Routing Number</label><input type="text" pattern="\d*" name="numberRouting" inputmode="numeric" required ></div>
+                    <div class="row"><label>Account Number</label><input type="text" name="accountNumber" required ></div>
+                </div>
+
+                <div class="grid-2 tight">
+                    <div class="row"><label>Requested Withdrawal Date (1st thru 28th):</label><input type="number" name="dateWithdrawal" min="1" max="28" required ></div>
+                    <div class="row">
+                        <label>Withdraw Payment:</label>
+                        <div class="choices grid-4">
+                            <label class="checkline"><input type="checkbox" name="monthly" /> Monthly</label>
+                            <label class="checkline"><input type="checkbox" name="quarterly" /> Quarterly</label>
+                            <label class="checkline"><input type="checkbox" name="semiAnnually" /> Semi‑Annually</label>
+                            <label class="checkline"><input type="checkbox" name="annually" /> Annually</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row tight">
+                    <label>Type of Account:</label>
+                    <div class="choices grid-3">
+                        <label class="checkline"><input type="checkbox" name="personalChecking"/> Personal Checking Account</label>
+                        <label class="checkline"><input type="checkbox" name="personalSavings"/> Personal Savings Account</label>
+                        <label class="checkline"><input type="checkbox" name="corporate"/> Corporate/Business Checking</label>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="panel center">
+                <img src="{% static 'assets/images/icons/cheque.png' %}" width="650" alt="Cheque ejemplo" />        
+            </div>
+
+            <div class="panel">
+                <div class="row">
+                    <label>Purpose for Submitting this Authorization – Check appropriate box(es):</label>
+                    <div class="choices grid-4">
+                        <label class="checkline"><input type="checkbox" name="nueve" /> New authorization</label>
+                        <label class="checkline"><input type="checkbox" name="diez" /> Change in checking/savings account</label>
+                        <label class="checkline"><input type="checkbox" name="once" /> Change in financial institution</label>
+                        <label class="checkline"><input type="checkbox" name="doce" /> Change in existing coverage</label>
+                    </div>
+                </div>
+                <div class="row tight">
+                    <label>Name of Employer Group</label>
+                    <input type="text" name="nameEmployer" />
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>Applicant Information for Financial Institutions</h2>
+                <p class="note">
+                    As a convenience to me, I hereby request and authorize you to pay and charge to my account, drafts drawn on my account by and payable to the Company selected above provided there are sufficient funds in said account to pay the same on presentation. Such drafts will bear my printed name. This authorization shall remain in effect until revoked by me in writing, and until you actually receive such notice. I agree that you shall be fully protected in honoring any such draft. I agree that your rights in respect to any such draft shall be the same as if it were a check signed personally by me. I further agree that if any such draft is dishonored, whether intentionally or inadvertently, you shall be under no liability whatsoever even though such dishonor results in the forfeiture of insurance.
+                </p>
+                <div class="divider"></div>
+                <h2 class="tight">Pre‑Authorization Agreement for Electronic Funds Transfer</h2>
+                <p class="note">
+                    Applicant Information for the Company Selected Above: It is understood that the initial draft will occur when the policy is issued. All subsequent drafts will be drawn on or about the requested date each month. The presentation of such drafts to the above Financial Institution shall constitute notice of premiums being due upon the contract, and no other notice of premiums due will be given. No premium shall be deemed to have been paid unless and until actual payment of the draft drawn for such premium payment has been received by the Company selected above. The cancelled draft will constitute receipt of premium payment. The privilege of paying premiums under this Plan may be revoked by the Company selected above if any draft is not paid upon presentation. The payment of premiums under this Plan may be terminated by the Contract Owner, Financial Institution Depositor if other than Contract Owner, or by the Company selected above upon 30 days written notice.
+                </p>
+
+                <div class="sig-grid">
+                    <div class="sig">
+                        <div><input type="text" name="nameDepositor" required ></div>
+                        <div class="small">Print Name of Depositor (as it appears on account)</div>
+                    </div>
+
+                    <div class="sig">
+                        <canvas width="330px" id="drawingCanvas" class="signature-pad"></canvas>
+                        <input type="hidden" id="signatureInput" name="signature">                    
+                        <div class="d-flex justify-content-end mt-2">
+                            <button type="button" class="btn btn-danger" id="clearCanvas">Clear signature</button>
+                        </div>
+                        <div class="small">Signature of Depositor</div>
+                    </div>
+
+                    <div class="sig">
+                        <div class="small">{% now "d F Y" %}</div>
+                        <div class="small">Date</div>
+                    </div>
+                </div>
+                
+            </div>
+
+            {% if not temporalyURL %}
+
+                <button type="submit" class="btn-classic">Send</button>
+            {% endif %}
+
+        </form>
+
+    </div>
+
+    {% if temporalyURL %}
+        <script>
+            function copyCurrentURL() {
+                // Obtener la URL actual
+                const URL = '{{temporalyURL|safe}}';
+                
+                // Copiar al portapapeles
+                navigator.clipboard.writeText(URL).then(() => {
+                    // Mostrar mensaje de éxito
+                    const successMessage = document.querySelector('.success-message');
+                    successMessage.style.display = 'block';
+                    
+                    // Cambiar el texto del botón temporalmente
+                    const button = document.querySelector('.copy-button');
+                    const originalContent = button.innerHTML;
+                    button.innerHTML = '<i class="fas fa-check"></i> Copiado!';
+                    
+                    // Restaurar después de 2 segundos
+                    setTimeout(() => {
+                        successMessage.style.display = 'none';
+                        button.innerHTML = originalContent;
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Error al copiar:', err);
+                    alert('No se pudo copiar el link. Por favor, inténtalo de nuevo.');
+                });
+            }
+        </script>
+    {% endif %}
+
+    <script src="{% static 'assets/js/consent/cignaSuplemental.js' %}"></script>
+
+</body>
+</html>

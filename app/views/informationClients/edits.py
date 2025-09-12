@@ -735,6 +735,7 @@ def editSupp(request, supp_id):
     paymentDateSupp = PaymentDate.objects.filter(supp = supp).first()
     users = Users.objects.filter(role='SUPP', company = company_id, is_active = True)
     documentSupp = DocumentObamaSupp.objects.filter(supp = supp)
+    cignaSuplemental = CignaSuplemental.objects.filter(supp = supp_id )
 
     # Obtener el objeto Supp que tiene el id `supp_id`
     supp_instance = Supp.objects.get(id=supp_id)
@@ -897,6 +898,7 @@ def editSupp(request, supp_id):
         'users' : users,
         'documentSupp' : documentSupp,
         'agentUsa' : agentUsa,
+        'cignaSuplemental' : cignaSuplemental,
         #SMS Blue
         'contact':contact,
         'chat':chat,
