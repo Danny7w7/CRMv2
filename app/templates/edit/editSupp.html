@@ -381,11 +381,6 @@
 						<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalDocument">
 							Documents
 						</button>
-						{% if request.user.role == 'SUPP' or request.user.role == 'Admin' %}
-							<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalDocument">
-								View Cigna Suplemental
-							</button>
-						{% endif %}
 
 						<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#AgentTicketAssignment">
 							Ticket
