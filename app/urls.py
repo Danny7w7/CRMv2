@@ -102,6 +102,10 @@ urlpatterns = [
     path('validarCita/', modals.validarCita, name='validarCita'),
     path('paymentDateObama/<obama_id>/', modals.paymentDateObama, name='paymentDateObama'),
     path('preComplaint/', modals.preComplaint, name='preComplaint'),
+    path('changePlanDate/<int:plan_id>/', modals.changePlanDate, name='changePlanDate'),
+    path('changePlanAgent/<int:plan_id>/', modals.changePlanAgent, name='changePlanAgent'),
+    path('fetchChangePlanDate/<int:change_id>/', modals.fetchChangePlanDate, name='fetchChangePlanDate'),
+    path('fetchChangePlanAgent/<int:change_id>/', modals.fetchChangePlanAgent, name='fetchChangePlanAgent'),
 
     path('clientAccionRequired/', table.clientAccionRequired, name='clientAccionRequired'),
 
@@ -232,7 +236,9 @@ urlpatterns = [
 
     
     #<---------------------------Supervisor Panel--------------------------->
-    path('customerAssginments/', supervisorPanel.customerAssginments, name='customerAssginments'),
+    path('customerAssignments/', supervisorPanel.customerAssignments, name='customerAssignments'),
+    path('requestsChangeDate/', supervisorPanel.requestsChangeDate, name='requestsChangeDate'),
+    path('requestsChangeAgent/', supervisorPanel.requestsChangeAgent, name='requestsChangeAgent'),
 
 
     #<---------------------------Users--------------------------->    

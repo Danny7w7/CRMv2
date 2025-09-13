@@ -76,6 +76,7 @@ document.addEventListener('DOMContentLoaded', function () {
     flatpickr("#date_effective_coverage", { dateFormat: "m/d/Y" });
     flatpickr("#date_effective_coverage_end", { dateFormat: "m/d/Y" });
     flatpickr("#dateAppointment", { dateFormat: "m/d/Y" });
+    flatpickr("#newDate", { dateFormat: "m/d/Y" });
 
     // ⚡ Validación de fecha antes de enviar formulario
     let saveAppointmentForm = document.getElementById('saveAppointment');

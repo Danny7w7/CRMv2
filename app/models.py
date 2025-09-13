@@ -383,6 +383,34 @@ class Supp(models.Model):
     class Meta:
         db_table = 'supp'
 
+class ChangeDateLogs(models.Model):
+    obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null=True)
+    supp = models.ForeignKey(Supp, on_delete=models.CASCADE, null=True)
+    old_date = models.DateField()
+    new_date = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    authorized_at = models.DateTimeField(null=True)
+    created_by = models.ForeignKey(Users, on_delete=models.CASCADE, null=True, related_name='date_logs_created')
+    authorized_by = models.ForeignKey(Users, on_delete=models.CASCADE, null=True, related_name='date_logs_authorized')
+    approved = models.BooleanField(null=True)
+
+    class Meta:
+        db_table = 'change_date_logs'
+
+class ChangeAgentLogs(models.Model):
+    obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null=True)
+    supp = models.ForeignKey(Supp, on_delete=models.CASCADE, null=True)
+    old_agent = models.ForeignKey(Users, on_delete=models.CASCADE, null=True, related_name='old_agent')
+    new_agent = models.ForeignKey(Users, on_delete=models.CASCADE, null=True, related_name='new_agent')
+    created_at = models.DateTimeField(auto_now_add=True)
+    authorized_at = models.DateTimeField(null=True)
+    created_by = models.ForeignKey(Users, on_delete=models.CASCADE, null=True, related_name='agent_logs_created')
+    authorized_by = models.ForeignKey(Users, on_delete=models.CASCADE, null=True, related_name='agent_logs_authorized')
+    approved = models.BooleanField(null=True)
+
+    class Meta:
+        db_table = 'change_agent_logs'
+
 class ClientsAssure(models.Model):
     agent = models.ForeignKey(Users, on_delete=models.CASCADE)
     agent_usa = models.CharField(max_length=100)

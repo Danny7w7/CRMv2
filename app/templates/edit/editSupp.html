@@ -30,6 +30,34 @@
 	<!-- Custom styles -->
 	<link rel="stylesheet" href="{% static 'assets/css/floatingSms.css' %}">
 
+	<style>
+		.hover-lift {
+			transition: all 0.3s ease;
+		}
+		.hover-lift:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+		}
+		.bg-light-info {
+			background-color: rgba(13, 202, 240, 0.05) !important;
+		}
+		.bg-light-warning {
+			background-color: rgba(255, 193, 7, 0.05) !important;
+		}
+		.bg-light-secondary {
+			background-color: rgba(108, 117, 125, 0.05) !important;
+		}
+		.card {
+			border-radius: 12px;
+		}
+		.btn {
+			border-radius: 8px;
+		}
+		.rounded-3 {
+			border-radius: 12px !important;
+		}
+	</style>
+
 {% endblock %}
 {% block page_content %}
 <h6 class="mb-0 text-uppercase">Client supplemental</h6>
@@ -339,17 +367,69 @@
 						</div> 
 						{% endif %}
                     <hr> 					                  
-                    <div class="col-md-12">
-                        <div class="d-md-flex d-grid align-items-center gap-3">
-							<button type="submit" name="action" value="save_supp" id="enviar" class="btn btn-primary px-4"  >Submit</button>
-							<button type="submit" name="action" id="enviar2" value="save_supp_agent" class="btn btn-primary px-4" style="display: none;">Submits</button>                            
-							<a href="{% url 'clientSupp' %}" class="btn btn-light px-4">Back</a>
-							<a class="btn btn-light px-4" data-bs-toggle="modal" data-bs-target="#verDocument">Document</a>
-							{% if request.user.role == 'SUPP' or request.user.role == 'Admin' and supps.carrier == 'CIGNA' %}
-								<a class="btn btn-light px-4" data-bs-toggle="modal" data-bs-target="#verCignaSuplemental">View Cigna Suplemental</a>
-							{% endif %}
-                        </div>
-                    </div>
+
+					<div class="col-md-12">
+						<div class="card border-0 shadow-sm">
+							<div class="card-body p-4">
+								<!-- Botones principales de acción -->
+								<div class="d-flex flex-wrap gap-3 mb-4 pb-3 border-bottom">
+									<button type="submit" name="action" value="save_supp" id="enviar" class="btn btn-primary btn-lg px-5 py-2 shadow-sm">
+										<i class="fas fa-save me-2"></i>
+										<span class="fw-semibold">Submit</span>
+									</button>
+									<button type="submit" name="action" id="enviar2" value="save_supp_agent" class="btn btn-success btn-lg px-5 py-2 shadow-sm" style="display: none;">
+										<i class="fas fa-paper-plane me-2"></i>
+										<span class="fw-semibold">Submits</span>
+									</button>
+									
+									<!-- Botón Back -->
+									<a href="{% url 'clientSupp' %}" class="btn btn-outline-dark px-4 py-2 shadow-sm">
+										<i class="fas fa-arrow-left me-2"></i>
+										<span class="fw-semibold">Back</span>
+									</a>
+								</div>
+
+								<!-- Sección de acciones rápidas -->
+								<div class="row g-3">
+									<!-- Documentos -->
+									<div class="col-lg-6 col-md-6">
+										<div class="bg-light-info bg-opacity-10 p-3 rounded-3 border border-info border-opacity-25">
+											<h6 class="text-info mb-2 fw-bold">
+												<i class="fas fa-folder-open me-2"></i>Documents
+											</h6>
+											<div class="d-grid gap-2">
+												<a class="btn btn-outline-info btn-sm hover-lift" data-bs-toggle="modal" data-bs-target="#verDocument">
+													<i class="fas fa-file-alt me-2"></i>Document
+												</a>
+												{% if request.user.role == 'SUPP' or request.user.role == 'Admin' and supps.carrier == 'CIGNA' %}
+													<a class="btn btn-outline-info btn-sm hover-lift" data-bs-toggle="modal" data-bs-target="#verCignaSuplemental">
+														<i class="fas fa-shield-alt me-2"></i>View Cigna Suplemental
+													</a>
+												{% endif %}
+											</div>
+										</div>
+									</div>
+
+									<!-- Cambios -->
+									<div class="col-lg-6 col-md-6">
+										<div class="bg-light-secondary bg-opacity-10 p-3 rounded-3 border border-secondary border-opacity-25">
+											<h6 class="text-secondary mb-2 fw-bold">
+												<i class="fas fa-edit me-2"></i>Cambios
+											</h6>
+											<div class="d-grid gap-2">
+												<a class="btn btn-outline-secondary btn-sm hover-lift" data-bs-toggle="modal" data-bs-target="#changeDate">
+													<i class="fas fa-calendar-alt me-2"></i>Change Date
+												</a>
+												<a class="btn btn-outline-secondary btn-sm hover-lift" data-bs-toggle="modal" data-bs-target="#changeAgent">
+													<i class="fas fa-user-edit me-2"></i>Change Agent
+												</a>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
                     {% csrf_token %}	
                 </form>
 				<hr>
@@ -749,6 +829,55 @@
 						</div>
 					</div>
 					
+					<!-- Modal para cambiar la fecha -->
+					<div class="modal fade" id="changeDate" tabindex="-1" aria-labelledby="vchangeDateLabel" aria-hidden="true">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<form id="changeDateForm" action="{% url 'changePlanDate' supps.id %}" method="POST">
+									<div class="modal-header">
+										<h5 class="modal-title" id="changeDateLabel">Change Date</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										{% csrf_token %}
+										<div class="mb-3">
+											<label for="newDate" class="form-label">New Date:</label>
+											<input type="text" class="form-control flatpickr-date" name="newDate" id="newDate" value="{{ supps.created_at|date:'m/d/Y' }}" required>
+										</div>
+										<input type="hidden" name="type_plan" id="type_plan" value="supp">
+										<button type="submit" class="btn btn-primary">Change</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+
+					<!-- Modal para cambiar el agente de registro -->
+					<div class="modal fade" id="changeAgent" tabindex="-1" aria-labelledby="vchangeAgentLabel" aria-hidden="true">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<form id="changeAgentForm" action="{% url 'changePlanAgent' supps.id %}" method="POST">
+									<div class="modal-header">
+										<h5 class="modal-title" id="changeDateLabel">Change Agent</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										{% csrf_token %}
+										<div class="mb-3">
+											<label for="newAgent" class="form-label">New Agent:</label>
+											<select class="form-select" name="newAgent" id="newAgent">
+												{% for agent in agents %}
+													<option {% if supps.agent_id == agent.id %} selected {% endif %} value="{{ agent.id }}">{{ agent.first_name }} {{ agent.last_name }}</option>
+												{% endfor %}
+											</select>
+										</div>
+										<input type="hidden" name="type_plan" id="type_plan" value="supp">
+										<button type="submit" class="btn btn-primary">Change</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
 				</div>
             </div>
         </div>
@@ -868,6 +997,11 @@
 	<script src="{% static 'assets/js/payments/paymentDateSupp.js' %}"></script>
 	<script src="{% static 'assets/js/payments/fetchPayments.js' %}"></script>
 	<script src="{% static 'assets/js/validations/saveDocumentObama.js' %}" defer></script>	
+	
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+	<!-- JS para crear la peticion para cambiar fecha -->
+	<script src="{% static 'assets/js/validations/changeDate.js' %}"></script>
 
 	<!-- Scripts SMS's -->
 	<script>

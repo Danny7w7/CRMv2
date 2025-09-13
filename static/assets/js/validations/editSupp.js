@@ -58,7 +58,8 @@ document.addEventListener('DOMContentLoaded', function() {
             "[id^='dateBirthDependent']", 
             "#date_effective_coverage", 
             "#date_effective_coverage_end",
-            "paymentDate"
+            '#newDate',
+            "paymentDate",
         ];
 
         datepickerConfigs.forEach(selector => {

@@ -1,20 +1,25 @@
 document.addEventListener("DOMContentLoaded", function() {
-    var username = document.body.getAttribute("data-user-role"); // Obtener el nombre de usuario
+    var username = document.body.getAttribute("data-user-role");
 
-    if (username === "S" ) { 
-        var table1 = $('#tableClient').DataTable({
-            lengthChange: false,
-            buttons: ['excel', 'print']
-        });
-        table1.buttons().container().appendTo('#tableClient_wrapper .col-md-6:eq(0)');
+    function initDataTable(selector, withButtons = false) {
+        if ($(selector).length) {
+            if (withButtons) {
+                var table = $(selector).DataTable({
+                    lengthChange: false,
+                    buttons: ['excel', 'print']
+                });
+                table.buttons().container().appendTo(`${selector}_wrapper .col-md-6:eq(0)`);
+            } else {
+                $(selector).DataTable();
+            }
+        }
+    }
 
-        var table2 = $('#tableClient2').DataTable({
-            lengthChange: false,
-            buttons: ['excel', 'print']
-        });
-        table2.buttons().container().appendTo('#tableClient2_wrapper .col-md-6:eq(0)');
+    if (username === "S") {
+        initDataTable('#tableClient', true);
+        initDataTable('#tableClient2', true);
     } else {
-        $('#tableClient').DataTable();
-        $('#tableClient2').DataTable();
+        initDataTable('#tableClient');
+        initDataTable('#tableClient2');
     }
 });

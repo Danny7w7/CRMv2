@@ -529,6 +529,12 @@ def editObama(request ,obamacare_id, way):
     obamacare.subsidy = f"{float(obamacare.subsidy):.2f}"
     obamacare.premium = f"{float(obamacare.premium):.2f}"
 
+    # Obtener los agentes disponibles.
+    if request.user.role == 'S' or request.user.is_superuser or request.user.is_staff:
+        agents = Users.objects.filter(is_active=True, is_staff=False, company=request.user.company)
+    else:
+        agents = None
+
     # Obtener los mensajes de texto del Cliente.
     if request.user.is_superuser:
         contact = Contacts.objects.filter(phone_number=obamacare.client.phone_number, company=obamacare.company.id).first()
@@ -586,7 +592,8 @@ def editObama(request ,obamacare_id, way):
         'messages':messages,
         'secretKey':secretKey,
         'companyInsurance':getCompanyPerAgent(obamacare.agent_usa),
-        'paymentsSummary': getPaymentsSummary(obamacare.id)
+        'paymentsSummary': getPaymentsSummary(obamacare.id),
+        'agents': agents
     }
 
     return render(request, 'edit/editObama.html', context)
@@ -885,6 +892,12 @@ def editSupp(request, supp_id):
         messages = None
         secretKey = None
 
+    # Obtener los agentes disponibles.
+    if request.user.role == 'S' or request.user.is_superuser or request.user.is_staff:
+        agents = Users.objects.filter(is_active=True, is_staff=False, company=request.user.company)
+    else:
+        agents = None
+
 
     context = {
         'supps': supp,
@@ -904,7 +917,8 @@ def editSupp(request, supp_id):
         'chat':chat,
         'messages':messages,
         'secretKey':secretKey,
-        'paymentsSummary':getPaymentsSuplementalSummary(supp_id)
+        'paymentsSummary':getPaymentsSuplementalSummary(supp_id),
+        'agents': agents,
     }
     
     return render(request, 'edit/editSupp.html', context)

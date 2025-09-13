@@ -1,0 +1,92 @@
+{% extends "dashboard/index.html" %}
+{% load static %}
+{% block head %}
+    <title>Policy Agent Change Requests</title>
+	<!--plugins-->
+	<link href="{% static 'assets/plugins/simplebar/css/simplebar.css' %}" rel="stylesheet" />
+	<link href="{% static 'assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css' %}" rel="stylesheet" />
+	<link href="{% static 'assets/plugins/metismenu/css/metisMenu.min.css' %}" rel="stylesheet" />
+	<link href="{% static 'assets/plugins/datatable/css/dataTables.bootstrap5.min.css' %}" rel="stylesheet" />
+	<!-- loader-->
+	<link href="{% static 'assets/css/pace.min.css' %}" rel="stylesheet" />
+	<script src="{% static 'assets/js/pace.min.js' %}"></script>
+	<!-- Bootstrap CSS -->
+	<link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet">
+	<link href="{% static 'assets/css/bootstrap-extended.css' %}" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&amp;display=swap" rel="stylesheet">
+	<link href="{% static 'assets/css/app.css' %}" rel="stylesheet">
+	<link href="{% static 'assets/css/icons.css' %}" rel="stylesheet">
+	<!-- Theme Style CSS -->
+	<link rel="stylesheet" href="{% static 'assets/css/dark-theme.css' %}"/>
+	<link rel="stylesheet" href="{% static 'assets/css/semi-dark.css' %}"/>
+	<link rel="stylesheet" href="{% static 'assets/css/header-colors.css' %}"/>
+{% endblock %}
+{% block page_content %}
+<h6 class="mb-0 text-uppercase">Review & Approve Agent Change Requests</h6>
+<hr/>
+<div class="row align-items-stretch">
+	<div class="col-xl-10 mx-auto">
+		<div class="row mb-3">
+			<div class="col-md-12">
+				<div class="card h-100">
+					<div class="card-body">
+                        <div class="table-responsive">
+                            <table id="tableClient" class="table table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Client Name</th>
+                                        <th scope="col">Policy Type</th>
+                                        <th scope="col">Created By</th>
+                                        <th scope="col">Old Agent</th>
+                                        <th scope="col">New Agent</th>
+                                        <th scope="col">Options</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for log in changeAgentLogs %}
+                                    <tr>
+                                        <td>{% if log.obamacare.client %}{{ log.obamacare.client.first_name }} {{ log.obamacare.client.last_name }}{% else %}{{ log.supp.client.first_name }} {{ log.supp.client.last_name }}{% endif %}</td>
+                                        <td>{% if log.obamacare %}ACA{% else %}{{ log.supp.carrier }}/{{ log.supp.policy_type }}{% endif %}</td>
+                                        <td>{{ log.created_by.first_name }} {{ log.created_by.last_name }}</td>
+                                        <td>{{ log.old_agent.first_name }} {{ log.old_agent.last_name }}</td>
+                                        <td>{{ log.new_agent.first_name }} {{ log.new_agent.last_name }}</td>
+                                        <td>
+                                            {% if log.approved is None %}
+                                            <button onclick="buttonApproveChangeAgent('{{ log.id }}', true, '{% if log.obamacare %}ACA{% else %}Supp{% endif %}')" class="btn btn-primary">Approve</button>
+                                            <button onclick="buttonApproveChangeAgent('{{ log.id }}', false, '{% if log.obamacare %}ACA{% else %}Supp{% endif %}')" class="btn btn-danger">Diminish</button>
+                                            {% else %}
+                                                {% if log.approved %}Accepted by {{ log.authorized_by.first_name }} {{ log.authorized_by.last_name }} on {{ log.authorized_at|date:"m/d/Y" }}{% else %}Rejected by {{ log.authorized_by.first_name }} {{ log.authorized_by.last_name }} on {{ log.authorized_at|date:"m/d/Y" }}{% endif %}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+{% block end_js %}
+	<!-- Bootstrap JS -->
+	<script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+	<!--plugins-->
+	<script src="{% static 'assets/js/jquery.min.js' %}"></script>
+	<script src="{% static 'assets/plugins/simplebar/js/simplebar.min.js' %}"></script>
+	<script src="{% static 'assets/plugins/metismenu/js/metisMenu.min.js' %}"></script>
+	<script src="{% static 'assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js' %}"></script>
+	<script src="{% static 'assets/plugins/datatable/js/jquery.dataTables.min.js' %}"></script>
+	<script src="{% static 'assets/plugins/datatable/js/dataTables.bootstrap5.min.js' %}"></script>
+
+	<!--app JS-->
+	<script src="{% static 'assets/js/app.js' %}"></script>
+    <script src="{% static 'assets/js/validations/changeDate.js' %}"></script>
+	<script src="{% static 'assets/js/stylesTables/stylesTable.js' %}"></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+{% endblock %}

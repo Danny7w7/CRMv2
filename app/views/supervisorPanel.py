@@ -11,7 +11,7 @@ from django.shortcuts import render
 from app.models import *
 
 @login_required(login_url='/login') 
-def customerAssginments(request):
+def customerAssignments(request):
     if request.method == 'POST':
         userId = request.POST.get('user')
         agentUSAId = request.POST.getlist('usAgent')
@@ -37,3 +37,23 @@ def customerAssginments(request):
     }
 
     return render(request, 'supervisorPanel/customerAssignments.html', context)
+
+@login_required(login_url='/login') 
+def requestsChangeDate(request):
+    changeDateLogs = ChangeDateLogs.objects.select_related(
+        'obamacare__client',  # Relación anidada para ObamaCare -> Client
+        'supp__client',       # Relación anidada para Supp -> Client
+        'created_by',
+        'authorized_by'
+    ).all()
+    return render(request, 'supervisorPanel/requestsChangeDate.html', {'changeDateLogs': changeDateLogs})
+
+@login_required(login_url='/login') 
+def requestsChangeAgent(request):
+    changeAgentLogs = ChangeAgentLogs.objects.select_related(
+        'obamacare__client',  # Relación anidada para ObamaCare -> Client
+        'supp__client',       # Relación anidada para Supp -> Client
+        'created_by',
+        'authorized_by'
+    ).all()
+    return render(request, 'supervisorPanel/requestsChangeAgent.html', {'changeAgentLogs': changeAgentLogs})

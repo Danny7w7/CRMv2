@@ -1,5 +1,6 @@
 # Standard Python libraries
 import datetime
+import json
 
 # Django utilities
 from django.http import JsonResponse, HttpResponse
@@ -11,6 +12,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 
 # Application-specific imports
 from app.models import *
@@ -577,3 +580,166 @@ def preComplaint(request):
         )
         
         return redirect('complaint',obamacare_id, id.id ) 
+
+@require_POST
+def changePlanDate(request, plan_id):
+    try:
+        new_date = request.POST.get('newDate')
+        type_plan = request.POST.get('type_plan')
+        
+        if not new_date:
+            return JsonResponse({"error": "Missing parameter: newDate."}, status=400)
+
+        # Try to parse date
+        try:
+            dateObj = datetime.datetime.strptime(new_date, "%m/%d/%Y").date()
+        except ValueError:
+            return JsonResponse({"error": "Invalid date format. Expected MM/DD/YYYY."}, status=400)
+
+        changeDate = ChangeDateLogs()
+        obamacare = None
+        supp = None
+
+        if type_plan == 'obamacare':
+            obamacare = ObamaCare.objects.filter(id=plan_id).first()
+            if not obamacare:
+                return JsonResponse({"error": "ObamaCare record not found."}, status=404)
+            changeDate.obamacare = obamacare
+        elif type_plan == 'supp':
+            supp = Supp.objects.filter(id=plan_id).first()
+            if not supp:
+                return JsonResponse({"error": "Supp record not found."}, status=404)
+            changeDate.supp = supp
+        else:
+            return JsonResponse({"error": "Invalid type_plan."}, status=400)
+
+        # Save log
+        changeDate.created_at = timezone.now()
+        changeDate.old_date = obamacare.created_at if obamacare else supp.created_at
+        changeDate.new_date = dateObj
+        changeDate.created_by = request.user
+        changeDate.save()
+
+        return JsonResponse({"message": "Date updated successfully."})
+
+    except Exception as e:
+        return JsonResponse({"error": f"Unexpected error: {str(e)}"}, status=500)
+
+def changePlanAgent(request, plan_id):
+    try:
+        new_agent = request.POST.get('newAgent')
+        type_plan = request.POST.get('type_plan')
+
+        if not new_agent:
+            return JsonResponse({"error": "Missing parameter: newAgent."}, status=400)
+
+        # Try to parse date
+        try:
+            agent = Users.objects.get(id=new_agent)
+        except ValueError:
+            return JsonResponse({"error": "Invalid agent ID format."}, status=400)
+
+        changeAgent = ChangeAgentLogs()
+        obamacare = None
+        supp = None
+
+        if type_plan == 'obamacare':
+            obamacare = ObamaCare.objects.filter(id=plan_id).first()
+            if not obamacare:
+                return JsonResponse({"error": "ObamaCare record not found."}, status=404)
+            changeAgent.obamacare = obamacare
+        elif type_plan == 'supp':
+            supp = Supp.objects.filter(id=plan_id).first()
+            if not supp:
+                return JsonResponse({"error": "Supp record not found."}, status=404)
+            changeAgent.supp = supp
+        else:
+            return JsonResponse({"error": "Invalid type_plan."}, status=400)
+
+        # Save log
+        changeAgent.created_at = timezone.now()
+        changeAgent.old_agent = obamacare.agent if obamacare else supp.agent
+        changeAgent.new_agent = agent
+        changeAgent.created_by = request.user
+        changeAgent.save()
+
+        return JsonResponse({"message": "Agent updated successfully."})
+
+    except Exception as e:
+        return JsonResponse({"error": f"Unexpected error: {str(e)}"}, status=500)
+
+@csrf_exempt
+def fetchChangePlanDate(request, change_id):
+    try:
+        data = json.loads(request.body)
+        
+        typePlan = data.get('type_plan')
+        approve = bool(data.get('approve'))
+
+        if not typePlan:
+            return JsonResponse({"error": "Missing parameter: type_plan."}, status=400)
+
+        changeDate = ChangeDateLogs.objects.get(id=change_id)
+
+        if approve:
+            if typePlan == 'ACA':
+                obamacare = ObamaCare.objects.filter(id=changeDate.obamacare.id).first()
+                if not obamacare:
+                    return JsonResponse({"error": "ObamaCare record not found."}, status=404)
+                obamacare.created_at = changeDate.new_date
+                obamacare.save()
+
+            elif typePlan == 'Supp':
+                supp = Supp.objects.filter(id=changeDate.supp.id).first()
+                if not supp:
+                    return JsonResponse({"error": "Supp record not found."}, status=404)
+                supp.created_at = changeDate.new_date
+                supp.save()
+        
+        changeDate.authorized_by = request.user
+        changeDate.authorized_at = timezone.now()
+        changeDate.approved = approve
+        changeDate.save()
+
+        return JsonResponse({"Message": 'Date modified successfully'}, status=200)
+
+    except Exception as e:
+        return JsonResponse({"error": f"Unexpected error: {str(e)}"}, status=500)
+    
+@csrf_exempt
+def fetchChangePlanAgent(request, change_id):
+    try:
+        data = json.loads(request.body)
+        
+        typePlan = data.get('type_plan')
+        approve = bool(data.get('approve'))
+
+        if not typePlan:
+            return JsonResponse({"error": "Missing parameter: type_plan."}, status=400)
+
+        changeAgent = ChangeAgentLogs.objects.get(id=change_id)
+
+        if approve:
+            if typePlan == 'ACA':
+                obamacare = ObamaCare.objects.filter(id=changeAgent.obamacare.id).first()
+                if not obamacare:
+                    return JsonResponse({"error": "ObamaCare record not found."}, status=404)
+                obamacare.agent = changeAgent.new_agent
+                obamacare.save()
+
+            elif typePlan == 'Supp':
+                supp = Supp.objects.filter(id=changeAgent.supp.id).first()
+                if not supp:
+                    return JsonResponse({"error": "Supp record not found."}, status=404)
+                supp.agent = changeAgent.new_agent
+                supp.save()
+
+        changeAgent.authorized_by = request.user
+        changeAgent.authorized_at = timezone.now()
+        changeAgent.approved = approve
+        changeAgent.save()
+
+        return JsonResponse({"Message": 'Date modified successfully'}, status=200)
+
+    except Exception as e:
+        return JsonResponse({"error": f"Unexpected error: {str(e)}"}, status=500)
