@@ -308,10 +308,12 @@
 							<ul>
 								<li> <a href="{% url 'customerAssignments' %}"><i class='bx bx-radio-circle'></i>Customer Assignments</a>
 								</li>
+								{% if request.user.role == 'Admin' %}
 								<li> <a href="{% url 'requestsChangeDate' %}"><i class='bx bx-radio-circle'></i>Requests Change Date</a>
 								</li>
 								<li> <a href="{% url 'requestsChangeAgent' %}"><i class='bx bx-radio-circle'></i>Requests Change Agent</a>
 								</li>
+								{% endif %}
 							</ul>
 						</li>
 					{% endif %}				
