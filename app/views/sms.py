@@ -57,21 +57,50 @@ logger = logging.getLogger('django')
 @csrf_exempt
 def sendMessage(request):
     if comprobate_company(request.user.company):
-        return JsonResponse({'message':'No money'})
+        return JsonResponse({'message': 'No money'}, status=402)
+
     telnyx.api_key = settings.TELNYX_API_KEY
-    telnyx.Message.create(
-        from_=f"+{request.user.assigned_phone.phone_number}", # Your Telnyx number
-        to=f'+{request.POST['phoneNumber']}',
-        text= request.POST['messageContent']
-    )
-    contact, created = createOrUpdatecontact(request.POST['phoneNumber'], request.user.company)
-    if request.user.role == 'Customer':
-        chat = createOrUpdateChat(contact, request.user.company)
-    else:
-        chat = createOrUpdateChat(contact, request.user.company, request.user)
-    saveMessageInDb('Agent', request.POST['messageContent'], chat, request.user)
+
+    phone_number = request.POST.get('phoneNumber')
+    message_content = request.POST.get('messageContent', '')
+
+    assigned_phone = getattr(request.user, "assigned_phone", None)
+
+    if not assigned_phone or not getattr(assigned_phone, "phone_number", None):
+        return JsonResponse({
+            'error': 'You do not have an assigned phone number. Please contact the website administrators.'
+        }, status=400)
     
-    return JsonResponse({'message':'ok'})
+    # Telnyx SMS limit (single part, GSM-7)
+    MAX_SMS_LENGTH = 160
+    if len(message_content) > MAX_SMS_LENGTH:
+        return JsonResponse({
+            'error': f'Message too long. Max allowed is {MAX_SMS_LENGTH} characters.',
+            'currentLength': len(message_content)
+        }, status=400)
+
+    try:
+        telnyx.Message.create(
+            from_=f"+{request.user.assigned_phone.phone_number}",
+            to=f'+{phone_number}',
+            text=message_content
+        )
+
+        contact, created = createOrUpdatecontact(phone_number, request.user.company)
+        if request.user.role == 'Customer':
+            chat = createOrUpdateChat(contact, request.user.company)
+        else:
+            chat = createOrUpdateChat(contact, request.user.company, request.user)
+
+        saveMessageInDb('Agent', message_content, chat, request.user)
+
+        return JsonResponse({'message': 'ok'})
+
+    except telnyx.error.InvalidRequestError as e:
+        return JsonResponse({'error': f'Telnyx error: {str(e)}'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': f'Unexpected error: {str(e)}'}, status=500)
+
 
 @csrf_exempt
 @require_POST

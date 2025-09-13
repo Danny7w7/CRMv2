@@ -190,40 +190,55 @@ async function sendFirstMessage(message) {
     formData.append('phoneNumber', chat_id);
     formData.append('messageContent', message);
 
-    return fetch('/sendMessage/', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
+    try {
+        const response = await fetch('/sendMessage/', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
         if (!response.ok) {
-            throw new Error(`Server error ${response.status}: ${response.statusText}`);
+            // Manejo de errores del backend (400, 402, etc.)
+            const errorMsg = data.error || `Server error ${response.status}: ${response.statusText}`;
+
+            await Swal.fire({
+                title: "Error",
+                html: `<p style="color:red;">${errorMsg}</p>`,
+                icon: "error"
+            });
+
+            // Lanza error para cortar ejecución, pero NO cae al catch
+            return Promise.reject(new Error(errorMsg));
         }
-        return response.json();
-    })
-    .then(data => {
+
+        // Caso: sin saldo
         if (data.message === 'No money') {
-            return Swal.fire({
+            await Swal.fire({
                 title: "<p style='color: red;'>Insufficient funding</p>",
                 text: "Recharge your account, in case of error contact support.",
                 icon: "error"
-            }).then(() => {
-                window.location.reload();
             });
+            window.location.reload();
+            return;
         }
-        
+
+        // Caso éxito
         addMessage(message, 'Agent');
         return data;
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-        Swal.fire({
-            title: "Error",
-            text: `An error occurred while sending the message. Please try again later.<br> Error: ${error.message}`,
+
+    } catch (error) {
+        // Solo atrapa errores inesperados (ej: caída del servidor, red)
+        console.error('Unexpected Error:', error);
+        await Swal.fire({
+            title: "Unexpected Error",
+            html: `An unexpected error occurred.<br><b>${error.message}</b>`,
             icon: "error"
         });
         throw error;
-    });
+    }
 }
+
 
 // Obtener el formulario cuando el DOM esté cargado
 document.addEventListener('DOMContentLoaded', function() {
