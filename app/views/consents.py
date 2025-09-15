@@ -282,6 +282,8 @@ def generateConsentPdf(request, obamacare, dependents, supps, language):
     consent.signature = image
     consent.save()
 
+    id = f"{obamacare.id:08d}"
+
     context = {
         'obamacare':obamacare,
         'dependents':dependents,
@@ -292,7 +294,8 @@ def generateConsentPdf(request, obamacare, dependents, supps, language):
         'current_date':current_date,
         'date_more_3_months':date_more_3_months,
         'ip':getIPClient(request),
-        'var':var
+        'var':var,
+        'id': id
     }
 
     activate(language)
@@ -430,11 +433,14 @@ def generateIncomeLetterPDF(request, obamacare, language):
     incomeLetter.signature = image
     incomeLetter.save()
 
+    id = f"{obamacare.id:08d}"
+
     context = {
         'obamacare':obamacare,
         'current_date':current_date,
         'ip':getIPClient(request),
-        'incomeLetter':incomeLetter
+        'incomeLetter':incomeLetter,
+        'id': id
     }
 
     activate(language)
@@ -463,12 +469,14 @@ def ILFFM(request, obamacare):
     activate(language)
 
     incomeLetter = IncomeLetterFFM(obamacare=obamacare)
+    id = f"{obamacare.id:08d}"
 
     context = {
         'obamacare':obamacare,
         'current_date':current_date,
         'ip':getIPClient(request),
-        'signature': signature
+        'signature': signature,
+        'id': id
     } 
 
     # Renderiza la plantilla HTML a un string
