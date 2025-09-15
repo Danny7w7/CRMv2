@@ -11,28 +11,28 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const actionUrl = form.getAttribute('action');
-            console.log('Form action URL:', actionUrl);
 
             fetch(actionUrl, { method: 'POST', body: new FormData(form) })
-                .then(response => {
-                    if (response.ok) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: '¡Success!',
-                            text: `${typeChange} change request successfully created`,
-                        })
-                        showOrHideModal(`change${typeChange}`, false);
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: '¡Error!',
-                            text: `${typeChange} change request failed`,
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+            .then(response => {
+                if (response.ok) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Success!',
+                        text: `${typeChange} change request successfully created`,
+                    })
+                    showOrHideModal(`change${typeChange}`, false);
+                    document.getElementById('optionsColumn').textContent = ``;
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '¡Error!',
+                        text: `${typeChange} change request failed`,
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
         });
     });
 });
@@ -82,6 +82,9 @@ function buttonApproveChangeDate(logId, approve, typePlan) {
             icon: 'success',
             title: '¡Success!',
             text: `Date Change request successfully ${approve ? 'approved' : 'rejected'}`,
+        })
+        .then(() => {
+            document.getElementById(`optionsColumn${logId}`).textContent = `${data.status} by ${data.user} on ${new Date().toLocaleDateString()}`;
         });
     })
     .catch(err => {
@@ -122,6 +125,37 @@ function buttonApproveChangeAgent(logId, approve, typePlan) {
             icon: 'error',
             title: 'Error!',
             text: `Agent Change request failed: ${err.message}`,
+        });
+    });
+}
+
+function showReasonChange(typeChange, reasonId) {
+    fetch(`/getReasonChange/${reasonId}/?type=${typeChange}`, {
+        method: 'GET',
+
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(response.error || 'Error fetching reason');
+        }
+        return response.json(); // <- aquí conviertes la respuesta a JSON
+    })
+    .then(data => {
+        // aquí ya puedes acceder a data.message o cualquier otra propiedad
+        Swal.fire({
+            icon: 'info',
+            title: 'Reason',
+            text: data.reason,
+        });
+    })
+    .catch(error => {
+        Swal.fire({
+            icon: 'error',
+            title: '¡Error!',
+            text: error.message,
         });
     });
 }

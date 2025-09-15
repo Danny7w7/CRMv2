@@ -586,6 +586,7 @@ def changePlanDate(request, plan_id):
     try:
         new_date = request.POST.get('newDate')
         type_plan = request.POST.get('type_plan')
+        reason = request.POST.get('reason')
         
         if not new_date:
             return JsonResponse({"error": "Missing parameter: newDate."}, status=400)
@@ -618,6 +619,7 @@ def changePlanDate(request, plan_id):
         changeDate.old_date = obamacare.created_at if obamacare else supp.created_at
         changeDate.new_date = dateObj
         changeDate.created_by = request.user
+        changeDate.reason = reason
         changeDate.save()
 
         return JsonResponse({"message": "Date updated successfully."})
@@ -629,6 +631,7 @@ def changePlanAgent(request, plan_id):
     try:
         new_agent = request.POST.get('newAgent')
         type_plan = request.POST.get('type_plan')
+        reason = request.POST.get('reason')
 
         if not new_agent:
             return JsonResponse({"error": "Missing parameter: newAgent."}, status=400)
@@ -661,6 +664,7 @@ def changePlanAgent(request, plan_id):
         changeAgent.old_agent = obamacare.agent if obamacare else supp.agent
         changeAgent.new_agent = agent
         changeAgent.created_by = request.user
+        changeAgent.reason = reason
         changeAgent.save()
 
         return JsonResponse({"message": "Agent updated successfully."})
@@ -701,7 +705,9 @@ def fetchChangePlanDate(request, change_id):
         changeDate.approved = approve
         changeDate.save()
 
-        return JsonResponse({"Message": 'Date modified successfully'}, status=200)
+        return JsonResponse({"message": 'Date modified successfully',
+                             "status": 'Accepted' if approve else 'Rejected',
+                             "user": f'{request.user.first_name} {request.user.last_name}'}, status=200)
 
     except Exception as e:
         return JsonResponse({"error": f"Unexpected error: {str(e)}"}, status=500)
@@ -739,7 +745,9 @@ def fetchChangePlanAgent(request, change_id):
         changeAgent.approved = approve
         changeAgent.save()
 
-        return JsonResponse({"Message": 'Date modified successfully'}, status=200)
+        return JsonResponse({"message": 'Date modified successfully',
+                             "status": 'Accepted' if approve else 'Rejected',
+                             "user": f'{request.user.first_name} {request.user.last_name}'}, status=200)
 
     except Exception as e:
         return JsonResponse({"error": f"Unexpected error: {str(e)}"}, status=500)

@@ -386,6 +386,7 @@ class Supp(models.Model):
 class ChangeDateLogs(models.Model):
     obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null=True)
     supp = models.ForeignKey(Supp, on_delete=models.CASCADE, null=True)
+    reason = models.TextField(null=False)
     old_date = models.DateField()
     new_date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -400,6 +401,7 @@ class ChangeDateLogs(models.Model):
 class ChangeAgentLogs(models.Model):
     obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null=True)
     supp = models.ForeignKey(Supp, on_delete=models.CASCADE, null=True)
+    reason = models.TextField(null=False)
     old_agent = models.ForeignKey(Users, on_delete=models.CASCADE, null=True, related_name='old_agent')
     new_agent = models.ForeignKey(Users, on_delete=models.CASCADE, null=True, related_name='new_agent')
     created_at = models.DateTimeField(auto_now_add=True)

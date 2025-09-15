@@ -5,7 +5,9 @@
 # Django core libraries
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 
 # Application-specific imports
 from app.models import *
@@ -57,3 +59,27 @@ def requestsChangeAgent(request):
         'authorized_by'
     ).all()
     return render(request, 'supervisorPanel/requestsChangeAgent.html', {'changeAgentLogs': changeAgentLogs})
+
+@csrf_exempt
+def getReasonChange(request, logId):
+    try:
+        log_type = request.GET.get('type')
+
+        reason = None
+
+        if log_type == 'Date':
+            change_log = ChangeDateLogs.objects.filter(id=logId).first()
+            if change_log:
+                reason = change_log.reason
+        elif log_type == 'Agent':
+            change_log = ChangeAgentLogs.objects.filter(id=logId).first()
+            if change_log:
+                reason = change_log.reason
+
+        if reason:
+            return JsonResponse({"reason": reason}, status=200)
+        else:
+            return JsonResponse({"error": "Log not found or no reason available."}, status=404)
+
+    except Exception as e:
+        return JsonResponse({"error": f"Unexpected error: {str(e)}"}, status=500)

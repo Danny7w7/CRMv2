@@ -239,6 +239,7 @@ urlpatterns = [
     path('customerAssignments/', supervisorPanel.customerAssignments, name='customerAssignments'),
     path('requestsChangeDate/', supervisorPanel.requestsChangeDate, name='requestsChangeDate'),
     path('requestsChangeAgent/', supervisorPanel.requestsChangeAgent, name='requestsChangeAgent'),
+    path('getReasonChange/<int:logId>/', supervisorPanel.getReasonChange, name='getReasonChange'),
 
 
     #<---------------------------Users--------------------------->    

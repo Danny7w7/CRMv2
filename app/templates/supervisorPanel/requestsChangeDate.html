@@ -36,10 +36,12 @@
                                     <tr>
                                         <th scope="col">Client Name</th>
                                         <th scope="col">Policy Type</th>
+                                        <th scope="col">Policy Status</th>
                                         <th scope="col">Created By</th>
                                         <th scope="col">Old Date</th>
                                         <th scope="col">New Date</th>
                                         <th scope="col">Options</th>
+                                        <th scope="col">Reason</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -47,10 +49,11 @@
                                     <tr>
                                         <td>{% if log.obamacare.client %}{{ log.obamacare.client.first_name }} {{ log.obamacare.client.last_name }}{% else %}{{ log.supp.client.first_name }} {{ log.supp.client.last_name }}{% endif %}</td>
                                         <td>{% if log.obamacare %}ACA{% else %}{{ log.supp.carrier }}/{{ log.supp.policy_type }}{% endif %}</td>
-                                        <td>{{ log.created_by.first_name }} {{ log.created_by.last_name }}</td>
+                                        <td>{% if log.obamacare %}{{ log.obamacare.status }}{% else %}{{ log.supp.status }}{% endif %}</td>
+										<td>{{ log.created_by.first_name }} {{ log.created_by.last_name }}</td>
                                         <td>{{ log.old_date|date:"m/d/Y" }}</td>
                                         <td>{{ log.new_date|date:"m/d/Y" }}</td>
-                                        <td>
+                                        <td id="optionsColumn{{ log.id }}">
                                             {% if log.approved is None %}
                                             <button onclick="buttonApproveChangeDate('{{ log.id }}', true, '{% if log.obamacare %}ACA{% else %}Supp{% endif %}')" class="btn btn-primary">Approve</button>
                                             <button onclick="buttonApproveChangeDate('{{ log.id }}', false, '{% if log.obamacare %}ACA{% else %}Supp{% endif %}')" class="btn btn-danger">Diminish</button>
@@ -58,6 +61,9 @@
                                                 {% if log.approved %}Accepted by {{ log.authorized_by.first_name }} {{ log.authorized_by.last_name }} on {{ log.authorized_at|date:"m/d/Y" }}{% else %}Rejected by {{ log.authorized_by.first_name }} {{ log.authorized_by.last_name }} on {{ log.authorized_at|date:"m/d/Y" }}{% endif %}
                                             {% endif %}
                                         </td>
+                                        <td>
+											<button onclick="showReasonChange('Date', '{{ log.id }}')" class="btn btn-primary">Reason</button>
+										</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
