@@ -844,6 +844,10 @@
 											<label for="newDate" class="form-label">New Date:</label>
 											<input type="text" class="form-control flatpickr-date" name="newDate" id="newDate" value="{{ supps.created_at|date:'m/d/Y' }}" required>
 										</div>
+										<div class="mb-3">
+											<label for="reason" class="form-label">Reason:</label>
+											<textarea class="form-control" name="reason" id="reason" rows="3" required></textarea>
+										</div>
 										<input type="hidden" name="type_plan" id="type_plan" value="supp">
 										<button type="submit" class="btn btn-primary">Change</button>
 									</div>
