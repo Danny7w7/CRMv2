@@ -72,7 +72,7 @@ def sendMessage(request):
         }, status=400)
     
     # Telnyx SMS limit (single part, GSM-7)
-    MAX_SMS_LENGTH = 160
+    MAX_SMS_LENGTH = 1530
     if len(message_content) > MAX_SMS_LENGTH:
         return JsonResponse({
             'error': f'Message too long. Max allowed is {MAX_SMS_LENGTH} characters.',

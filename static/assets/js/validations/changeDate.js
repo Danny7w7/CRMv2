@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     const forms = document.querySelectorAll('#changeDateForm, #changeAgentForm');
-    console.log(forms)
 
     forms.forEach(form => {
         form.addEventListener('submit', event => {
