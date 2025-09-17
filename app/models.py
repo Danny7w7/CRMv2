@@ -989,12 +989,14 @@ class ControlQuestions(models.Model):
 class QuestionTracking(models.Model):
 
     control_question = models.ForeignKey(ControlQuestions, on_delete=models.CASCADE)
+    answer = models.CharField(max_length=100)
     control_agent = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='control_agent')
     sales_agent = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='sales_agent')
     client = models.ForeignKey(Clients, on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True) 
     created_at = models.DateTimeField(auto_now_add=True)
     company = models.ForeignKey(Companies, on_delete=models.CASCADE)
+    obs = models.TextField(null=True)
 
 
     class Meta:

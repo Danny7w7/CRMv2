@@ -211,19 +211,21 @@ def formAsignationQuestionControl(request):
         agent = Users.objects.filter(id = agentID).first()
         clientID = request.POST.get('client')
         clients = Clients.objects.filter(id = clientID).first()
+        obs = request.POST.get('obs')
 
         for question in questions:
             key = f"question_{question.id}"
             answer = request.POST.get(key)
 
-            if answer == "yes":
-                QuestionTracking.objects.create(
-                    control_agent = request.user,
-                    sales_agent = agent,
-                    client=clients,
-                    company = company,
-                    control_question = question,
-                )
+            QuestionTracking.objects.create(
+                control_agent = request.user,
+                sales_agent = agent,
+                client=clients,
+                company = company,
+                control_question = question,
+                answer = answer,
+                obs = obs
+            )
     
     return render (request, 'quality/formAsignationQuestionControl.html', context)
 

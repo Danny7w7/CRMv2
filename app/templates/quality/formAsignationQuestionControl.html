@@ -51,6 +51,11 @@
 									name="question_{{ item.id }}" value="no" id="no_{{ item.id }}">
 								<label class="form-check-label" for="no_{{ item.id }}">No</label>
 							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio"
+									name="question_{{ item.id }}" value="N/A" id="N/A_{{ item.id }}">
+								<label class="form-check-label" >Not Applicable</label>
+							</div>
 						</div>
 					{% endfor %}
 					<div class="col-md-6">
@@ -71,6 +76,10 @@
 							{% endfor %}
 						</select>
 						<div id="clientNameDisplay" class="mt-2 text-primary fw-bold" style="display: none;"></div>
+					</div>
+					<div class="col-md-6">
+						<label for="clientSelect" class="form-label">Obs</label>
+						<textarea  class="form-control" name="obs" id="obs" style="resize: none"  ></textarea>						
 					</div>
 
 					<div class="col-md-12">
