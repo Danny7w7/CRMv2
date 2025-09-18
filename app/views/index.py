@@ -20,6 +20,9 @@ from .decoratorsCompany import *
 @login_required(login_url='/login') 
 def index(request):
 
+    if request.user.role == 'TV':
+        return redirect('weeklyLiveViewTV')
+
     obama = countSalesObama(request)
     supp = countSalesSupp(request)
     chartOne = chartSaleIndex(request)
