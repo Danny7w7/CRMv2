@@ -698,7 +698,7 @@ class Consents(models.Model):
         storage=S3Boto3Storage(),
         null=True)
         
-    createdAt = models.DateTimeField(null=True, blank=True, auto_now_add=True)  # nuevo campo
+    createdAt = models.DateTimeField(auto_now_add=True)  # nuevo campo
 
     class Meta:
         db_table = 'consents'
