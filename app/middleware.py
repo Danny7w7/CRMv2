@@ -1,5 +1,18 @@
 from django.urls import resolve
 from django.shortcuts import render
+from django.utils.deprecation import MiddlewareMixin
+
+class CustomSessionMiddleware(MiddlewareMixin):
+    def process_request(self, request):
+        if not request.user.is_authenticated:
+            return
+
+        # Excepción: rol TV, superuser o staff
+        if request.user.role == "TV" or request.user.is_superuser or request.user.is_staff:
+            request.session.set_expiry(36000)  # 10 horas
+        else:
+            request.session.set_expiry(1800)  # 30 minutos
+
 
 class NoCacheMiddleware:
     def __init__(self, get_response):
