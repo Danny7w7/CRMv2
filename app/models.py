@@ -1031,6 +1031,13 @@ class CignaSuplemental(models.Model):
     class Meta:
         db_table = 'cigna_suplemental'
 
+class CignaSuplementalDraft(models.Model):
+    supp = models.OneToOneField("Supp", on_delete=models.CASCADE)
+    data = models.JSONField(default=dict)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "cigna_suplemental_drafts"
 
 from .modelsSMS import *
 from .modelsWhatsapp import *

@@ -288,6 +288,7 @@ urlpatterns = [
     path('sendConsentForm/', consents.sendConsentForm, name='sendConsentForm'),
 
     path('cignaSuplemental/<supp_id>/', consents.cignaSuplemental, name='cignaSuplemental'),
+    path("saveCignaDraft/<int:supp_id>/", consents.saveCignaDraft, name="saveCignaDraft"),
 
     #<---------------------------Company---------------------------> 
     path('formCreateCompanies/', companies.formCreateCompanies, name='formCreateCompanies'),

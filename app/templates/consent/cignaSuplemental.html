@@ -172,24 +172,24 @@
 
         <h1>CIGNA SUPPLEMENTAL BENEFITS</h1>
 
-        <form method="POST" id="signatureForm">
+        <form method="POST" id="signatureForm"  data-supp-id="{{ supp.id }}">
             {% csrf_token %}
 
             <div class="panel">
-                <h2>Online Pre‑Authorization Agreement for Electronic Funds Transfer</h2>
+                <h2>Online Pre‑Authorization Agreement for Electronic Funds Transfer </h2>
                 <div class="grid-2">
                     <div class="checklist">
-                        <label class="checkline"><input type="checkbox" name="uno" /> CIGNA National Health Insurance Company</label>
-                        <label class="checkline"><input type="checkbox" name="dos" /> Loyal American Life Insurance Company</label>
-                        <label class="checkline"><input type="checkbox" name="tres" /> Sterling Life Insurance Company</label>
-                        <label class="checkline"><input type="checkbox" name="cuatro" /> Continental General Insurance Company</label>
+                        <label class="checkline"><input type="checkbox" name="uno" {% if form_data.uno %}checked{% endif %} /> CIGNA National Health Insurance Company</label>
+                        <label class="checkline"><input type="checkbox" name="dos" {% if form_data.dos %}checked{% endif %} /> Loyal American Life Insurance Company</label>
+                        <label class="checkline"><input type="checkbox" name="tres" {% if form_data.tres %}checked{% endif %} /> Sterling Life Insurance Company</label>
+                        <label class="checkline"><input type="checkbox" name="cuatro" {% if form_data.cuatro %}checked{% endif %}/> Continental General Insurance Company</label>
                     </div>
                     <div class="checklist">
-                        <label class="checkline"><input type="checkbox" name="cinco" /> American Retirement Life Insurance Company</label>
-                        <label class="checkline"><input type="checkbox" name="seis" /> CIGNA Health and Life Insurance Company</label>
-                        <label class="checkline"><input type="checkbox" name="siete" /> Provident American Life &amp; Health Insurance Company</label>
+                        <label class="checkline"><input type="checkbox" name="cinco" {% if form_data.cinco %}checked{% endif %} /> American Retirement Life Insurance Company</label>
+                        <label class="checkline"><input type="checkbox" name="seis" {% if form_data.seis %}checked{% endif %} /> CIGNA Health and Life Insurance Company</label>
+                        <label class="checkline"><input type="checkbox" name="siete" {% if form_data.siete %}checked{% endif %} /> Provident American Life &amp; Health Insurance Company</label>
                         <div class="muted">Administering Medicare Supplement and Supplemental Health for</div>
-                        <label class="checkline"><input type="checkbox" name="ocho" /> Great American Life Insurance Company<sup>®</sup></label>
+                        <label class="checkline"><input type="checkbox" name="ocho" {% if form_data.ocho %}checked{% endif %} /> Great American Life Insurance Company<sup>®</sup></label>
                     </div>
                 </div>
             </div>
@@ -200,23 +200,23 @@
                     <div class="row"><label>Policy Number (if Available)</label><input type="text" name="policy" value="{% if supp.policyNumber is not none %} {{ supp.policyNumber}} {% endif %}" {% if supp.policyNumber is not none %}readonly{% endif %}></div>
                 </div>
                 <div class="grid-2 tight">
-                    <div class="row"><label>Financial Institution Name and Telephone Number</label><input name="phoneFinancial" type="text" required ></div>
-                    <div class="row"><label>Financial Institution Address</label><input type="text" name="addressFinancial" required ></div>
+                    <div class="row"><label>Financial Institution Name and Telephone Number</label><input name="phoneFinancial" type="text" required value="{{ form_data.phoneFinancial }}" ></div>
+                    <div class="row"><label>Financial Institution Address</label><input type="text" name="addressFinancial" value="{{ form_data.addressFinancial }}" required ></div>
                 </div>
                 <div class="grid-2 tight">
-                    <div class="row"><label>9 Digit Routing Number</label><input type="text" pattern="\d*" name="numberRouting" inputmode="numeric" required ></div>
-                    <div class="row"><label>Account Number</label><input type="text" name="accountNumber" required ></div>
+                    <div class="row"><label>9 Digit Routing Number</label><input type="text" pattern="\d*" name="numberRouting" inputmode="numeric" value="{{ form_data.numberRouting }}" required ></div>
+                    <div class="row"><label>Account Number</label><input type="text" name="accountNumber" value="{{ form_data.accountNumber }}" required ></div>
                 </div>
 
                 <div class="grid-2 tight">
-                    <div class="row"><label>Requested Withdrawal Date (1st thru 28th):</label><input type="number" name="dateWithdrawal" min="1" max="28" required ></div>
+                    <div class="row"><label>Requested Withdrawal Date (1st thru 28th):</label><input type="number" name="dateWithdrawal" min="1" max="28" value="{{ form_data.dateWithdrawal }}" required ></div>
                     <div class="row">
                         <label>Withdraw Payment:</label>
                         <div class="choices grid-4">
-                            <label class="checkline"><input type="checkbox" name="monthly" /> Monthly</label>
-                            <label class="checkline"><input type="checkbox" name="quarterly" /> Quarterly</label>
-                            <label class="checkline"><input type="checkbox" name="semiAnnually" /> Semi‑Annually</label>
-                            <label class="checkline"><input type="checkbox" name="annually" /> Annually</label>
+                            <label class="checkline"><input type="checkbox" name="monthly" {% if form_data.monthly %}checked{% endif %} /> Monthly</label>
+                            <label class="checkline"><input type="checkbox" name="quarterly" {% if form_data.quarterly %}checked{% endif %} /> Quarterly</label>
+                            <label class="checkline"><input type="checkbox" name="semiAnnually" {% if form_data.semiAnnually %}checked{% endif %} /> Semi‑Annually</label>
+                            <label class="checkline"><input type="checkbox" name="annually" {% if form_data.annually %}checked{% endif %} /> Annually</label>
                         </div>
                     </div>
                 </div>
@@ -224,9 +224,9 @@
                 <div class="row tight">
                     <label>Type of Account:</label>
                     <div class="choices grid-3">
-                        <label class="checkline"><input type="checkbox" name="personalChecking"/> Personal Checking Account</label>
-                        <label class="checkline"><input type="checkbox" name="personalSavings"/> Personal Savings Account</label>
-                        <label class="checkline"><input type="checkbox" name="corporate"/> Corporate/Business Checking</label>
+                        <label class="checkline"><input type="checkbox" name="personalChecking" {% if form_data.personalChecking %}checked{% endif %} /> Personal Checking Account</label>
+                        <label class="checkline"><input type="checkbox" name="personalSavings" {% if form_data.personalSavings %}checked{% endif %} /> Personal Savings Account</label>
+                        <label class="checkline"><input type="checkbox" name="corporate" {% if form_data.corporate %}checked{% endif %} /> Corporate/Business Checking</label>
                     </div>
                 </div>
 
@@ -240,15 +240,15 @@
                 <div class="row">
                     <label>Purpose for Submitting this Authorization – Check appropriate box(es):</label>
                     <div class="choices grid-4">
-                        <label class="checkline"><input type="checkbox" name="nueve" /> New authorization</label>
-                        <label class="checkline"><input type="checkbox" name="diez" /> Change in checking/savings account</label>
-                        <label class="checkline"><input type="checkbox" name="once" /> Change in financial institution</label>
-                        <label class="checkline"><input type="checkbox" name="doce" /> Change in existing coverage</label>
+                        <label class="checkline"><input type="checkbox" name="nueve" {% if form_data.nueve %}checked{% endif %} /> New authorization</label>
+                        <label class="checkline"><input type="checkbox" name="diez" {% if form_data.diez %}checked{% endif %} /> Change in checking/savings account</label>
+                        <label class="checkline"><input type="checkbox" name="once" {% if form_data.once %}checked{% endif %} /> Change in financial institution</label>
+                        <label class="checkline"><input type="checkbox" name="doce" {% if form_data.doce %}checked{% endif %} /> Change in existing coverage</label>
                     </div>
                 </div>
                 <div class="row tight">
                     <label>Name of Employer Group</label>
-                    <input type="text" name="nameEmployer" />
+                    <input type="text" name="nameEmployer" value="{{ form_data.nameEmployer }}" />
                 </div>
             </div>
 
@@ -265,18 +265,22 @@
 
                 <div class="sig-grid">
                     <div class="sig">
-                        <div><input type="text" name="nameDepositor" required ></div>
+                        <div><input type="text" name="nameDepositor" value="{{ form_data.nameDepositor }}" required ></div>
                         <div class="small">Print Name of Depositor (as it appears on account)</div>
                     </div>
 
-                    <div class="sig">
-                        <canvas width="330px" id="drawingCanvas" class="signature-pad"></canvas>
-                        <input type="hidden" id="signatureInput" name="signature">                    
-                        <div class="d-flex justify-content-end mt-2">
-                            <button type="button" class="btn btn-danger" id="clearCanvas">Clear signature</button>
+                    {% if not temporalyURL %}
+
+                        <div class="sig">
+                            <canvas width="330px" id="drawingCanvas" class="signature-pad"></canvas>
+                            <input type="hidden" id="signatureInput" name="signature">                    
+                            <div class="d-flex justify-content-end mt-2">
+                                <button type="button" class="btn btn-danger" id="clearCanvas">Clear signature</button>
+                            </div>
+                            <div class="small">Signature of Depositor</div>
                         </div>
-                        <div class="small">Signature of Depositor</div>
-                    </div>
+                    
+                    {% endif %}
 
                     <div class="sig">
                         <div class="small">{% now "d F Y" %}</div>
@@ -287,7 +291,6 @@
             </div>
 
             {% if not temporalyURL %}
-
                 <button type="submit" class="btn-classic">Send</button>
             {% endif %}
 

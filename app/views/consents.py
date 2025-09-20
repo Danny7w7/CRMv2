@@ -2,8 +2,8 @@
 import base64
 import io
 import json
-import re
 from datetime import timedelta, datetime
+from types import SimpleNamespace
 
 # Django utilities
 from django.core.files.base import ContentFile
@@ -920,6 +920,11 @@ def cignaSuplemental(request, supp_id):
         )
     else:
         return HttpResponse('Acceso denegado. Por favor, inicie sesión o use un enlace válido.')
+    
+    # cargar draft
+    draft = CignaSuplementalDraft.objects.filter(supp=supp).first()
+    form_data = draft.data if draft else {}
+    form_data = SimpleNamespace(**form_data) 
 
     if request.method == 'POST':
         # ✅ Capturar todos los datos del formulario
@@ -1010,9 +1015,21 @@ def cignaSuplemental(request, supp_id):
     # GET → mostrar formulario
     context = {
         'temporalyURL': temporalyURL,
-        'supp': supp
+        'supp': supp,
+        'form_data' : form_data
     }
     return render(request, 'consent/cignaSuplemental.html', context)
 
+@csrf_exempt
+def saveCignaDraft(request, supp_id):
+    if request.method == "POST":
+        supp = Supp.objects.get(id=supp_id)
+        data = json.loads(request.body.decode("utf-8"))
 
+        draft, created = CignaSuplementalDraft.objects.get_or_create(supp=supp)
+        draft.data = data
+        draft.save()
+
+        return JsonResponse({"status": "ok"})
+    return JsonResponse({"error": "Invalid request"}, status=400)
 
