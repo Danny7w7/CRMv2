@@ -200,8 +200,8 @@
                     <div class="row"><label>Policy Number (if Available)</label><input type="text" name="policy" value="{% if supp.policyNumber is not none %} {{ supp.policyNumber}} {% endif %}" {% if supp.policyNumber is not none %}readonly{% endif %}></div>
                 </div>
                 <div class="grid-2 tight">
-                    <div class="row"><label>Financial Institution Name and Telephone Number</label><input name="phoneFinancial" type="text" required value="{{ form_data.phoneFinancial }}" ></div>
-                    <div class="row"><label>Financial Institution Address</label><input type="text" name="addressFinancial" value="{{ form_data.addressFinancial }}" required ></div>
+                    <div class="row"><label>Financial Institution Name and Telephone Number</label><input name="phoneFinancial" type="text" value="{{ form_data.phoneFinancial }}" ></div>
+                    <div class="row"><label>Financial Institution Address</label><input type="text" name="addressFinancial" value="{{ form_data.addressFinancial }}" ></div>
                 </div>
                 <div class="grid-2 tight">
                     <div class="row"><label>9 Digit Routing Number</label><input type="text" pattern="\d*" name="numberRouting" inputmode="numeric" value="{{ form_data.numberRouting }}" required ></div>
