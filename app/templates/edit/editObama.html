@@ -710,12 +710,10 @@
 								Ticket
 							</button>
 							<!-- Yarelys -->
-							{% if request.user.id == 18 %} 
-							{% if request.user.is_staff or request.user.is_superuser %}
+							{% if request.user.is_staff or request.user.is_superuser or request.user.id == 18 %}
 							<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalEmailComplaint">
 								Email Complaint
 							</button>
-							{% endif %}
 							{% endif %}
 							
 							<button type="button" class="btn btn-secondary me-2" data-bs-toggle="modal" data-bs-target="#modalVerTexto">
