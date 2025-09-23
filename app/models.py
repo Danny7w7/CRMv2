@@ -746,6 +746,17 @@ class Complaint(models.Model):
     class Meta:
         db_table = 'complaint'
 
+class EmailFraudReportRecord(models.Model):
+    body = models.TextField()
+    obamacare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
+    first_consent = models.ForeignKey(Consents, on_delete=models.CASCADE, related_name='first_consent')
+    last_consent = models.ForeignKey(Consents, on_delete=models.CASCADE, related_name='last_consent')
+    complaint = models.ForeignKey(Complaint, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'email_fraud_report_record'
+
 class TemporaryToken(models.Model):
     client = models.ForeignKey(Clients, on_delete=models.CASCADE, null = True)
     contact = models.ForeignKey('app.Contacts', on_delete=models.CASCADE, null = True)

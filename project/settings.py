@@ -204,10 +204,13 @@ AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME')
 
 # Configuraciones de email
-SMTP_HOST = os.getenv('SMTP_HOST')  # Ejemplo: mail.lapeira.com
+SMTP_HOST = os.getenv('SMTP_HOST')
 SMTP_PORT = os.getenv('SMTP_PORT', '587')
-SENDER_EMAIL_ADDRESS = os.getenv('SENDER_EMAIL_ADDRESS')  # no-reply@lapeira.com
+SENDER_EMAIL_ADDRESS = os.getenv('SENDER_EMAIL_ADDRESS')
 EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
+
+SENDER_EMAIL_ADDRESS_FRAUD = os.getenv('SENDER_EMAIL_ADDRESS_FRAUD')
+EMAIL_PASSWORD_FRAUD = os.getenv('EMAIL_PASSWORD_FRAUD')
 
 # ➤ Configuración real del backend de correo
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

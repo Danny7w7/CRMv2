@@ -104,6 +104,7 @@ urlpatterns = [
     path('preComplaint/', modals.preComplaint, name='preComplaint'),
     path('changePlanDate/<int:plan_id>/', modals.changePlanDate, name='changePlanDate'),
     path('changePlanAgent/<int:plan_id>/', modals.changePlanAgent, name='changePlanAgent'),
+    path('sendEmailComplaint/', consents.sendEmailComplaint, name='sendEmailComplaint'),
     path('fetchChangePlanDate/<int:change_id>/', modals.fetchChangePlanDate, name='fetchChangePlanDate'),
     path('fetchChangePlanAgent/<int:change_id>/', modals.fetchChangePlanAgent, name='fetchChangePlanAgent'),
 

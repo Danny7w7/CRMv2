@@ -705,9 +705,12 @@
 										SMS Temp
 									</button>
 								{% endif %}
-							{% endif %} 
+							{% endif %}
 							<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#AgentTicketAssignment">
 								Ticket
+							</button>
+							<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalEmailComplaint">
+								Email Complaint
 							</button>
 							<button type="button" class="btn btn-secondary me-2" data-bs-toggle="modal" data-bs-target="#modalVerTexto">
 								See Observations
@@ -752,6 +755,82 @@
 								</div>
 							</div>
 						</div>
+
+						<!-- Modal para enviar el Email del Complaint -->
+						<div class="modal modal-lg fade" id="modalEmailComplaint" tabindex="-1" role="dialog" aria-labelledby="modalTitleId" aria-hidden="true">
+							<div class="modal-dialog" role="document">
+								<div class="modal-content">
+									<form id="emailComplaintForm" method="POST">
+										<div class="modal-header">
+											<h5 class="modal-title" id="modalTitleId">
+												Email Complaint
+											</h5>
+											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+										</div>
+										<div class="modal-body row">
+											{% for complaint in complaints %}
+												<div class="mb-3">
+													<p></p>
+												</div>
+											{% endfor %}
+
+											<div class="mb-3 col-10">
+												<label for="firstConsent" class="form-label">First Consent</label>
+												<select class="form-select" name="firstConsent" id="firstConsent" required>
+													<option selected>Select one</option>
+													{% for consents in consent %}
+													<option value="{{ consents.id }}" data-url="{{ consents.pdf.url }}">Consent #{{ forloop.counter }} {{ consents.createdAt|date:"Y-m-d H:i:s" }}</option>
+													{% endfor %}
+												</select>
+											</div>
+											<div class="col-2 pt-4">
+												<a target="_blank" id='viewFirstConsent' href="">View Consent</a>
+											</div>
+											<div class="mb-3 col-10">
+												<label for="lastConsent" class="form-label">Last Consent</label>
+												<select class="form-select" name="lastConsent" id="lastConsent" required>
+													<option selected>Select one</option>
+													{% for consents in consent %}
+													<option value="{{ consents.id }}" data-url="{{ consents.pdf.url }}">Consent #{{ forloop.counter }} {{ consents.createdAt|date:"Y-m-d H:i:s" }}</option>
+													{% endfor %}
+												</select>
+											</div>
+											<div class="col-2 pt-4">
+												<a target="_blank" id='viewLastConsent' href="">View Consent</a>
+											</div>
+											<div class="mb-3 col-10">
+												<label for="complaint" class="form-label">Complaint</label>
+												<select class="form-select" name="complaint" id="complaint" required>
+													<option selected>Select one</option>
+													{% for item in complaint %}
+													<option value="{{ item.id }}" data-url="{{ item.pdf.url }}">Complaint #{{ forloop.counter }} {{ item.created_at|date:"Y-m-d H:i:s" }}</option>
+													{% endfor %}
+												</select>
+											</div>
+											<div class="col-2 pt-4">
+												<a target="_blank" id='viewComplaint' href="">View Complaint</a>
+											</div>
+											<div class="col-6 mb-3">
+												<label for="nameUnscrupulousAgent" class="form-label">Name of unscrupulous agent</label>
+												<input type="text" class="form-control" name="nameUnscrupulousAgent" id="nameUnscrupulousAgent" required/>
+											</div>
+											<div class="col-6 mb-3">
+												<label for="npnUnscrupulousAgent" class="form-label">NPN of unscrupulous agent</label>
+												<input type="text" class="form-control" name="npnUnscrupulousAgent" id="npnUnscrupulousAgent" required/>
+											</div>
+										</div>
+										<div class="modal-footer">
+											<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+												Close
+											</button>
+											{% csrf_token %}
+											<button type="submit" class="btn btn-primary">Send Email</button>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+						
 				
 						<!-- Modal para ingresar texto -->
 						<div class="modal fade" id="modalIngresarTexto" tabindex="-1" aria-labelledby="modalIngresarTextoLabel" aria-hidden="true">
@@ -1150,7 +1229,7 @@
 							</div>
 						</div>
 			
-						<!-- Modal para ver las consent -->
+						<!-- Modal para ver los consent -->
 						<div class="modal fade" id="verConsent" tabindex="-1" aria-labelledby="verConsentLabel" aria-hidden="true">
 							<div class="modal-dialog">
 								<div class="modal-content">
@@ -1998,6 +2077,9 @@
 
 	<!-- JS para crear la peticion para cambiar fecha -->
 	<script src="{% static 'assets/js/validations/changeDate.js' %}"></script>
+	
+	<!-- JS para modificar la url de los botones de los consents -->
+	<script src="{% static 'assets/js/validations/emailComplaint.js' %}"></script>
 	
 	<script src="{% static 'assets/js/modals/modalRenovations.js' %}"></script>
 	

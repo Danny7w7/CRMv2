@@ -2,6 +2,10 @@
 import base64
 import io
 import json
+import logging
+import re
+import smtplib
+import ssl
 from datetime import timedelta, datetime
 from types import SimpleNamespace
 
@@ -11,14 +15,17 @@ from django.core.signing import BadSignature, Signer
 from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_exempt
+from email.message import EmailMessage
 
 # Django core libraries
+from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.translation import activate
+from django.views.decorators.http import require_POST
 from urllib.parse import urlencode
 
 # Third-party libraries
@@ -28,6 +35,7 @@ from weasyprint import HTML
 from app.models import *
 from ..alertWebsocket import websocketAlertGeneric
 from app.utils import enviar_email, uploadTempUrl
+logger = logging.getLogger(__name__)
 
 def consetMedicare(request, client_id, language):
 
@@ -1033,3 +1041,213 @@ def saveCignaDraft(request, supp_id):
         return JsonResponse({"status": "ok"})
     return JsonResponse({"error": "Invalid request"}, status=400)
 
+@require_POST
+def sendEmailComplaint(request):
+    try:
+        idFirstConsent = request.POST.get('firstConsent')
+        idLastConsent = request.POST.get('lastConsent')
+        idComplaint = request.POST.get('complaint')
+        unscrupulousAgent = request.POST.get('nameUnscrupulousAgent')
+        unscrupulousAgentNPN = request.POST.get('npnUnscrupulousAgent')
+
+        firstConsentObject = Consents.objects.select_related(
+            "obamacare", 
+            "obamacare__client"
+        ).filter(id=idFirstConsent).first()
+        lastConsentObject = Consents.objects.filter(id=idLastConsent).first()
+        complaintObject = Complaint.objects.filter(id=idComplaint).first()
+
+        # Validar que los objetos existan
+        if not firstConsentObject or not lastConsentObject or not complaintObject:
+            return JsonResponse({
+                'success': False, 
+                'error': 'No se encontraron todos los objetos requeridos'
+            }, status=400)
+
+        firstName = firstConsentObject.obamacare.client.first_name.split()[0]
+        lastName = firstConsentObject.obamacare.client.last_name.split()[0][0]
+        agentUsa = firstConsentObject.obamacare.agent_usa.upper()
+        match = re.match(r"^(.*?)\s*-\s*NPN\s*(\d+)$", agentUsa)   
+
+        
+        agentUsa = match.group(1).strip()
+        npnAgentUsa = match.group(2).strip()
+
+        # Preparar los archivos PDF - LEER EL CONTENIDO
+        pdf_files = []
+        
+        # Obtener contenido del primer consent
+        if firstConsentObject.pdf:
+            try:
+                firstConsentObject.pdf.open()
+                first_pdf_content = firstConsentObject.pdf.read()
+                firstConsentObject.pdf.close()
+                pdf_files.append({
+                    'content': first_pdf_content,
+                    'filename': f'{firstConsentObject.pdf.name}.pdf'
+                })
+            except Exception as e:
+                logger.error(f"Error leyendo primer PDF: {e}")
+        
+        # Obtener contenido del último consent
+        if lastConsentObject.pdf:
+            try:
+                lastConsentObject.pdf.open()
+                last_pdf_content = lastConsentObject.pdf.read()
+                lastConsentObject.pdf.close()
+                pdf_files.append({
+                    'content': last_pdf_content,
+                    'filename': f'{lastConsentObject.pdf.name}'
+                })
+            except Exception as e:
+                logger.error(f"Error leyendo último PDF: {e}")
+        
+        # Obtener contenido del complaint
+        if complaintObject.pdf:
+            try:
+                complaintObject.pdf.open()
+                complaint_pdf_content = complaintObject.pdf.read()
+                complaintObject.pdf.close()
+                pdf_files.append({
+                    'content': complaint_pdf_content,
+                    'filename': f'{complaintObject.pdf.name}.pdf'
+                })
+            except Exception as e:
+                logger.error(f"Error leyendo PDF de complaint: {e}")
+
+        # Verificar que tengamos al menos un PDF
+        if not pdf_files:
+            return JsonResponse({
+                'success': False, 
+                'error': 'No se pudieron leer los archivos PDF'
+            }, status=400)
+
+        body = f"""
+WHOMEVER MAY CONCERNED
+ATN: HEALTH MARKETPLACE FRAUD DEPARTMENT
+
+With this email, I hereby would like to report our client's concern about another agent or broker who may have engaged in fraud or abusive conduct by making unauthorized changes to my client's enrollment within the Health Marketplace.
+
+Attached pls find the following documents:
+
+1. Initial consent signed by our client {firstName} {lastName}., dated {firstConsentObject.createdAt.strftime("%B %d, %Y")}, where our client {firstName} {lastName} authorizes our agent {agentUsa}, as the Agent on Record for any enrollment or application in the Health Marketplace.
+
+2. Most recent consent signed by our client {firstName} {lastName}., dated {lastConsentObject.createdAt.strftime("%B %d, %Y")}, where our client {firstName} {lastName} confirms and authorizes our agent {agentUsa}, as the Agent on Record for any enrollment or application in the Health Marketplace.
+
+3. Complaint form signed by our client {firstName} {lastName}., dated {complaintObject.created_at.strftime("%B %d, %Y")}, against {unscrupulousAgent}, NPN: {unscrupulousAgentNPN}, stating that our client did NOT authorize {unscrupulousAgent} to initiate any enrollment or make changes to our client's application in the Health Marketplace.
+
+In summary, our client {firstName} {lastName}. would like to report this fraudulent activity and expects the Health Marketplace to act accordingly to the legal framework established for this type of illegal activity.
+{getCompanyPerAgent(agentUsa)}
+Agent: {agentUsa}
+NPN: {npnAgentUsa}
+    """
+
+        # Enviar email
+        success = send_email_with_pdfs(
+            subject="Fraud Report",
+            email_from=settings.SENDER_EMAIL_ADDRESS_FRAUD,
+            email_password=settings.EMAIL_PASSWORD_FRAUD,
+            body=body,
+            receiver_email=["it.bluestream2@gmail.com", "it@lapeira.com"],
+            pdf_files=pdf_files
+        )
+
+        if success:
+            saveEmailInDatabase(body, firstConsentObject.obamacare, firstConsentObject, lastConsentObject, complaintObject)
+            return JsonResponse({
+                'success': True, 
+                'message': 'Email enviado exitosamente',
+                'files_sent': len(pdf_files)
+            })
+        else:
+            return JsonResponse({
+                'success': False, 
+                'error': 'Error al enviar el email'
+            }, status=500)
+
+    except Exception as e:
+        logger.error(f"Error en sendEmailComplaint: {e}")
+        return JsonResponse({
+            'success': False, 
+            'error': f'Error interno: {str(e)}'
+        }, status=500)
+
+def saveEmailInDatabase(body, obamacare, firstConsent, lastConsent, complaint):
+    try:
+        email_record = EmailFraudReportRecord.objects.create(
+            body=body,
+            obamacare=obamacare,
+            first_consent=firstConsent,
+            last_consent=lastConsent,
+            complaint=complaint
+        )
+        return email_record
+    except Exception as e:
+        logger.error(f"Error guardando email en base de datos: {e}")
+        return None
+
+def send_email_with_pdfs(subject, email_from, email_password, body, receiver_email, pdf_files):
+    """
+    Envía un email con múltiples archivos PDF adjuntos.
+    
+    Args:
+        subject (str): Asunto del email
+        email_from (str): Email del remitente
+        email_password (str): Contraseña del remitente
+        body (str): Cuerpo del mensaje
+        receiver_email (list): Lista de emails destinatarios
+        pdf_files (list): Lista de diccionarios con información de PDFs
+                         Formato: [{'content': pdf_content, 'filename': 'nombre.pdf'}, ...]
+                         O lista de tuplas: [(pdf_content, 'nombre.pdf'), ...]
+    
+    Returns:
+        bool: True si se envió correctamente, False en caso contrario
+    """
+    try:
+        # Configurar mensaje
+        message = EmailMessage()
+        message['Subject'] = subject
+        message['From'] = email_from
+        message['To'] = ', '.join(receiver_email)
+        message.set_content(body)
+
+        # Adjuntar múltiples PDFs
+        for i, pdf_file in enumerate(pdf_files):
+            # Soporte para diferentes formatos de entrada
+            if isinstance(pdf_file, dict):
+                pdf_content = pdf_file['content']
+                filename = pdf_file.get('filename', f'documento_{i+1}.pdf')
+            elif isinstance(pdf_file, (tuple, list)) and len(pdf_file) >= 2:
+                pdf_content = pdf_file[0]
+                filename = pdf_file[1]
+            else:
+                # Si solo se pasa el contenido, usar nombre genérico
+                pdf_content = pdf_file
+                filename = f'documento_{i+1}.pdf'
+            
+            # Validar que el contenido no esté vacío
+            if pdf_content:
+                message.add_attachment(
+                    pdf_content,
+                    maintype='application',
+                    subtype='pdf',
+                    filename=filename
+                )
+            else:
+                print(f"⚠️ Advertencia: PDF vacío omitido - {filename}")
+
+        # Enviar email
+        context = ssl.create_default_context()
+        with smtplib.SMTP_SSL(settings.SMTP_HOST, int(settings.SMTP_PORT), context=context) as server:
+            server.login(email_from, email_password)
+            server.send_message(message)
+
+        pdf_count = len([pdf for pdf in pdf_files if (isinstance(pdf, dict) and pdf['content']) or 
+                        (isinstance(pdf, (tuple, list)) and pdf[0]) or 
+                        (not isinstance(pdf, (dict, tuple, list)) and pdf)])
+        print(f"✅ Email enviado exitosamente a {receiver_email} con {pdf_count} archivo(s) PDF adjunto(s)")
+        return True
+
+    except Exception as e:
+        print(f"❌ Error al enviar email: {str(e)}")
+        return False
