@@ -1130,9 +1130,9 @@ With this email, I hereby would like to report our client's concern about anothe
 
 Attached pls find the following documents:
 
-1. Initial consent signed by our client {firstName} {lastName}., dated {firstConsentObject.createdAt.strftime("%B %d, %Y")}, where our client {firstName} {lastName} authorizes our agent {agentUsa}, as the Agent on Record for any enrollment or application in the Health Marketplace.
+1. Initial consent signed by our client {firstName} {lastName}., dated {firstConsentObject.created_at.strftime("%B %d, %Y")}, where our client {firstName} {lastName} authorizes our agent {agentUsa}, as the Agent on Record for any enrollment or application in the Health Marketplace.
 
-2. Most recent consent signed by our client {firstName} {lastName}., dated {lastConsentObject.createdAt.strftime("%B %d, %Y")}, where our client {firstName} {lastName} confirms and authorizes our agent {agentUsa}, as the Agent on Record for any enrollment or application in the Health Marketplace.
+2. Most recent consent signed by our client {firstName} {lastName}., dated {lastConsentObject.created_at.strftime("%B %d, %Y")}, where our client {firstName} {lastName} confirms and authorizes our agent {agentUsa}, as the Agent on Record for any enrollment or application in the Health Marketplace.
 
 3. Complaint form signed by our client {firstName} {lastName}., dated {complaintObject.created_at.strftime("%B %d, %Y")}, against {unscrupulousAgent}, NPN: {unscrupulousAgentNPN}, stating that our client did NOT authorize {unscrupulousAgent} to initiate any enrollment or make changes to our client's application in the Health Marketplace.
 

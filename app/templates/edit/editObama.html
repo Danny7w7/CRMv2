@@ -785,7 +785,7 @@
 												<select class="form-select" name="firstConsent" id="firstConsent" required>
 													<option selected>Select one</option>
 													{% for consents in consent %}
-													<option value="{{ consents.id }}" data-url="{{ consents.pdf.url }}">Consent #{{ forloop.counter }} {{ consents.createdAt|date:"Y-m-d H:i:s" }}</option>
+													<option value="{{ consents.id }}" data-url="{{ consents.pdf.url }}">Consent #{{ forloop.counter }} {{ consents.created_at|date:"Y-m-d H:i:s" }}</option>
 													{% endfor %}
 												</select>
 											</div>
@@ -797,7 +797,7 @@
 												<select class="form-select" name="lastConsent" id="lastConsent" required>
 													<option selected>Select one</option>
 													{% for consents in consent %}
-													<option value="{{ consents.id }}" data-url="{{ consents.pdf.url }}">Consent #{{ forloop.counter }} {{ consents.createdAt|date:"Y-m-d H:i:s" }}</option>
+													<option value="{{ consents.id }}" data-url="{{ consents.pdf.url }}">Consent #{{ forloop.counter }} {{ consents.created_at|date:"Y-m-d H:i:s" }}</option>
 													{% endfor %}
 												</select>
 											</div>
