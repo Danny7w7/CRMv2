@@ -486,15 +486,11 @@ def allReports():
 
 
 
-
-
 def get_obamacare_and_supp():
     """Genera un Excel con datos de Obamacare y Supp"""
 
     from django.db.models import F, Value
     from django.db.models.functions import Concat
-    import pandas as pd
-    import io
 
     # Consulta Obamacare
     obamacare_qs = ObamaCare.objects.select_related("agent", "client").annotate(
@@ -508,7 +504,7 @@ def get_obamacare_and_supp():
             Value(" "),
             F("agent__last_name"),
         ),
-        origen=Value("Obamacare")  
+        origen=Value("Obamacare")
     ).values(
         "origen",
         "agent_usa",
@@ -519,6 +515,10 @@ def get_obamacare_and_supp():
         "status",
     )
     obamacare_df = pd.DataFrame(list(obamacare_qs))
+    if not obamacare_df.empty:
+        obamacare_df = obamacare_df[
+            ["origen", "agent_usa", "agente", "cliente", "client__phone_number", "created_at", "status"]
+        ]
 
     # Consulta Supp
     supp_qs = Supp.objects.select_related("agent", "client").annotate(
@@ -532,7 +532,7 @@ def get_obamacare_and_supp():
             Value(" "),
             F("agent__last_name"),
         ),
-        origen=Value("Supp")  
+        origen=Value("Supp")
     ).values(
         "origen",
         "agent_usa",
@@ -545,8 +545,12 @@ def get_obamacare_and_supp():
         "carrier",
     )
     supp_df = pd.DataFrame(list(supp_qs))
+    if not supp_df.empty:
+        supp_df = supp_df[
+            ["origen", "agent_usa", "agente", "cliente", "client__phone_number", "created_at", "status", "policy_type", "carrier"]
+        ]
 
-    # Quitar timezone en ambas consultas
+    # 👇 Quitar timezone en ambas consultas
     for df in [obamacare_df, supp_df]:
         if not df.empty and "created_at" in df.columns:
             df["created_at"] = pd.to_datetime(df["created_at"]).dt.tz_localize(None)
@@ -559,6 +563,8 @@ def get_obamacare_and_supp():
     output.seek(0)
 
     return output.getvalue()
+
+
 
 
 @shared_task
