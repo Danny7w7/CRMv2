@@ -490,30 +490,33 @@ from django.core.mail import EmailMessage
 from django.conf import settings
 from .models import ObamaCare, Supp
 
+from django.db.models import F
+
 def get_obamacare_and_supp():
+    
     """Genera un Excel con datos de Obamacare y Supp"""
 
     # Consulta Obamacare
     obamacare_qs = ObamaCare.objects.select_related("agent", "client").values(
-        agente_usa="agent_usa",
-        Agente=("agent__first_name"),
-        Cliente=("client__first_name"),
-        numero_cliente=("client__phone_number"),
-        created_at=("created_at"),
-        status=("status"),
+        agente_usa=F("agent_usa"),
+        Agente=F("agent__first_name"),
+        Cliente=F("client__first_name"),
+        numero_cliente=F("client__phone_number"),
+        created_at=F("created_at"),
+        status=F("status"),
     )
     obamacare_df = pd.DataFrame(list(obamacare_qs))
 
     # Consulta Supp
     supp_qs = Supp.objects.select_related("agent", "client").values(
-        agente_usa="agent_usa",
-        Agente=("agent__first_name"),
-        Cliente=("client__first_name"),
-        numero_cliente=("client__phone_number"),
-        created_at=("created_at"),
-        status=("status"),
-        policy_type=("policy_type"),
-        carrier=("carrier"),
+        agente_usa=F("agent_usa"),
+        Agente=F("agent__first_name"),
+        Cliente=F("client__first_name"),
+        numero_cliente=F("client__phone_number"),
+        created_at=F("created_at"),
+        status=F("status"),
+        policy_type=F("policy_type"),
+        carrier=F("carrier"),
     )
     supp_df = pd.DataFrame(list(supp_qs))
 
@@ -525,6 +528,7 @@ def get_obamacare_and_supp():
     output.seek(0)
 
     return output.getvalue()
+
 
 @shared_task
 def enviar_reporte_obamacare_supp():
