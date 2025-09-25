@@ -527,26 +527,24 @@ def get_obamacare_and_supp():
     return output.getvalue()
 
 
-@shared_task
-def send_daily_report():
-    """Genera el Excel y lo envía por correo"""
-    excel_content = get_obamacare_and_supp()
-    
+def enviar_reporte_obamacare_supp():
+    # Obtener Excel en memoria
+    excel_bytes = get_obamacare_and_supp()
 
-    email = EmailMessage(
-        subject="Reporte Diario - Obamacare & Supp",
-        body="Adjunto encontrarás el reporte diario.",
-        from_email=settings.SENDER_EMAIL_ADDRESS,  # o settings.SENDER_EMAIL_ADDRESS_FRAUD
-        to=["it.bluestream2@gmail.com"],  # 👉 cámbialo por el correo real
+    # Datos para el template
+    context = {
+        "titulo": "Reporte Obamacare y Supp",
+        "mensaje": "Adjunto encontrarás el reporte en Excel."
+    }
+
+    # Enviar email
+    send_email_with_attachment(
+        subject="📊 Reporte Obamacare y Supp",
+        receiver_email="usuario@ejemplo.com",
+        template_name="email_templates/reporte",
+        context_data=context,
+        attachment_name="reporte_obamacare_supp.xlsx",
+        attachment_bytes=excel_bytes
     )
-    email.attach("reporte_diario.xlsx", excel_content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-
-    # Si quieres enviar con la cuenta secundaria de fraude:
-    # email.connection = email.get_connection(
-    #     username=settings.SENDER_EMAIL_ADDRESS_FRAUD,
-    #     password=settings.EMAIL_PASSWORD_FRAUD,
-    # )
-
-    email.send()
 
 

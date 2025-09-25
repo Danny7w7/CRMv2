@@ -67,6 +67,58 @@ def notify_websocket(user_id):
         }
     )
 
+
+def send_email_with_attachment(subject: str, receiver_email: str, template_name: str, context_data: dict, attachment_name: str, attachment_bytes: bytes) -> bool:
+    """
+    Envía un email con template y un archivo adjunto.
+
+    Args:
+        subject: Asunto del correo
+        receiver_email: Email del destinatario
+        template_name: Nombre del template (sin .html)
+        context_data: Datos para el template
+        attachment_name: Nombre con el que se guardará el archivo adjunto
+        attachment_bytes: Contenido binario del archivo (bytes)
+    """
+    try:
+        # Renderizar el template
+        html_content = render_to_string(f"{template_name}.html", context_data)
+
+        # Crear mensaje
+        message = EmailMessage()
+        message["Subject"] = subject
+        message["From"] = settings.SENDER_EMAIL_ADDRESS
+        message["To"] = receiver_email
+        message.set_content(html_content, subtype="html")
+
+        # Agregar adjunto (Excel en este caso)
+        message.add_attachment(
+            attachment_bytes,
+            maintype="application",
+            subtype="vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            filename=attachment_name,
+        )
+
+        # Enviar el email
+        context = ssl.create_default_context()
+        with smtplib.SMTP_SSL(settings.SMTP_HOST, settings.SMTP_PORT, context=context) as server:
+            server.login(settings.SENDER_EMAIL_ADDRESS, settings.EMAIL_PASSWORD)
+            server.send_message(message)
+            logger.info(f"Email enviado exitosamente a {receiver_email}")
+            return True
+
+    except smtplib.SMTPAuthenticationError:
+        logger.error("Error de autenticación SMTP")
+        return False
+    except smtplib.SMTPException as e:
+        logger.error(f"Error SMTP: {str(e)}")
+        return False
+    except Exception as e:
+        logger.error(f"Error inesperado: {str(e)}")
+        return False
+
+
+
 #Email
 def send_email(subject: str, receiver_email: str, template_name: str, context_data: Dict) -> bool:
     """

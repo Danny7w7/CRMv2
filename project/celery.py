@@ -50,8 +50,8 @@ app.conf.beat_schedule = {
     #     'schedule': crontab(minute=8, hour=16, day_of_week='6'),  # Ejecutar a las 4PM todo los sabado
     # },
      'send-daily-report-task': {
-        'task': 'app.tasks.send_daily_report',
-        'schedule': crontab(minute=27, hour=10),  # todos los días a las 6:00 AM
+        'task': 'app.tasks.enviar_reporte_obamacare_supp',
+        'schedule': crontab(minute=36, hour=10),  # todos los días a las 6:00 AM
     },
 }
 
