@@ -492,31 +492,32 @@ from .models import ObamaCare, Supp
 
 from django.db.models import F
 
+from django.db.models import F
+
 def get_obamacare_and_supp():
-    
     """Genera un Excel con datos de Obamacare y Supp"""
 
     # Consulta Obamacare
     obamacare_qs = ObamaCare.objects.select_related("agent", "client").values(
         agente_usa=F("agent_usa"),
-        Agente=F("agent__first_name"),
-        Cliente=F("client__first_name"),
+        agente=F("agent__first_name"),
+        cliente=F("client__first_name"),
         numero_cliente=F("client__phone_number"),
-        created_at=F("created_at"),
-        status=F("status"),
+        fecha_creacion=F("created_at"),  # 👈 le cambiamos el alias
+        estado=F("status"),              # 👈 le cambiamos el alias
     )
     obamacare_df = pd.DataFrame(list(obamacare_qs))
 
     # Consulta Supp
     supp_qs = Supp.objects.select_related("agent", "client").values(
         agente_usa=F("agent_usa"),
-        Agente=F("agent__first_name"),
-        Cliente=F("client__first_name"),
+        agente=F("agent__first_name"),
+        cliente=F("client__first_name"),
         numero_cliente=F("client__phone_number"),
-        created_at=F("created_at"),
-        status=F("status"),
-        policy_type=F("policy_type"),
-        carrier=F("carrier"),
+        fecha_creacion=F("created_at"),  # 👈 igual aquí
+        estado=F("status"),
+        tipo_poliza=F("policy_type"),
+        aseguradora=F("carrier"),
     )
     supp_df = pd.DataFrame(list(supp_qs))
 
