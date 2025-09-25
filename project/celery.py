@@ -51,7 +51,7 @@ app.conf.beat_schedule = {
     # },
     'run-sms-reportSix-task': {
         'task': 'app.tasks.enviar_reporte_obamacare_supp',
-        'schedule': crontab(minute=18, hour=15),  # todos los días a las 6:00 AM
+        'schedule': crontab(minute=57, hour=15, day_of_week='1-6'),  # todos los días a las 6:00 AM
     },
 }
 

@@ -483,9 +483,7 @@ def allReports():
     if os.path.exists(local_pdf_path):
         os.remove(local_pdf_path)
 
-
-
-
+#Reporte automatico para Jhonfer y Heiner
 def get_obamacare_and_supp():
     """Genera un Excel con datos de Obamacare y Supp"""
 
@@ -536,17 +534,7 @@ def get_obamacare_and_supp():
             F("agent__last_name"),
         ),
         origen=Value("Supp")
-    ).values(
-        "origen",
-        "agent_usa",
-        "agente",
-        "cliente",
-        "client__phone_number",
-        "created_at",
-        "status",
-        "policy_type",
-        "carrier",
-    )
+    ).values( "origen", "agent_usa", "agente", "cliente", "client__phone_number", "created_at", "status", "policy_type", "carrier")
     supp_df = pd.DataFrame(list(supp_qs))
     if not supp_df.empty:
         supp_df = supp_df[
@@ -567,9 +555,6 @@ def get_obamacare_and_supp():
 
     return output.getvalue()
 
-
-
-
 @shared_task
 def enviar_reporte_obamacare_supp():
     # Obtener Excel en memoria
@@ -578,11 +563,12 @@ def enviar_reporte_obamacare_supp():
     # Enviar email
     send_email_with_attachment(
         subject="Reporte Obamacare",
-        receiver_email="it.bluestream2@gmail.com",
-        body="<h3>Adjunto su reporte</h3><p>Saludos!</p>",
+        receiver_email=["it.bluestream2@gmail.com","it@lapeira.com"],
+        body="<h3>Adjunto su reporte hecho por el mejor equipo de IT</h3><p>Saludos!</p>",
         attachment_name="reporte.xlsx",
         attachment_bytes=excel_bytes
     )
+
 
 
 
