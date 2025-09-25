@@ -67,16 +67,8 @@ def notify_websocket(user_id):
         }
     )
 
-
-def send_email_with_attachment(
-    subject: str,
-    receiver_email: str,
-    attachment_name: str,
-    attachment_bytes: bytes,
-    template_name: str = None,
-    context_data: dict = None,
-    body: str = None,
-) -> bool:
+#Email Excel Adjunto Template opcional
+def send_email_with_attachment(subject: str, receiver_email: str, attachment_name: str, attachment_bytes: bytes, template_name: str = None, context_data: dict = None, body: str = None,) -> bool:
     """
     Envía un email con o sin template y con un archivo adjunto.
 
@@ -128,8 +120,6 @@ def send_email_with_attachment(
     except Exception as e:
         logger.error(f"Error inesperado: {str(e)}")
         return False
-
-
 
 #Email
 def send_email(subject: str, receiver_email: str, template_name: str, context_data: Dict) -> bool:

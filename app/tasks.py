@@ -491,11 +491,20 @@ def allReports():
 def get_obamacare_and_supp():
     """Genera un Excel con datos de Obamacare y Supp"""
 
+    from django.db.models import F, Value
+    from django.db.models.functions import Concat
+
     # Consulta Obamacare
-    obamacare_qs = ObamaCare.objects.select_related("agent", "client").values(
+    obamacare_qs = ObamaCare.objects.select_related("agent", "client").annotate(
+        cliente=Concat(
+            F("client__first_name"),
+            Value(" "),
+            F("client__last_name"),
+        )
+    ).values(
         agente_usa=F("agent_usa"),
         agente=F("agent__first_name"),
-        cliente=F("client__first_name"),
+        cliente=F("cliente"),
         numero_cliente=F("client__phone_number"),
         fecha_creacion=F("created_at"),
         estado=F("status"),
@@ -503,10 +512,16 @@ def get_obamacare_and_supp():
     obamacare_df = pd.DataFrame(list(obamacare_qs))
 
     # Consulta Supp
-    supp_qs = Supp.objects.select_related("agent", "client").values(
+    supp_qs = Supp.objects.select_related("agent", "client").annotate(
+        cliente=Concat(
+            F("client__first_name"),
+            Value(" "),
+            F("client__last_name"),
+        )
+    ).values(
         agente_usa=F("agent_usa"),
         agente=F("agent__first_name"),
-        cliente=F("client__first_name"),
+        cliente=F("cliente"),
         numero_cliente=F("client__phone_number"),
         fecha_creacion=F("created_at"),
         estado=F("status"),
@@ -514,6 +529,7 @@ def get_obamacare_and_supp():
         aseguradora=F("carrier"),
     )
     supp_df = pd.DataFrame(list(supp_qs))
+
 
     # 👇 Quitar timezone en ambas consultas
     for df in [obamacare_df, supp_df]:
@@ -534,12 +550,6 @@ def get_obamacare_and_supp():
 def enviar_reporte_obamacare_supp():
     # Obtener Excel en memoria
     excel_bytes = get_obamacare_and_supp()
-
-    # Datos para el template
-    context = {
-        "titulo": "Reporte Obamacare y Supp",
-        "mensaje": "Adjunto encontrarás el reporte en Excel."
-    }
 
     # Enviar email
     send_email_with_attachment(
