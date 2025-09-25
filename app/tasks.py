@@ -503,8 +503,8 @@ def get_obamacare_and_supp():
         agente=F("agent__first_name"),
         cliente=F("client__first_name"),
         numero_cliente=F("client__phone_number"),
-        fecha_creacion=F("created_at"),  # 👈 le cambiamos el alias
-        estado=F("status"),              # 👈 le cambiamos el alias
+        fecha_creacion=F("created_at"),
+        estado=F("status"),
     )
     obamacare_df = pd.DataFrame(list(obamacare_qs))
 
@@ -514,12 +514,17 @@ def get_obamacare_and_supp():
         agente=F("agent__first_name"),
         cliente=F("client__first_name"),
         numero_cliente=F("client__phone_number"),
-        fecha_creacion=F("created_at"),  # 👈 igual aquí
+        fecha_creacion=F("created_at"),
         estado=F("status"),
         tipo_poliza=F("policy_type"),
         aseguradora=F("carrier"),
     )
     supp_df = pd.DataFrame(list(supp_qs))
+
+    # 👇 Quitar timezone en ambas consultas
+    for df in [obamacare_df, supp_df]:
+        if not df.empty and "fecha_creacion" in df.columns:
+            df["fecha_creacion"] = pd.to_datetime(df["fecha_creacion"]).dt.tz_localize(None)
 
     # Guardar en un Excel en memoria
     output = io.BytesIO()
