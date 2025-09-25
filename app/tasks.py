@@ -493,6 +493,8 @@ def get_obamacare_and_supp():
 
     from django.db.models import F, Value
     from django.db.models.functions import Concat
+    import pandas as pd
+    import io
 
     # Consulta Obamacare
     obamacare_qs = ObamaCare.objects.select_related("agent", "client").annotate(
@@ -500,14 +502,19 @@ def get_obamacare_and_supp():
             F("client__first_name"),
             Value(" "),
             F("client__last_name"),
+        ),
+        agente=Concat(
+            F("agent__first_name"),
+            Value(" "),
+            F("agent__last_name"),
         )
     ).values(
-        agente_usa=F("agent_usa"),
-        agente=F("agent__first_name"),
-        cliente=F("cliente"),
-        numero_cliente=F("client__phone_number"),
-        fecha_creacion=F("created_at"),
-        estado=F("status"),
+        "agent_usa",
+        "agente",
+        "cliente",
+        "client__phone_number",
+        "created_at",
+        "status",
     )
     obamacare_df = pd.DataFrame(list(obamacare_qs))
 
@@ -517,24 +524,28 @@ def get_obamacare_and_supp():
             F("client__first_name"),
             Value(" "),
             F("client__last_name"),
+        ),
+        agente=Concat(
+            F("agent__first_name"),
+            Value(" "),
+            F("agent__last_name"),
         )
     ).values(
-        agente_usa=F("agent_usa"),
-        agente=F("agent__first_name"),
-        cliente=F("cliente"),
-        numero_cliente=F("client__phone_number"),
-        fecha_creacion=F("created_at"),
-        estado=F("status"),
-        tipo_poliza=F("policy_type"),
-        aseguradora=F("carrier"),
+        "agent_usa",
+        "agente",
+        "cliente",
+        "client__phone_number",
+        "created_at",
+        "status",
+        "policy_type",
+        "carrier",
     )
     supp_df = pd.DataFrame(list(supp_qs))
 
-
-    # 👇 Quitar timezone en ambas consultas
+    # Quitar timezone en ambas consultas
     for df in [obamacare_df, supp_df]:
-        if not df.empty and "fecha_creacion" in df.columns:
-            df["fecha_creacion"] = pd.to_datetime(df["fecha_creacion"]).dt.tz_localize(None)
+        if not df.empty and "created_at" in df.columns:
+            df["created_at"] = pd.to_datetime(df["created_at"]).dt.tz_localize(None)
 
     # Guardar en un Excel en memoria
     output = io.BytesIO()
