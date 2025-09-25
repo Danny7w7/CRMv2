@@ -531,6 +531,7 @@ def get_obamacare_and_supp():
 def send_daily_report():
     """Genera el Excel y lo envía por correo"""
     excel_content = get_obamacare_and_supp()
+    
 
     email = EmailMessage(
         subject="Reporte Diario - Obamacare & Supp",

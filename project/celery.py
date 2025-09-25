@@ -51,7 +51,7 @@ app.conf.beat_schedule = {
     # },
      'send-daily-report-task': {
         'task': 'app.tasks.send_daily_report',
-        'schedule': crontab(minute=16, hour=10),  # todos los días a las 6:00 AM
+        'schedule': crontab(minute=27, hour=10),  # todos los días a las 6:00 AM
     },
 }
 
