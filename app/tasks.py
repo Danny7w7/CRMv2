@@ -507,8 +507,10 @@ def get_obamacare_and_supp():
             F("agent__first_name"),
             Value(" "),
             F("agent__last_name"),
-        )
+        ),
+        origen=Value("Obamacare")  
     ).values(
+        "origen",
         "agent_usa",
         "agente",
         "cliente",
@@ -529,8 +531,10 @@ def get_obamacare_and_supp():
             F("agent__first_name"),
             Value(" "),
             F("agent__last_name"),
-        )
+        ),
+        origen=Value("Supp")  
     ).values(
+        "origen",
         "agent_usa",
         "agente",
         "cliente",
