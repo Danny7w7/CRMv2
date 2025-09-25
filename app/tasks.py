@@ -493,7 +493,7 @@ def get_obamacare_and_supp():
     from django.db.models.functions import Concat
 
     # Consulta Obamacare
-    obamacare_qs = ObamaCare.objects.select_related("agent", "client").annotate(
+    obamacare_qs = ObamaCare.objects.select_related("agent", "client").filter(company = 2, is_active = True).annotate(
         cliente=Concat(
             F("client__first_name"),
             Value(" "),
@@ -521,7 +521,7 @@ def get_obamacare_and_supp():
         ]
 
     # Consulta Supp
-    supp_qs = Supp.objects.select_related("agent", "client").annotate(
+    supp_qs = Supp.objects.select_related("agent", "client").filter(company = 2, is_active = True).annotate(
         cliente=Concat(
             F("client__first_name"),
             Value(" "),
