@@ -49,27 +49,10 @@ app.conf.beat_schedule = {
     #     'task': 'app.tasks.allReports',
     #     'schedule': crontab(minute=8, hour=16, day_of_week='6'),  # Ejecutar a las 4PM todo los sabado
     # },
-     'send-daily-report-task': {
+    'run-sms-reportSix-task': {
         'task': 'app.tasks.enviar_reporte_obamacare_supp',
-        'schedule': crontab(minute=36, hour=10),  # todos los días a las 6:00 AM
+        'schedule': crontab(minute=42, hour=10),  # todos los días a las 6:00 AM
     },
 }
 
-import os
-from celery import Celery
-from celery.schedules import crontab
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "CRMv2.settings")
-
-app = Celery("CRMv2")
-app.config_from_object("django.conf:settings", namespace="CELERY")
-app.autodiscover_tasks()
-
-# --- Aquí agregas la programación con Beat ---
-app.conf.beat_schedule = {
-    "generate-excel-everyday-7am": {
-        "task": "app.tasks.generate_excel_task",  # ajusta "app" al nombre de tu app
-        "schedule": crontab(hour=7, minute=0),    # todos los días a las 7:00 AM
-        "args": ("obamacare_supp.xlsx",),
-    },
-}

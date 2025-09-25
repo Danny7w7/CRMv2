@@ -526,7 +526,7 @@ def get_obamacare_and_supp():
 
     return output.getvalue()
 
-
+@shared_task
 def enviar_reporte_obamacare_supp():
     # Obtener Excel en memoria
     excel_bytes = get_obamacare_and_supp()
