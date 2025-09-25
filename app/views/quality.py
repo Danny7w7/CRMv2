@@ -95,7 +95,7 @@ def createQuality(request):
     company_filter = {'company': company_id} if not request.user.is_staff else {}    
     company_filter_agent = {'agent__company': company_id} if not request.user.is_staff else {} 
 
-    userRole = [ 'A' , 'C']
+    userRole = [ 'A' , 'C','SUPP']
     agents = Users.objects.filter(is_active = True, role__in=userRole, **company_filter )
 
     if request.method == 'POST':
