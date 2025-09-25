@@ -8,7 +8,7 @@ import pandas as pd
 
 from django.conf import settings
 from django.core.files.base import ContentFile
-from django.db.models import OuterRef, Subquery, Q, F
+from django.db.models import OuterRef, Subquery, Q, Exists
 
 from celery import shared_task
 from datetime import datetime, date
@@ -493,26 +493,29 @@ def get_obamacare_and_supp():
     from django.db.models.functions import Concat
 
     # Consulta Obamacare
-    obamacare_qs = ObamaCare.objects.select_related("agent", "client").filter(company = 2, is_active = True).annotate(
-        cliente=Concat(
-            F("client__first_name"),
-            Value(" "),
-            F("client__last_name"),
-        ),
-        agente=Concat(
-            F("agent__first_name"),
-            Value(" "),
-            F("agent__last_name"),
-        ),
-        origen=Value("Obamacare")
-    ).values(
-        "origen",
-        "agent_usa",
-        "agente",
-        "cliente",
-        "client__phone_number",
-        "created_at",
-        "status",
+    obamacare_qs = (ObamaCare.objects.select_related("agent", "client").filter(company=2, is_active=True)
+        .exclude(
+            Exists(
+                CustomerRedFlag.objects.filter(
+                    obamacare=OuterRef("id"),
+                    date_completed__isnull=True
+                )
+            )
+        )
+        .annotate(
+            cliente=Concat(
+                F("client__first_name"),
+                Value(" "),
+                F("client__last_name"),
+            ),
+            agente=Concat(
+                F("agent__first_name"),
+                Value(" "),
+                F("agent__last_name"),
+            ),
+            origen=Value("Obamacare"),
+        )
+        .values("origen", "agent_usa", "agente", "cliente", "client__phone_number", "created_at", "status" )
     )
     obamacare_df = pd.DataFrame(list(obamacare_qs))
     if not obamacare_df.empty:
