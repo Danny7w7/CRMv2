@@ -482,3 +482,70 @@ def allReports():
         os.remove(local_pdf_path)
 
 
+
+import io
+import pandas as pd
+from celery import shared_task
+from django.core.mail import EmailMessage
+from django.conf import settings
+from .models import ObamaCare, Supp
+
+def get_obamacare_and_supp():
+    """Genera un Excel con datos de Obamacare y Supp"""
+
+    # Consulta Obamacare
+    obamacare_qs = ObamaCare.objects.select_related("agent", "client").values(
+        agente_usa="agent_usa",
+        Agente=("agent__first_name"),
+        Cliente=("client__first_name"),
+        numero_cliente=("client__phone_number"),
+        created_at=("created_at"),
+        status=("status"),
+    )
+    obamacare_df = pd.DataFrame(list(obamacare_qs))
+
+    # Consulta Supp
+    supp_qs = Supp.objects.select_related("agent", "client").values(
+        agente_usa="agent_usa",
+        Agente=("agent__first_name"),
+        Cliente=("client__first_name"),
+        numero_cliente=("client__phone_number"),
+        created_at=("created_at"),
+        status=("status"),
+        policy_type=("policy_type"),
+        carrier=("carrier"),
+    )
+    supp_df = pd.DataFrame(list(supp_qs))
+
+    # Guardar en un Excel en memoria
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine="openpyxl") as writer:
+        obamacare_df.to_excel(writer, index=False, sheet_name="Obamacare")
+        supp_df.to_excel(writer, index=False, sheet_name="Supp")
+    output.seek(0)
+
+    return output.getvalue()
+
+
+@shared_task
+def send_daily_report():
+    """Genera el Excel y lo envía por correo"""
+    excel_content = get_obamacare_and_supp()
+
+    email = EmailMessage(
+        subject="Reporte Diario - Obamacare & Supp",
+        body="Adjunto encontrarás el reporte diario.",
+        from_email=settings.SENDER_EMAIL_ADDRESS,  # o settings.SENDER_EMAIL_ADDRESS_FRAUD
+        to=["it.bluestream2@gmail.com"],  # 👉 cámbialo por el correo real
+    )
+    email.attach("reporte_diario.xlsx", excel_content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
+    # Si quieres enviar con la cuenta secundaria de fraude:
+    # email.connection = email.get_connection(
+    #     username=settings.SENDER_EMAIL_ADDRESS_FRAUD,
+    #     password=settings.EMAIL_PASSWORD_FRAUD,
+    # )
+
+    email.send()
+
+
