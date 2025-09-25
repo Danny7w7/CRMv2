@@ -3,10 +3,12 @@ import os
 import requests
 import telnyx
 import time
+import io
+import pandas as pd
 
 from django.conf import settings
 from django.core.files.base import ContentFile
-from django.db.models import OuterRef, Subquery, Q
+from django.db.models import OuterRef, Subquery, Q, F
 
 from celery import shared_task
 from datetime import datetime, date
@@ -483,16 +485,8 @@ def allReports():
 
 
 
-import io
-import pandas as pd
-from celery import shared_task
-from django.core.mail import EmailMessage
-from django.conf import settings
-from .models import ObamaCare, Supp
 
-from django.db.models import F
 
-from django.db.models import F
 
 def get_obamacare_and_supp():
     """Genera un Excel con datos de Obamacare y Supp"""
@@ -549,12 +543,12 @@ def enviar_reporte_obamacare_supp():
 
     # Enviar email
     send_email_with_attachment(
-        subject="📊 Reporte Obamacare y Supp",
+        subject="Reporte Obamacare",
         receiver_email="it.bluestream2@gmail.com",
-        template_name="email_templates/reporte",
-        context_data=context,
-        attachment_name="reporte_obamacare_supp.xlsx",
+        body="<h3>Adjunto su reporte</h3><p>Saludos!</p>",
+        attachment_name="reporte.xlsx",
         attachment_bytes=excel_bytes
     )
+
 
 
