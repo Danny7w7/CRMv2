@@ -1148,7 +1148,7 @@ NPN: {npnAgentUsa}
             email_from=settings.SENDER_EMAIL_ADDRESS_FRAUD,
             email_password=settings.EMAIL_PASSWORD_FRAUD,
             body=body,
-            receiver_email=["it.bluestream2@gmail.com", "it@lapeira.com"],
+            receiver_email=["FFMProducerAssisterHelpDesk@cms.hhs.gov"],
             pdf_files=pdf_files
         )
 
