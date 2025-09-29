@@ -25,7 +25,7 @@ logger = get_task_logger(__name__)
 
 @shared_task
 def dial_leads_task(campaign_id, timeout=60):
-    start_time = time.time()
+    last_call_time = time.time()  # 👈 Cambiamos el nombre para que sea más claro
 
     # Subquery para obtener el último outcome de cada lead
     latest_call = Call.objects.filter(contact=OuterRef('pk')).order_by('-started_at')
@@ -39,16 +39,14 @@ def dial_leads_task(campaign_id, timeout=60):
         Q(lastRequiresCallback=True) | Q(lastRequiresCallback__isnull=True)
     )
 
-    campaign = Campaign.objects.get(id=campaign_id)
-
     for lead in leads:
         # Timeout para evitar bucle infinito
-        while Call.objects.filter(status='ringing').count() >= Campaign.objects.get(id=campaign_id).max_concurrent_calls*Agent.objects.filter(status='available', current_campaign=campaign).count():
-            if time.time() - start_time > timeout:
+        while Call.objects.filter(status='ringing').count() >= Campaign.objects.get(id=campaign_id).max_concurrent_calls*Agent.objects.filter(status='available').count():
+            if time.time() - last_call_time > timeout:  # 👈 Usa last_call_time
                 break
             time.sleep(1)
 
-        if not Agent.objects.filter(status='available', current_campaign=campaign) or time.time() - start_time > timeout:
+        if not Agent.objects.filter(status='available') or time.time() - last_call_time > timeout:  # 👈 Usa last_call_time
             break
 
         callData = telnyx.Call.create(
@@ -68,6 +66,8 @@ def dial_leads_task(campaign_id, timeout=60):
 
         lead.attempts += 1
         lead.save()
+
+        last_call_time = time.time()  # 👈 REINICIA el contador después de cada llamada exitosa
 
         time.sleep(0.5)
 
