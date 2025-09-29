@@ -25,6 +25,7 @@ logger = get_task_logger(__name__)
 
 @shared_task
 def dial_leads_task(campaign_id, timeout=60):
+    logger.info(f"Starting dialer for campaign {campaign_id}")
     last_call_time = time.time()  # 👈 Cambiamos el nombre para que sea más claro
 
     # Subquery para obtener el último outcome de cada lead
@@ -42,12 +43,11 @@ def dial_leads_task(campaign_id, timeout=60):
     for lead in leads:
         # Timeout para evitar bucle infinito
         while Call.objects.filter(status='ringing').count() >= Campaign.objects.get(id=campaign_id).max_concurrent_calls*Agent.objects.filter(status='available').count():
+            logger.info('Esperando a que haya menos llamadas en curso...')
             if time.time() - last_call_time > timeout:  # 👈 Usa last_call_time
+                logger.info('Limite de llamadas en curso alcanzado, terminando el dialer por timeout')
                 break
             time.sleep(1)
-
-        if not Agent.objects.filter(status='available') or time.time() - last_call_time > timeout:  # 👈 Usa last_call_time
-            break
 
         callData = telnyx.Call.create(
             connection_id="2715575536108701048",
@@ -57,6 +57,8 @@ def dial_leads_task(campaign_id, timeout=60):
             webhook_url=f"{settings.DOMAIN}/api/dialer/webhooks/",
             webhook_url_method="POST",
         )
+
+        logger.info(f"Llamando al lead {lead.id} - {lead.phone_number}")
 
         Call.objects.create(
             telnyx_call_control_id=callData.call_control_id,
