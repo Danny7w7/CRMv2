@@ -134,9 +134,8 @@
 						</a>
 						<ul>
 							{% if request.user|has_module:"OBAMACARE" %}
-								{% comment %} <li> <a href="{% url 'clientObamacare' %}"><i class='bx bx-radio-circle'></i>Clients Obama Now</a> </li>
-								<li> <a href="{% url 'clientObamacarePass' %}"><i class='bx bx-radio-circle'></i>Clients Obama Pass</a> </li> {% endcomment %}
-								<li> <a href="{% url 'clientObamacarePass' %}"><i class='bx bx-radio-circle'></i>Clients Obama</a> </li>
+								<li> <a href="{% url 'clientObamacare' %}"><i class='bx bx-radio-circle'></i>Clients Obama New</a> </li>
+								<li> <a href="{% url 'clientObamacarePass' %}"><i class='bx bx-radio-circle'></i>Clients Obama Pass</a> </li>
 								<li> <a href="{% url 'clientAccionRequired' %}"><i class='bx bx-radio-circle'></i>Clients Accion Required </a> </li>
 							{% endif %}
 							{% if  request.user|has_module:"SUPP" %}
