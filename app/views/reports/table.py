@@ -1538,7 +1538,7 @@ def customerStep(request):
         datetime.datetime(now.year, now.month + 1, 1, 0, 0, 0, 0) - timezone.timedelta(microseconds=1)
     )
 
-    agent = ObamaCare.objects.values_list('profiling', flat=True).filter(created_at__range=(startDate, endDate)).distinct()
+    agent = ObamaCare.objects.values_list('profiling', flat=True).distinct()
     obama = ObamaCare.objects.select_related('client', 'agent').prefetch_related(
         'letterscard_set__agent_create',
         'appointmentclient_set__agent_create', 
