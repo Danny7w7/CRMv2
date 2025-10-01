@@ -106,7 +106,7 @@
 									<i class="lni lni-whatsapp me-2"></i> Authorization
 									</a>
 								</li>
-								{% if authorization %}
+					
 									<li>
 										<a id="buttonActivaChat" type="button" class="dropdown-item d-flex align-items-center" >
 										<i class="lni lni-whatsapp me-2"></i> Customer Service
@@ -117,7 +117,7 @@
 										<i class="lni lni-whatsapp me-2"></i> Renovations
 										</a>
 									</li>									
-								{% endif %}
+						
 							</ul>
 						</div>						  
 						{% if request.user.role == 'Admin' or request.user.is_superuser %}

@@ -485,7 +485,7 @@ def template(request, contact_id):
 
                 return JsonResponse({'message': 'ok'}, status=200)
             
-            elif content_sid :
+            elif content_sid:
 
                 message = client.messages.create(
                     from_=f"whatsapp:+{from_number}",
