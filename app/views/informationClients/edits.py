@@ -2,7 +2,6 @@
 import calendar
 import datetime
 import json
-from itertools import chain
 import re
 from datetime import datetime, date
 
@@ -1602,7 +1601,6 @@ def saveRenovation(request):
             migration_status=clientData['migration_status']
         )        
 
-        fecha_deseada = datetime.datetime(2025, 11, 1, 16, 15, 2, 361874)
         saveObama = ObamaCare.objects.create(
             agent_usa=obamacareData['agent_usa_obamacare'],
             taxes=obamacareData['taxes'],
@@ -1620,12 +1618,8 @@ def saveRenovation(request):
             agent = request.user,
             client = clientIstancia,
             is_active = True,
-            company = request.user.company            
-        )
-
-        #ESTO SE TENIE QUE BORRAR EL PRIMERO DE NOVIEMBRE
-        ObamaCare.objects.filter(id=saveObama.id).update(
-            created_at = fecha_deseada
+            company = request.user.company,
+            tipe_sale = 'R'      
         )
         
         for dep in dependents_data:

@@ -337,6 +337,7 @@ class ObamaCare(models.Model):
     is_active = models.BooleanField(default=True)
     company = models.ForeignKey(Companies, on_delete=models.CASCADE)
     objects = VisibilityManager()
+    tipe_sale = models.CharField(max_length=10, default='V')
 
     class Meta:
         db_table = 'obamacare'

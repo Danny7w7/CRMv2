@@ -1,6 +1,6 @@
 # Django core libraries
 from django.contrib.auth.decorators import login_required
-from django.db.models import Subquery, OuterRef
+from django.db.models import Subquery, OuterRef, Q
 from django.db.models.functions import Substr
 from django.shortcuts import render
 from datetime import datetime, date
@@ -70,7 +70,6 @@ def clientObamacare(request):
 
     # Rango de fechas límite (zonas horarias incluidas)
     startDate_dt = datetime(2025, 11, 1, 0, 0, 0, tzinfo=timezone.get_current_timezone())
-    endDate_dt   = datetime(2026, 10, 31, 23, 59, 59, tzinfo=timezone.get_current_timezone())
 
     #Excluir los que tenga observaciones malas de customer
     # Rango de fechas del mes actual
@@ -87,27 +86,24 @@ def clientObamacare(request):
 
     if request.user.is_superuser:
 
-        obamaCare = ObamaCare.objects.select_related('agent','client').filter(created_at__range=(startDate_dt, endDate_dt)).annotate(
-            truncated_agent_usa=Substr('agent_usa', 1, 8),
-            has_observation=Subquery(obs.values('typification')[:1])).exclude(
-                id__in=CustomerRedFlag.objects.filter(date_completed__isnull=True).values_list(
-                    'obamacare_id', flat=True)).order_by('-created_at')           
+        obamaCare = ObamaCare.objects.select_related('agent','client').filter(Q(tipe_sale='R') | Q(created_at__gte=startDate_dt)).annotate(
+            truncated_agent_usa=Substr('agent_usa', 1, 8), has_observation=Subquery(obs.values('typification')[:1])).exclude(
+                id__in=CustomerRedFlag.objects.filter(date_completed__isnull=True).values_list('obamacare_id', flat=True)).order_by('-created_at')       
 
     elif request.user.role == 'Admin':         
-        obamaCare = ObamaCare.objects.visible_for_user(request.user).select_related('agent','client').filter(created_at__range=(startDate_dt, endDate_dt)).only(
+        obamaCare = ObamaCare.objects.visible_for_user(request.user).select_related('agent','client').filter(Q(tipe_sale='R') | Q(created_at__gte=startDate_dt)).only(
             'agent_usa', 'agent__first_name', 'agent__last_name', 'client__first_name', 'client__last_name',
-                'client__phone_number', 'status', 'status_color', 'profiling','created_at', 'is_active').annotate(
+                'client__phone_number', 'status', 'status_color', 'profiling','created_at', 'is_active','tipe_sale').annotate(
                     has_observation=Subquery(obs.values('typification')[:1])
                         ).exclude(id__in=CustomerRedFlag.objects.filter(date_completed__isnull=True).values_list(
                             'obamacare_id', flat=True)).order_by('-created_at')    
     else:
-        obamaCare = ObamaCare.objects.select_related('agent', 'client').filter(created_at__range=(startDate_dt, endDate_dt)).only(
+        obamaCare = ObamaCare.objects.select_related('agent', 'client').filter(Q(tipe_sale='R') | Q(created_at__gte=startDate_dt)).only(
             'agent_usa', 'agent__first_name', 'agent__last_name', 'client__first_name', 'client__last_name',
-                'client__phone_number', 'status', 'status_color', 'profiling','created_at', 'is_active').annotate(
-                    truncated_agent_usa=Substr('agent_usa', 1, 8),
-                    has_observation=Subquery(obs.values('typification')[:1])).filter(is_active = True, company = company_id).exclude(
-                        id__in=CustomerRedFlag.objects.filter(date_completed__isnull=True).values_list(
-                            'obamacare_id', flat=True)).order_by('-created_at')  
+                'client__phone_number', 'status', 'status_color', 'profiling','created_at', 'is_active','tipe_sale').annotate(
+                    truncated_agent_usa=Substr('agent_usa', 1, 8), has_observation=Subquery(obs.values('typification')[:1])).filter(
+                        is_active = True, company = company_id).exclude( id__in=CustomerRedFlag.objects.filter(
+                            date_completed__isnull=True).values_list('obamacare_id', flat=True)).order_by('-created_at')  
 
     context = {
         'obamacares': obamaCare,
