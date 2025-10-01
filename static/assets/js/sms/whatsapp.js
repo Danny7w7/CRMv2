@@ -275,6 +275,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     const buttonAutorizacionChat = document.getElementById('buttonAutorizacionChat');
     const buttonActivaChat = document.getElementById('buttonActivaChat');
+    const buttonRenovationChat = document.getElementById('buttonRenovationChat');
     const buttonStartChat = document.getElementById('buttonStartChat');
 
     if (buttonAutorizacionChat) {
@@ -283,6 +284,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (buttonActivaChat) {
         buttonActivaChat.addEventListener('click', () => SecretKey('activation'));
+    }
+
+    if (buttonRenovationChat) {
+        buttonRenovationChat.addEventListener('click', () => SecretKey('renovacion'));
     }
 
 });
