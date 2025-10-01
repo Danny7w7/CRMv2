@@ -18,28 +18,22 @@ from requests.auth import HTTPBasicAuth
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
-from django.core.signing import BadSignature, Signer
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
 
 # Django core libraries
 from django.utils import timezone
-from django.utils.encoding import force_bytes, force_str
-from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-from django.utils.timezone import timedelta
-from django.utils.translation import activate, gettext as _
+from django.utils.timezone import timedelta, now
+import unicodedata
 
 # Third-party imports
-import twilio
 from twilio.rest import Client
 
 # Application-specific imports
 from app.modelsWhatsapp import *
 from ..forms import *
 from .utils import *
-from ..alertWebsocket import websocketAlertGeneric
 from .decoratorsCompany import *
 from ..contextProcessors import validateSms
 from .sms import disableAllUserCompany , paymend_recording, deactivatecontact, activatecontact, discountRemainingBalance
@@ -237,7 +231,19 @@ def chat(request, chatId):
     # Usamos select_related para optimizar las consultas
     messages = Messages_whatsapp.objects.filter(chat=chat.id).select_related('files_whatsapp')
 
-    authorization = Messages_whatsapp.objects.filter(chat=chat, message_content__in=['AUTHORIZATION'])
+    def normalize_text(text):
+        # elimina tildes y pasa a mayúsculas
+        text = unicodedata.normalize("NFD", text).encode("ascii", "ignore").decode("utf-8")
+        return text.strip().upper()
+
+
+    # Traer el último mensaje del cliente en ese chat para validar su autorization
+    last_msg = Messages_whatsapp.objects.filter(chat=chat, sender="Client").order_by("-created_at").first()
+    authorization = False
+    if last_msg:
+        normalized = normalize_text(last_msg.message_content)
+        if normalized in ["SI", "SÍ", "Si", "sI","si"]: 
+            authorization = True
 
     #validar si el chat lleva mas de 24h para usar plantilla o no 
     limite = timezone.now() - timedelta(hours=23, minutes=59)
