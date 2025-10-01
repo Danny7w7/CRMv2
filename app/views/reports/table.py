@@ -1559,9 +1559,9 @@ def customerStep(request):
 
     if request.method == 'POST':
 
-        startDatePost = request.POST['start_date']
-        endDatePost = request.POST['end_date']
-        agentPost = request.POST['agent']
+        startDatePost = request.POST.get('start_date')
+        endDatePost = request.POST.get('end_date')
+        agentPost = request.POST.get('agent')
 
         startDate = timezone.make_aware(
             datetime.datetime.strptime(startDatePost, '%Y-%m-%d').replace(hour=0, minute=0, second=0, microsecond=0)
