@@ -238,7 +238,7 @@ def chat(request, chatId):
 
 
     # Traer el último mensaje del cliente en ese chat para validar su autorization
-    last_msg = Messages_whatsapp.objects.filter(chat=chat, sender="Client").order_by("-created_at").first()
+    last_msg = Messages_whatsapp.objects.filter(chat=chat, sender_type="Client").order_by("-created_at").first()
     authorization = False
     if last_msg:
         normalized = normalize_text(last_msg.message_content)
