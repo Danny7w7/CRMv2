@@ -469,6 +469,10 @@ def template(request, contact_id):
                 }
                 content_sid = settings.CUSTOMER
 
+            elif type_param == 'renovacion':
+
+                content_sid = settings.RENOVATION
+
             if variables_dict and content_sid:
                 message = client.messages.create(
                     from_=f"whatsapp:+{from_number}",
@@ -480,6 +484,19 @@ def template(request, contact_id):
                 saveMessageInDb('Agent', f"template-{type_param}", chat, request.user)
 
                 return JsonResponse({'message': 'ok'}, status=200)
+            
+            elif content_sid and variables_dict == None :
+
+                message = client.messages.create(
+                    from_=f"whatsapp:+{from_number}",
+                    to=f"whatsapp:+{to_number}",
+                    content_sid=content_sid
+                )
+
+                saveMessageInDb('Agent', f"template-{type_param}", chat, request.user)
+
+                return JsonResponse({'message': 'ok'}, status=200)
+
 
             return JsonResponse({'error': 'Datos insuficientes para enviar el mensaje.'}, status=400)
 
