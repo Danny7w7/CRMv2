@@ -82,7 +82,7 @@ TEMPLATES = [
                 'app.contextProcessors.themeMode',
                 'app.contextProcessors.validateSms',
                 'app.contextProcessors.company',
-                # 'app.utils.context_processors.alert_count',  # Asegúrate de que 'core' es la app correcta #Estoy hay que repararlo
+                'app.contextProcessors.alert_count',
             ],
         },
     },
