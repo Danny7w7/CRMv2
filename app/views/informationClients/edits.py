@@ -320,20 +320,7 @@ def editObama(request ,obamacare_id, way):
 
     fechaLimite =  datetime.datetime(2025, 10, 31, 23, 59, 59, tzinfo=timezone.get_current_timezone())
 
-    
-    currentYear = datetime.datetime.now().year
-    currentDate = datetime.datetime.now().date()
-
-    if currentDate >= date(currentYear, 11, 1):
-        # Si ya estamos en nov o después, el próximo período es del año siguiente
-        startDate = date(currentYear + 1, 11, 1)
-        endDate = date(currentYear + 2, 10, 31)
-    else:
-        # Si estamos antes de nov, el próximo período comienza este año
-        startDate = date(currentYear, 11, 1)
-        endDate = date(currentYear + 1, 10, 31)
-
-    renovation = ObamaCare.objects.filter(is_active = True, company = request.user.company, client = obamacare.client, created_at__gte = startDate,  created_at__lte = endDate )
+    renovation = ObamaCare.objects.filter(is_active = True, company = request.user.company, client = obamacare.client, tipe_sale = 'R' )
 
     if request.method == 'POST':
         action = request.POST.get('action')
@@ -492,7 +479,7 @@ def editObama(request ,obamacare_id, way):
                     dateCard = dateCard )
 
             if way == 1:
-                if obamacare.created_at > fechaLimite:
+                if obamacare.created_at > fechaLimite or obamacare.tipe_sale == 'R':
                     return redirect('clientObamacare')
                 else:
                     return redirect('clientObamacarePass')

@@ -728,7 +728,7 @@
 							{% if renovation %}
 								<p class="text-success fw-bold">Ya esta renovado</p>
 							{% else %}
-								{% if obamacare.created_at < fechaLimite %}
+								{% if obamacare.created_at < fechaLimite or obamacare.type_sale != 'R' %}
 									<!-- Botón para abrir el modal -->
 									<a class="btn btn-success px-4" data-bs-toggle="modal" data-bs-target="#renovationModal">Renovations</a>										
 								{% endif %}		

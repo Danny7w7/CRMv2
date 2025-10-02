@@ -33,21 +33,21 @@ def clientObamacarePass(request):
 
     if request.user.is_superuser:
 
-        obamaCare = ObamaCare.objects.select_related('agent','client').filter(created_at__lte=fechaLimite).annotate(
+        obamaCare = ObamaCare.objects.select_related('agent','client').filter(Q(~Q(tipe_sale='R')) | Q(created_at__lte=fechaLimite)).annotate(
             truncated_agent_usa=Substr('agent_usa', 1, 8),
             has_observation=Subquery(obs.values('typification')[:1])).exclude(
                 id__in=CustomerRedFlag.objects.filter(date_completed__isnull=True).values_list(
                     'obamacare_id', flat=True)).order_by('-created_at')           
 
     elif request.user.role == 'Admin':         
-        obamaCare = ObamaCare.objects.visible_for_user(request.user).select_related('agent','client').filter(created_at__lte=fechaLimite).only(
+        obamaCare = ObamaCare.objects.visible_for_user(request.user).select_related('agent','client').filter(Q(~Q(tipe_sale='R')) | Q(created_at__lte=fechaLimite)).only(
             'agent_usa', 'agent__first_name', 'agent__last_name', 'client__first_name', 'client__last_name',
                 'client__phone_number', 'status', 'status_color', 'profiling','created_at', 'is_active').annotate(
                     has_observation=Subquery(obs.values('typification')[:1])
                         ).exclude(id__in=CustomerRedFlag.objects.filter(date_completed__isnull=True).values_list(
                             'obamacare_id', flat=True)).order_by('-created_at')    
     else:
-        obamaCare = ObamaCare.objects.select_related('agent', 'client').filter(created_at__lte=fechaLimite).only(
+        obamaCare = ObamaCare.objects.select_related('agent', 'client').filter(Q(~Q(tipe_sale='R')) | Q(created_at__lte=fechaLimite)).only(
             'agent_usa', 'agent__first_name', 'agent__last_name', 'client__first_name', 'client__last_name',
                 'client__phone_number', 'status', 'status_color', 'profiling','created_at', 'is_active').annotate(
                     truncated_agent_usa=Substr('agent_usa', 1, 8),

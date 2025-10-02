@@ -102,7 +102,7 @@ def consent(request, obamacare_id):
         # Si el usuario no está logueado y no hay token válido
         return HttpResponse('Acceso denegado. Por favor, inicie sesión o use un enlace válido.')
     
-    dependents = Dependents.objects.filter(client=obamacare.client)
+    dependents = Dependents.objects.filter(obamacare=obamacare)
     supps = Supp.objects.filter(client_id=obamacare.client.id)
     consent = Consents.objects.select_related('obamacare').filter(obamacare = obamacare_id ).last()
     contact = ContactClient.objects.filter(client = obamacare.client.id).first()
