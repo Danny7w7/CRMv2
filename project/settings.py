@@ -166,8 +166,8 @@ USE_TZ = True
 # Permitir que tu app se incruste en iframes desde cualquier sitio
 X_FRAME_OPTIONS = 'ALLOWALL'
 
-# Cierra la sesión tras 30 minutos (1800 segundos) de inactividad
-SESSION_COOKIE_AGE = 36000  # 30 minutos = 30*60
+# Cierra la sesión tras 9 horas (32400 segundos) de inactividad
+SESSION_COOKIE_AGE = 32400  # 9 horas = 9*60*60
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_SAVE_EVERY_REQUEST = True
 
