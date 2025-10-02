@@ -25,8 +25,8 @@ userSocket.onmessage = function(e) {
 function startRedirectTimer(redirectUrl) {
     // Ensure the DOM is fully loaded before starting the timer
     document.addEventListener('DOMContentLoaded', () => {
-        // Set the duration in milliseconds (14 minutes = 14 * 60 * 1000)
-        const duration = 14 * 60 * 1000;
+        // Set the duration in milliseconds (3 minutes = 3 * 60 * 1000)
+        const duration = 3 * 60 * 1000;
 
         // Set a timeout to redirect after the specified duration
         setTimeout(() => {
