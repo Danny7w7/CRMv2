@@ -43,31 +43,34 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="eventModalLabel">Detalles de la Alerta</h5>
+                <h5 class="modal-title" id="eventModalLabel">Details Alert</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p><strong>Cliente:</strong> <span id="modal-client-name"></span></p>
+                <p><strong>Client:</strong> <span id="modal-client-name"></span></p>
 				<p><strong>Phone:</strong> <span id="modal-client-phone"></span></p>
-                <p><strong>Agente:</strong> <span id="modal-agent-name"></span></p>
-                <p><strong>Fecha:</strong> <span id="modal-date"></span></p>
-                <p><strong>Hora:</strong> <span id="modal-time"></span></p>
-                <p><strong>Observación:</strong> <span id="modal-content"></span></p>
+                <p><strong>Agent:</strong> <span id="modal-agent-name"></span></p>
+                <p><strong>Date:</strong> <span id="modal-date"></span></p>
+                <p><strong>Time:</strong> <span id="modal-time"></span></p>
+                <p><strong>Observation:</strong> <span id="modal-content"></span></p>
                 {% if user_role == 'Admin' %}
-                <p><strong>Estado:</strong> <span id="modal-status"></span></p>
+                <p><strong>Status:</strong> <span id="modal-status"></span></p>
                 {% endif %}
                 {% if is_superuser %}
-                <p><strong>Empresa:</strong> <span id="modal-company"></span></p>
+                <p><strong>Company:</strong> <span id="modal-company"></span></p>
                 {% endif %}
             </div>
             <div class="modal-footer">
+				<a href="#" id="asistio-link" class="btn btn-warning">
+					<i class='bx bxs-calendar-check'></i> Check 
+				</a>
                 <a href="#" id="edit-link" class="btn btn-primary">
-                    <i class='bx bxs-edit'></i> Editar
+                    <i class='bx bxs-edit'></i> Edit
                 </a>
                 <a href="#" id="toggle-link" class="btn btn-danger">
                     <i class='bx bxs-trash'></i> Toggle
                 </a>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

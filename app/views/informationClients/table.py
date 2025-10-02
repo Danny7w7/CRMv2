@@ -258,6 +258,7 @@ def tableAlert(request):
             'title': f"{alertClient.name_client} - {alertClient.truncated_contect}",
             'start': start_time,
             'description': f"Agent: {alertClient.agent.first_name} {alertClient.agent.last_name}",
+            'completed': alertClient.completed,
             'extendedProps': {
                 'agent_name': f"{alertClient.agent.first_name} {alertClient.agent.last_name}",
                 'client_name': alertClient.name_client,
@@ -268,14 +269,20 @@ def tableAlert(request):
                 'time': alertClient.time.strftime('%H:%M') if hasattr(alertClient, 'time') and alertClient.time else '',
                 'datetime': alertClient.datetime.strftime('%Y-%m-%d %H:%M') if hasattr(alertClient.datetime, 'strftime') else str(alertClient.datetime),
                 'edit_url': f"/editAlert/{alertClient.id}/",  # Ajusta según tu URL
-                'toggle_url': f"/toggleAlert/{alertClient.id}/"  # Ajusta según tu URL
+                'toggle_url': f"/toggleAlert/{alertClient.id}/",  # Ajusta según tu URL
+                'check_url': f"/check/{alertClient.id}/" 
             }
         }
         
         # Agregar color basado en el estado
         if hasattr(alertClient, 'is_active'):
-            event['backgroundColor'] = '#28a745' if alertClient.is_active else '#dc3545'
+            event['backgroundColor'] = '#28a745' if alertClient.is_active else "#3546dc"
             event['borderColor'] = '#28a745' if alertClient.is_active else '#dc3545'
+
+        # Agregar color basado en el estado
+        if hasattr(alertClient, 'completed'):
+            event['backgroundColor'] = '#28a745' if alertClient.completed else '#0b23ff'
+            event['borderColor'] = '#28a745' if alertClient.completed else '#0b23ff'
         
         events.append(event)
     

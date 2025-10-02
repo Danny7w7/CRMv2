@@ -119,9 +119,19 @@ class CalendarManager {
     setModalLinks(props) {
         const editLink = document.getElementById('edit-link');
         const toggleLink = document.getElementById('toggle-link');
-        
+        const asistioLink = document.getElementById('asistio-link');
+            
         if (editLink) editLink.href = props.edit_url;
         if (toggleLink) toggleLink.href = props.toggle_url;
+
+        if (asistioLink) {
+            if (!props.completed) {
+                asistioLink.style.display = 'inline-block';
+                asistioLink.href = props.check_url;
+            } else {
+                asistioLink.style.display = 'none';
+            }
+        }
     }
 
     showModal() {

@@ -47,7 +47,7 @@ def alert_count(request):
     if request.user.role in roleAuditar:
 
         #(ALERT) Obtener las alertas vencidas (fechas menores o iguales a la fecha actual)
-        expiredAlerts = ClientAlert.objects.filter(datetime__lte=date.today(), is_active=True)
+        expiredAlerts = ClientAlert.objects.filter(datetime__lte=date.today(), is_active=True, company = request.user.company, completed = False)
 
         # Contar las alertas
         alertCount = expiredAlerts.count()
@@ -55,7 +55,7 @@ def alert_count(request):
     elif request.user.role not in roleAuditar:
 
         #(ALERT) Obtener las alertas vencidas (fechas menores o iguales a la fecha actual)
-        expiredAlerts = ClientAlert.objects.filter(datetime__lte=date.today(), is_active=True, agent = request.user.id)
+        expiredAlerts = ClientAlert.objects.filter(datetime__lte=date.today(), is_active=True, agent = request.user.id, completed = False)
 
         # Contar las alertas
         alertCount = expiredAlerts.count()

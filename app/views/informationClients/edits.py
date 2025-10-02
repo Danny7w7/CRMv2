@@ -889,7 +889,7 @@ def editSupp(request, supp_id):
         'supps': supp,
         'formatted_social':formatted_social,
         'dependents': dependents,
-        'obsSuppText': '\n'.join([obs.content for obs in obsSupp]),
+        'obsSuppText': '\n'.join([f"{obs.content} - {obs.user.first_name} {obs.user.last_name}  - {obs.created_at.strftime('%b %d, %Y')}"for obs in obsSupp]),
         'obsCustomer': obsCus,
         'list_drow': list_drow,
         'old' : old,

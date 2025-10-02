@@ -42,6 +42,14 @@ def toggleAlert(request, alertClient_id):
     # Redirigir de nuevo a la página actual con un parámetro de éxito
     return redirect('alert')
 
+def check(request, alert_id):
+
+    ClientAlert.objects.filter(id = alert_id).update(
+        completed = True
+    )
+
+    return redirect('alert')
+
 def toggleTypification(request, typifications_id):
     # Obtener el cliente por su ID
     typi = get_object_or_404(ObservationCustomer, id=typifications_id)

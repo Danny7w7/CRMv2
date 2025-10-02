@@ -145,6 +145,7 @@ urlpatterns = [
     path('alert/', table.tableAlert, name='alert'),
     path('toggleAlert/<alertClient_id>/', toggles.toggleAlert, name='toggleAlert'),
     path('editAlert/<int:alertClient_id>/', edits.editAlert, name='editAlert'),
+    path('check/<int:alert_id>/', toggles.check, name='check'),
 
     #<---------------------------ticket--------------------------->
     path('ticketAsing/', table.ticketAsing, name='ticketAsing'),
