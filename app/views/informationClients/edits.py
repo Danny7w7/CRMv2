@@ -311,7 +311,7 @@ def editObama(request ,obamacare_id, way):
     consent = Consents.objects.filter(obamacare = obamacare_id )
     income = IncomeLetter.objects.filter(obamacare = obamacare_id)
     document = DocumentsClient.objects.filter(client = obamacare.client)
-    documentObama = DocumentObamaSupp.objects.filter(obamacare = obamacare)
+    documentObama = DocumentObamaSupp.objects.filter(client = obamacare.client)
     incomeffm = IncomeLetterFFM.objects.filter(obamacare = obamacare_id)
     complaint = Complaint.objects.filter(obamacare = obamacare_id).exclude(pdf='')
     smsTemplate = SmsTemplate.objects.select_related('contentTemplate').filter(obamacare = obamacare_id)
@@ -1454,7 +1454,6 @@ def editFinallExpenses(request, finallExpenses_id):
 
     return render(request, 'edit/editFinallExpenses.html', {'finalExpenses':finalExpenses})
     
-
 def saveRenovation(request):
 
     try:
