@@ -1454,7 +1454,7 @@ def editFinallExpenses(request, finallExpenses_id):
 
     return render(request, 'edit/editFinallExpenses.html', {'finalExpenses':finalExpenses})
     
-@require_http_methods(["POST"])
+
 def saveRenovation(request):
 
     try:
