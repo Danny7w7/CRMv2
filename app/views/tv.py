@@ -207,11 +207,11 @@ def getSalesForMonth(company_id):
     
     # Filtrar todas las ventas realizadas en el mes actual
     if company_id == 1:
-        obamaSales = ObamaCare.objects.filter(created_at__range=[startDate, endDate])
-        suppSales = Supp.objects.filter(created_at__range=[startDate, endDate])
+        obamaSales = ObamaCare.objects.filter(created_at__range=[startDate, endDate], is_active = True)
+        suppSales = Supp.objects.filter(created_at__range=[startDate, endDate], is_active = True)
     else:
-        obamaSales = ObamaCare.objects.filter(created_at__range=[startDate, endDate], company = company_id)
-        suppSales = Supp.objects.filter(created_at__range=[startDate, endDate], company = company_id)
+        obamaSales = ObamaCare.objects.filter(created_at__range=[startDate, endDate], company = company_id, is_active = True)
+        suppSales = Supp.objects.filter(created_at__range=[startDate, endDate], company = company_id, is_active = True)
     
     # Iterar sobre las ventas de Obamacare y organizarlas por semanas
     for sale in obamaSales:
@@ -235,11 +235,11 @@ def getSalesForMonth(company_id):
 
     # Agregar el conteo de pólizas activas por agente para Obamacare y Supp
     if company_id == 1:
-        activeObamaPolicies = ObamaCare.objects.filter(status='Active')
-        activeSuppPolicies = Supp.objects.filter(status='Active')
+        activeObamaPolicies = ObamaCare.objects.filter(status='Active', is_active = True)
+        activeSuppPolicies = Supp.objects.filter(status='Active', is_active = True)
     else:
-        activeObamaPolicies = ObamaCare.objects.filter(status='Active',company = company_id)
-        activeSuppPolicies = Supp.objects.filter(status='Active',company = company_id)
+        activeObamaPolicies = ObamaCare.objects.filter(status='Active',company = company_id, is_active = True)
+        activeSuppPolicies = Supp.objects.filter(status='Active',company = company_id, is_active = True)
     
     for policy in activeObamaPolicies:
         agentName = policy.agent.username
