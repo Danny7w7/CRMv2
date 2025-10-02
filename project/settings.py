@@ -61,7 +61,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'app.middleware.CustomSessionMiddleware',
     'app.middleware.NoCacheMiddleware',  # middleware para borrar cache
     'app.middleware.ModuleAccessMiddleware' # Middleware para manejos de modulos
 ]
