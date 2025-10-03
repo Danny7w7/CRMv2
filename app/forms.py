@@ -30,7 +30,7 @@ class ObamaForm(forms.ModelForm):
     class Meta:
         model = ObamaCare
         fields = '__all__'
-        exclude = ['client','agent','is_active','profiling','profiling_date','ffm','required_bearing','date_bearing','status','npm','date_effective_coverage','date_effective_coverage_end','password_carrier','username_carrier','policyNumber','status_color','observation','company']
+        exclude = ['client','agent','is_active','profiling','profiling_date','ffm','required_bearing','date_bearing','status','npm','date_effective_coverage','date_effective_coverage_end','password_carrier','username_carrier','policyNumber','status_color','observation','company','tipe_sale']
 
 class SuppForm(forms.ModelForm):
     class Meta:
