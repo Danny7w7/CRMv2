@@ -19,14 +19,18 @@ from .decoratorsCompany import *
 @login_required(login_url='/login')
 @company_ownership_required_sinURL
 def weeklyLiveView(request):
-
     company_id = request.company_id  # Obtener company_id desde request
 
+    weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+
     context = {
-        'weeklySales': getSalesForWeekly(company_id)
+        'weeklySales': getSalesForWeekly(company_id),
+        'weekDays': weekDays
     }
-    if request.user.role == 'TV': return render(request, 'tv/weeklyLiveViewTV.html', context)
-    else: return render(request, 'tv/weeklyLiveView.html', context)
+    if request.user.role == 'TV': 
+        return render(request, 'tv/weeklyLiveViewTV.html', context)
+    else: 
+        return render(request, 'tv/weeklyLiveView.html', context)
 
 def getSalesForWeekly(company_id):
     # Obtener la fecha de hoy y calcular el inicio de la semana (asumiendo que empieza el lunes)
@@ -62,6 +66,8 @@ def getSalesForWeekly(company_id):
         filterCompany = ObamaCare.objects.filter(is_active = True)
     else:
         filterCompany = ObamaCare.objects.filter(company = company_id, is_active = True)
+
+    print(filterCompany.count())
 
     # Filtrar por la semana actual
     obamaCounts = filterCompany.values('agent', 'created_at') \
@@ -161,6 +167,7 @@ def getSalesForWeekly(company_id):
 
     return finalCounts
 
+
 def getSalesForMonth(company_id):
     # Obtener las fechas de inicio y fin del mes actual
     today = datetime.datetime.today()
@@ -213,6 +220,8 @@ def getSalesForMonth(company_id):
         obamaSales = ObamaCare.objects.filter(created_at__range=[startDate, endDate], company = company_id, is_active = True)
         suppSales = Supp.objects.filter(created_at__range=[startDate, endDate], company = company_id, is_active = True)
     
+    print(obamaSales.count())
+
     # Iterar sobre las ventas de Obamacare y organizarlas por semanas
     for sale in obamaSales:
         agentName = sale.agent.username  # Nombre del agente

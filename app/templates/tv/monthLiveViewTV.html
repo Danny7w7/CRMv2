@@ -14,7 +14,7 @@
 	<link rel="stylesheet" href="{% static 'assets/css/header-colors.css' %}" />
 {% endblock %}
 {% block page_content %}
-<div class="row">					
+<div class="row">
     <div class="col-12">
         <div class="card radius-10">
             <div class="card-body">
@@ -67,9 +67,9 @@
                     </table>
                 </div>
                 {% if toggle %}
-                <a class="btn btn-outline-primary" href="{% url "weeklyLiveViewTV" %}">View Daily</a>
+                <a class="btn btn-outline-primary" href="{% url 'weeklyLiveViewTV' %}">View Daily</a>
                 {% else %}
-                <a class="btn btn-outline-primary" href="{% url "monthLiveViewTV" %}">View Month</a>
+                <a class="btn btn-outline-primary" href="{% url 'monthLiveViewTV' %}">View Month</a>
                 {% endif %}
             </div>
         </div>
