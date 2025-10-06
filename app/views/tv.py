@@ -34,7 +34,7 @@ def weeklyLiveView(request):
 
 def getSalesForWeekly(company_id):
     # Obtener la fecha de hoy y calcular el inicio de la semana (asumiendo que empieza el lunes)
-    today = timezone.now()
+    today = datetime.datetime(2025, 10, 5)
     startOfWeek = today - timedelta(days=today.weekday())
     endOfWeek = startOfWeek + timedelta(days=6)
 
@@ -169,11 +169,14 @@ def getSalesForWeekly(company_id):
 
 
 def getSalesForMonth(company_id):
-    # Obtener las fechas de inicio y fin del mes actual
     today = datetime.datetime.today()
-    startDate = today.replace(day=1)  # Primer día del mes actual
+
+    # Primer día del mes a medianoche
+    startDate = today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+    # Último día del mes a las 23:59:59
     _, lastDay = calendar.monthrange(today.year, today.month)
-    endDate = today.replace(day=lastDay)  # Último día del mes actual
+    endDate = today.replace(day=lastDay, hour=23, minute=59, second=59, microsecond=999999)
 
     excludedUsernames = ['Calidad01', 'mariluz', 'MariaCaTi']  # Excluimos a gente que no debe aparecer en la vista
     userRoles = ['A', 'C', 'S']
@@ -220,7 +223,6 @@ def getSalesForMonth(company_id):
         obamaSales = ObamaCare.objects.filter(created_at__range=[startDate, endDate], company = company_id, is_active = True)
         suppSales = Supp.objects.filter(created_at__range=[startDate, endDate], company = company_id, is_active = True)
     
-    print(obamaSales.count())
 
     # Iterar sobre las ventas de Obamacare y organizarlas por semanas
     for sale in obamaSales:
