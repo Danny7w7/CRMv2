@@ -75,28 +75,43 @@ def dial_leads_task(campaign_id, timeout=60):
 
 @shared_task
 def my_daily_task():
-    now = datetime.now().date()
-    # Filtramos los clientes que cumplen años hoy, ignorando el año
+    today = datetime.now().date()
+
     birthdayClients = Clients.objects.filter(
-        date_birth__month=now.month,
-        date_birth__day=now.day
+        date_birth__month=today.month,
+        date_birth__day=today.day
     )
 
-    for clientBlue in birthdayClients:
-        lines = clientBlue.agent_usa.split("\n")
-        agentFirstName = lines[0].split()[0] 
-        clientSms = Clients.objects.filter(phone_number=clientBlue.phone_number).first()
+    for client in birthdayClients:
+        obamacare = ObamaCare.objects.filter(client=client, is_active=True).last()
+        supp = Supp.objects.filter(client=client, is_active=True).last()
 
-        if clientSms:
-            chat = Chat.objects.select_related('agent').filter(contact_id=clientSms.id).first()
+        agentUsa = None
+        if obamacare:
+            agentUsa = obamacare.agent_usa
+        elif supp:
+            agentUsa = supp.agent_usa
 
-            sendIndividualsSms(
-                '+17869848427',
-                clientBlue.phone_number,
-                Users.objects.get(id=1),
-                clientSms.company,
-                f'¡Feliz cumpleaños, {clientBlue.first_name} {clientBlue.last_name}! 🎉 \nTodo el equipo de {getCompanyPerAgent(agentFirstName)} le desea un año lleno de salud, éxitos y bienestar. \nRecuerde que su agente de seguros, {clientBlue.agent_usa}, está siempre disponible para apoyarle con su póliza. \n¡Que tenga un día maravilloso! 🌟'
-            )
+        if not agentUsa:
+            continue
+
+        lines = agentUsa.split("\n")
+        agentFirstName = lines[0].split()[0] if lines else "Agente"
+
+        clientSms = Clients.objects.filter(phone_number=client.phone_number).first()
+        if not clientSms:
+            continue
+
+        sendIndividualsSms(
+            '+17869848427',
+            client.phone_number,
+            Users.objects.get(id=1),
+            client.company,
+            f'¡Feliz cumpleaños, {client.first_name} {client.last_name}! 🎉\n'
+            f'Todo el equipo de {getCompanyPerAgent(agentFirstName)} le desea un año lleno de salud, éxitos y bienestar.\n'
+            f'Recuerde que su agente de seguros, {agentUsa}, está siempre disponible para apoyarle con su póliza.\n'
+            f'¡Que tenga un día maravilloso! 🌟'
+        )
 
 @shared_task
 def smsPayment():
