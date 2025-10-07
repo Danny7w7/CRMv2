@@ -1,8 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
-from django.utils import timezone
 from storages.backends.s3boto3 import S3Boto3Storage
 from .models import Companies, Users
+import mimetypes
 
 # Create your models here.
 
@@ -62,13 +61,21 @@ class Messages_whatsapp(models.Model):
     class Meta:
         db_table = 'messages_whatsapp'
 
-
 class Files_whatsapp(models.Model):
     file = models.FileField(
         upload_to='files',
         storage=S3Boto3Storage()
     )
     message = models.OneToOneField(Messages_whatsapp, on_delete=models.CASCADE)
+    content_type = models.CharField(max_length=100, null=True, blank=True)  # nuevo campo
+
+    def save(self, *args, **kwargs):
+        if self.file and not self.content_type:
+            # Detectar tipo MIME según el nombre o extensión del archivo
+            type_, _ = mimetypes.guess_type(self.file.name)
+            self.content_type = type_ or ''
+        super().save(*args, **kwargs)
 
     class Meta:
         db_table = 'files_whatsapp'
+
