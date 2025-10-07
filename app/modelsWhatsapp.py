@@ -70,11 +70,12 @@ class Files_whatsapp(models.Model):
     content_type = models.CharField(max_length=100, null=True, blank=True)  # nuevo campo
 
     def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
         if self.file and not self.content_type:
-            # Detectar tipo MIME según el nombre o extensión del archivo
+            import mimetypes
             type_, _ = mimetypes.guess_type(self.file.name)
             self.content_type = type_ or ''
-        super().save(*args, **kwargs)
+            super().save(update_fields=['content_type'])
 
     class Meta:
         db_table = 'files_whatsapp'
