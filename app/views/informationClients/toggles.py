@@ -121,4 +121,24 @@ def toggleControlQuestions(request,question_id):
     # Redirigir de nuevo a la página actual con un parámetro de éxito
     return redirect('formCreateQuestionControl')
 
+def toggleDependentsObama(request, dependents_id, obamacare_id, way):
 
+    # Obtener el cliente por su ID
+    dependent = get_object_or_404(Dependents, id=dependents_id)
+    
+    # Cambiar el estado de is_active (True a False o viceversa)
+    dependent.is_active_obama = not dependent.is_active_obama
+    dependent.save()  # Guardar los cambios en la base de datos
+
+    return redirect('editObama', obamacare_id, way)
+
+def toggleDependentsSupp(request, dependents_id, supp_id):
+
+    # Obtener el cliente por su ID
+    dependent = get_object_or_404(Dependents, id=dependents_id)
+    
+    # Cambiar el estado de is_active (True a False o viceversa)
+    dependent.is_active_supp = not dependent.is_active_supp
+    dependent.save()  # Guardar los cambios en la base de datos
+
+    return redirect('editSupp', supp_id)

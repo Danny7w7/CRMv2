@@ -180,7 +180,7 @@ def fetchDependent(request, client_id):
     dependents_data = {}
     updated_dependents_ids = []
 
-    # Procesar datos de dependientes como antes
+    # Procesar datos del formulario
     for key, value in request.POST.items():
         if key.startswith('dependent'):
             try:
@@ -188,74 +188,58 @@ def fetchDependent(request, client_id):
                 field_name = key.split('[')[2].split(']')[0]
             except IndexError:
                 continue
-            
-            if index not in dependents_data:
-                dependents_data[index] = {}
+            dependents_data.setdefault(index, {})[field_name] = value
 
-            dependents_data[index][field_name] = value
-
-    # Crear lista de dependientes
     dependents_to_add = []
+
     for dep_data in dependents_data.values():
         if 'nameDependent' in dep_data:
             dependent_id = dep_data.get('id')
-
-            # Procesar múltiples valores de type_police
-            type_police_values = dep_data.get('typePoliceDependents', [])
+            type_police_values = dep_data.get('typePoliceDependents', '')
             type_police = ", ".join(type_police_values.split(',') if type_police_values else [])
 
-            # Lógica para asociar ObamaCare
-            obamacare = None
-            if 'ACA' in type_police:
-                # Buscar un plan ObamaCare para el cliente
-                obamacare = ObamaCare.objects.filter(client=client, is_active = True).order_by('-created_at').first()
+            # ✅ Lógica correcta
+            has_obama = 'ACA' in type_police
+            has_supp = not has_obama or (',' in type_police and 'ACA' in type_police)
 
-            # Crear o actualizar Dependent
+            # Buscar ObamaCare activo solo si aplica
+            obamacare = None
+            if has_obama:
+                obamacare = ObamaCare.objects.filter(
+                    client=client, is_active=True
+                ).order_by('-created_at').first()
+
+            dependent_defaults = {
+                'name': dep_data.get('nameDependent'),
+                'apply': dep_data.get('applyDependent'),
+                'date_birth': dep_data.get('dateBirthDependent'),
+                'migration_status': dep_data.get('migrationStatusDependent'),
+                'sex': dep_data.get('sexDependent'),
+                'kinship': dep_data.get('kinship'),
+                'type_police': type_police,
+                'is_active_obama': has_obama,
+                'is_active_supp': has_supp,
+            }
+
             if dependent_id:
                 dependent = Dependents.objects.get(id=dependent_id)
-                for attr, value in {
-                    'name': dep_data.get('nameDependent'),
-                    'apply': dep_data.get('applyDependent'),
-                    'date_birth': dep_data.get('dateBirthDependent'),
-                    'migration_status': dep_data.get('migrationStatusDependent'),
-                    'sex': dep_data.get('sexDependent'),
-                    'kinship': dep_data.get('kinship'),
-                    'type_police': type_police,
-                }.items():
+                for attr, value in dependent_defaults.items():
                     setattr(dependent, attr, value)
                 dependent.save()
-
-                dependent.obamacare.clear()
-                if obamacare:
-                    dependent.obamacare.add(obamacare)
-
             else:
-                dependent = Dependents.objects.create(
-                    client=client,
-                    name=dep_data.get('nameDependent'),
-                    apply=dep_data.get('applyDependent'),
-                    date_birth=dep_data.get('dateBirthDependent'),
-                    migration_status=dep_data.get('migrationStatusDependent'),
-                    sex=dep_data.get('sexDependent'),
-                    kinship=dep_data.get('kinship'),
-                    type_police=type_police,
-                )
+                dependent = Dependents.objects.create(client=client, **dependent_defaults)
 
-                if obamacare:
-                    dependent.obamacare.add(obamacare)
+            dependent.obamacare.clear()
+            if obamacare:
+                dependent.obamacare.add(obamacare)
 
             dependents_to_add.append(dependent)
             updated_dependents_ids.append(dependent.id)
 
-    # Obtener todos los Supp para este cliente
+    # Asociar dependientes con Supps
     supps = Supp.objects.filter(client=client)
-    
-    # Agregar todos los dependientes a cada Supp
     for supp in supps:
-        supp.dependents.clear()  # Limpiar relaciones existentes
+        supp.dependents.clear()
         supp.dependents.add(*dependents_to_add)
 
-    return JsonResponse({
-        'success': True,
-        'dependents_ids': updated_dependents_ids
-    })
+    return JsonResponse({'success': True, 'dependents_ids': updated_dependents_ids})

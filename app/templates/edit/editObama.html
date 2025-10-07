@@ -279,28 +279,23 @@
 									<option value = False {% if obamacare.client.apply == False %}selected{% endif %} >NO</option>
 								</select>
 							</div>
-							<div class="col-12 col-lg-5">
-								<label for="agent_usa" class="form-label font-weight-bold">Agente USA</label>
-								<input type="hidden" id="limitValue" value="{{ c }}">
-								{% if request.user.company != obamacare.client.company %}
-									<input readonly type="text" class="form-control" value="{{ obamacare.client.agent_usa }}" >
-								{% else %}
-									<select class="form-select" id="agent_usa" aria-label="Default select example" name="agent_usa" required >
-										<option value="" disabled selected>Please Select</option>
-										{% for agentUsa in agentUsa %}
-											<option {% if obamacare.client.agent_usa == agentUsa.name %}selected{% endif %}  value="{{agentUsa.name}}">{{agentUsa.name}}</option>
-										{% endfor %}
-									</select>
-
-								{% endif %}							
-							</div>
-							
+														
 							<hr>
-							{% if dependents %}
+
+							<div class="d-flex align-items-center justify-content-between">
 								<h4>Dependents</h4>
-							{% endif %}
-						
+								<!-- Botón para abrir el modal -->
+								<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDependentModal">
+									Add
+								</button>
+							</div>
+
+							{% if not dependents %}
+								<hr>
+							{% endif %}	
+														
 						{% for dependent in dependents %}
+	
 							<div class="col-12 col-lg-5">
 								<label class="form-label">Name of Dependent #{{ forloop.counter }}</label>
 								<input type="hidden" name="dependentId_{{ dependent.id }}" value="{{ dependent.id }}">
@@ -323,6 +318,7 @@
 								</select>
 							</div>
 							<div class="col-12 col-lg-3">
+								
 								<label class="form-label">Policy Number</label>
 								<input type="text" class="form-control" id="policyNumber"  name="policyNumberDependent_{{ dependent.id }}"  value="{{ dependent.policyNumber|default_if_none:'' }}" >
 							</div>
@@ -362,6 +358,13 @@
 									<option value="UNKNOWN" {% if dependent.migration_status  == "UNKNOWN" %}selected{% endif %} >UNKNOWN</option>
 								</select>
 							</div>
+
+							{% if request.user.role != 'A' %}
+								<div class="col-12 col-lg-3">
+									<a class="btn btn-danger" href="{% url 'toggleDependentsObama' dependent.id obamacare.id way %}"> Delete Dependent #{{ forloop.counter }}</a>	
+								</div>
+							{% endif %}
+							
 						<hr>
 						{% endfor %}
 
@@ -1788,17 +1791,6 @@
 												</select>
 											</div>
 											
-											
-											<div class="col-12 col-lg-6">
-												<label for="renovation_agent_usa" class="form-label font-weight-bold">Agente USA</label>
-												<select class="form-select" id="renovation_agent_usa" name="agent_usa" required>
-													<option value="" disabled>Please Select</option>
-													{% for agentUsa in agentUsa %}
-														<option {% if obamacare.client.agent_usa == agentUsa.name %}selected{% endif %} value="{{agentUsa.name}}">{{agentUsa.name}}</option>
-													{% endfor %}
-												</select>
-											</div>
-
 											<!-- Sección de Dependientes (si existen) -->
 											<div id="renovationDependents">
 												<!-- Aquí se cargarán los dependientes dinámicamente -->
@@ -1908,6 +1900,84 @@
 										</button>
 									</div>
 
+								</div>
+							</div>
+						</div>
+
+						<!-- Modal Add dependents -->
+						<div class="modal fade" id="addDependentModal"  tabindex="-1" aria-labelledby="addDependentModalLabel" aria-hidden="true">
+							<div class="modal-dialog modal-lg">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title" id="addDependentModalLabel">Add Dependent</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									</div>
+									<div class="modal-body">
+										<!-- Formulario dentro del modal -->
+										<form  action="{% url 'addDependObama' obamacare.id way %}" method="POST">
+											<div class="row g-3">
+												<div class="col-12 col-lg-6">
+													<label class="form-label">Name of Dependent</label>
+													<input type="text" class="form-control" name="nameDependent" required>
+												</div>
+												<div class="col-12 col-lg-6">
+													<label class="form-label">Apply</label>
+													<select class="form-select" name="applyDependent" required>
+														<option disabled selected ></option>
+														<option value="YES">YES</option>
+														<option value="NO">NO</option>
+													</select>
+												</div>
+												<div class="col-12 col-lg-6">
+													<label class="form-label">Date Birth</label>
+													<input type="text" class="form-control" name="dateBirthDependent" id="dateBirthDependent" required >
+												</div>
+												<div class="col-12 col-lg-6">
+													<label class="form-label">Migration Status</label>
+													<select class="form-select" name="migrationStatusDependent" required>															
+														<option  disabled selected>Please Select</option>
+														<option value="EMPLOYMENT AUTHORIZATION">Employment Authorization</option>
+														<option value="NOTICE OF ACTION">Notice of Action (i-797)</option>
+														<option value="REFUGEE">Refugee</option>
+														<option value="ASYLUM">Asylum</option>
+														<option value="TPS">Temporary Protection Status (TPS)</option>
+														<option value="DOMESTIC VIOLENCE">Domestic Violence</option>
+														<option value="PERMANENT RESIDENT">Permanent Resident (Green Card)</option>
+														<option value="CONDITIONAL RESIDENT">Conditional Resident</option>
+														<option value="PAROLE">Parole</option>
+														<option value="US CITIZEN">US Citizen (Driver's License)</option>
+														<option value="STUDENT VISA">Student Visa (I-20)</option>
+														<option value="CURRENTLY IN PROCESS">Currently In Process (this means the client received an i-797)</option>	  
+													</select>
+												</div>
+												<div class="col-12 col-lg-6">
+													<label class="form-label">Sex</label>
+													<select class="form-select" name="sexDependent" required>
+														<option disabled selected ></option>
+														<option value="M">MALE</option>
+														<option value="F">FEMALE</option>
+													</select>
+												</div>
+												<div class="col-12 col-lg-6">
+													<label for="kinship" class="form-label">Relationship</label>
+													<select class="form-select" id="kinship" name="kinship" aria-label="Default select example" required>
+														<option disabled selected ></option>
+														<option value="DAD">DAD</option>
+														<option value="MOM">MOM</option>
+														<option value="SON">SON</option>
+														<option value="GRANDPARENT">GRANDPARENT</option>
+														<option value="GRANDMOTHER">GRANDMOTHER</option>
+														<option value="COUPLE">COUPLE</option>
+														<option value="OTHER">OTHER</option>
+													</select>
+												</div>
+												<div class="d-flex align-items-center gap-3" >
+													<button type="submit" class="btn btn-primary">Save</button>
+												</div>
+												{% csrf_token %} 
+											</div>								
+										</form>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -2058,7 +2128,6 @@
 
 	<script src="{% static 'assets/js/validations/saveDocumentObama.js' %}"></script>
 	<script src="{% static 'assets/js/validations/duplicidadClient.js' %}"></script>
-	<script src="{% static 'assets/js/alerts/renovations.js' %}"></script>
 
 	<!-- Scripts SMS's -->
 	<script>

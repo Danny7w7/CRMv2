@@ -98,13 +98,7 @@
                                             <input type="hidden" name="route" value="SUPP">
                                         </form>
                                     </li>
-                                    <li>
-                                        <form method="POST" action="{% url 'updateTypeSales' client.id %}" class="typeSalesForm">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="route" value="DEPEND">
-                                            <button type="submit" class="dropdown-item">ADD DEPENDENTS</button>
-                                        </form>
-                                    </li>
+                                   
                                 {% endif %}
                             </ul>
                         </td>

@@ -44,7 +44,7 @@
 					<input type="date" required name="end_date" id="end_date" class="form-control" value="{{ endDate }}">
 				</div>
 				<div class="col-md-3">
-					<label for="end_date">Agent:</label>
+					<label for="end_date">Agent: {{obama.premium}} </label>
 					<select  class="form-select" name="agent" id="agent">
 						<option disabled selected>Please Select</option>
 						{% for item in agent %}
@@ -122,10 +122,14 @@
 								<td> ❔ </td>
 							{% endif %}
 
-							{% if item.paymentdate_set.first.payment_date %}
-								<td> ✅ </td>
+							{% if item.premium > 0 %}
+								{% if item.paymentdate_set.first.payment_date %}
+									<td> ✅ </td>
+								{% else %}
+									<td> ❔ </td>
+								{% endif %}
 							{% else %}
-								<td> ❔ </td>
+								<td> N/A </td>
 							{% endif %}
 
 							{% if item.documentobamasupp_set.first.created_at %}

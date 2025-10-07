@@ -74,9 +74,11 @@ urlpatterns = [
     path('select_client/', existClient.select_client, name='select_client'), # Vista para seleccionar clientes existentes
     path('updateTypeSales/<int:client_id>/', existClient.updateTypeSales, name='updateTypeSales'), # Funcion intermedia que cambia el TypeSale del cliente
     path('formAddObama/<client_id>/', forms.formAddObama, name='formAddObama'),
+    path('addDependObama/<obamacare_id>/<way>/', edits.addDependObama, name='addDependObama'),
+    path('toggleDependentsObama/<dependents_id>/<obamacare_id>/<way>/', toggles.toggleDependentsObama, name='toggleDependentsObama'),
     path('formAddSupp/<client_id>/', forms.formAddSupp, name='formAddSupp'),
-    path('formAddDepend/<client_id>/', forms.formAddDepend, name='formAddDepend'),
-    path('addDepend/', forms.addDepend, name='addDepend'),
+    path('addDependSupp/<supp_id>/', edits.addDependSupp, name='addDependSupp'),
+    path('toggleDependentsSupp/<dependents_id>/<supp_id>/', toggles.toggleDependentsSupp, name='toggleDependentsSupp'),
 
     path('formCreateAlert/', forms.formCreateAlert, name='formCreateAlert'), # Formulario para crear las Alertas
     
@@ -330,5 +332,7 @@ urlpatterns = [
     path('sendWhatsappConversation/', whatsApp.sendWhatsappConversation, name='sendWhatsappConversation'),
     path('deleteContactWhatsApp/<id>/', whatsApp.deleteContactWhatsApp, name='deleteContactWhatsApp'),
     path('template/<contact_id>/', whatsApp.template, name='template'),
+path('download_file/<path:file_key>/', whatsApp.download_file, name='download_file'),
+
 
 ]

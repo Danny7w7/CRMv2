@@ -38,12 +38,6 @@ class SuppForm(forms.ModelForm):
         fields = '__all__'
         exclude = ['client','agent','is_active','status','date_effective_coverage','date_effective_coverage_end','payment_type','status_color','policyNumber','observation','effective_date','dependents','company']
 
-class DepentForm(forms.ModelForm):
-    class Meta:
-        model = Dependents
-        fields = '__all__'
-        exclude = ['client','obamacare','date_birth']
-
 class PaymentsForm(forms.ModelForm):
     class Meta:
         model = Payments

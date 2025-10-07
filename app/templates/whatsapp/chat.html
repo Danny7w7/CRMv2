@@ -13,11 +13,33 @@
                         <div class="flex-grow-1 ms-2">
                             <p class="mb-0 chat-time">{% if contact.name %}{{contact.name}}{% else %}{{contact.phone_number}}{%endif%}, {{ message.created_at|date:"m:H - d/m" }}</p>
                             {% if message.file %}
-                            <p class="chat-left-msg">
-                                <img class="img-responsive" src="{{ message.file.file.url }}" alt="">
-                            </p>
+
+                                {% if message.file.content_type and "video" in message.file.content_type %}
+                                    <div class="chat-left-msg">
+                                        <video class="img-responsive w-100" controls preload="metadata">
+                                            <source src="{{ message.file.file.url }}" type="{{ message.file.content_type }}">
+                                            Tu navegador no soporta la reproducción de video.
+                                        </video>
+                                    </div>
+                                {% elif message.file.content_type and "image" in message.file.content_type %}
+                                    <div class="chat-left-msg">
+                                        <img class="img-responsive w-100" src="{{ message.file.file.url }}" alt="archivo" style="max-width:100%; height:auto;">
+                                    </div>
+                                {% elif message.file.content_type and "pdf" in message.file.content_type %}
+                                    <div class="chat-left-msg">
+                                        <a href="{% url 'download_file' message.file.file.name %}" class="btn btn-outline-secondary">📎 Descargar PDF</a>
+                                    </div>
+
+                                {% elif message.file.content_type and "audio" in message.file.content_type %}
+                                    <div class="rounded shadow-sm">
+                                        <audio controls class="w-100 chat-left-msg" style="outline:none;">
+                                        <source src="{{ message.file.file.url }}" type="{{ message.file.content_type|default:'audio/mpeg' }}">
+                                        Tu navegador no soporta la reproducción de audio.
+                                        </audio>
+                                    </div>
+                                {% endif %}
                             {% else %}
-                            <p class="chat-left-msg" style="white-space: pre-wrap;">{{message.message_content}}</p>
+                                <p class="chat-left-msg" style="white-space: pre-wrap;">{{ message.message_content }}</p>
                             {% endif %}
                         </div>
                     </div>

@@ -444,7 +444,8 @@
             </div>
             <div hidden class="mb-3">
                 <label class="form-label">{% blocktrans %}Aplicante (s) Adicional (es) (Nombre Completo, Fecha Nacimiento, Sexo, Status, Parentesco){% endblocktrans %} </label>
-                <input disabled type="text" class="form-control input-verde-sombra"value="{% for dependent in dependents %}{{dependent.name}}, {{dependent.date_birth}}, {{dependent.sex}}, {{dependent.migration_status}}, {{dependent.kinship}}{% endfor %}"  >
+                <textarea disabled class="form-control input-verde-sombra"  rows="5" >{% for dependent in dependents %} {{dependent.name}}, {{dependent.date_birth}}, {{dependent.sex}}, {{dependent.migration_status}}, {{dependent.kinship}}
+{% endfor %}</textarea>
             </div>
             <div hidden class="mb-3">
                 <label class="form-label">{% trans "Direccion" %}</label>

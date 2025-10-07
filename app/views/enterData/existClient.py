@@ -66,9 +66,6 @@ def updateTypeSales(request, client_id):
         request.session['type_sales'] = type_sales
         return JsonResponse({"status": "success", "redirect_url": f"/formAddSupp/{client_id}/"})
 
-    elif route == 'DEPEND':
-        return JsonResponse({"status": "success", "redirect_url": f"/formAddDepend/{client_id}/"})
-
     return JsonResponse({"status": "success", "redirect_url": "/select_client/"})
 
 @login_required(login_url='/login') 

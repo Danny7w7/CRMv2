@@ -353,6 +353,8 @@ class Dependents(models.Model):
     date_birth = models.DateField(null=True)
     migration_status = models.CharField(max_length=50)
     type_police = models.TextField()
+    is_active_obama = models.BooleanField(default=True)
+    is_active_supp = models.BooleanField(default=True)
 
     class Meta:
         db_table = 'dependents'

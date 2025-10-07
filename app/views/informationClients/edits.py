@@ -3,21 +3,21 @@ import calendar
 import datetime
 import json
 import re
-from datetime import datetime, date
+from datetime import datetime
 
 #libreria de paises
 import urllib.request
 from django.shortcuts import render
 
 # Django utilities
-from django.db.models import Sum, Count
+from django.db.models import F, Value
 from django.http import JsonResponse
 from collections import defaultdict
+from django.db.models.functions import Concat
 
 # Django core libraries
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.decorators.http import require_http_methods
 
 # Application-specific imports
 from app.models import *
@@ -185,7 +185,7 @@ def editClient(request,client_id):
 
     # Campos de Client
     client_fields = [
-        'agent_usa', 'first_name', 'last_name', 'phone_number', 'email', 'address', 'zipcode',
+        'first_name', 'last_name', 'phone_number', 'email', 'address', 'zipcode',
         'city', 'state', 'county', 'sex', 'migration_status', 'apply'
     ]
     
@@ -210,7 +210,6 @@ def editClient(request,client_id):
 
     # Actualizar Client
     client = Clients.objects.filter(id=client_id).update(
-        agent_usa=cleaned_client_data['agent_usa'],
         first_name=cleaned_client_data['first_name'],
         last_name=cleaned_client_data['last_name'],
         email=cleaned_client_data['email'],
@@ -234,7 +233,7 @@ def editObama(request ,obamacare_id, way):
     company_id = request.user.company.id
 
     obamacare = ObamaCare.objects.select_related('agent', 'client').filter(id=obamacare_id).first()
-    dependents = Dependents.objects.prefetch_related('obamacare').filter(obamacare=obamacare)
+    dependents = Dependents.objects.prefetch_related('obamacare').filter(obamacare=obamacare, is_active_obama = True)
     letterCard = LettersCard.objects.filter(obamacare = obamacare_id).first()
     apppointment = AppointmentClient.objects.select_related('obamacare','agent_create').filter(obamacare = obamacare_id)
     userCarrier = UserCarrier.objects.filter(obamacare = obamacare_id).first()
@@ -584,6 +583,66 @@ def editObama(request ,obamacare_id, way):
 
     return render(request, 'edit/editObama.html', context)
 
+@login_required(login_url='/login')
+def addDependObama(request, obamacare_id, way):
+
+    nameDependent = request.POST.get('nameDependent')
+    applyDependent = request.POST.get('applyDependent')
+    dateBirthDependent = request.POST.get('dateBirthDependent')
+    migrationStatusDependent = request.POST.get('migrationStatusDependent')
+    sexDependent = request.POST.get('sexDependent')        
+    kinship = request.POST.get('kinship')
+
+    obama = ObamaCare.objects.select_related('client').filter(id=obamacare_id).first()  
+
+    # Conversión solo si los valores no son nulos o vacíos
+    if dateBirthDependent not in [None, '']:
+        dateNew = datetime.datetime.strptime(dateBirthDependent, '%m/%d/%Y').date()
+    else:
+        dateNew = None
+
+    if nameDependent.strip():  # Validar que el texto no esté vacío
+
+        updated = Dependents.objects.filter(
+            client=obama.client,
+            name=nameDependent,
+            apply=applyDependent,
+            sex=sexDependent,
+            kinship=kinship,
+            date_birth=dateNew,
+            migration_status=migrationStatusDependent
+        ).update(
+            type_police=Concat(F('type_police'), Value(f', ACA')))
+        
+
+    if not updated:  # Si no se actualizó ninguno, crear uno nuevo
+        dependent = Dependents.objects.create(
+            client=obama.client,
+            name=nameDependent,
+            apply=applyDependent,
+            sex=sexDependent,
+            kinship=kinship,
+            date_birth=dateNew,
+            migration_status=migrationStatusDependent,
+            type_police='ACA'
+        )
+    else:
+        # obtener el que se actualizó para usarlo abajo
+        dependent = Dependents.objects.filter(
+            client=obama.client,
+            name=nameDependent,
+            apply=applyDependent,
+            sex=sexDependent,
+            kinship=kinship,
+            date_birth=dateNew,
+            migration_status=migrationStatusDependent
+        ).first()
+
+    if obama:
+        dependent.obamacare.add(obama)
+   
+    return redirect('editObama', obamacare_id, way)
+
 def getPaymentsSummary(obamacareId):
     summary = defaultdict(lambda: {
         "oneil": 0,
@@ -734,7 +793,7 @@ def editSupp(request, supp_id):
     supp_instance = Supp.objects.get(id=supp_id)
 
     # Obtener todos los dependientes asociados a este Supp
-    dependents = supp_instance.dependents.all()
+    dependents = supp_instance.dependents.filter(is_active_supp=True)
     
     action = request.POST.get('action')
   
@@ -884,7 +943,6 @@ def editSupp(request, supp_id):
     else:
         agents = None
 
-
     context = {
         'supps': supp,
         'formatted_social':formatted_social,
@@ -908,6 +966,67 @@ def editSupp(request, supp_id):
     }
     
     return render(request, 'edit/editSupp.html', context)
+
+@login_required(login_url='/login')
+def addDependSupp(request, supp_id):
+
+    nameDependent = request.POST.get('nameDependent')
+    applyDependent = request.POST.get('applyDependent')
+    dateBirthDependent = request.POST.get('dateBirthDependent')
+    migrationStatusDependent = request.POST.get('migrationStatusDependent')
+    sexDependent = request.POST.get('sexDependent')        
+    kinship = request.POST.get('kinship')
+
+    supp = Supp.objects.select_related('client').filter(id=supp_id).first()  
+
+    # Conversión solo si los valores no son nulos o vacíos
+    if dateBirthDependent not in [None, '']:
+        dateNew = datetime.datetime.strptime(dateBirthDependent, '%m/%d/%Y').date()
+    else:
+        dateNew = None
+
+    if nameDependent.strip():  # Validar que el texto no esté vacío
+
+        updated = Dependents.objects.filter(
+            client=supp.client,
+            name=nameDependent,
+            apply=applyDependent,
+            sex=sexDependent,
+            kinship=kinship,
+            date_birth=dateNew,
+            migration_status=migrationStatusDependent
+        ).update(
+            type_police=Concat(F('type_police'), Value(f', {supp.policy_type}')))
+    
+
+    if not updated:  # Si no se actualizó ninguno, crear uno nuevo
+        dependent = Dependents.objects.create(
+            client=supp.client,
+            name=nameDependent,
+            apply=applyDependent,
+            sex=sexDependent,
+            kinship=kinship,
+            date_birth=dateNew,
+            migration_status=migrationStatusDependent,
+            type_police=supp.policy_type
+        )
+    else:
+        # obtener el que se actualizó para usarlo abajo
+        dependent = Dependents.objects.filter(
+            client=supp.client,
+            name=nameDependent,
+            apply=applyDependent,
+            sex=sexDependent,
+            kinship=kinship,
+            date_birth=dateNew,
+            migration_status=migrationStatusDependent
+        ).first()
+
+    # si supp y dependent existen, asociarlos
+    if supp and dependent:
+        supp.dependents.add(dependent)
+
+    return redirect('editSupp', supp_id)
 
 @login_required(login_url='/login')
 @company_ownership_required(model_name="ClientsAssure", id_field="assure_id")
@@ -1475,7 +1594,6 @@ def saveRenovation(request):
             'sex': request.POST.get('sex', '').strip(),
             'migration_status': request.POST.get('migration_status', '').strip(),
             'apply': request.POST.get('apply', '').strip(),
-            'agent_usa': request.POST.get('agent_usa', '').strip()
         }
         
         # DATOS DEL PLAN OBAMACARE
@@ -1572,7 +1690,6 @@ def saveRenovation(request):
 
         # Actualizar Client
         Clients.objects.filter(id=originalClientId).update(
-            agent_usa=clientData['agent_usa'],
             first_name=clientData['first_name'],
             last_name=clientData['last_name'],
             email=clientData['email'],
@@ -1625,7 +1742,7 @@ def saveRenovation(request):
                 kinship=dep['kinship'],
                 date_birth=dateNew,
                 migration_status=dep['migration'],
-                type_police='ACA'
+                is_active_obama = True
             ).first()
 
             if existingDep:
@@ -1641,7 +1758,8 @@ def saveRenovation(request):
                     kinship=dep['kinship'],
                     date_birth=dateNew,
                     migration_status=dep['migration'],
-                    type_police='ACA'
+                    type_police='ACA',
+                    is_active_obama = True
                 )
                 newDep.obamacare.add(saveObama)
         

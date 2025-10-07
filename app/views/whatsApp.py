@@ -512,3 +512,44 @@ def deleteContactWhatsApp(request, id):
         contact = Contacts_whatsapp.objects.get(id=id)
         contact.delete()
     return redirect(index)
+
+from django.http import HttpResponse
+from django.conf import settings
+import boto3
+import mimetypes
+
+
+from django.http import HttpResponse
+from django.conf import settings
+import boto3
+
+def download_file(request, file_key):
+    s3 = boto3.client(
+        's3',
+        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+    )
+
+    bucket_name = settings.AWS_STORAGE_BUCKET_NAME
+
+    try:
+        # Descarga el archivo desde S3
+        file_obj = s3.get_object(Bucket=bucket_name, Key=file_key)
+        file_data = file_obj['Body'].read()
+
+        # Obtener content-type real desde S3
+        content_type = file_obj.get('ContentType', 'application/octet-stream')
+
+        # Intentar deducir una extensión
+        extension = '.pdf'
+
+        # Nombre del archivo con extensión real
+        filename = file_key.split('/')[-1] + extension
+
+        response = HttpResponse(file_data, content_type=content_type)
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+
+    except Exception as e:
+        return HttpResponse(f"Error al descargar el archivo: {e}", status=400)
+

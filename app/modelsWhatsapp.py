@@ -70,26 +70,26 @@ class Files_whatsapp(models.Model):
     content_type = models.CharField(max_length=100, null=True, blank=True)  # nuevo campo
 
     def save(self, *args, **kwargs):
-            # Primero guarda el archivo en S3
-            super().save(*args, **kwargs)
+        # Primero guarda el archivo en S3
+        super().save(*args, **kwargs)
 
-            # Luego detecta tipo solo si no está seteado
-            if not self.content_type and self.file:
-                try:
-                    # Leer primeros bytes del archivo real
-                    self.file.open('rb')
-                    data = self.file.read(2048)
-                    self.file.close()
+        # Luego detecta tipo solo si no está seteado
+        if not self.content_type and self.file:
+            try:
+                # Leer primeros bytes del archivo real
+                self.file.open('rb')
+                data = self.file.read(2048)
+                self.file.close()
 
-                    kind = filetype.guess(data)
-                    if kind:
-                        self.content_type = kind.mime
-                    else:
-                        self.content_type = 'application/octet-stream'
+                kind = filetype.guess(data)
+                if kind:
+                    self.content_type = kind.mime
+                else:
+                    self.content_type = 'application/octet-stream'
 
-                    super().save(update_fields=['content_type'])
-                except Exception as e:
-                    print(f"⚠️ Error detectando tipo de archivo: {e}")
+                super().save(update_fields=['content_type'])
+            except Exception as e:
+                print(f"⚠️ Error detectando tipo de archivo: {e}")
 
     class Meta:
         db_table = 'files_whatsapp'

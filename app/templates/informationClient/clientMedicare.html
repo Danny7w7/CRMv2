@@ -49,7 +49,7 @@
                     {% for item in medicares %}
                     <tr>
                         <td>{{item.truncated_agent_usa }}</td>
-                        <td>{{item.agent.first_name}} {{item.last_name}}</td>
+                        <td>{{item.agent.first_name}} {{item.agent.last_name}}</td>
                         <td>{{item.first_name}} {{item.last_name}}</td>
                         <td>{{item.phone_number|formatUsaPhone}}</td>
 						<td>{{item.created_at|date:"m-d-Y"}}</td>

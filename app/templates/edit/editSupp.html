@@ -177,69 +177,87 @@
 						</div>
 					</div>
                     <hr>
-					{% if dependents %}
-                   	 <h4>Dependents</h4>					
-					{% endif %}
-						{% for dependent in dependents %}
-							<div class="col-12 col-lg-6">
-								<label class="form-label">Name of Dependent #{{ forloop.counter }}</label>
-								<input type="hidden" name="dependentId_{{ dependent.id }}" value="{{ dependent.id }}">
-								<input type="text" class="form-control" name="nameDependent_{{ dependent.id }}" value="{{ dependent.name }}" required >
-							</div>
-							<div class="col-12 col-lg-2">
-								<label class="form-label">Apply</label>
-								<select class="form-select" name="applyDependent_{{ dependent.id }}" required >
-									<option value="" disabled selected>Please Select</option>
-									<option value="SI" {% if dependent.apply == "SI" %}selected{% endif %}>SI</option>
-									<option value="NO" {% if dependent.apply == "NO" %}selected{% endif %}>NO</option>
-								</select>
-							</div>
-							<div class="col-12 col-lg-4">
-								<label class="form-label">Sex</label>
-								<select class="form-select" name="sexDependent_{{ dependent.id }}" required >
-									<option value="" disabled selected>Please Select</option>
-									<option value="M" {% if dependent.sex == "M" %}selected{% endif %}>MALE</option>
-									<option value="F" {% if dependent.sex == "F" %}selected{% endif %}>FEMALE</option>
-								</select>
-							</div>
+
+					<div class="d-flex align-items-center justify-content-between">
+						<h4>Dependents</h4>
+						<!-- Botón para abrir el modal -->
+						<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDependentModal">
+							Add
+						</button>
+					</div>
+
+					{% if not dependents %}
+						<hr>
+					{% endif %}	
+
+					{% for dependent in dependents %}
+						<div class="col-12 col-lg-6">
+							<label class="form-label">Name of Dependent #{{ forloop.counter }}</label>
+							<input type="hidden" name="dependentId_{{ dependent.id }}" value="{{ dependent.id }}">
+							<input type="text" class="form-control" name="nameDependent_{{ dependent.id }}" value="{{ dependent.name }}" required >
+						</div>
+						<div class="col-12 col-lg-2">
+							<label class="form-label">Apply</label>
+							<select class="form-select" name="applyDependent_{{ dependent.id }}" required >
+								<option value="" disabled selected>Please Select</option>
+								<option value="YES" {% if dependent.apply == "YES" %}selected{% endif %}>YES</option>
+								<option value="NO" {% if dependent.apply == "NO" %}selected{% endif %}>NO</option>
+							</select>
+						</div>
+						<div class="col-12 col-lg-4">
+							<label class="form-label">Sex</label>
+							<select class="form-select" name="sexDependent_{{ dependent.id }}" required >
+								<option value="" disabled selected>Please Select</option>
+								<option value="M" {% if dependent.sex == "M" %}selected{% endif %}>MALE</option>
+								<option value="F" {% if dependent.sex == "F" %}selected{% endif %}>FEMALE</option>
+							</select>
+						</div>
+						<div class="col-12 col-lg-3">
+							<label for="kinship" class="form-label">Relationship</label>
+							<select class="form-select" id="kinship" name="kinship_{{ dependent.id }}" aria-label="Default select example" required>
+								<option value="" disabled selected>Please Select</option>
+								<option value="DAD" {% if dependent.kinship == 'DAD' %}selected{% endif %}>DAD</option>
+								<option value="MOM" {% if dependent.kinship == 'MOM' %}selected{% endif %}>MOM</option>
+								<option value="SON" {% if dependent.kinship == 'SON' %}selected{% endif %}>SON</option>
+								<option value="GRANDPARENT" {% if dependent.kinship == 'GRANDPARENT' %}selected{% endif %}>GRANDPARENT</option>
+								<option value="GRANDMOTHER" {% if dependent.kinship == 'GRANDMOTHER' %}selected{% endif %}>GRANDMOTHER</option>
+								<option value="COUPLE" {% if dependent.kinship == 'COUPLE' %}selected{% endif %}>COUPLE</option>
+								<option value="UNKNOWN" {% if dependent.kinship == 'UNKNOWN' %}selected{% endif %}>UNKNOWN</option>
+							</select>
+						</div>
+						<div class="col-12 col-lg-3">
+							<label class="form-label">Date Birth</label>
+							<input type="text" class="form-control" id="dateBirthDependent"  name="dateBirthDependent_{{ dependent.id }}"  value="{{ dependent.date_birth|date:'m/d/Y' }}" required>
+						</div>
+						<div class="col-12 col-lg-6">
+							<label class="form-label">Migration Status</label>
+							<select class="form-select" name="migrationStatusDependent_{{ dependent.id }}" required>
+								<option value="" disabled selected>Please Select</option>
+								<option value="EMPLOYMENT AUTHORIZATION" {% if   dependent.migration_status == "EMPLOYMENT AUTHORIZATION" %}selected{% endif %} >Employment Authorization</option>
+								<option value="NOTICE OF ACTION" {% if   dependent.migration_status == "NOTICE OF ACTION" %}selected{% endif %} >Notice of Action (i-797)</option>
+								<option value="REFUGEE" {% if  dependent.migration_status  == "REFUGEE" %}selected{% endif %} >Refugee</option>
+								<option value="ASYLUM" {% if dependent.migration_status  == "ASYLUM" %}selected{% endif %} >Asylum</option>
+								<option value="TPS" {% if dependent.migration_status == "TPS" %}selected{% endif %} >Temporary Protection Status (TPS)</option>
+								<option value="DOMESTIC VIOLENCE" {% if dependent.migration_status == "DOMESTIC VIOLENCE" %}selected{% endif %} >Domestic Violence</option>
+								<option value="PERMANENT RESIDENT" {% if dependent.migration_status == "PERMANENT RESIDENT" %}selected{% endif %} >Permanent Resident (Green Card)</option>
+								<option value="CONDITIONAL RESIDENT" {% if dependent.migration_status  == "CONDITIONAL RESIDENT" %}selected{% endif %} >Conditional Resident</option>
+								<option value="PAROLE" {% if dependent.migration_status  == "PAROLE" %}selected{% endif %} >Parole</option>
+								<option value="US CITIZEN" {% if dependent.migration_status  == "US CITIZEN" %}selected{% endif %} >US Citizen (Driver's License)</option>
+								<option value="STUDENT VISA" {% if dependent.migration_status  == "STUDENT VISA" %}selected{% endif %} >Student Visa (I-20)</option>
+								<option value="CURRENTLY IN PROCESS" {% if dependent.migration_status  == "CURRENTLY IN PROCESS" %}selected{% endif %} >Currently In Process (this means the client received an i-797)</option>
+								<option value="UNKNOWN" {% if dependent.migration_status  == "UNKNOWN" %}selected{% endif %} >UNKNOWN</option>
+							</select>
+						</div>
+
+						{% if request.user.role != 'A' %}
 							<div class="col-12 col-lg-3">
-								<label for="kinship" class="form-label">Relationship</label>
-								<select class="form-select" id="kinship" name="kinship_{{ dependent.id }}" aria-label="Default select example" required>
-									<option value="" disabled selected>Please Select</option>
-									<option value="DAD" {% if dependent.kinship == 'DAD' %}selected{% endif %}>DAD</option>
-									<option value="MOM" {% if dependent.kinship == 'MOM' %}selected{% endif %}>MOM</option>
-									<option value="SON" {% if dependent.kinship == 'SON' %}selected{% endif %}>SON</option>
-									<option value="GRANDPARENT" {% if dependent.kinship == 'GRANDPARENT' %}selected{% endif %}>GRANDPARENT</option>
-									<option value="GRANDMOTHER" {% if dependent.kinship == 'GRANDMOTHER' %}selected{% endif %}>GRANDMOTHER</option>
-									<option value="COUPLE" {% if dependent.kinship == 'COUPLE' %}selected{% endif %}>COUPLE</option>
-									<option value="UNKNOWN" {% if dependent.kinship == 'UNKNOWN' %}selected{% endif %}>UNKNOWN</option>
-								</select>
+								<a class="btn btn-danger" href="{% url 'toggleDependentsSupp' dependent.id supps.id %}"> Delete Dependent #{{ forloop.counter }}</a>	
 							</div>
-							<div class="col-12 col-lg-3">
-								<label class="form-label">Date Birth</label>
-								<input type="text" class="form-control" id="dateBirthDependent"  name="dateBirthDependent_{{ dependent.id }}"  value="{{ dependent.date_birth|date:'m/d/Y' }}" required>
-							</div>
-							<div class="col-12 col-lg-6">
-								<label class="form-label">Migration Status</label>
-								<select class="form-select" name="migrationStatusDependent_{{ dependent.id }}" required>
-									<option value="" disabled selected>Please Select</option>
-									<option value="EMPLOYMENT AUTHORIZATION" {% if   dependent.migration_status == "EMPLOYMENT AUTHORIZATION" %}selected{% endif %} >Employment Authorization</option>
-									<option value="NOTICE OF ACTION" {% if   dependent.migration_status == "NOTICE OF ACTION" %}selected{% endif %} >Notice of Action (i-797)</option>
-									<option value="REFUGEE" {% if  dependent.migration_status  == "REFUGEE" %}selected{% endif %} >Refugee</option>
-									<option value="ASYLUM" {% if dependent.migration_status  == "ASYLUM" %}selected{% endif %} >Asylum</option>
-									<option value="TPS" {% if dependent.migration_status == "TPS" %}selected{% endif %} >Temporary Protection Status (TPS)</option>
-									<option value="DOMESTIC VIOLENCE" {% if dependent.migration_status == "DOMESTIC VIOLENCE" %}selected{% endif %} >Domestic Violence</option>
-									<option value="PERMANENT RESIDENT" {% if dependent.migration_status == "PERMANENT RESIDENT" %}selected{% endif %} >Permanent Resident (Green Card)</option>
-									<option value="CONDITIONAL RESIDENT" {% if dependent.migration_status  == "CONDITIONAL RESIDENT" %}selected{% endif %} >Conditional Resident</option>
-									<option value="PAROLE" {% if dependent.migration_status  == "PAROLE" %}selected{% endif %} >Parole</option>
-									<option value="US CITIZEN" {% if dependent.migration_status  == "US CITIZEN" %}selected{% endif %} >US Citizen (Driver's License)</option>
-									<option value="STUDENT VISA" {% if dependent.migration_status  == "STUDENT VISA" %}selected{% endif %} >Student Visa (I-20)</option>
-									<option value="CURRENTLY IN PROCESS" {% if dependent.migration_status  == "CURRENTLY IN PROCESS" %}selected{% endif %} >Currently In Process (this means the client received an i-797)</option>
-									<option value="UNKNOWN" {% if dependent.migration_status  == "UNKNOWN" %}selected{% endif %} >UNKNOWN</option>
-								</select>
-							</div>
-							<hr>
-						{% endfor %}
+						{% endif %}
+
+						<hr>
+					{% endfor %}
+
                     <H4>Plan</H4>
 						<div class="col-12 col-lg-6">
 							<label for="agent_usa" class="form-label font-weight-bold">Agente USA</label>
@@ -886,6 +904,85 @@
 							</div>
 						</div>
 					</div>
+
+					<!-- Modal Add dependents -->
+					<div class="modal fade" id="addDependentModal"  tabindex="-1" aria-labelledby="addDependentModalLabel" aria-hidden="true">
+						<div class="modal-dialog modal-lg">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="addDependentModalLabel">Add Dependent</h5>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								</div>
+								<div class="modal-body">
+									<!-- Formulario dentro del modal -->
+									<form  action="{% url 'addDependSupp' supps.id %}" method="POST">
+										<div class="row g-3">
+											<div class="col-12 col-lg-6">
+												<label class="form-label">Name of Dependent</label>
+												<input type="text" class="form-control" name="nameDependent" required>
+											</div>
+											<div class="col-12 col-lg-6">
+												<label class="form-label">Apply</label>
+												<select class="form-select" name="applyDependent" required>
+													<option disabled selected ></option>
+													<option value="YES">YES</option>
+													<option value="NO">NO</option>
+												</select>
+											</div>
+											<div class="col-12 col-lg-6">
+												<label class="form-label">Date Birth</label>
+												<input type="text" class="form-control" name="dateBirthDependent" id="dateBirthDependent" required >
+											</div>
+											<div class="col-12 col-lg-6">
+												<label class="form-label">Migration Status</label>
+												<select class="form-select" name="migrationStatusDependent" required>															
+													<option  disabled selected>Please Select</option>
+													<option value="EMPLOYMENT AUTHORIZATION">Employment Authorization</option>
+													<option value="NOTICE OF ACTION">Notice of Action (i-797)</option>
+													<option value="REFUGEE">Refugee</option>
+													<option value="ASYLUM">Asylum</option>
+													<option value="TPS">Temporary Protection Status (TPS)</option>
+													<option value="DOMESTIC VIOLENCE">Domestic Violence</option>
+													<option value="PERMANENT RESIDENT">Permanent Resident (Green Card)</option>
+													<option value="CONDITIONAL RESIDENT">Conditional Resident</option>
+													<option value="PAROLE">Parole</option>
+													<option value="US CITIZEN">US Citizen (Driver's License)</option>
+													<option value="STUDENT VISA">Student Visa (I-20)</option>
+													<option value="CURRENTLY IN PROCESS">Currently In Process (this means the client received an i-797)</option>	  
+												</select>
+											</div>
+											<div class="col-12 col-lg-6">
+												<label class="form-label">Sex</label>
+												<select class="form-select" name="sexDependent" required>
+													<option disabled selected ></option>
+													<option value="M">MALE</option>
+													<option value="F">FEMALE</option>
+												</select>
+											</div>
+											<div class="col-12 col-lg-6">
+												<label for="kinship" class="form-label">Relationship</label>
+												<select class="form-select" id="kinship" name="kinship" aria-label="Default select example" required>
+													<option disabled selected ></option>
+													<option value="DAD">DAD</option>
+													<option value="MOM">MOM</option>
+													<option value="SON">SON</option>
+													<option value="GRANDPARENT">GRANDPARENT</option>
+													<option value="GRANDMOTHER">GRANDMOTHER</option>
+													<option value="COUPLE">COUPLE</option>
+													<option value="OTHER">OTHER</option>
+												</select>
+											</div>
+											<div class="d-flex align-items-center gap-3" >
+												<button type="submit" class="btn btn-primary">Save</button>
+											</div>
+											{% csrf_token %} 
+										</div>								
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+
 				</div>
             </div>
         </div>

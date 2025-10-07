@@ -74,9 +74,20 @@
 					</select>
 				</div>
 
-				<div id="dependientes"></div>
-				<button type="button" class="btn btn-outline-secondary px-5 rounded-0" onclick="agregarDependiente()">➕ Agregar dependiente</button>
-				<hr>
+				<!-- CONTENEDOR DE DEPENDIENTES -->
+				<div class="col-12">
+					<div id="dependientes">
+						{% for dep in dependientes %}
+							<input type="hidden" name="edad_{{ dep.index }}" value="{{ dep.edad }}">
+							<input type="hidden" name="genero_{{ dep.index }}" value="{{ dep.genero }}">
+							<input type="hidden" name="tabaco_{{ dep.index }}" value="{{ dep.tabaco }}">
+						{% endfor %}
+					</div>
+				</div>
+
+				<div class="col-12 ">
+					<button type="button" class="btn btn-outline-secondary px-12 w-100 rounded-0" onclick="agregarDependiente()">➕ Agregar dependiente</button>
+				</div>
 
 				<h5 class="mb-1">Datos del hogar</h5>
 
@@ -129,11 +140,11 @@
 								<p class="mb-1"><strong>Deducible:</strong> $ {{ plan.tiered_deductibles.0.amount }}</p>
 								<p class="mb-1"><strong>Máximo bolsillo:</strong> $ {{ plan.tiered_moops.0.amount }}</p>
 							</div>
-							<div class="card-footer bg-white border-0">
-								<a href="{{ plan.benefits_url }}" target="_blank" class="btn btn-outline-primary btn-sm w-100 mb-2">
+							<div class="card-footer border-0">
+								<a href="{{ plan.benefits_url }}" target="_blank" class="btn btn-outline-primary w-100 mb-2">
 									Resumen de Beneficios
 								</a>
-								<a href="{{ plan.brochure_url }}" target="_blank" class="btn btn-outline-primary btn-sm w-100">
+								<a href="{{ plan.brochure_url }}" target="_blank" class="btn btn-outline-primary w-100">
 									Brochure Plan
 								</a>
 							</div>
