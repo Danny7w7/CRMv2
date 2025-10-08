@@ -1398,20 +1398,29 @@ def paymentsReports(request):
     # Diccionario final
     reportData = defaultdict(dict)
 
+    reportData = {}
+
     for record in obamacareRecords:
         clientName = f"{record.client.first_name} {record.client.last_name}"
+        agentUsa = record.agent_usa.split(' ')[0]
         obamacareId = record.id
+
+        # Crea una clave única combinando cliente y agente
+        key = (clientName, agentUsa)
+        
+        if key not in reportData:
+            reportData[key] = {}
 
         for m in months:
             monthNum = m.month
             monthName = month_abbr[monthNum]
 
-            # Obtener payable si existe
+            # Obtener los estados/valores si existen
             carrierStatus = carrierMap.get((obamacareId, monthNum))
             payable = oneilMap.get((obamacareId, monthNum))
             sherpaStatus = sherpaMap.get((obamacareId, monthNum))
 
-            reportData[clientName][monthName] = {
+            reportData[key][monthName] = {
                 'carrier': carrierStatus,
                 'oneil': payable,
                 'sherpa': sherpaStatus,

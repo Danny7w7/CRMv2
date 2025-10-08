@@ -79,6 +79,7 @@
 				<thead>
 				<tr>
 					<th rowspan="2">Client</th>
+					<th rowspan="2">Agent USA</th>
 					{% for month in months %}
 					<th class="text-center" colspan="3">{{ month }}</th>
 					{% endfor %}
@@ -92,9 +93,10 @@
 				</tr>
 				</thead>
 				<tbody class="table-group-divider">
-				{% for clientName, monthData in reportData.items %}
+				{% for key, monthData in reportData.items %}
 					<tr>
-						<td>{{ clientName }}</td>
+						<td>{{ key.0 }}</td>  <!-- client -->
+						<td>{{ key.1 }}</td>  <!-- agent -->
 						{% for month in months %}
 							{% with status=monthData|dict_get:month %}
 							<td class="text-center">
