@@ -372,11 +372,11 @@
 						</div> 
 						<div class="col-12 col-lg-6">
 							<label for="observationSuple" class="form-label">Observation</label>
-							<textarea class="form-control" id="observationSuple" name="observationSuple" rows="3" type="text" style="resize: none">{{supps.observation}}</textarea>
+							<textarea class="form-control" id="observationSuple" name="observationSuple" rows="8" type="text" style="resize: none">{{supps.observation}}</textarea>
 						</div>
 						<div class="col-12 col-lg-6">
 							<label for="observationObama" class="form-label">Observation Agent</label>
-							<textarea class="form-control" id="observationObama" name="observationObama" disabled rows="3" style="resize: none">{{ obsSuppText }}</textarea>
+							<textarea class="form-control" id="observationObama" name="observationObama" disabled rows="8" style="resize: none">{{ obsSuppText }}</textarea>
 						</div>
 						{% if request.user.role == 'A' %}
 						<div class="col-12 col-lg-6" id="obs_agent">

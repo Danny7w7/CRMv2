@@ -506,3 +506,38 @@ def parseMonthInputToDate(monthStr: str) -> Optional[date]:
         return datetime.datetime.strptime(monthStr + "-01", "%Y-%m-%d").date()
     except ValueError:
         return None
+    
+@csrf_exempt
+def saveMonitoring(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            recordId = data.get("record_id")
+            recordType = data.get("record_type")
+            content = data.get("content")
+            user = request.user
+
+            if not recordId or not recordType or not content:
+                return JsonResponse({"success": False, "error": "Datos incompletos"})
+
+            kwargs = {
+                "user": user,
+                "content": content
+            }
+
+            if recordType == "obama":
+                kwargs["obamaCare_id"] = recordId
+            elif recordType == "supp":
+                kwargs["supp_id"] = recordId
+            else:
+                return JsonResponse({"success": False, "error": "Tipo no reconocido"})
+
+            PlanMonitoring.objects.create(**kwargs)
+
+            return JsonResponse({"success": True})
+
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)})
+
+    return JsonResponse({"success": False, "error": "Método no permitido"})
+

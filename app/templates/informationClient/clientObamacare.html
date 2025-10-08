@@ -117,8 +117,16 @@
 										</form>
 									</li>
 								</ul>
-								<a href="{% url 'editObama' obamacare.id 1 %}" class="ms-3"><i class='bx bxs-edit'></i></a>					
-								{% if request.user.is_superuser %}
+
+								{% if request.user.role == 'SUPP' or request.user.role == 'C' %}
+									<a href="#" class="ms-3" data-bs-toggle="modal" data-bs-target="#monitoringModal" data-id="{{ obamacare.id }}"
+										data-type="obama" data-url="{% url 'editObama' obamacare.id 1 %}"> <i class='bx bxs-edit'></i>
+									</a>
+								{% else %}	
+									<a href="{% url 'editObama' obamacare.id 1 %}" class="ms-3"><i class='bx bxs-edit'></i></a>	
+								{% endif %}
+			
+								{% if request.user.role == 'Admin' %}
 								<a href="{% url 'toggleObamaStatus' obamacare.id %}" class="ms-3">
 									<i class="bx bxs-trash"></i>
 								</a>
@@ -133,6 +141,26 @@
         </div>
     </div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="monitoringModal" tabindex="-1" aria-labelledby="monitoringLabel" aria-hidden="true">
+  	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="monitoringLabel">Register tracking</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<div class="modal-body">
+				<textarea id="monitoringContent" class="form-control" rows="4" placeholder="Write a note..."></textarea>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+				<button type="button" class="btn btn-primary" id="saveMonitoringBtn">Save and continue</button>
+			</div>
+		</div>
+  	</div>
+</div>
+
 {% endblock %}
 {% block end_js %}
 
@@ -149,7 +177,12 @@
 	<script src="{% static "assets/plugins/datatable/js/jquery.dataTables.min.js" %}"></script>
 	<script src="{% static "assets/plugins/datatable/js/dataTables.bootstrap5.min.js" %}"></script>
 
-
 	<!--app JS-->
 	<script src="{% static "assets/js/app.js" %}"></script>
+	<script>
+		const saveMonitoringURL = "{% url 'saveMonitoring' %}";
+		const CSRF_TOKEN = "{{ csrf_token }}";
+	</script>
+	<script src="{% static "assets/js/modals/saveMonitoring.js" %}"></script>
+
 {% endblock %}

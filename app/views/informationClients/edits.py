@@ -477,6 +477,14 @@ def editObama(request ,obamacare_id, way):
                     card=cards,
                     dateCard = dateCard )
 
+            note = request.POST.get('monitoring_note')
+            if note:
+                PlanMonitoringPost.objects.create(
+                    obamaCare=obamacare,
+                    user=request.user,
+                    content=note
+                )
+
             if way == 1:
                 if obamacare.created_at > fechaLimite or obamacare.tipe_sale == 'R':
                     return redirect('clientObamacare')
@@ -612,7 +620,9 @@ def addDependObama(request, obamacare_id, way):
             date_birth=dateNew,
             migration_status=migrationStatusDependent
         ).update(
-            type_police=Concat(F('type_police'), Value(f', ACA')))
+            type_police=Concat(F('type_police'), Value(f', ACA')),
+            is_active_obama = True
+        )
         
 
     if not updated:  # Si no se actualizó ninguno, crear uno nuevo
@@ -624,7 +634,9 @@ def addDependObama(request, obamacare_id, way):
             kinship=kinship,
             date_birth=dateNew,
             migration_status=migrationStatusDependent,
-            type_police='ACA'
+            type_police='ACA',
+            is_active_obama = True,
+            is_active_supp = False
         )
     else:
         # obtener el que se actualizó para usarlo abajo
@@ -996,7 +1008,9 @@ def addDependSupp(request, supp_id):
             date_birth=dateNew,
             migration_status=migrationStatusDependent
         ).update(
-            type_police=Concat(F('type_police'), Value(f', {supp.policy_type}')))
+            type_police=Concat(F('type_police'), Value(f', {supp.policy_type}')),
+            is_active_supp = True
+        )
     
 
     if not updated:  # Si no se actualizó ninguno, crear uno nuevo
@@ -1008,7 +1022,9 @@ def addDependSupp(request, supp_id):
             kinship=kinship,
             date_birth=dateNew,
             migration_status=migrationStatusDependent,
-            type_police=supp.policy_type
+            type_police=supp.policy_type,
+            is_active_obama = False,
+            is_active_supp = True
         )
     else:
         # obtener el que se actualizó para usarlo abajo
@@ -1407,7 +1423,7 @@ def editDepentsObama(request, obamacare_id):
             policyNumber = request.POST.get(f'policyNumberDependent_{dependent.id}')
             
             # Verificar si el ID coincide
-            if dependent.id == int(dependent_id):  # Verificamos si el ID coincide
+            if dependent.id == dependent_id:  # Verificamos si el ID coincide
                 
                 # Verificamos que todos los campos tengan datos
                 if name and apply and kinship and date_birth and migration_status and sex:

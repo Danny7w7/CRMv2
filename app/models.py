@@ -353,8 +353,8 @@ class Dependents(models.Model):
     date_birth = models.DateField(null=True)
     migration_status = models.CharField(max_length=50)
     type_police = models.TextField()
-    is_active_obama = models.BooleanField(default=True)
-    is_active_supp = models.BooleanField(default=True)
+    is_active_obama = models.BooleanField()
+    is_active_supp = models.BooleanField()
 
     class Meta:
         db_table = 'dependents'
@@ -1053,6 +1053,29 @@ class CignaSuplementalDraft(models.Model):
 
     class Meta:
         db_table = "cigna_suplemental_drafts"
+
+class PlanMonitoring(models.Model):
+
+    obamaCare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE, null=True, blank=True)
+    supp = models.ForeignKey(Supp, on_delete=models.CASCADE, null=True, blank=True)
+    assure = models.ForeignKey(ClientsAssure, on_delete=models.CASCADE, null=True, blank=True)
+    life_insurance = models.ForeignKey(ClientsLifeInsurance, on_delete=models.CASCADE, null=True, blank=True)
+    user = models.ForeignKey(Users, on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "plan_monitoring"
+
+class PlanMonitoringPost(models.Model):
+
+    obamaCare = models.ForeignKey(ObamaCare, on_delete=models.CASCADE)
+    user = models.ForeignKey(Users, on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "plan_monitoring_post"
 
 from .modelsSMS import *
 from .modelsWhatsapp import *

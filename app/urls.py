@@ -68,6 +68,7 @@ urlpatterns = [
     path('fetchDependent/<client_id>/', fetchsEnterData.fetchDependent, name='fetchDependent'),
     path('formCreatePlan/deleteDependent/<int:dependent_id>/', fetchInformations.delete_dependent, name='delete_dependent'),
     path('formCreatePlan/deleteSupp/<int:supp_id>/', fetchInformations.delete_supp, name='delete_supp'),
+    path('saveMonitoring/', fetchInformations.saveMonitoring, name='saveMonitoring'),
 
     path('formCreateClientMedicare/', forms.formCreateClientMedicare, name='formCreateClientMedicare'), # Formulario para crear clientes Medicare
 
