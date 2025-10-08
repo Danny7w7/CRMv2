@@ -1423,7 +1423,7 @@ def editDepentsObama(request, obamacare_id):
             policyNumber = request.POST.get(f'policyNumberDependent_{dependent.id}')
             
             # Verificar si el ID coincide
-            if dependent.id == dependent_id:  # Verificamos si el ID coincide
+            if dependent.id == int(dependent_id):  # Verificamos si el ID coincide
                 
                 # Verificamos que todos los campos tengan datos
                 if name and apply and kinship and date_birth and migration_status and sex:
