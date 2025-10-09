@@ -164,6 +164,8 @@ urlpatterns = [
     path('startChat/<phoneNumber>/', sms.startChat, name='startChat'),
     path('sendMessage/', sms.sendMessage, name='sendMessage'),
     path('deleteChat/<id>/', sms.deleteContact, name='deleteContact'),
+    
+    path('getChatsLoad/', sms.getChatsLoad, name='getChatsLoad'),
 
     path('sms/<int:company_id>/', sms.sms, name='sms'),
 

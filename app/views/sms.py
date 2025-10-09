@@ -19,6 +19,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
 from django.core.signing import BadSignature, Signer
+from django.core.paginator import Paginator
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
@@ -280,13 +281,8 @@ def index(request):
     validSms = validateSms(request)
     if not validSms or not validSms.get('smsIsActive'):
         return render(request, "auth/404.html", {"message": "Perfil desactivado por falta de pago."})
-    if request.user.is_superuser:
-        chats = Chat.objects.all()
-    elif request.user.is_staff:
-        chats = Chat.objects.select_related('contact').filter(company=request.user.company).order_by('-last_message')
-    else:
-        chats = Chat.objects.select_related('contact').filter(agent_id=request.user.id).order_by('-last_message')
-    chats = get_last_message_for_chats(chats)
+
+    chats = getPageChats(request, 1)
 
     if request.method == 'POST':
         phoneNumber = request.POST.get('phoneNumber')
@@ -363,14 +359,8 @@ def chat(request, chatId):
         messages_with_files.append(message_dict)
     messages.update(is_read=True)
 
-    if request.user.is_superuser:
-        chats = Chat.objects.all()
-    elif request.user.is_staff:
-        chats = Chat.objects.select_related('contact').filter(company=request.user.company).order_by('-last_message')
-    else:
-        chats = Chat.objects.select_related('contact').filter(agent_id=request.user.id).order_by('-last_message')
-        
-    chats = get_last_message_for_chats(chats)
+    chats = getPageChats(request, 1)
+
     context = {
         "chat_url": f"/chatSms/{chatId}/",
         'contact': chat.contact,
@@ -379,6 +369,53 @@ def chat(request, chatId):
         'secretKey':secretKey
     }
     return render(request, 'sms/chat.html', context)
+
+def getPageChats(request, page):
+    queryset = Chat.objects.select_related('contact').order_by('-last_message')
+
+    if request.user.is_superuser:
+        pass
+    elif request.user.is_staff:
+        queryset = queryset.filter(company=request.user.company)
+    else:
+        queryset = queryset.filter(agent_id=request.user.id)
+
+    paginator = Paginator(queryset, 20)
+    chats = paginator.get_page(page)
+    chats = get_last_message_for_chats(chats)
+
+    return chats
+
+@csrf_exempt
+@require_POST
+@login_required(login_url='/login')
+def getChatsLoad(request):
+    data = json.loads(request.body)
+    text = data.get('text', '')
+
+    chats = Chat.objects.select_related('contact').filter(
+        Q(contact__name__icontains=text) | Q(contact__phone_number__icontains=text)
+    ).order_by('-last_message')
+
+    chats = get_last_message_for_chats(chats)
+
+    # Serializar manualmente para incluir todos los atributos agregados
+    chats_data = [
+        {
+            'id': chat.id,
+            'contactName': chat.contact.name,
+            'contactPhone': chat.contact.phone_number,
+            'lastMessage': chat.last_message_content,
+            'lastMessageTime': chat.last_message_time,
+            'isMessageUnread': chat.is_message_unread,
+            'unreadMessages': chat.unread_messages,
+            'hasAttachment': chat.has_attachment,
+            'createdAt': chat.created_at,
+        }
+        for chat in chats
+    ]
+
+    return JsonResponse({'chats': chats_data})
 
 @csrf_exempt
 def startChat(request, phoneNumber):

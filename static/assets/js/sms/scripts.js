@@ -167,6 +167,7 @@ function addMessage(text, type, typemsj, messageTime = getCurrentTime()) {
     }
     scrollToBottom();
 }
+
 function activateTextArea(msg) {    
     // Convertimos el mensaje a mayúsculas para evitar problemas de comparación
     const upperMsg = msg.toUpperCase();
@@ -380,21 +381,110 @@ function validatePhoneNumber(phoneNumber) {
 }
 
 const listChats = document.getElementById('listChats');
-if (listChats){
-    var anchorsArray = Array.from(listChats.querySelectorAll('a'));
-}
 
 const searchInput = document.getElementById('searchInput');
-if (searchInput){
-    searchInput.addEventListener('input', function() {
-        anchorsArray.forEach(anchor => {
-            if (isSubsequence(searchInput.value.toLowerCase(), anchor.id.toLowerCase())){
-                anchor.style.display = 'block'; 
-            }else{
-                anchor.style.display = 'none';
-            }
+
+if (searchInput) {
+    let debounceTimeout;
+
+    const sendSearchRequest = () => {
+        const text = searchInput.value.trim();
+        if (!text) return; // Prevent empty searches
+
+        fetch('/getChatsLoad/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ text }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            listChats.innerHTML = '';
+            data.chats.forEach(chat => {
+                const chatElement = createChatElement(chat);
+                listChats.appendChild(chatElement);
+            });
+        })
+        .catch(error => {
+            console.error('Error:', error);
         });
+    };
+
+    // Debounced input listener
+    searchInput.addEventListener('input', function() {
+        clearTimeout(debounceTimeout);
+        debounceTimeout = setTimeout(sendSearchRequest, 2000); // 2 seconds delay
     });
+
+    // Enter key triggers immediate search
+    searchInput.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            clearTimeout(debounceTimeout); // Cancel any pending debounce
+            sendSearchRequest(); // Execute immediately
+        }
+    });
+}
+
+
+function formatTime(dateString) {
+    const date = new Date(dateString);
+    let hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+    return `${hours}:${minutes} ${ampm}`;
+}
+
+function createChatElement(chat) {
+    const a = document.createElement('a');
+    a.id = `chat${chat.id}`;
+    a.href = `/chatSms/${chat.id}`;
+    a.className = 'list-group-item';
+
+    const divFlex = document.createElement('div');
+    divFlex.className = 'd-flex';
+
+    const icon = document.createElement('i');
+    icon.className = 'bx bx-user fs-5';
+    divFlex.appendChild(icon);
+
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'flex-grow-1 ms-2';
+
+    const h6 = document.createElement('h6');
+    h6.className = `mb-0 chat-title ${chat.isMessageUnread ? 'fw-bold' : ''}`;
+    h6.textContent = chat.contactName || chat.contactPhone;
+    contentDiv.appendChild(h6);
+
+    const p = document.createElement('p');
+    p.className = `mb-0 chat-msg ${chat.isMessageUnread ? 'fw-bold' : ''}`;
+    p.textContent = chat.lastMessage || '';
+    if (chat.hasAttachment) {
+        const clip = document.createElement('i');
+        clip.className = 'bx bx-paperclip';
+        p.appendChild(clip);
+    }
+    contentDiv.appendChild(p);
+
+    if (chat.isMessageUnread) {
+        const span = document.createElement('span');
+        span.className = 'alert-count';
+        span.textContent = chat.unreadMessages;
+        contentDiv.appendChild(span);
+    }
+
+    divFlex.appendChild(contentDiv);
+
+    if (chat.lastMessageTime) {
+        const timeDiv = document.createElement('div');
+        timeDiv.className = 'chat-time';
+        timeDiv.textContent = formatTime(chat.lastMessageTime);
+        divFlex.appendChild(timeDiv);
+    }
+
+    a.appendChild(divFlex);
+    return a;
 }
 
 function isSubsequence(sub, str) {
