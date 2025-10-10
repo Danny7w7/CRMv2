@@ -118,7 +118,7 @@
 									</li>
 								</ul>
 
-								{% if request.user.role == 'SUPP' or request.user.role == 'C' %}
+								{% if request.user.role == 'SUPP' or request.user.role == 'C' and request.user.id != 26 %}
 									<a href="#" class="ms-3" data-bs-toggle="modal" data-bs-target="#monitoringModal" data-id="{{ obamacare.id }}"
 										data-type="obama" data-url="{% url 'editObama' obamacare.id 1 %}"> <i class='bx bxs-edit'></i>
 									</a>
