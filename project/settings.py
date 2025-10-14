@@ -246,3 +246,11 @@ RENOVATION = os.getenv('RENOVATION')
 
 #CMS
 CMS_SECRET_KEY = os.getenv('CMS_SECRET_KEY')
+
+
+#Facebook
+SITE_URL = os.getenv('SITE_URL') 
+FB_APP_ID = os.getenv('FB_APP_ID')
+FB_APP_SECRET = os.getenv('FB_APP_SECRET')
+
+FB_VERIFY_TOKEN = os.getenv('FB_VERIFY_TOKEN')

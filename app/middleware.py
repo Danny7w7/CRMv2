@@ -44,7 +44,7 @@ EXCLUDED_VIEWS = ['index', 'weeklyLiveViewTV', 'monthLiveViewTV', 'toggleDarkMod
                   'logout','viewConsent','consetMedicare','formCreateUser', 'addNumbersUsers','incomeLetter',
                   'ConsentLifeInsurance','complaint', 'sms','whatsappReply','url_temporal', 'obtainLeadsByGoHighLevel',
                   'consentL','sendConsentForm','enviar_email','uploadTempUrl','cignaSuplemental','tableStatusSale',
-                  'webhooks','check']  # Puedes agregar más si lo necesitas
+                  'webhooks','check','facebook_connect','facebook_callback','subscribe_page_to_app','facebook_save_page','get_lead_details','facebook_webhook']  # Puedes agregar más si lo necesitas
 
 class ModuleAccessMiddleware:
     def __init__(self, get_response):

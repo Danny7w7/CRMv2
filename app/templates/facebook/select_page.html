@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Seleccionar página</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 30px;
+      }
+      form {
+        max-width: 500px;
+        margin: auto;
+        background: #f9f9f9;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      }
+      h3 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+      }
+      li {
+        margin: 8px 0;
+      }
+      button {
+        width: 100%;
+        background: #1877f2;
+        color: white;
+        border: none;
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #165ed0;
+      }
+      input[type="text"] {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <form method="POST" action="/facebook/save_page/">
+      {% csrf_token %}
+
+      <h3>Selecciona la página que quieres conectar</h3>
+
+      <label>Nombre para tu cliente (ej: Empresa A)</label>
+      <input type="text" name="owner_name" placeholder="Nombre de la empresa">
+
+      <ul>
+        {% for p in pages %}
+          <li>
+            <input type="radio"
+                   name="page_id"
+                   value="{{ p.id }}"
+                   data-token="{{ p.access_token }}"
+                   data-name="{{ p.name }}"
+                   id="page_{{ forloop.counter }}">
+            <label for="page_{{ forloop.counter }}">{{ p.name }} ({{ p.id }})</label>
+          </li>
+        {% empty %}
+          <li>No hay páginas disponibles</li>
+        {% endfor %}
+      </ul>
+
+      <!-- Campos ocultos que se llenan automáticamente -->
+      <input type="hidden" name="page_access_token" id="page_token_input">
+      <input type="hidden" name="page_name" id="page_name_input">
+
+      <button type="submit">Conectar página</button>
+    </form>
+
+    <script>
+      // Antes de enviar el formulario, insertamos el token y nombre de la página seleccionada
+      document.querySelector('form').addEventListener('submit', function(e){
+        const checked = document.querySelector('input[name="page_id"]:checked');
+        if (!checked) {
+          e.preventDefault();
+          alert('Selecciona una página antes de continuar.');
+          return;
+        }
+
+        // Obtener los valores del radio seleccionado
+        const token = checked.dataset.token || '{{ user_token }}';
+        const name = checked.dataset.name || checked.nextElementSibling.textContent.trim();
+
+        // Rellenar los inputs ocultos
+        document.getElementById('page_token_input').value = token;
+        document.getElementById('page_name_input').value = name;
+      });
+    </script>
+  </body>
+</html>

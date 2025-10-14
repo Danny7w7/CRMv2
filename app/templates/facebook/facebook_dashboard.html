@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conectar Facebook - CRM</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .fb-icon {
+            width: 80px;
+            height: 80px;
+            background: #1877f2;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+        }
+        
+        .info-box {
+            background: #f8f9fa;
+            border-left: 4px solid #1877f2;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .info-box h3 {
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .info-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .info-box li {
+            color: #666;
+            padding: 5px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .info-box li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #1877f2;
+            font-weight: bold;
+        }
+        
+        .btn-connect {
+            display: block;
+            width: 100%;
+            background: #1877f2;
+            color: white;
+            text-align: center;
+            padding: 15px 30px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            margin-top: 25px;
+        }
+        
+        .btn-connect:hover {
+            background: #165ed0;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(24, 119, 242, 0.3);
+        }
+        
+        .connected-pages {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #eee;
+        }
+        
+        .connected-pages h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .page-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-info {
+            flex: 1;
+        }
+        
+        .page-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .page-owner {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .status-badge {
+            background: #28a745;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="fb-icon">f</div>
+            <h1>Conectar Facebook</h1>
+            <p>Captura leads automáticamente desde tus campañas</p>
+        </div>
+        
+        <div class="info-box">
+            <h3>¿Qué podrás hacer?</h3>
+            <ul>
+                <li>Recibir leads en tiempo real</li>
+                <li>Conectar múltiples páginas de Facebook</li>
+                <li>Sincronización automática 24/7</li>
+                <li>Gestionar todos tus leads desde un solo lugar</li>
+            </ul>
+        </div>
+        
+        <a href="/facebook/connect/" class="btn-connect">
+            🔗 Conectar mi página de Facebook
+        </a>
+        
+        <!-- Sección de páginas conectadas (opcional, si quieres mostrarlas) -->
+        <div class="connected-pages">
+            <h3>📊 Páginas conectadas</h3>
+            
+            {% if facebook_accounts %}
+                {% for account in facebook_accounts %}
+                <div class="page-item">
+                    <div class="page-info">
+                        <div class="page-name">{{ account.page_name }}</div>
+                        <div class="page-owner">{{ account.owner_name }}</div>
+                    </div>
+                    <div class="status-badge">✓ Activa</div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <p>Aún no tienes páginas conectadas</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

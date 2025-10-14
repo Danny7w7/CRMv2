@@ -25,7 +25,7 @@ from .views.reports import fecths as fetchsReports
 from .views.reports import table as tableReports
 from .views.reports import charts, download
 from .views.users import users, companies
-from .views import dbExcel, quality, consents, sms, utils, supervisorPanel, whatsApp, comparativeReports, leadConector, book
+from .views import dbExcel, quality, consents, sms, utils, supervisorPanel, whatsApp, comparativeReports, leadConector, book, facebook
 from .views.dialer import agentDialer, adminDialer, dialerLogic
 
 
@@ -335,7 +335,21 @@ urlpatterns = [
     path('sendWhatsappConversation/', whatsApp.sendWhatsappConversation, name='sendWhatsappConversation'),
     path('deleteContactWhatsApp/<id>/', whatsApp.deleteContactWhatsApp, name='deleteContactWhatsApp'),
     path('template/<contact_id>/', whatsApp.template, name='template'),
-path('download_file/<path:file_key>/', whatsApp.download_file, name='download_file'),
+    path('download_file/<path:file_key>/', whatsApp.download_file, name='download_file'),
+
+
+
+
+
+
+
+    path('facebook/connect/', facebook.facebook_connect, name='facebook_connect'),
+    path('facebook/callback/', facebook.facebook_callback, name='facebook_callback'),
+    path('facebook/save_page/', facebook.facebook_save_page, name='facebook_save_page'),
+
+    # Webhook unificado para Facebook Leads (GET y POST)
+    path('webhook/facebook/leads/', facebook.facebook_webhook, name='facebook_webhook'),
+    path('facebook/dashboard/', facebook.facebook_dashboard, name='facebook_dashboard'),
 
 
 ]

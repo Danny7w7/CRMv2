@@ -1078,6 +1078,32 @@ class PlanMonitoringPost(models.Model):
     class Meta:
         db_table = "plan_monitoring_post"
 
+
+from django.db import models
+
+class FacebookAccount(models.Model):
+    # Representa la conexión de una página de Facebook para un cliente
+    owner_name = models.CharField(max_length=150, help_text="Nombre de la empresa/cliente")
+    page_id = models.CharField(max_length=100, unique=True)
+    page_name = models.CharField(max_length=200)
+    page_access_token = models.TextField()
+    connected_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.owner_name} — {self.page_name} ({self.page_id})"
+
+class FacebookLead(models.Model):
+    facebook_account = models.ForeignKey(FacebookAccount, on_delete=models.CASCADE, related_name='leads')
+    leadgen_id = models.CharField(max_length=100)
+    created_time = models.DateTimeField(null=True, blank=True)
+    raw_payload = models.JSONField(null=True, blank=True)
+    processed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Lead {self.leadgen_id} — {self.facebook_account.page_name}"
+
+
 from .modelsSMS import *
 from .modelsWhatsapp import *
 from .modelsDialer import *
