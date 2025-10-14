@@ -8,7 +8,8 @@ import pandas as pd
 
 from django.conf import settings
 from django.core.files.base import ContentFile
-from django.db.models import OuterRef, Subquery, Q, Exists
+from django.db.models import OuterRef, Subquery, Q, Exists,  F, Value
+from django.db.models.functions import Concat
 
 from celery import shared_task
 from datetime import datetime, date
@@ -504,9 +505,6 @@ def allReports():
 def get_obamacare_and_supp():
     """Genera un Excel con datos de Obamacare y Supp"""
 
-    from django.db.models import F, Value
-    from django.db.models.functions import Concat
-
     # Consulta Obamacare
     obamacare_qs = (ObamaCare.objects.select_related("agent", "client").filter(company=2, is_active=True)
         .exclude(
@@ -558,6 +556,23 @@ def get_obamacare_and_supp():
             ["origen", "agent_usa", "agente", "cliente", "client__phone_number", "created_at", "status", "policy_type", "carrier"]
         ]
 
+    # Consulta Calls
+    call_qs = (ControlCall.objects.select_related("agent").filter(company=2, is_active=True)
+        .annotate(
+            agente=Concat(
+                F("agent__first_name"),
+                Value(" "),
+                F("agent__last_name"),
+            )
+        )
+        .values("agente","daily","answerd", "mins" , "date" )
+    )
+    call_df = pd.DataFrame(list(call_qs))
+    if not call_df.empty:
+        call_df = call_df[
+            [ "agente","daily","answerd", "mins" , "date" ]
+        ]
+
     # 👇 Quitar timezone en ambas consultas
     for df in [obamacare_df, supp_df]:
         if not df.empty and "created_at" in df.columns:
@@ -568,6 +583,7 @@ def get_obamacare_and_supp():
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
         obamacare_df.to_excel(writer, index=False, sheet_name="Obamacare")
         supp_df.to_excel(writer, index=False, sheet_name="Supp")
+        call_df.to_excel(writer, index=False, sheet_name="Call")
     output.seek(0)
 
     return output.getvalue()
@@ -580,7 +596,8 @@ def enviar_reporte_obamacare_supp():
     # Enviar email
     send_email_with_attachment(
         subject="Reporte Obamacare",
-        receiver_email=["customerlap4@gmail.com","heinersup.bluestream@gmail.com"],
+        # receiver_email=["customerlap4@gmail.com","heinersup.bluestream@gmail.com"],
+        receiver_email="it.bluestream2@gmail.com",
         body="<h3>Adjunto su reporte hecho por el mejor equipo de IT</h3><p>Saludos!</p>",
         attachment_name="reporte.xlsx",
         attachment_bytes=excel_bytes
