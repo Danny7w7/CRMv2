@@ -59,6 +59,7 @@ def formCreateControl(request):
                 call = form.save(commit=False)
                 call.agent_create = request.user
                 call.is_active = True
+                call.company = request.user.company
                 call.save()
                 
                 # Responder con éxito y la URL de redirección

@@ -596,8 +596,7 @@ def enviar_reporte_obamacare_supp():
     # Enviar email
     send_email_with_attachment(
         subject="Reporte Obamacare",
-        # receiver_email=["customerlap4@gmail.com","heinersup.bluestream@gmail.com"],
-        receiver_email="it.bluestream2@gmail.com",
+        receiver_email=["customerlap4@gmail.com","heinersup.bluestream@gmail.com"],
         body="<h3>Adjunto su reporte hecho por el mejor equipo de IT</h3><p>Saludos!</p>",
         attachment_name="reporte.xlsx",
         attachment_bytes=excel_bytes

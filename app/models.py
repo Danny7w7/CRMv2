@@ -664,7 +664,7 @@ class ControlCall(models.Model):
     date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
-    company = models.ForeignKey(Companies, on_delete=models.CASCADE, default=2)
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'control_call'

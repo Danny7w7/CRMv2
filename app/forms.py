@@ -81,7 +81,7 @@ class ControlCallForm(forms.ModelForm):
     class Meta:
         model = ControlCall
         fields = '__all__'
-        exclude = ['agent_create']
+        exclude = ['agent_create','company']
 
     #cambiamos formato de la fecha para guardarla como se debe en la BD ya que la obtenes en formato USA
     def clean_date(self):
