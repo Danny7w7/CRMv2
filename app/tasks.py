@@ -557,7 +557,7 @@ def get_obamacare_and_supp():
         ]
 
     # Consulta Calls
-    call_qs = (ControlCall.objects.select_related("agent").filter(company=2, is_active=True)
+    call_qs = (ControlCall.objects.select_related("agent").filter(company=2, is_active=True, agent__is_active = True)
         .annotate(
             agente=Concat(
                 F("agent__first_name"),
