@@ -565,12 +565,12 @@ def get_obamacare_and_supp():
                 F("agent__last_name"),
             )
         )
-        .values("agente","daily","answerd", "mins" , "date" )
+        .values("agente","daily","answered", "mins" , "date" )
     )
     call_df = pd.DataFrame(list(call_qs))
     if not call_df.empty:
         call_df = call_df[
-            [ "agente","daily","answerd", "mins" , "date" ]
+            [ "agente","daily","answered", "mins" , "date" ]
         ]
 
     # 👇 Quitar timezone en ambas consultas
