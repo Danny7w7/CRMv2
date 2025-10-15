@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-15 17:59-0500\n"
+"POT-Creation-Date: 2025-10-15 18:43-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -552,6 +552,10 @@ msgstr "Day"
 #: .\app\templates\consent\consent1.html:438
 msgid "Dias"
 msgstr "Days"
+
+#: .\app\templates\consent\consent1.html:446
+msgid "Certificación de Revisión y Reconocimiento de la Información"
+msgstr "Information Review and Recognition Certification"
 
 #: .\app\templates\consent\consent1.html:447
 #: .\app\templates\consent\consent1.html:558
