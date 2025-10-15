@@ -479,7 +479,7 @@ def validateKey(request):
             if  accessKey == key.password:
                 allowed = True
 
-                client = Clients.objects.filter(phone_number = newNumber).first()
+                client = Clients.objects.filter(phone_number = newNumber, company = request.user.company).first()
 
                 # Aquí guardamos el registro
                 KeyAccessLog.objects.create(
