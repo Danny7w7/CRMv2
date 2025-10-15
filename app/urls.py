@@ -343,13 +343,21 @@ urlpatterns = [
 
 
 
+    # Conexión
     path('facebook/connect/', facebook.facebook_connect, name='facebook_connect'),
     path('facebook/callback/', facebook.facebook_callback, name='facebook_callback'),
     path('facebook/save_page/', facebook.facebook_save_page, name='facebook_save_page'),
-
-    # Webhook unificado para Facebook Leads (GET y POST)
-    path('webhook/facebook/leads/', facebook.facebook_webhook, name='facebook_webhook'),
+    
+    # Dashboard y gestión
     path('facebook/dashboard/', facebook.facebook_dashboard, name='facebook_dashboard'),
+    path('facebook/leads/', facebook.facebook_leads_list, name='facebook_leads_list'),
+    path('facebook/leads/<int:lead_id>/', facebook.facebook_lead_detail, name='facebook_lead_detail'),
+    path('facebook/leads/<int:lead_id>/mark-processed/', facebook.facebook_lead_mark_processed, name='facebook_lead_mark_processed'),
+    path('facebook/account/<int:account_id>/', facebook.facebook_account_detail, name='facebook_account_detail'),
+    path('facebook/account/<int:account_id>/disconnect/', facebook.facebook_account_disconnect, name='facebook_account_disconnect'),
+    
+    # Webhook
+    path('webhook/facebook/leads/', facebook.facebook_webhook, name='facebook_webhook'),
 
 
 ]

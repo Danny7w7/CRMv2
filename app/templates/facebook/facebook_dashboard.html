@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conectar Facebook - CRM</title>
+    <title>Dashboard Facebook - CRM</title>
     <style>
         * {
             margin: 0;
@@ -15,201 +15,373 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             padding: 20px;
         }
         
         .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-width: 600px;
-            width: 100%;
-            padding: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Mensajes de Django */
+        .messages {
+            margin-bottom: 20px;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .alert-icon {
+            font-size: 24px;
         }
         
         .header {
-            text-align: center;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
             margin-bottom: 30px;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
         }
         
         .header h1 {
             color: #333;
-            font-size: 28px;
-            margin-bottom: 10px;
-        }
-        
-        .header p {
-            color: #666;
-            font-size: 16px;
+            font-size: 32px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
         
         .fb-icon {
-            width: 80px;
-            height: 80px;
+            width: 50px;
+            height: 50px;
             background: #1877f2;
-            border-radius: 50%;
-            margin: 0 auto 20px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 40px;
+            font-size: 28px;
             color: white;
         }
         
-        .info-box {
-            background: #f8f9fa;
-            border-left: 4px solid #1877f2;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 5px;
-        }
-        
-        .info-box h3 {
-            color: #333;
-            font-size: 16px;
-            margin-bottom: 10px;
-        }
-        
-        .info-box ul {
-            list-style: none;
-            padding-left: 0;
-        }
-        
-        .info-box li {
-            color: #666;
-            padding: 5px 0;
-            padding-left: 25px;
-            position: relative;
-        }
-        
-        .info-box li:before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: #1877f2;
-            font-weight: bold;
-        }
-        
-        .btn-connect {
-            display: block;
-            width: 100%;
-            background: #1877f2;
-            color: white;
-            text-align: center;
-            padding: 15px 30px;
-            border-radius: 10px;
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
             text-decoration: none;
-            font-size: 18px;
             font-weight: 600;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
+            display: inline-block;
             border: none;
             cursor: pointer;
-            margin-top: 25px;
         }
         
-        .btn-connect:hover {
+        .btn-primary {
+            background: #1877f2;
+            color: white;
+        }
+        
+        .btn-primary:hover {
             background: #165ed0;
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(24, 119, 242, 0.3);
         }
         
-        .connected-pages {
-            margin-top: 30px;
-            padding-top: 30px;
-            border-top: 2px solid #eee;
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
         }
         
-        .connected-pages h3 {
-            color: #333;
-            margin-bottom: 15px;
+        .btn-secondary:hover {
+            background: #5a6268;
         }
         
-        .page-item {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .stat-number {
+            font-size: 48px;
+            font-weight: bold;
+            color: #1877f2;
             margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        .accounts-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .section-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 25px;
         }
         
-        .page-info {
+        .section-title {
+            font-size: 24px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .account-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        
+        .account-card:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+        
+        .account-info {
             flex: 1;
         }
         
-        .page-name {
+        .account-name {
             font-weight: 600;
             color: #333;
+            font-size: 18px;
             margin-bottom: 5px;
         }
         
-        .page-owner {
+        .account-owner {
             color: #666;
             font-size: 14px;
+        }
+        
+        .account-stats {
+            display: flex;
+            gap: 20px;
+            margin-right: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1877f2;
+        }
+        
+        .stat-text {
+            font-size: 12px;
+            color: #666;
         }
         
         .status-badge {
             background: #28a745;
             color: white;
-            padding: 5px 12px;
+            padding: 6px 14px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
         }
         
         .empty-state {
             text-align: center;
-            padding: 30px;
+            padding: 60px 20px;
             color: #999;
+        }
+        
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state h3 {
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Mensajes de Django -->
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                <span class="alert-icon">
+                    {% if message.tags == 'success' %}✅{% elif message.tags == 'error' %}❌{% else %}⚠️{% endif %}
+                </span>
+                <span>{{ message }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
         <div class="header">
-            <div class="fb-icon">f</div>
-            <h1>Conectar Facebook</h1>
-            <p>Captura leads automáticamente desde tus campañas</p>
+            <div class="header-content">
+                <h1>
+                    <div class="fb-icon">f</div>
+                    Dashboard Facebook
+                </h1>
+                <div class="actions">
+                    <a href="/facebook/leads/" class="btn btn-secondary">📋 Ver Leads</a>
+                    <a href="/facebook/connect/" class="btn btn-primary">➕ Conectar Página</a>
+                </div>
+            </div>
         </div>
         
-        <div class="info-box">
-            <h3>¿Qué podrás hacer?</h3>
-            <ul>
-                <li>Recibir leads en tiempo real</li>
-                <li>Conectar múltiples páginas de Facebook</li>
-                <li>Sincronización automática 24/7</li>
-                <li>Gestionar todos tus leads desde un solo lugar</li>
-            </ul>
+        <!-- Estadísticas -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{ total_leads|default:0 }}</div>
+                <div class="stat-label">Total Leads</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-number">{{ leads_today|default:0 }}</div>
+                <div class="stat-label">Leads Hoy</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-number">{{ leads_pending|default:0 }}</div>
+                <div class="stat-label">Pendientes</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-number">{{ total_accounts|default:0 }}</div>
+                <div class="stat-label">Páginas Conectadas</div>
+            </div>
         </div>
         
-        <a href="/facebook/connect/" class="btn-connect">
-            🔗 Conectar mi página de Facebook
-        </a>
-        
-        <!-- Sección de páginas conectadas (opcional, si quieres mostrarlas) -->
-        <div class="connected-pages">
-            <h3>📊 Páginas conectadas</h3>
+        <!-- Lista de cuentas conectadas -->
+        <div class="accounts-section">
+            <div class="section-header">
+                <h2 class="section-title">📊 Páginas Conectadas</h2>
+            </div>
             
             {% if facebook_accounts %}
                 {% for account in facebook_accounts %}
-                <div class="page-item">
-                    <div class="page-info">
-                        <div class="page-name">{{ account.page_name }}</div>
-                        <div class="page-owner">{{ account.owner_name }}</div>
+                <div class="account-card">
+                    <div class="account-info">
+                        <div class="account-name">{{ account.page_name }}</div>
+                        <div class="account-owner">{{ account.owner_name }}</div>
                     </div>
-                    <div class="status-badge">✓ Activa</div>
+                    
+                    <div class="account-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">{{ account.total_leads|default:0 }}</div>
+                            <div class="stat-text">Total</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">{{ account.unprocessed_leads|default:0 }}</div>
+                            <div class="stat-text">Nuevos</div>
+                        </div>
+                    </div>
+                    
+                    <div class="actions">
+                        <a href="/facebook/account/{{ account.id }}/" class="btn btn-secondary" style="padding: 8px 16px; font-size: 14px;">Ver detalles</a>
+                        <span class="status-badge">✓ Activa</span>
+                    </div>
                 </div>
                 {% endfor %}
             {% else %}
                 <div class="empty-state">
-                    <p>Aún no tienes páginas conectadas</p>
+                    <div class="empty-state-icon">📱</div>
+                    <h3>No hay páginas conectadas</h3>
+                    <p>Conecta tu primera página de Facebook para empezar a recibir leads</p>
+                    <br>
+                    <a href="/facebook/connect/" class="btn btn-primary">Conectar ahora</a>
                 </div>
             {% endif %}
         </div>
     </div>
+    
+    <script>
+        // Auto-ocultar mensajes después de 5 segundos
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.transition = 'opacity 0.5s, transform 0.5s';
+                alert.style.opacity = '0';
+                alert.style.transform = 'translateY(-20px)';
+                setTimeout(() => alert.remove(), 500);
+            });
+        }, 5000);
+    </script>
 </body>
 </html>

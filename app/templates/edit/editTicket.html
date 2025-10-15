@@ -39,7 +39,7 @@
 						{% if ticket.obamacare %}
 							<input readonly type="text" class="form-control" id="name_client" name="name_client" value="{{ticket.obamacare.client.first_name}} {{ticket.obamacare.client.last_name}}">
 						{% else %}
-							<input readonly type="text" class="form-control" id="name_client" name="name_client" value="{{ticket.obamacare.client.first_name}} {{ticket.obamacare.client.last_name}}">
+							<input readonly type="text" class="form-control" id="name_client" name="name_client" value="{{ticket.supp.client.first_name}} {{ticket.supp.client.last_name}}">
 						{% endif %}					
 					</div>
 					<div class="col-md-3">

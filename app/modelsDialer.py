@@ -14,7 +14,7 @@ class Campaign(models.Model):
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
-    max_concurrent_calls = models.IntegerField(default=3)  # Para no superar 5 CPS
+    max_concurrent_calls = models.IntegerField(default=3)
     
     def __str__(self):
         return self.name
