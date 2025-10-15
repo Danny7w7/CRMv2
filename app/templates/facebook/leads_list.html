@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leads de Facebook</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            color: #333;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            background: #1877f2;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #165ed0;
+        }
+        
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .filters form {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: end;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+            font-size: 14px;
+        }
+        
+        .filter-group select,
+        .filter-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .leads-table {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background: #f8f9fa;
+        }
+        
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #555;
+            font-size: 14px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            color: #333;
+        }
+        
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-processed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .lead-preview {
+            max-width: 300px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📨 Leads de Facebook</h1>
+            <a href="/facebook/dashboard/" class="btn btn-primary">← Volver al Dashboard</a>
+        </div>
+        
+        <div class="filters">
+            <form method="GET">
+                <div class="filter-group">
+                    <label>Cuenta de Facebook</label>
+                    <select name="account">
+                        <option value="">Todas las cuentas</option>
+                        {% for account in accounts %}
+                        <option value="{{ account.id }}" {% if selected_account == account.id|stringformat:"s" %}selected{% endif %}>
+                            {{ account.page_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Estado</label>
+                    <select name="status">
+                        <option value="">Todos</option>
+                        <option value="pending" {% if selected_status == 'pending' %}selected{% endif %}>Pendientes</option>
+                        <option value="processed" {% if selected_status == 'processed' %}selected{% endif %}>Procesados</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Buscar</label>
+                    <input type="text" name="search" placeholder="Buscar en datos..." value="{{ search_query }}">
+                </div>
+                
+                <div class="filter-group" style="flex: 0;">
+                    <button type="submit" class="btn btn-primary">🔍 Filtrar</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="leads-table">
+            {% if leads %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Página</th>
+                        <th>Fecha</th>
+                        <th>Vista previa</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lead in leads %}
+                    <tr>
+                        <td><strong>{{ lead.leadgen_id|slice:":8" }}...</strong></td>
+                        <td>{{ lead.facebook_account.page_name }}</td>
+                        <td>{{ lead.created_time|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            <div class="lead-preview">
+                                {% if lead.raw_payload.field_data %}
+                                    {% for field in lead.raw_payload.field_data|slice:":2" %}
+                                        {{ field.name }}: {{ field.values.0 }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    Sin datos
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            {% if lead.processed %}
+                            <span class="status-badge status-processed">✓ Procesado</span>
+                            {% else %}
+                            <span class="status-badge status-pending">⏳ Pendiente</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="/facebook/leads/{{ lead.id }}/" class="btn btn-primary btn-small">Ver detalles</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">📭</div>
+                <h3>No hay leads aún</h3>
+                <p>Los leads aparecerán aquí automáticamente cuando lleguen desde Facebook</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
