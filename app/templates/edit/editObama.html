@@ -2262,31 +2262,71 @@
 
 	{% if temporalyURL %}
 		<script>
-			function copyCurrentURL() {
-				// Obtener la URL actual
-				const URL = '{{temporalyURL|safe}}';
-				
-				// Copiar al portapapeles
-				navigator.clipboard.writeText(URL).then(() => {
-					// Mostrar mensaje de éxito
-					const successMessage = document.querySelector('.success-message');
-					successMessage.style.display = 'block';
-					
-					// Cambiar el texto del botón temporalmente
-					const button = document.querySelector('.copy-button');
-					const originalContent = button.innerHTML;
-					button.innerHTML = '<i class="fas fa-check"></i> "Copiado!" ';
-					
-					// Restaurar después de 2 segundos
-					setTimeout(() => {
-						successMessage.style.display = 'none';
-						button.innerHTML = originalContent;
-					}, 2000);
-				}).catch(err => {
-					console.error('Error al copiar:', err);
-					alert('"No se pudo copiar el link. Por favor, inténtalo de nuevo."');
-				});
-			}
+async function copyCurrentURL() {
+    let currentURL = '{{ temporalyURL|safe }}';
+
+    const url = new URL(currentURL);
+    const params = new URLSearchParams(url.search);
+    const language = params.get('lenguaje');
+
+    // Si no tiene el parámetro de lenguaje, preguntar
+    if (!language) {
+        const result = await Swal.fire({
+            title: 'Select your language',
+            text: 'Please choose a language before copying the link:',
+            icon: 'question',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'English',
+            denyButtonText: 'Español',
+            cancelButtonText: 'Cancel',
+            reverseButtons: true
+        });
+
+        if (result.isConfirmed) {
+            params.set('lenguaje', 'en');
+        } else if (result.isDenied) {
+            params.set('lenguaje', 'es');
+        } else {
+            console.log('Usuario canceló');
+            return; // Sale sin copiar
+        }
+
+        url.search = params.toString();
+        currentURL = url.toString();
+    }
+
+    try {
+        await navigator.clipboard.writeText(currentURL);
+
+        const successMessage = document.querySelector('.success-message');
+        const button = document.querySelector('.copy-button');
+        const originalContent = button.innerHTML;
+
+        const lang = new URLSearchParams(url.search).get('lenguaje') || 'es';
+        const copiedText = lang === 'en' ? 'Copied!' : '¡Copiado!';
+
+        if (successMessage) successMessage.style.display = 'block';
+        button.innerHTML = `<i class="fas fa-check"></i> ${copiedText}`;
+
+        setTimeout(() => {
+            if (successMessage) successMessage.style.display = 'none';
+            button.innerHTML = originalContent;
+        }, 2000);
+
+    } catch (err) {
+        console.error('Error al copiar:', err);
+        Swal.fire({
+            icon: 'error',
+            title: language === 'en' ? 'Error copying' : 'Error al copiar',
+            text: language === 'en'
+                ? 'Could not copy the link. Please try again.'
+                : 'No se pudo copiar el link. Por favor, inténtalo de nuevo.'
+        });
+    }
+}
+
+
 		</script>
 	{% endif %}
 	

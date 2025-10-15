@@ -315,7 +315,7 @@ def editObama(request ,obamacare_id, way):
     complaint = Complaint.objects.filter(obamacare = obamacare_id).exclude(pdf='')
     smsTemplate = SmsTemplate.objects.select_related('contentTemplate').filter(obamacare = obamacare_id)
     smsTemplateAll = ContentTemplate.objects.filter(company = company_id)    
-    temporalyURL = f"{request.build_absolute_uri('/viewConsent/')}{obamacare_id}?token={generateTemporaryToken(obamacare.client , 'obamacare')}&lenguaje={'es'}"
+    temporalyURL = f"{request.build_absolute_uri('/viewConsent/')}{obamacare_id}?token={generateTemporaryToken(obamacare.client , 'obamacare')}"
 
     fechaLimite =  datetime.datetime(2025, 10, 31, 23, 59, 59, tzinfo=timezone.get_current_timezone())
 
