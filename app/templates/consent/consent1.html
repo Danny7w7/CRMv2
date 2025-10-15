@@ -378,12 +378,6 @@
                         <li>{% blocktrans %}Los costos verdaderos y precisos asociados con el plan de salud, incluyendo primas, deducibles y otras obligaciones financieras.{% endblocktrans %}</li>
                     </ol>
                     <p class="roboto-light">{% blocktrans %}Además, confirmo que no se me ha ofrecido ni prometido ningún tipo de ofertas gratuitas, recompensas en efectivo, reembolsos u otros incentivos relacionados con la inscripción en el plan de salud. Reconozco que no se me ha hecho ninguna afirmación o promesa sobre este tipo de incentivos durante el proceso de inscripción.{% endblocktrans %}</p>
-                    <span class="roboto-black">Certificación de Revisión y Reconocimiento de la Información</span><br>
-                    <p class="roboto-light">{% trans "Yo, " %}<span id="textName3" class="roboto-black">{{obamacare.client.first_name}} {{obamacare.client.last_name}}</span>{% trans ", he revisado y confirmado que la información para mi aplicación en el mercado de salud es CORRECTA Y VERIDICA y estará disponible como es requerido por el Centro de Servicios de Medicare & Medicaid (CMS) para efectos de elegibilidad y enrolamiento." %}</p> 
-                    <p class="roboto-light">{% trans "Nombre del Agente en Registro: " %}<span class="roboto-black" id="textAgent3">{{obamacare.agent_usa}}</span><br>
-                        {% trans "Nombre de la Agencia en Registro: " %}<span class="roboto-black" id="textCarrier7">{{company}}</span><br>
-                        {% trans "Teléfono de la Agencia: " %}<span class="roboto-black">+1 (855) 963 6900</span>
-                    </p>
                 </div>
             </div>
 
@@ -398,6 +392,65 @@
                     <input type="hidden" id="signatureInput" name="signature">
                 </div>
                 <button type="button" id="clearCanvas" class="btn btn-secondary btn-sm">{% trans "Limpiar firma" %}</button>
+            </div>
+
+            <!-- Authorized representative -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="p-3 rounded" style="background-color: #00c3ff;">
+                        <label class="form-label">{% trans "Nombre de Representante Autorizado (en caso que sea el Rep Aut quien firme)" %}</label>
+                        <input id="inputRepresentativeAuthorized" name="inputRepresentativeAuthorized" class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="p-3 rounded" style="background-color: #66ff00;">
+                        <label class="form-label">{% trans "Relacion con el Aplicante" %}</label>
+                        <select name="relationshipWithApplicant" id="relationshipWithApplicant" class="form-select">
+                            <option value="no_valid">Please Select</option>
+                            <option value="Guardian Legal">Guardian Legal</option>
+                            <option value="Padre">Padre</option>
+                            <option value="Madre">Madre</option>
+                            <option value="Hermano (a)">Hermano (a)</option>
+                            <option value="Hijo (a)">Hijo (a)</option>
+                            <option value="Esposo (a)">Esposo (a)</option>
+                            <option value="Pariente Relativo">Pariente Relativo</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Date Section -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="p-3 rounded" style="background-color: #ff00c8;">
+                        <label class="form-label">{% trans "Fecha y Hora de la Firma" %}</label>
+                        <input readonly id="inputDateTime" name="inputDateTime" class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="p-3 rounded" style="background-color: #ff1e00;">
+                        <label class="form-label">{% trans "Autorización válida por" %}</label>
+                        <select name="authorizationValidFor" id="authorizationValidFor" class="form-select">
+                            <option value="no_valid">Please Select</option>
+                            <option value="1">1 {% trans "Dia" %}</option>
+                            <option value="90">90 {% trans "Dias" %}</option>
+                            <option value="180">180 {% trans "Dias" %}</option>
+                            <option value="365">365 {% trans "Dias" %}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rights Section -->
+            <div class="p-3 rounded" style="background-color: #fffb00;">
+                <span class="roboto-black">Certificación de Revisión y Reconocimiento de la Información</span><br>
+                <p class="roboto-light">{% trans "Yo, " %}<span id="textName3" class="roboto-black">{{obamacare.client.first_name}} {{obamacare.client.last_name}}</span>{% trans ", he revisado y confirmado que la información para mi aplicación en el mercado de salud es CORRECTA Y VERIDICA y estará disponible como es requerido por el Centro de Servicios de Medicare & Medicaid (CMS) para efectos de elegibilidad y enrolamiento." %}</p> 
+                <p class="roboto-light">Así mismo, acepto a <span class="roboto-black" id="textAgent3">{{obamacare.agent_usa}}</span> como mi agente en registro por los próximos <span class="roboto-black" id="textDuration">{{duration}}</span> a partir del día <span class="roboto-black" id="textDate">{% now "m/d/Y" %}</span> y entiendo que <span class="roboto-black" id="textAgent3">{{obamacare.agent_usa}}</span> mantendrá copia de la documentación suministrada por mi como es requerido por el Centro de Servicios de Medicare & Medicaid para efectos de elegibilidad y enrolamiento. Para constancia de ello queda firmado este consent.</p>
+                <p class="roboto-light">{% trans "Nombre del Aplicante: " %}<span class="roboto-black" id="textName6">{{obamacare.client.first_name}} {{obamacare.client.last_name}}</span><br>
+                    {% trans "Nombre del Agente en Registro: " %}<span class="roboto-black" id="textAgent3">{{obamacare.agent_usa}}</span><br>
+                    {% trans "Nombre de la Agencia en Registro: " %}<span class="roboto-black" id="textCarrier7">{{company}}</span><br>
+                    {% trans "Teléfono de la Agencia: " %}<span class="roboto-black">+1 (855) 963 6900</span>
+                </p>
             </div>
             
             {% csrf_token %}

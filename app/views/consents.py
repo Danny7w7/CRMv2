@@ -260,9 +260,12 @@ def incomeLetter(request, obamacare_id):
 
 def generateConsentPdf(request, obamacare, dependents, supps, language):
     token = request.GET.get('token')
+    daysAuthorization = request.POST.get('authorizationValidFor')
+    representativeAuthorized = request.POST.get('inputRepresentativeAuthorized')
+    relationshipWithApplicant = request.POST.get('relationshipWithApplicant')
 
     current_date = datetime.now().strftime("%A, %B %d, %Y %I:%M")
-    date_more_3_months = (datetime.now() + timedelta(days=360)).strftime("%A, %B %d, %Y %I:%M")
+    date_more_3_months = (datetime.now() + timedelta(days=int(daysAuthorization))).strftime("%A, %B %d, %Y %I:%M")
 
     contact = ContactClient.objects.filter(client = obamacare.client).first()
 
@@ -275,8 +278,7 @@ def generateConsentPdf(request, obamacare, dependents, supps, language):
     if contact.whatsapp: true_fields.append('whatsapp')
 
     # Variable con los nombres de los campos
-    var = ", ".join(true_fields)
-    
+    var = ", ".join(true_fields)    
 
     consent = Consents.objects.create(
         obamacare=obamacare,
@@ -303,7 +305,9 @@ def generateConsentPdf(request, obamacare, dependents, supps, language):
         'date_more_3_months':date_more_3_months,
         'ip':getIPClient(request),
         'var':var,
-        'id': id
+        'id': id,
+        'representativeAuthorized': representativeAuthorized,
+        'relationshipWithApplicant': relationshipWithApplicant
     }
 
     activate(language)

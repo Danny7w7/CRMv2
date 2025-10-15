@@ -3,7 +3,6 @@ import calendar
 from datetime import datetime
 import json
 
-from app.tasks import *
 # Django core libraries
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q
@@ -13,7 +12,7 @@ from django.http import JsonResponse
 
 # Application-specific imports
 from app.models import *
-
+from app.tasks import *
 from django.shortcuts import render
 from .decoratorsCompany import *
 

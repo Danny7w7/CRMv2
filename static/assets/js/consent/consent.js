@@ -300,20 +300,53 @@ document.addEventListener("DOMContentLoaded", function () {
     revisarButton.addEventListener("click", function (event) {
         event.preventDefault();
 
+        // Detect language from URL (default to 'es')
+        const urlParams = new URLSearchParams(window.location.search);
+        const language = urlParams.get("lenguaje") || "es";
+
+        // Define messages based on language
+        const messages = {
+            es: {
+                emptyCanvas: "Debe firmar antes de revisar.",
+                invalidPhone: "Valide su número de teléfono.",
+                invalidEmail: "Valide su Email.",
+                invalidRelationship: "Por favor, seleccione la relación con el aplicante.",
+                invalidDays: "Por favor, seleccione por cuántos días es válida la autorización."
+            },
+            en: {
+                emptyCanvas: "You must sign before reviewing.",
+                invalidPhone: "Please validate your phone number.",
+                invalidEmail: "Please validate your email.",
+                invalidRelationship: "Please select your relationship with the applicant.",
+                invalidDays: "Please select for how many days the authorization is valid."
+            }
+        };
+
+        // Pick correct set of messages
+        const msg = messages[language];
+
+        // Validations
         if (isCanvasEmpty()) {
-            alert("Debe firmar antes de revisar.");
+            alert(msg.emptyCanvas);
             return;
-        }else if (!validatePhoneNumber()){
-            alert("Valide su numero de telefono.");
+        } else if (!validatePhoneNumber()) {
+            alert(msg.invalidPhone);
             return;
-        }else if (!validateEmail()){
-            alert("Valide su Email.");
+        } else if (!validateEmail()) {
+            alert(msg.invalidEmail);
+            return;
+        } else if (!validateSelectRelationship()) {
+            alert(msg.invalidRelationship);
+            return;
+        } else if (!validateDays()) {
+            alert(msg.invalidDays);
             return;
         }
 
         toggleFields();
-        focusFirstVisibleInput(); // Asegura que el primer input visible reciba el foco
+        focusFirstVisibleInput(); // Ensure first visible input gets focus
     });
+
 
     devolverButton.addEventListener("click", function (event) {
         event.preventDefault();
@@ -497,3 +530,50 @@ function validateEmail() {
 // Asignar la función a eventos de input y blur
 emailInput.addEventListener('input', validateEmail);
 emailInput.addEventListener('blur', validateEmail);
+
+function validateSelectRelationship() {
+    const input = document.getElementById('inputRepresentativeAuthorized');
+    const select = document.getElementById('relationshipWithApplicant');
+
+    if (input.value.trim() !== '') {
+        if (select.value === 'no_valid') {
+            select.focus();
+            return false;
+        }
+    }
+    return true;
+}
+
+function validateDays() {
+    const input = document.getElementById('authorizationValidFor');
+    if (input.value === 'no_valid') {
+        input.focus();
+        return false;
+    }
+    return true;
+}
+
+function updateDateTime() {
+  const now = new Date();
+
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const year = now.getFullYear();
+
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+
+  const formattedDateTime = `${month}/${day}/${year} ${hours}:${minutes}:${seconds}`;
+
+  const input = document.getElementById('inputDateTime');
+  if (input) {
+    input.value = formattedDateTime;
+  }
+}
+
+// Actualiza cada segundo
+setInterval(updateDateTime, 1000);
+
+// Llama una vez al cargar
+updateDateTime();
