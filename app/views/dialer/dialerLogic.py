@@ -54,14 +54,14 @@ def webhooksTelnyx(request):
 
     if eventType == 'call.initiated':
         if call is None:
-            logger.error(f"Call {call.contact.name} not found (Initiated event)")
+            logger.error(f"Call not found (Initiated event)")
             return JsonResponse({'error': f'Call with call_control_id {callControlId} not found'}, status=404)
         call.status = 'Ringing'
         call.save()
         logger.info(f"Call {call.contact.name} initiated successfully.")
     elif eventType == 'call.answered':
         if call is None:
-            logger.error(f"Call {call.contact.name} not found (Answered event)")
+            logger.error(f"Call not found (Answered event)")
             return JsonResponse({'error': f'Call with call_control_id {callControlId} not found'}, status=404)
         call.status = 'Answered'
         call.answered_at = datetime.now()
