@@ -604,7 +604,6 @@ def subscribe_page_to_app(page_id, page_access_token):
         'success': subscribe_result.get('success', False)
     }
 
-
 @csrf_exempt
 def facebook_save_page(request):
     """Endpoint para guardar la página seleccionada y redirigir con mensaje de éxito."""
@@ -637,20 +636,26 @@ def facebook_save_page(request):
         subscribe_resp = subscribe_page_to_app(page_id, page_token)
         
         # Verificar si la suscripción fue exitosa
-        if subscribe_resp.get('success'):
+        if subscribe_resp.get('success') or subscribe_resp.get('subscribe', {}).get('success'):
             if created:
-                messages.success(request, f'✅ Página "{page_name}" conectada exitosamente. Ya puedes recibir leads automáticamente.')
+                # Agregar instrucciones si es necesario configurar manualmente
+                messages.success(
+                    request, 
+                    f'✅ Página "{page_name}" conectada exitosamente. '
+                    f'IMPORTANTE: Si los leads no llegan automáticamente, ve a Meta Business Suite → '
+                    f'Configuración de la página → Herramientas de empresa → Aplicaciones conectadas → '
+                    f'Agrega "BlueAiW" y activa el acceso a leads.'
+                )
             else:
                 messages.success(request, f'✅ Página "{page_name}" actualizada correctamente.')
         else:
-            messages.warning(request, f'⚠️ Página guardada pero hubo un problema con la suscripción: {subscribe_resp}')
+            messages.warning(request, f'⚠️ Página guardada. Verifica manualmente en Meta Business Suite que la app tenga acceso a leads.')
         
         return redirect('facebook_dashboard')
         
     except Exception as e:
         messages.error(request, f'❌ Error al conectar la página: {str(e)}')
         return redirect('facebook_dashboard')
-
 
 def get_lead_details(leadgen_id, page_access_token):
     """Llama a la Graph API para recuperar el detalle del lead (field_data)."""
