@@ -24,6 +24,9 @@ from app.tasks import dial_leads_task
 
 telnyx.api_key = settings.TELNYX_API_KEY
 
+import logging
+logger = logging.getLogger(__name__)
+
 @csrf_exempt
 def iniciateCalls(request, campaign_id):
     if request.method == 'GET':
@@ -50,9 +53,16 @@ def webhooksTelnyx(request):
     call = Call.objects.select_related('contact', 'agent').filter(telnyx_call_control_id = callControlId).first()
 
     if eventType == 'call.initiated':
+        if call is None:
+            logger.error(f"Call {call.contact.name} not found (Initiated event)")
+            return JsonResponse({'error': f'Call with call_control_id {callControlId} not found'}, status=404)
         call.status = 'Ringing'
         call.save()
+        logger.info(f"Call {call.contact.name} initiated successfully.")
     elif eventType == 'call.answered':
+        if call is None:
+            logger.error(f"Call {call.contact.name} not found (Answered event)")
+            return JsonResponse({'error': f'Call with call_control_id {callControlId} not found'}, status=404)
         call.status = 'Answered'
         call.answered_at = datetime.now()
         agent = getAvailableAgent()
@@ -61,6 +71,7 @@ def webhooksTelnyx(request):
         sendClientData(agent, call.contact, call)
         updateContactedLead(call.contact)
         call.save()
+        logger.info(f"Call {call.contact.name} answered and transferred to agent {agent.id}.")
     elif eventType == 'call.hangup':
         if call.answered_at == None:
             tipifyCall = tipifyNoAnswerCall(call)
@@ -68,6 +79,7 @@ def webhooksTelnyx(request):
         call.ended_at = timezone.now()
         call.duration = secondsBetweenTimes(call.started_at, call.ended_at)
         call.save()
+        logger.info(f"Call {call.contact.name} completed.")
 
     # Imprimir el cuerpo completo
     # print("Cuerpo completo de la solicitud:")
@@ -168,7 +180,7 @@ def transferCallToAgent(callControlId, agent):
         agent.status = 'available'
         agent.save()
 
-        print(f"Error al transferir la llamada: {str(e)}")
+        logger.error(f"Error al transferir la llamada: {str(e)}")
 
 def secondsBetweenTimes(startTime, endTime):
     difference = endTime - startTime
