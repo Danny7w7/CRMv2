@@ -34,7 +34,7 @@ chartsAgentsData.forEach((chartData, index) => {
     container.className = "chart-container";
 
     const title = document.createElement("h2");
-    title.textContent = `Semana: ${chartData.semana}`;
+    title.textContent = `Week: ${chartData.semana}`;
 
     const chartDiv = document.createElement("div");
     chartDiv.id = chartId;

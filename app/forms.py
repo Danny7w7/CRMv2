@@ -51,7 +51,7 @@ class ClientAlertForm(forms.ModelForm):
         exclude = ['agent','company']
 
 class ExcelUploadForm(forms.Form):
-    file = forms.FileField(label="Subir archivo Excel", 
+    file = forms.FileField(label="Upload Excel file", 
         widget=forms.FileInput(attrs={
             'class': 'form-control',
             'accept': '.xlsx, .xls'  # Limita a archivos Excel

@@ -49,16 +49,16 @@
 				<form method="post">
 					{% csrf_token %}
 
-					<label for="file_name">Selecciona un Archivo:</label>
+					<label for="file_name">Select a File:</label>
 					<select name="file_name" class="form-select" id="file_name" required>
-						<option value="" selected disabled>-- Selecciona un Archivo --</option>
+						<option value="" selected disabled>-- Select a File --</option>
 						{% for file in files %}
 						<option value="{{ file.id }}">{{ file.file_name }}</option>
 						{% endfor %}
 					</select>
 					<br><br>
 
-					<label for="users">Selecciona Usuarios:</label>
+					<label for="users">Select Users:</label>
 					<select name="users" id="users" class="form-select" multiple required>
 						{% for user in users %}
 						<option value="{{ user.id }}">{{ user.first_name }} {{ user.last_name }}</option>
@@ -66,8 +66,8 @@
 					</select>
 					<br><br>
 
-					<button type="submit" class="btn btn-secondary px-4" name="action" value="assign">Asignar Agentes</button>
-					<button type="submit" class="btn btn-secondary px-4" name="action" value="remove">Quitar Asignaciones</button>
+					<button type="submit" class="btn btn-secondary px-4" name="action" value="assign">Assign Agents</button>
+					<button type="submit" class="btn btn-secondary px-4" name="action" value="remove">Remove Assignments</button>
 				</form>
 				
 								
@@ -78,18 +78,18 @@
 {% endblock %}
 {% block end_js %}
 	<!-- Bootstrap JS -->
-	<script src="{% static "assets/js/bootstrap.bundle.min.js" %}"></script>
+	<script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
 	<!--plugins-->
-	<script src="{% static "assets/js/jquery.min.js" %}"></script>
-	<script src="{% static "assets/plugins/simplebar/js/simplebar.min.js" %}"></script>
-	<script src="{% static "assets/plugins/metismenu/js/metisMenu.min.js" %}"></script>
-	<script src="{% static "assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js" %}"></script>
-	<script src="{% static "assets/plugins/datatable/js/jquery.dataTables.min.js" %}"></script>
-	<script src="{% static "assets/plugins/datatable/js/dataTables.bootstrap5.min.js" %}"></script>
+	<script src="{% static 'assets/js/jquery.min.js' %}"></script>
+	<script src="{% static 'assets/plugins/simplebar/js/simplebar.min.js' %}"></script>
+	<script src="{% static 'assets/plugins/metismenu/js/metisMenu.min.js' %}"></script>
+	<script src="{% static 'assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js' %}"></script>
+	<script src="{% static 'assets/plugins/datatable/js/jquery.dataTables.min.js' %}"></script>
+	<script src="{% static 'assets/plugins/datatable/js/dataTables.bootstrap5.min.js' %}"></script>
 	<!-- Select2 JS -->
 	<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 	<!--app JS-->
-	<script src="{% static "assets/js/app.js" %}"></script>
+	<script src="{% static 'assets/js/app.js' %}"></script>
 
 	<script>
         $(document).ready(function() {
