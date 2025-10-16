@@ -49,15 +49,15 @@
 			{% csrf_token %}
 
 			<div class="row g-3">
-				<h5 class="mb-1">Aplicante Principal</h5>
+				<h5 class="mb-1">Primary Applicant</h5>
 
 				<div class="col-12 col-lg-4">
-					<label class="form-label">Edad</label>
+					<label class="form-label">Age</label>
 					<input class="form-control" type="number" min="18" max="100" name="edad_0" required value="{{ post_data.edad_0 }}">
 				</div>
 
 				<div class="col-12 col-lg-4">
-					<label class="form-label">Género:</label>
+					<label class="form-label">Gender:</label>
 					<select class="form-select" name="genero_0" required>
 						<option value="no_valid" disabled {% if not post_data.genero_0 %}selected{% endif %}>Please Select</option>
 						<option value="Female" {% if post_data.genero_0 == 'Female' %}selected{% endif %}>Femenino</option>
@@ -66,7 +66,7 @@
 				</div>
 
 				<div class="col-12 col-lg-4">
-					<label class="form-label">¿Usa tabaco?</label> 
+					<label class="form-label">Do you smoke?</label> 
 					<select class="form-select" name="tabaco_0" required>
 						<option value="no_valid" disabled {% if not post_data.tabaco_0 %}selected{% endif %}>Please Select</option>
 						<option value="on" {% if post_data.tabaco_0 == 'on' %}selected{% endif %}>YES</option>
@@ -89,10 +89,10 @@
 					<button type="button" class="btn btn-outline-secondary px-12 w-100 rounded-0" onclick="agregarDependiente()">➕ Agregar dependiente</button>
 				</div>
 
-				<h5 class="mb-1">Datos del hogar</h5>
+				<h5 class="mb-1">Household information</h5>
 
 				<div class="col-12 col-lg-4">
-					<label class="form-label">Ingreso del hogar</label> 
+					<label class="form-label">Household income</label> 
 					<input class="form-control" type="number" name="ingreso" required value="{{ post_data.ingreso }}">
 				</div>
 
@@ -104,7 +104,7 @@
 				</div>
 
 				<div class="col-12 col-lg-4">
-					<label class="form-label">Estado (ej. NC):</label> 
+					<label class="form-label">State (ej. NC):</label> 
 					<input class="form-control" type="text" id="estado" name="estado" value="{{ post_data.estado }}">
 				</div>
 
@@ -125,7 +125,7 @@
 		<div class="card-body">
 
 			<div class="row g-3" id="planes-container">
-				<h5 class="mb-3">Planes disponibles</h5>
+				<h5 class="mb-3">Available plans</h5>
 
 				{% for plan in planes %}
 					<div class="col-md-6 col-lg-4 plan-card ">
@@ -133,16 +133,16 @@
 							<div class="card-body">
 								<h6 class="card-title fw-bold text-primary">{{ plan.issuer.name }}</h6>
 								<h6 class="card-title fw-bold text-primary">{{ plan.name }}</h6>
-								<p class="mb-1"><strong>Categoria:</strong> {{ plan.metal_level }}</p>
-								<p class="mb-1"><strong>Tipo de plan:</strong> {{ plan.type }}</p>
-								<p class="mb-1"><strong>Valor del Plan:</strong> ${{ plan.premium }}</p>
-								<p class="mb-1"><strong>Prima mensual:</strong> ${{ plan.premium_w_credit }}</p>
-								<p class="mb-1"><strong>Deducible:</strong> $ {{ plan.tiered_deductibles.0.amount }}</p>
-								<p class="mb-1"><strong>Máximo bolsillo:</strong> $ {{ plan.tiered_moops.0.amount }}</p>
+								<p class="mb-1"><strong>Category:</strong> {{ plan.metal_level }}</p>
+								<p class="mb-1"><strong>Plan Type:</strong> {{ plan.type }}</p>
+								<p class="mb-1"><strong>Plan Value:</strong> ${{ plan.premium }}</p>
+								<p class="mb-1"><strong>Monthly Premium:</strong> ${{ plan.premium_w_credit }}</p>
+								<p class="mb-1"><strong>Deductible:</strong> $ {{ plan.tiered_deductibles.0.amount }}</p>
+								<p class="mb-1"><strong>Max Out-of-Pocket:</strong> $ {{ plan.tiered_moops.0.amount }}</p>
 							</div>
 							<div class="card-footer border-0">
 								<a href="{{ plan.benefits_url }}" target="_blank" class="btn btn-outline-primary w-100 mb-2">
-									Resumen de Beneficios
+									Summary of Benefits
 								</a>
 								<a href="{{ plan.brochure_url }}" target="_blank" class="btn btn-outline-primary w-100">
 									Brochure Plan
@@ -184,20 +184,20 @@
 {% block end_js %}
 	<!--end switcher-->
 	<!-- Bootstrap JS -->
-	<script src="{% static "assets/js/bootstrap.bundle.min.js" %}"></script>
+	<script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
 	<!--plugins-->
-	<script src="{% static "assets/js/jquery.min.js" %}"></script>
-	<script src="{% static "assets/plugins/simplebar/js/simplebar.min.js" %}"></script>
-	<script src="{% static "assets/plugins/metismenu/js/metisMenu.min.js" %}"></script>
-	<script src="{% static "assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js" %}"></script>
+	<script src="{% static 'assets/js/jquery.min.js' %}"></script>
+	<script src="{% static 'assets/plugins/simplebar/js/simplebar.min.js' %}"></script>
+	<script src="{% static 'assets/plugins/metismenu/js/metisMenu.min.js' %}"></script>
+	<script src="{% static 'assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js' %}"></script>
 	
 	<!--app JS-->
-	<script src="{% static "assets/js/app.js" %}"></script>
+	<script src="{% static 'assets/js/app.js' %}"></script>
 
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-	<script src="{% static "assets/js/cms/Quotation.js" %}"></script>
-	<script src="{% static "assets/js/cms/pagination.js" %}"></script>
+	<script src="{% static 'assets/js/cms/Quotation.js' %}"></script>
+	<script src="{% static 'assets/js/cms/pagination.js' %}"></script>
 	
 
 {% endblock %}

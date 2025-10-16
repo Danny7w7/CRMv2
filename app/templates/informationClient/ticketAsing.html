@@ -63,9 +63,9 @@
 							</td>
 							{% if request.user.role == 'Admin' %}
 								{% if  ticket.is_active%}								
-									<td>Vigente</td>
+									<td>Valid</td>
 								{% else %}
-									<td> Eliminada</td>
+									<td>Removed</td>
 								{% endif %}		
 							{% endif %}
 							{% if request.user.is_superuser %} <td>{{ticket.company.company_name}}</td> {% endif %}				

@@ -87,7 +87,7 @@ def get_last_message_for_chats(chats):
             chat.has_attachment = hasattr(last_message, 'files')
             chat.is_message_unread = not last_message.is_read
         else:
-            chat.last_message_content = "No hay mensajes"
+            chat.last_message_content = "There are no messages."
             chat.last_message_time = None
             chat.has_attachment = False
             chat.is_message_unread = False
