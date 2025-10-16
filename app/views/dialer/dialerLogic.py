@@ -52,17 +52,15 @@ def webhooksTelnyx(request):
     callControlId = payload.get('call_control_id')
     call = Call.objects.select_related('contact', 'agent').filter(telnyx_call_control_id = callControlId).first()
 
+    if call is None:
+        logger.warning(f"Call with call_control_id {callControlId} not found in the database.")
+        return JsonResponse({'error': f'Call with call_control_id {callControlId} not found'}, status=404)
+
     if eventType == 'call.initiated':
-        if call is None:
-            logger.error(f"Call not found (Initiated event)")
-            return JsonResponse({'error': f'Call with call_control_id {callControlId} not found'}, status=404)
         call.status = 'Ringing'
         call.save()
         logger.info(f"Call {call.contact.name} initiated successfully.")
     elif eventType == 'call.answered':
-        if call is None:
-            logger.error(f"Call not found (Answered event)")
-            return JsonResponse({'error': f'Call with call_control_id {callControlId} not found'}, status=404)
         call.status = 'Answered'
         call.answered_at = datetime.now()
         agent = getAvailableAgent()
