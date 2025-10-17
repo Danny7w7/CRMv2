@@ -28,7 +28,7 @@ def formCreateControl(request):
     company_filter = {'company': company_id} if not request.user.is_staff else {}
 
     userRole = [ 'A' , 'C', 'SUPP', 'S']
-    users = Users.objects.filter(role__in = userRole, **company_filter )
+    users = Users.objects.filter(role__in = userRole, **company_filter ).order_by('first_name')
 
     if request.method == 'POST':
 
@@ -97,7 +97,7 @@ def createQuality(request):
     company_filter_agent = {'agent__company': company_id} if not request.user.is_staff else {} 
 
     userRole = [ 'A' , 'C', 'SUPP', 'S']
-    agents = Users.objects.filter(role__in=userRole, **company_filter )
+    agents = Users.objects.filter(role__in=userRole, **company_filter ).order_by('first_name')
 
     if request.method == 'POST':
 
