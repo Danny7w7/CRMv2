@@ -27,7 +27,7 @@ def formCreateControl(request):
     # Definir el filtro de compañía (será un diccionario vacío si es superusuario)
     company_filter = {'company': company_id} if not request.user.is_staff else {}
 
-    userRole = [ 'A' , 'C', 'SUPP']
+    userRole = [ 'A' , 'C', 'SUPP', 'S']
     users = Users.objects.filter(role__in = userRole, **company_filter )
 
     if request.method == 'POST':
@@ -96,8 +96,8 @@ def createQuality(request):
     company_filter = {'company': company_id} if not request.user.is_staff else {}    
     company_filter_agent = {'agent__company': company_id} if not request.user.is_staff else {} 
 
-    userRole = [ 'A' , 'C','SUPP']
-    agents = Users.objects.filter(is_active = True, role__in=userRole, **company_filter )
+    userRole = [ 'A' , 'C', 'SUPP', 'S']
+    agents = Users.objects.filter(role__in=userRole, **company_filter )
 
     if request.method == 'POST':
 
