@@ -1193,7 +1193,7 @@ msgstr "Immigration Status"
 
 #: .\app\templates\consent\templatePdfConsent.html:384
 msgid "Foto selfie con ID"
-msgstr "Foto selfie con ID"
+msgstr "Selfie photo with ID"
 
 #: .\app\templates\consent\templatePdfConsent.html:390
 msgid "Validez de la Autorización"
