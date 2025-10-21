@@ -175,7 +175,7 @@ msgstr "State"
 #: .\app\templates\consent\consent1.html:268
 #: .\app\templates\consent\consent1.html:517
 msgid "Fecha de Nacimiento "
-msgstr "Date of Birth"
+msgstr "Date of Birthday"
 
 #: .\app\templates\consent\consent1.html:272
 #: .\app\templates\consent\consent1.html:521
@@ -209,7 +209,7 @@ msgstr "PHONE"
 #: .\app\templates\consent\consent1.html:333
 #: .\app\templates\consent\consent1.html:541
 msgid "Agencia de Seguros"
-msgstr "Insurance Agency"
+msgstr "Insurance Broker"
 
 #: .\app\templates\consent\consent1.html:341
 msgid "Cargar documento de inmigración, SSN, ID, foto selfie con ID en mano"
@@ -967,12 +967,12 @@ msgstr ""
 
 #: .\app\templates\consent\templatePdfConsent.html:223
 msgid "INFORMACIÓN DE MIEMBRO APLICANTE"
-msgstr "APPLICANT MEMBER INFORMATION"
+msgstr "AGENT OF RECORD INITIAL CONSENT"
 
 #: .\app\templates\consent\templatePdfConsent.html:224
 #: .\app\templates\consent\templatePdfConsent.html:281
 msgid "PARA ENROLAMIENTO EN EL MERCADO DE SALUD"
-msgstr "PLEASE VERIFY THAT YOUR INFORMATION IS ACCURATE AND CORRECT"
+msgstr "AUTHORIZATION FORM TO ENROLL IN THE HEALTHCARE MARKETPLACE"
 
 #: .\app\templates\consent\templatePdfConsent.html:246
 #: .\app\templates\consent\templatePdfIncomeLetter.html:130
@@ -1119,9 +1119,9 @@ msgid ""
 msgstr ""
 " I understand that the information I provide to my Agent of Record will be "
 "used or disclosed ONLY to provide information or assist me with or "
-"facilitate enrollment through a Federally- Facilitated Exchange, including "
-"to searching for a current application using an approvedClassic Direct "
-"Enrollment (DE) or Enhanced Direct Enrollment (EDE)website (Marketplace).  "
+"facilitate enrollment through a Federally-Facilitated Exchange, including "
+"to searching for a current application using an approved Classic Direct "
+"Enrollment (DE) or Enhanced Direct Enrollment (EDE) website (Marketplace). "
 
 #: .\app\templates\consent\templatePdfConsent.html:334
 msgid "Acepto ser contactado via: "
@@ -1137,7 +1137,7 @@ msgstr ""
 "ACCURATE and I understand that my Agent of Record will maintain "
 "documentation as required by the Centers for Medicare & Medicaid Services "
 "(CMS) for eligibility and enrollment. I understand that a copy of this "
-"authorization.will be available upon request from the Center for Medicare "
+"authorization will be available upon request from the Center for Medicare "
 "and Medicaid Services as required."
 
 #: .\app\templates\consent\templatePdfConsent.html:342
