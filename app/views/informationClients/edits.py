@@ -1404,30 +1404,33 @@ def editDepentsObama(request, obamacare_id):
 
     if request.method == "POST":
         for dependent in dependents:
-
-            # Resetear la fecha guardarla como se debe porque la traigo en formato USA
-            date_birth = request.POST.get(f'dateBirthDependent_{dependent.id}')
-
-            # Conversión solo si los valores no son nulos o vacíos
-            if date_birth not in [None, '']:
-                date_birth_new = datetime.datetime.strptime(date_birth, '%m/%d/%Y').date()
-            else:
-                date_birth_new = None
-            
-
-            # Obtener los datos enviados por cada dependiente
             dependent_id = request.POST.get(f'dependentId_{dependent.id}')
-            name = request.POST.get(f'nameDependent_{dependent.id}')
-            apply = request.POST.get(f'applyDependent_{dependent.id}')
-            kinship = request.POST.get(f'kinship_{dependent.id}')
-            migration_status = request.POST.get(f'migrationStatusDependent_{dependent.id}')
-            sex = request.POST.get(f'sexDependent_{dependent.id}')
-            policyNumber = request.POST.get(f'policyNumberDependent_{dependent.id}')
-            
-            # Verificar si el ID coincide
-            if dependent.id == int(dependent_id):  # Verificamos si el ID coincide
-                
-                # Verificamos que todos los campos tengan datos
+            if not dependent_id:
+                continue  
+
+            # Evitar ValueError
+            try:
+                dependent_id = int(dependent_id)
+            except ValueError:
+                continue
+
+            # Solo actualizamos si el ID coincide
+            if dependent.id == dependent_id:
+                date_birth = request.POST.get(f'dateBirthDependent_{dependent.id}')
+                date_birth_new = None
+                if date_birth not in [None, '']:
+                    try:
+                        date_birth_new = datetime.datetime.strptime(date_birth, '%m/%d/%Y').date()
+                    except ValueError:
+                        pass  # formato incorrecto
+
+                name = request.POST.get(f'nameDependent_{dependent.id}')
+                apply = request.POST.get(f'applyDependent_{dependent.id}')
+                kinship = request.POST.get(f'kinship_{dependent.id}')
+                migration_status = request.POST.get(f'migrationStatusDependent_{dependent.id}')
+                sex = request.POST.get(f'sexDependent_{dependent.id}')
+                policyNumber = request.POST.get(f'policyNumberDependent_{dependent.id}')
+
                 if name and apply and kinship and date_birth and migration_status and sex:
                     dependent.name = name
                     dependent.apply = apply
@@ -1436,7 +1439,6 @@ def editDepentsObama(request, obamacare_id):
                     dependent.migration_status = migration_status
                     dependent.sex = sex
                     dependent.policyNumber = policyNumber
-
                     dependent.save()
 
     # Retornar todos los dependientes actualizados (o procesados)
