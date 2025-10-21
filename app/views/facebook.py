@@ -525,43 +525,190 @@ def facebook_connect(request):
 
 
 def facebook_callback(request):
-    """Callback de OAuth: intercambia code por token y obtiene la lista de páginas."""
+    """Callback de OAuth con debugging detallado"""
     code = request.GET.get('code')
+    error = request.GET.get('error')
+    error_reason = request.GET.get('error_reason')
+    error_description = request.GET.get('error_description')
+    
+    # 🔍 Log detallado de errores de Facebook
+    if error:
+        print(f"❌ Error de Facebook OAuth:")
+        print(f"   - Error: {error}")
+        print(f"   - Razón: {error_reason}")
+        print(f"   - Descripción: {error_description}")
+        
+        # Mensajes específicos según el tipo de error
+        if error_reason == 'user_denied':
+            messages.error(request, '❌ Has cancelado la autorización. Debes aceptar todos los permisos para continuar.')
+        elif 'not_eligible' in str(error_description).lower():
+            messages.error(
+                request, 
+                '❌ Tu cuenta no es elegible para usar esta función. '
+                'Verifica que seas administrador de la página y que tengas permisos de leads.'
+            )
+        elif 'temporarily_unavailable' in str(error_description).lower():
+            messages.error(request, '⚠️ El servicio de Facebook está temporalmente no disponible. Intenta más tarde.')
+        else:
+            messages.error(request, f'❌ Error de Facebook: {error_description or error}')
+        
+        return redirect('facebook_dashboard')
+    
     if not code:
-        return HttpResponseBadRequest('No code provided')
+        messages.error(request, '❌ No se recibió código de autorización.')
+        return redirect('facebook_dashboard')
 
-    token_url = 'https://graph.facebook.com/v19.0/oauth/access_token'
-    params = {
-        'client_id': settings.FB_APP_ID,
-        'redirect_uri': f"{settings.SITE_URL}/facebook/callback/",
-        'client_secret': settings.FB_APP_SECRET,
-        'code': code,
-    }
-    r = requests.get(token_url, params=params)
-    data = r.json()
-    short_token = data.get('access_token')
-    if not short_token:
-        return HttpResponseBadRequest('Error obtaining user access token')
+    try:
+        # Obtener token de acceso
+        token_url = 'https://graph.facebook.com/v19.0/oauth/access_token'
+        params = {
+            'client_id': settings.FB_APP_ID,
+            'redirect_uri': f"{settings.SITE_URL}/facebook/callback/",
+            'client_secret': settings.FB_APP_SECRET,
+            'code': code,
+        }
+        r = requests.get(token_url, params=params, timeout=10)
+        data = r.json()
+        
+        print(f"🔍 Respuesta token: {json.dumps(data, indent=2)}")
+        
+        if 'error' in data:
+            error_info = data['error']
+            print(f"❌ Error obteniendo token: {error_info}")
+            messages.error(
+                request, 
+                f"❌ Error de Facebook: {error_info.get('message', 'Error desconocido')}"
+            )
+            return redirect('facebook_dashboard')
+        
+        short_token = data.get('access_token')
+        if not short_token:
+            messages.error(request, '❌ No se pudo obtener el token de acceso.')
+            return redirect('facebook_dashboard')
 
-    # Intercambiar por un token de larga duración
-    long_token_url = 'https://graph.facebook.com/v19.0/oauth/access_token'
-    long_params = {
-        'grant_type': 'fb_exchange_token',
-        'client_id': settings.FB_APP_ID,
-        'client_secret': settings.FB_APP_SECRET,
-        'fb_exchange_token': short_token
-    }
-    long_r = requests.get(long_token_url, params=long_params)
-    long_data = long_r.json()
-    user_token = long_data.get('access_token', short_token)
+        # Intercambiar por token de larga duración
+        long_token_url = 'https://graph.facebook.com/v19.0/oauth/access_token'
+        long_params = {
+            'grant_type': 'fb_exchange_token',
+            'client_id': settings.FB_APP_ID,
+            'client_secret': settings.FB_APP_SECRET,
+            'fb_exchange_token': short_token
+        }
+        long_r = requests.get(long_token_url, params=long_params, timeout=10)
+        long_data = long_r.json()
+        
+        print(f"🔍 Respuesta long token: {json.dumps(long_data, indent=2)}")
+        
+        user_token = long_data.get('access_token', short_token)
 
-    # Obtener páginas a las que el usuario administra
-    pages_resp = requests.get('https://graph.facebook.com/v19.0/me/accounts', params={'access_token': user_token})
-    pages = pages_resp.json().get('data', [])
+        # 🔍 Verificar qué permisos se otorgaron realmente
+        debug_url = 'https://graph.facebook.com/v19.0/debug_token'
+        debug_params = {
+            'input_token': user_token,
+            'access_token': f"{settings.FB_APP_ID}|{settings.FB_APP_SECRET}"
+        }
+        debug_r = requests.get(debug_url, params=debug_params, timeout=10)
+        debug_data = debug_r.json()
+        
+        print(f"🔍 Debug token info:")
+        print(json.dumps(debug_data, indent=2))
+        
+        granted_scopes = debug_data.get('data', {}).get('scopes', [])
+        print(f"✅ Permisos otorgados: {granted_scopes}")
+        
+        # Verificar permisos críticos
+        required_scopes = ['pages_show_list', 'leads_retrieval', 'pages_manage_metadata']
+        missing_scopes = [s for s in required_scopes if s not in granted_scopes]
+        
+        if missing_scopes:
+            messages.error(
+                request,
+                f'⚠️ Faltan permisos: {", ".join(missing_scopes)}. '
+                f'La app no podrá acceder a los leads sin estos permisos.'
+            )
+            print(f"⚠️ Permisos faltantes: {missing_scopes}")
 
-    # Mostrar para que el usuario elija qué página conectar (plantilla simple)
-    return render(request, 'facebook/select_page.html', {'pages': pages, 'user_token': user_token})
+        # Obtener páginas
+        pages_resp = requests.get(
+            'https://graph.facebook.com/v19.0/me/accounts',
+            params={
+                'access_token': user_token,
+                'fields': 'id,name,access_token,tasks'  # tasks muestra los permisos de la página
+            },
+            timeout=10
+        )
+        pages_data = pages_resp.json()
+        
+        print(f"🔍 Respuesta páginas: {json.dumps(pages_data, indent=2)}")
+        
+        if 'error' in pages_data:
+            error_info = pages_data['error']
+            print(f"❌ Error obteniendo páginas: {error_info}")
+            
+            # Mensajes específicos según el código de error
+            error_code = error_info.get('code')
+            error_msg = error_info.get('message', 'Error desconocido')
+            
+            if error_code == 190:  # Token inválido
+                messages.error(request, '❌ Token de acceso inválido. Intenta reconectar tu cuenta.')
+            elif error_code == 200:  # Permiso denegado
+                messages.error(
+                    request,
+                    '❌ Acceso denegado. Asegúrate de ser administrador de al menos una página de Facebook '
+                    'y de haber autorizado todos los permisos solicitados.'
+                )
+            elif error_code == 10:  # Permiso no otorgado
+                messages.error(
+                    request,
+                    '❌ No se otorgaron los permisos necesarios. '
+                    'Debes aceptar todos los permisos para que la integración funcione.'
+                )
+            else:
+                messages.error(request, f'❌ Error al obtener páginas: {error_msg}')
+            
+            return redirect('facebook_dashboard')
+        
+        pages = pages_data.get('data', [])
+        
+        if not pages:
+            messages.warning(
+                request,
+                '⚠️ No se encontraron páginas. Posibles causas:\n'
+                '• No eres administrador de ninguna página\n'
+                '• No autorizaste el permiso "pages_show_list"\n'
+                '• Tu cuenta no tiene páginas de Facebook'
+            )
+            return redirect('facebook_dashboard')
+        
+        # Verificar qué páginas tienen acceso a leads
+        for page in pages:
+            tasks = page.get('tasks', [])
+            print(f"📄 Página: {page['name']}")
+            print(f"   Tasks: {tasks}")
+            
+            if 'MANAGE' not in tasks and 'CREATE_CONTENT' not in tasks:
+                print(f"   ⚠️ Sin permisos de administración completos")
 
+        return render(request, 'facebook/select_page.html', {
+            'pages': pages,
+            'user_token': user_token,
+            'granted_scopes': granted_scopes,
+            'missing_scopes': missing_scopes
+        })
+        
+    except requests.exceptions.Timeout:
+        messages.error(request, '⏱️ La solicitud a Facebook tardó demasiado. Intenta nuevamente.')
+        return redirect('facebook_dashboard')
+    except requests.exceptions.RequestException as e:
+        print(f"❌ Error de red: {str(e)}")
+        messages.error(request, f'❌ Error de conexión: {str(e)}')
+        return redirect('facebook_dashboard')
+    except Exception as e:
+        print(f"❌ Error inesperado: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        messages.error(request, f'❌ Error inesperado: {str(e)}')
+        return redirect('facebook_dashboard')
 
 def subscribe_page_to_app(page_id, page_access_token):
     """Subscribir la app a la página para recibir webhooks y dar acceso completo."""

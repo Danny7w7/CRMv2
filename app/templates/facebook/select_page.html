@@ -51,6 +51,25 @@
   </head>
 
   <body>
+    <!-- facebook/select_page.html -->
+    {% if missing_scopes %}
+    <div class="alert alert-warning">
+        <strong>⚠️ Advertencia:</strong> Faltan los siguientes permisos:
+        <ul>
+            {% for scope in missing_scopes %}
+            <li><code>{{ scope }}</code></li>
+            {% endfor %}
+        </ul>
+        <p>La app no funcionará correctamente sin estos permisos.</p>
+    </div>
+    {% endif %}
+
+    {% if granted_scopes %}
+    <div class="alert alert-info">
+        <strong>✅ Permisos otorgados:</strong>
+        {{ granted_scopes|join:", " }}
+    </div>
+    {% endif %}
     <form method="POST" action="/facebook/save_page/">
       {% csrf_token %}
 
