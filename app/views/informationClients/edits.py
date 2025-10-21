@@ -234,6 +234,8 @@ def editObama(request ,obamacare_id, way):
 
     obamacare = ObamaCare.objects.select_related('agent', 'client').filter(id=obamacare_id).first()
     dependents = Dependents.objects.prefetch_related('obamacare').filter(obamacare=obamacare, is_active_obama = True)
+    for i in dependents:
+        print(i)
     letterCard = LettersCard.objects.filter(obamacare = obamacare_id).first()
     apppointment = AppointmentClient.objects.select_related('obamacare','agent_create').filter(obamacare = obamacare_id)
     userCarrier = UserCarrier.objects.filter(obamacare = obamacare_id).first()
