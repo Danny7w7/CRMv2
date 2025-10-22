@@ -344,20 +344,25 @@ urlpatterns = [
 
 
     # Conexión
-    path('facebook/connect/', facebook.facebook_connect, name='facebook_connect'),
-    path('facebook/callback/', facebook.facebook_callback, name='facebook_callback'),
-    path('facebook/save_page/', facebook.facebook_save_page, name='facebook_save_page'),
+    path('facebook/connect/', facebook.facebookConnect, name='facebookConnect'),
+    path('facebook/callback/', facebook.facebookCallback, name='facebookCallback'),
+    path('facebook/save_page/', facebook.facebookSavePage, name='facebookSavePage'),
     
     # Dashboard y gestión
-    path('facebook/dashboard/', facebook.facebook_dashboard, name='facebook_dashboard'),
-    path('facebook/leads/', facebook.facebook_leads_list, name='facebook_leads_list'),
-    path('facebook/leads/<int:lead_id>/', facebook.facebook_lead_detail, name='facebook_lead_detail'),
-    path('facebook/leads/<int:lead_id>/mark-processed/', facebook.facebook_lead_mark_processed, name='facebook_lead_mark_processed'),
-    path('facebook/account/<int:account_id>/', facebook.facebook_account_detail, name='facebook_account_detail'),
-    path('facebook/account/<int:account_id>/disconnect/', facebook.facebook_account_disconnect, name='facebook_account_disconnect'),
+    path('facebook/dashboard/', facebook.facebookDashboard, name='facebookDashboard'),
+    path('facebook/leads/', facebook.facebookLeadsList, name='facebookLeadsList'),
+    path('facebook/leads/<int:lead_id>/', facebook.facebookLeadDetail, name='facebookLeadDetail'),
+    path('facebook/leads/<int:lead_id>/mark-processed/', facebook.facebookLeadMarkProcessed, name='facebookLeadMarkProcessed'),
+    path('facebook/account/<int:account_id>/', facebook.facebookAccountDetail, name='facebookAccountDetail'),
+    path('facebook/account/<int:account_id>/disconnect/', facebook.facebookAccountDisconnect, name='facebookAccountDisconnect'),
+
+    # Acciones de leads
+    path('facebook/leads/<int:lead_id>/process/', facebook.facebookLeadProcess, name='facebookLeadProcess'),
+    path('facebook/leads/<int:lead_id>/unprocess/', facebook.facebookLeadUnprocess, name='facebookLeadUnprocess'),
+    path('facebook/leads/<int:lead_id>/delete/', facebook.facebookLeadDelete, name='facebookLeadDelete'),
     
     # Webhook
-    path('webhook/facebook/leads/', facebook.facebook_webhook, name='facebook_webhook'),
+    path('webhook/facebook/leads/', facebook.facebookWebhook, name='facebookWebhook'),
 
 
 ]

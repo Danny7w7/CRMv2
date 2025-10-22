@@ -1,0 +1,395 @@
+{% extends "dashboard/index.html" %}
+{% load static %}
+{% block head %}
+    <title>{{ account.page_name }} - Detalle - CRM</title>
+	<!--plugins-->
+	<link href="{% static "assets/plugins/simplebar/css/simplebar.css" %}" rel="stylesheet" />
+	<link href="{% static "assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" %}" rel="stylesheet" />
+	<link href="{% static "assets/plugins/metismenu/css/metisMenu.min.css" %}" rel="stylesheet" />
+	<link href="{% static "assets/plugins/datatable/css/dataTables.bootstrap5.min.css" %}" rel="stylesheet" />
+	<!-- loader-->
+	<link href="{% static "assets/css/pace.min.css" %}" rel="stylesheet" />
+	<script src="{% static "assets/js/pace.min.js" %}"></script>
+	<!-- Bootstrap CSS -->
+	<link href="{% static "assets/css/bootstrap.min.css" %}" rel="stylesheet">
+	<link href="{% static "assets/css/bootstrap-extended.css" %}" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&amp;display=swap" rel="stylesheet">
+	<link href="{% static "assets/css/app.css" %}" rel="stylesheet">
+	<link href="{% static "assets/css/icons.css" %}" rel="stylesheet">
+	<!-- Theme Style CSS -->
+	<link rel="stylesheet" href="{% static "assets/css/dark-theme.css" %}" />
+	<link rel="stylesheet" href="{% static "assets/css/semi-dark.css" %}" />
+	<link rel="stylesheet" href="{% static "assets/css/header-colors.css" %}" />
+	
+	<style>
+		.fb-icon-badge {
+			width: 60px;
+			height: 60px;
+			background: linear-gradient(135deg, #1877f2 0%, #0c5bce 100%);
+			border-radius: 15px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 32px;
+			color: white;
+		}
+		
+		.info-card {
+			transition: transform 0.3s;
+		}
+		
+		.info-card:hover {
+			transform: translateY(-5px);
+		}
+		
+		.lead-preview {
+			max-width: 250px;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+		
+		.empty-state {
+			padding: 60px 20px;
+			text-align: center;
+		}
+		
+		.empty-state-icon {
+			font-size: 64px;
+			opacity: 0.3;
+			margin-bottom: 20px;
+		}
+	</style>
+{% endblock %}
+
+{% block page_content %}
+<!-- Header -->
+<div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+	<div class="breadcrumb-title pe-3">
+		<i class='bx bxl-facebook-circle me-2'></i>
+		Detalle de Cuenta
+	</div>
+	<div class="ps-3">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb mb-0 p-0">
+				<li class="breadcrumb-item"><a href="javascript:;"><i class="bx bx-home-alt"></i></a></li>
+				<li class="breadcrumb-item"><a href="/facebook/dashboard/">Facebook</a></li>
+				<li class="breadcrumb-item active" aria-current="page">{{ account.page_name }}</li>
+			</ol>
+		</nav>
+	</div>
+	<div class="ms-auto">
+		<a href="/facebook/dashboard/" class="btn btn-secondary">
+			<i class='bx bx-arrow-back'></i> Volver
+		</a>
+	</div>
+</div>
+
+<!-- Información de la Cuenta -->
+<div class="row">
+	<div class="col-12 col-xl-12">
+		<div class="card">
+			<div class="card-body">
+				<div class="d-flex align-items-center">
+					<div class="fb-icon-badge me-3">
+						f
+					</div>
+					<div class="flex-grow-1">
+						<h4 class="mb-1">{{ account.page_name }}</h4>
+						<p class="mb-0 text-secondary">
+							<i class='bx bx-user me-1'></i> {{ account.owner_name }}
+						</p>
+						<p class="mb-0 text-muted small">
+							<i class='bx bx-calendar me-1'></i> Conectada el {{ account.connected_at|date:"d/m/Y H:i" }}
+						</p>
+					</div>
+					<div>
+						<span class="badge bg-success" style="font-size: 14px; padding: 8px 16px;">
+							<i class='bx bx-check-circle'></i> Activa
+						</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Estadísticas -->
+<h6 class="mb-0 text-uppercase">Estadísticas</h6>
+<hr/>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-xl-4">
+	<div class="col">
+		<div class="card radius-10 info-card">
+			<div class="card-body">
+				<div class="d-flex align-items-center">
+					<div>
+						<p class="mb-0 text-secondary">Total Leads</p>
+						<h4 class="my-1 text-primary">{{ stats.total_leads|default:0 }}</h4>
+						<p class="mb-0 font-13 text-success">Todos los tiempos</p>
+					</div>
+					<div class="widgets-icons bg-light-primary text-primary ms-auto">
+						<i class='bx bxs-group'></i>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col">
+		<div class="card radius-10 info-card">
+			<div class="card-body">
+				<div class="d-flex align-items-center">
+					<div>
+						<p class="mb-0 text-secondary">Leads Hoy</p>
+						<h4 class="my-1 text-success">{{ stats.leads_today|default:0 }}</h4>
+						<p class="mb-0 font-13 text-success">Últimas 24 horas</p>
+					</div>
+					<div class="widgets-icons bg-light-success text-success ms-auto">
+						<i class='bx bxs-calendar-check'></i>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col">
+		<div class="card radius-10 info-card">
+			<div class="card-body">
+				<div class="d-flex align-items-center">
+					<div>
+						<p class="mb-0 text-secondary">Pendientes</p>
+						<h4 class="my-1 text-warning">{{ stats.unprocessed_leads|default:0 }}</h4>
+						<p class="mb-0 font-13 text-warning">Sin procesar</p>
+					</div>
+					<div class="widgets-icons bg-light-warning text-warning ms-auto">
+						<i class='bx bxs-time'></i>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col">
+		<div class="card radius-10 info-card">
+			<div class="card-body">
+				<div class="d-flex align-items-center">
+					<div>
+						<p class="mb-0 text-secondary">Procesados</p>
+						<h4 class="my-1 text-info">{{ stats.processed_leads|default:0 }}</h4>
+						<p class="mb-0 font-13 text-info">Completados</p>
+					</div>
+					<div class="widgets-icons bg-light-info text-info ms-auto">
+						<i class='bx bxs-check-circle'></i>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Leads Recientes -->
+<h6 class="mb-0 text-uppercase">Leads Recientes</h6>
+<hr/>
+
+<div class="card">
+	<div class="card-body">
+		{% if leads %}
+		<div class="table-responsive">
+			<table id="leadsTable" class="table table-striped table-bordered">
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Fecha</th>
+						<th>Vista previa</th>
+						<th>Estado</th>
+						<th>Acciones</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for lead in leads %}
+					<tr>
+						<td>
+							<span class="badge bg-secondary">{{ lead.leadgen_id|slice:":8" }}...</span>
+						</td>
+						<td>
+							<span class="text-secondary">{{ lead.created_time|date:"d/m/Y" }}</span><br>
+							<small class="text-muted">{{ lead.created_time|date:"H:i" }}</small>
+						</td>
+						<td>
+							<div class="lead-preview">
+								{% if lead.raw_payload.field_data %}
+									{% for field in lead.raw_payload.field_data|slice:":2" %}
+										<strong>{{ field.name }}:</strong> {{ field.values.0 }}{% if not forloop.last %}<br>{% endif %}
+									{% endfor %}
+								{% else %}
+									<span class="text-muted">Sin datos</span>
+								{% endif %}
+							</div>
+						</td>
+						<td>
+							{% if lead.processed %}
+							<span class="badge bg-success">
+								<i class='bx bx-check'></i> Procesado
+							</span>
+							{% else %}
+							<span class="badge bg-warning text-dark">
+								<i class='bx bx-time'></i> Pendiente
+							</span>
+							{% endif %}
+						</td>
+						<td>
+							<div class="d-flex gap-2">
+								<a href="/facebook/leads/{{ lead.id }}/" class="btn btn-primary btn-sm">
+									<i class='bx bx-show'></i> Ver
+								</a>
+							</div>
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+		
+		{% if has_more_leads %}
+		<div class="text-center mt-3">
+			<a href="/facebook/leads/?account={{ account.id }}" class="btn btn-primary">
+				<i class='bx bx-list-ul'></i> Ver todos los leads
+			</a>
+		</div>
+		{% endif %}
+		
+		{% else %}
+		<div class="empty-state">
+			<div class="empty-state-icon">
+				<i class='bx bx-envelope-open'></i>
+			</div>
+			<h4 class="text-secondary">No hay leads aún</h4>
+			<p class="text-muted">Los leads de esta página aparecerán aquí cuando lleguen desde Facebook</p>
+		</div>
+		{% endif %}
+	</div>
+</div>
+
+<!-- Información Técnica -->
+<div class="row">
+	<div class="col-12 col-xl-6">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title mb-3">
+					<i class='bx bx-info-circle me-2'></i>Información de la Cuenta
+				</h5>
+				<table class="table table-sm">
+					<tbody>
+						<tr>
+							<td class="fw-bold">ID de Página:</td>
+							<td><code>{{ account.page_id }}</code></td>
+						</tr>
+						<tr>
+							<td class="fw-bold">Propietario:</td>
+							<td>{{ account.owner_name }}</td>
+						</tr>
+						<tr>
+							<td class="fw-bold">Conectada desde:</td>
+							<td>{{ account.connected_at|date:"d/m/Y H:i" }}</td>
+						</tr>
+						<tr>
+							<td class="fw-bold">Última actualización:</td>
+							<td>{{ account.updated_at|date:"d/m/Y H:i" }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	
+	<div class="col-12 col-xl-6">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title mb-3">
+					<i class='bx bx-cog me-2'></i>Acciones
+				</h5>
+				<div class="d-grid gap-2">
+					<a href="/facebook/leads/?account={{ account.id }}" class="btn btn-primary">
+						<i class='bx bx-list-ul'></i> Ver todos los leads
+					</a>
+			
+					<button class="btn btn-danger" onclick="confirmDisconnect()">
+						<i class='bx bx-unlink'></i> Desconectar cuenta
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block end_js %}
+	<!-- Bootstrap JS -->
+	<script src="{% static "assets/js/bootstrap.bundle.min.js" %}"></script>
+	<!--plugins-->
+	<script src="{% static "assets/js/jquery.min.js" %}"></script>
+	<script src="{% static "assets/plugins/simplebar/js/simplebar.min.js" %}"></script>
+	<script src="{% static "assets/plugins/metismenu/js/metisMenu.min.js" %}"></script>
+	<script src="{% static "assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js" %}"></script>
+	<script src="{% static "assets/plugins/datatable/js/jquery.dataTables.min.js" %}"></script>
+	<script src="{% static "assets/plugins/datatable/js/dataTables.bootstrap5.min.js" %}"></script>
+	<!--app JS-->
+	<script src="{% static "assets/js/app.js" %}"></script>
+
+	<script>
+		$(document).ready(function() {
+			// Inicializar DataTable si hay datos
+			{% if leads %}
+			$('#leadsTable').DataTable({
+				"language": {
+					"url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Spanish.json"
+				},
+				"pageLength": 10,
+				"order": [[1, "desc"]], // Ordenar por fecha descendente
+				"columnDefs": [
+					{ "orderable": false, "targets": [2, 4] } // Deshabilitar orden en vista previa y acciones
+				]
+			});
+			{% endif %}
+		});
+		
+
+
+		// Confirmar desconexión
+		function confirmDisconnect() {
+			// Modal de confirmación más detallado
+			const message = '¿Estás seguro de desconectar esta página de Facebook?\n\n' +
+				'⚠️ IMPORTANTE:\n' +
+				'- La cuenta será desconectada\n' +
+				'- Los leads existentes se mantendrán en el sistema\n' +
+				'- No se podrán recibir nuevos leads automáticamente\n' +
+				'- Puedes volver a conectarla en cualquier momento\n\n' +
+				'¿Deseas continuar?';
+			
+			if (confirm(message)) {
+				// Opción 1: Redirección simple (sin página de confirmación)
+				window.location.href = "{% url 'facebookAccountDisconnect' account.id %}";
+				
+			}
+		}
+		
+		// Función auxiliar para mostrar notificaciones
+		function showNotification(type, message) {
+			const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+			const icon = type === 'success' ? 'bx-check-circle' : 'bx-x-circle';
+			
+			const alert = document.createElement('div');
+			alert.className = `alert ${alertClass} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+			alert.style.zIndex = '9999';
+			alert.innerHTML = `
+				<i class='bx ${icon} me-2'></i>${message}
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			`;
+			
+			document.body.appendChild(alert);
+			
+			setTimeout(() => {
+				alert.remove();
+			}, 5000);
+		}
+	</script>
+{% endblock %}

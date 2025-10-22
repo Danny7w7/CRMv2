@@ -163,6 +163,20 @@
 					</li>
 				{% endif %}
 
+				{% if request.user|has_module:"FACEBOOK" %}
+					<li class="menu-label">Facebook</li>
+					<li>
+						<a class="has-arrow" href="javascript:;">
+							<div class="parent-icon"><i class="lni lni-facebook"></i></div>
+							<div class="menu-title">Facebook page</div>
+						</a>
+						<ul>
+							<li> <a href="{% url 'facebookDashboard' %}"><i class='bx bx-radio-circle'></i>Connect Facebook</a> </li>
+							<li> <a href="{% url 'facebookLeadsList' %}"><i class='bx bx-radio-circle'></i>Facebook leads</a> </li>
+						</ul>
+					</li>
+				{% endif %}
+
 				{% if request.user|has_module:"QUOTATION" %}
 					<li class="menu-label">Quotation</li>
 					<li>

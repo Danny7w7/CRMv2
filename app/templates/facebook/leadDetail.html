@@ -1,0 +1,412 @@
+{% extends "dashboard/index.html" %}
+{% load static %}
+{% block head %}
+    <title>Lead #{{ lead.id }} - Detalle - CRM</title>
+	<!--plugins-->
+	<link href="{% static "assets/plugins/simplebar/css/simplebar.css" %}" rel="stylesheet" />
+	<link href="{% static "assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" %}" rel="stylesheet" />
+	<link href="{% static "assets/plugins/metismenu/css/metisMenu.min.css" %}" rel="stylesheet" />
+	<!-- loader-->
+	<link href="{% static "assets/css/pace.min.css" %}" rel="stylesheet" />
+	<script src="{% static "assets/js/pace.min.js" %}"></script>
+	<!-- Bootstrap CSS -->
+	<link href="{% static "assets/css/bootstrap.min.css" %}" rel="stylesheet">
+	<link href="{% static "assets/css/bootstrap-extended.css" %}" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&amp;display=swap" rel="stylesheet">
+	<link href="{% static "assets/css/app.css" %}" rel="stylesheet">
+	<link href="{% static "assets/css/icons.css" %}" rel="stylesheet">
+	<!-- Theme Style CSS -->
+	<link rel="stylesheet" href="{% static "assets/css/dark-theme.css" %}" />
+	<link rel="stylesheet" href="{% static "assets/css/semi-dark.css" %}" />
+	<link rel="stylesheet" href="{% static "assets/css/header-colors.css" %}" />
+	
+	<style>
+		.fb-icon-badge {
+			width: 50px;
+			height: 50px;
+			background: linear-gradient(135deg, #1877f2 0%, #0c5bce 100%);
+			border-radius: 12px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 24px;
+			color: white;
+		}
+		
+		.field-value {
+			background: #f8f9fa;
+			padding: 15px;
+			border-radius: 8px;
+			border-left: 4px solid #1877f2;
+			margin-bottom: 15px;
+		}
+		
+		.field-label {
+			font-weight: 600;
+			color: #555;
+			font-size: 14px;
+			margin-bottom: 5px;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+		}
+		
+		.field-data {
+			color: #333;
+			font-size: 16px;
+			word-break: break-word;
+		}
+		
+		.json-viewer {
+			background: #282c34;
+			color: #abb2bf;
+			padding: 20px;
+			border-radius: 8px;
+			overflow-x: auto;
+			font-family: 'Courier New', monospace;
+			font-size: 13px;
+			max-height: 500px;
+		}
+		
+		.timeline-item {
+			padding: 15px;
+			border-left: 3px solid #1877f2;
+			margin-bottom: 15px;
+			position: relative;
+			padding-left: 30px;
+		}
+		
+		.timeline-item::before {
+			content: '';
+			position: absolute;
+			left: -7px;
+			top: 20px;
+			width: 12px;
+			height: 12px;
+			background: #1877f2;
+			border-radius: 50%;
+			border: 3px solid white;
+		}
+		
+		.copy-btn {
+			cursor: pointer;
+			transition: all 0.3s;
+		}
+		
+		.copy-btn:hover {
+			transform: scale(1.1);
+		}
+	</style>
+{% endblock %}
+
+{% block page_content %}
+<!-- Mensajes -->
+{% if messages %}
+<div class="row">
+	<div class="col-12">
+		{% for message in messages %}
+		<div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+			<i class='bx {% if message.tags == "success" %}bx-check-circle{% elif message.tags == "error" %}bx-x-circle{% else %}bx-info-circle{% endif %} me-2'></i>
+			{{ message|safe }}
+			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
+		{% endfor %}
+	</div>
+</div>
+{% endif %}
+
+<!-- Header -->
+<div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+	<div class="breadcrumb-title pe-3">
+		<i class='bx bx-envelope me-2'></i>
+		Detalle del Lead
+	</div>
+	<div class="ps-3">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb mb-0 p-0">
+				<li class="breadcrumb-item"><a href="javascript:;"><i class="bx bx-home-alt"></i></a></li>
+				<li class="breadcrumb-item"><a href="{% url 'facebookDashboard' %}">Facebook</a></li>
+				<li class="breadcrumb-item"><a href="{% url 'facebookLeadsList' %}">Leads</a></li>
+				<li class="breadcrumb-item active" aria-current="page">Lead #{{ lead.id }}</li>
+			</ol>
+		</nav>
+	</div>
+	<div class="ms-auto">
+		<div class="btn-group">
+			<a href="{% url 'facebookLeadsList' %}" class="btn btn-secondary">
+				<i class='bx bx-arrow-back'></i> Volver
+			</a>
+			{% if not lead.processed %}
+			<button class="btn btn-primary" onclick="markAsProcessed()">
+				<i class='bx bx-check'></i> Marcar procesado
+			</button>
+			{% endif %}
+		</div>
+	</div>
+</div>
+
+<!-- Información Principal -->
+<div class="row">
+	<div class="col-12">
+		<div class="card">
+			<div class="card-body">
+				<div class="d-flex align-items-start justify-content-between flex-wrap gap-3">
+					<div class="d-flex align-items-center">
+						<div class="fb-icon-badge me-3">
+							f
+						</div>
+						<div>
+							<h4 class="mb-1">Lead de {{ lead.facebook_account.page_name }}</h4>
+							<p class="mb-0 text-secondary">
+								<i class='bx bx-calendar me-1'></i> {{ lead.created_time|date:"d/m/Y H:i:s" }}
+							</p>
+							<p class="mb-0 text-muted small">
+								<strong>ID:</strong> <code>{{ lead.leadgen_id }}</code>
+								<i class='bx bx-copy copy-btn ms-1' onclick="copyToClipboard('{{ lead.leadgen_id }}')" title="Copiar ID"></i>
+							</p>
+						</div>
+					</div>
+					<div>
+						{% if lead.processed %}
+						<span class="badge bg-success" style="font-size: 14px; padding: 10px 20px;">
+							<i class='bx bx-check-circle'></i> Procesado
+						</span>
+						{% else %}
+						<span class="badge bg-warning text-dark" style="font-size: 14px; padding: 10px 20px;">
+							<i class='bx bx-time'></i> Pendiente
+						</span>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<!-- Datos del Lead -->
+	<div class="col-12 col-xl-8">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title mb-4">
+					<i class='bx bx-user me-2'></i>Información del Lead
+				</h5>
+				
+				{% if lead.raw_payload.field_data %}
+					{% for field in lead.raw_payload.field_data %}
+					<div class="field-value">
+						<div class="field-label">
+							<i class='bx bx-info-circle me-1'></i>{{ field.name }}
+						</div>
+						<div class="field-data">
+							{% for value in field.values %}
+								{{ value }}{% if not forloop.last %}, {% endif %}
+							{% endfor %}
+							<i class='bx bx-copy copy-btn float-end' onclick="copyToClipboard('{% for value in field.values %}{{ value }}{% if not forloop.last %}, {% endif %}{% endfor %}')" title="Copiar"></i>
+						</div>
+					</div>
+					{% endfor %}
+				{% else %}
+					<div class="alert alert-warning">
+						<i class='bx bx-info-circle me-2'></i>
+						No hay datos de campos disponibles para este lead.
+					</div>
+				{% endif %}
+			</div>
+		</div>
+
+		<!-- Datos Técnicos -->
+		<div class="card">
+			<div class="card-body">
+				<div class="d-flex justify-content-between align-items-center mb-3">
+					<h5 class="card-title mb-0">
+						<i class='bx bx-code-alt me-2'></i>Datos Técnicos (JSON)
+					</h5>
+					<button class="btn btn-sm btn-outline-primary" onclick="copyJSON()">
+						<i class='bx bx-copy'></i> Copiar JSON
+					</button>
+				</div>
+				<div class="json-viewer" id="jsonViewer">
+					<pre>{{ lead.raw_payload|safe }}</pre>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Panel Lateral -->
+	<div class="col-12 col-xl-4">
+		<!-- Información de la Cuenta -->
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title mb-3">
+					<i class='bx bxl-facebook-circle me-2'></i>Cuenta de Facebook
+				</h5>
+				<table class="table table-sm table-borderless">
+					<tbody>
+						<tr>
+							<td class="text-muted">Página:</td>
+							<td class="text-end fw-bold">{{ lead.facebook_account.page_name }}</td>
+						</tr>
+						<tr>
+							<td class="text-muted">Propietario:</td>
+							<td class="text-end">{{ lead.facebook_account.owner_name }}</td>
+						</tr>
+						<tr>
+							<td class="text-muted">Page ID:</td>
+							<td class="text-end">
+								<code style="font-size: 11px;">{{ lead.facebook_account.page_id }}</code>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<a href="{% url 'facebookAccountDetail' lead.facebook_account.id %}" class="btn btn-primary btn-sm w-100">
+					<i class='bx bx-link-external'></i> Ver cuenta
+				</a>
+			</div>
+		</div>
+
+		<!-- Timeline -->
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title mb-3">
+					<i class='bx bx-time me-2'></i>Timeline
+				</h5>
+				
+				<div class="timeline-item">
+					<div class="d-flex justify-content-between align-items-start">
+						<div>
+							<strong>Lead recibido</strong><br>
+							<small class="text-muted">{{ lead.created_time|date:"d/m/Y H:i:s" }}</small>
+						</div>
+						<i class='bx bx-envelope text-primary' style="font-size: 20px;"></i>
+					</div>
+				</div>
+
+				{% if lead.processed %}
+				<div class="timeline-item" style="border-left-color: #28a745;">
+					<div class="d-flex justify-content-between align-items-start">
+						<div>
+							<strong>Procesado</strong><br>
+							<small class="text-muted">{{ lead.updated_at|date:"d/m/Y H:i:s" }}</small>
+						</div>
+						<i class='bx bx-check-circle text-success' style="font-size: 20px;"></i>
+					</div>
+				</div>
+				{% endif %}
+			</div>
+		</div>
+
+		<!-- Acciones -->
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title mb-3">
+					<i class='bx bx-cog me-2'></i>Acciones
+				</h5>
+				<div class="d-grid gap-2">
+					{% if not lead.processed %}
+					<button class="btn btn-success" onclick="markAsProcessed()">
+						<i class='bx bx-check'></i> Marcar como procesado
+					</button>
+					{% else %}
+					<button class="btn btn-warning" onclick="markAsUnprocessed()">
+						<i class='bx bx-undo'></i> Marcar como pendiente
+					</button>
+					{% endif %}
+					
+					<button class="btn btn-primary" onclick="createClient()">
+						<i class='bx bx-user-plus'></i> Crear cliente
+					</button>
+					
+					<button class="btn btn-danger" onclick="deleteLead()">
+						<i class='bx bx-trash'></i> Eliminar lead
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block end_js %}
+	<!-- Bootstrap JS -->
+	<script src="{% static "assets/js/bootstrap.bundle.min.js" %}"></script>
+	<!--plugins-->
+	<script src="{% static "assets/js/jquery.min.js" %}"></script>
+	<script src="{% static "assets/plugins/simplebar/js/simplebar.min.js" %}"></script>
+	<script src="{% static "assets/plugins/metismenu/js/metisMenu.min.js" %}"></script>
+	<script src="{% static "assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js" %}"></script>
+	<!--app JS-->
+	<script src="{% static "assets/js/app.js" %}"></script>
+
+	<script>
+		// Copiar al portapapeles
+		function copyToClipboard(text) {
+			navigator.clipboard.writeText(text).then(function() {
+				showNotification('success', '¡Copiado al portapapeles!');
+			}).catch(function(err) {
+				console.error('Error al copiar: ', err);
+				showNotification('error', 'Error al copiar');
+			});
+		}
+
+		// Copiar JSON completo
+		function copyJSON() {
+			const jsonText = document.querySelector('#jsonViewer pre').textContent;
+			copyToClipboard(jsonText);
+		}
+
+		// Marcar como procesado
+		function markAsProcessed() {
+			if (confirm('¿Marcar este lead como procesado?')) {
+				window.location.href = "{% url 'facebookLeadProcess' lead.id %}";
+			}
+		}
+
+		// Marcar como no procesado
+		function markAsUnprocessed() {
+			if (confirm('¿Marcar este lead como pendiente?')) {
+				window.location.href = "{% url 'facebookLeadUnprocess' lead.id %}";
+			}
+		}
+
+
+		// Eliminar lead
+		function deleteLead() {
+			if (confirm('¿Estás seguro de eliminar este lead?\n\nEsta acción no se puede deshacer.')) {
+				window.location.href = "{% url 'facebookLeadDelete' lead.id %}";
+			}
+		}
+
+		// Mostrar notificación
+		function showNotification(type, message) {
+			const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+			const icon = type === 'success' ? 'bx-check-circle' : 'bx-x-circle';
+			
+			const alert = document.createElement('div');
+			alert.className = `alert ${alertClass} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+			alert.style.zIndex = '9999';
+			alert.innerHTML = `
+				<i class='bx ${icon} me-2'></i>${message}
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			`;
+			
+			document.body.appendChild(alert);
+			
+			setTimeout(() => {
+				const bsAlert = new bootstrap.Alert(alert);
+				bsAlert.close();
+			}, 3000);
+		}
+
+		// Auto-ocultar mensajes
+		setTimeout(() => {
+			const alerts = document.querySelectorAll('.alert');
+			alerts.forEach(alert => {
+				if (!alert.classList.contains('position-fixed')) {
+					const bsAlert = new bootstrap.Alert(alert);
+					bsAlert.close();
+				}
+			});
+		}, 5000);
+	</script>
+{% endblock %}

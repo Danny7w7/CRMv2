@@ -37,7 +37,8 @@ MODULE_PATHS = {
     'TEAM MANAGEMENT': [ 'customerAssignments'],
     'QUOTATION': [ 'marketplace','obtenerCountyfips','obtenerLatLon'],
     'BOOK': ['uploadBook','bookList','bookPages','saveTime','toggleBook','bookReport'],
-    'DIALER': [ 'typifyCall', 'iniciateCalls', 'tranferCallToAgent', 'selectCampaign', 'configCampaigns', 'loginCampaign', 'agentDashboard', 'campaigns', 'campaigns', 'createCampaigns', 'getListCampaigns', 'processExcelForDialer', 'changeStatus', 'getStats',]
+    'DIALER': [ 'typifyCall', 'iniciateCalls', 'tranferCallToAgent', 'selectCampaign', 'configCampaigns', 'loginCampaign', 'agentDashboard', 'campaigns', 'campaigns', 'createCampaigns', 'getListCampaigns', 'processExcelForDialer', 'changeStatus', 'getStats',],
+    'FACEBOOK': ['facebookDashboard','facebookLeadsList','facebookLeadDetail','facebookLeadMarkProcessed','facebookAccountDetail','facebookAccountDisconnect','facebookLeadProcess','facebookLeadUnprocess','facebookLeadDelete']
 }
 
 EXCLUDED_VIEWS = ['index', 'weeklyLiveViewTV', 'monthLiveViewTV', 'toggleDarkMode' ,'motivationalPhrase','login',
@@ -45,8 +46,7 @@ EXCLUDED_VIEWS = ['index', 'weeklyLiveViewTV', 'monthLiveViewTV', 'toggleDarkMod
                   'ConsentLifeInsurance','complaint', 'sms','whatsappReply','url_temporal', 'obtainLeadsByGoHighLevel',
                   'consentL','sendConsentForm','enviar_email','uploadTempUrl','cignaSuplemental','tableStatusSale',
                   'webhooks','check',
-                  'facebook_connect','facebook_callback','facebook_save_page','facebook_dashboard','facebook_leads_list','facebook_lead_detail',
-                  'facebook_lead_mark_processed','facebook_account_detail','facebook_account_disconnect','facebook_webhook']  # Puedes agregar más si lo necesitas
+                  'facebookConnect','facebookCallback','facebookWebhook','facebookSavePage']  # Puedes agregar más si lo necesitas
 
 class ModuleAccessMiddleware:
     def __init__(self, get_response):
