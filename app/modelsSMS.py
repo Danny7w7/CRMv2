@@ -74,7 +74,7 @@ class FilesSMS(models.Model):
         upload_to='files',
         storage=S3Boto3Storage()
     )
-    message = models.OneToOneField(Messages, on_delete=models.CASCADE)
+    message = models.ForeignKey(Messages, on_delete=models.CASCADE, related_name='files')
 
     class Meta:
         db_table = 'sms_files'

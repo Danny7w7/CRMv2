@@ -31,9 +31,11 @@
                         </svg>
                         <div class="flex-grow-1 ms-2">
                             <p class="mb-0 chat-time">{% if contact.name %}{{contact.name}}{% else %}{{contact.phone_number}}{%endif%}, {{ message.created_at|date:"m:H - d/m" }}</p>
-                            {% if message.file %}
+                            {% if message.files %}
                             <p class="chat-left-msg">
-                                <img class="img-responsive" src="{{ message.file.file.url }}" alt="">
+                                {% for file in message.files %}
+                                <img class="img-responsive mb-2" src="{{ file }}" alt="">
+                                {% endfor %}
                             </p>
                             {% else %}
                             <p class="chat-left-msg" style="white-space: pre-wrap;">{{message.message_content}}</p>

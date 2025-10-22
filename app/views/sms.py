@@ -334,12 +334,12 @@ def chat(request, chatId):
         chat = Chat.objects.select_related('contact').get(id=chatId, company=request.user.company)
         
     secretKey = SecretKey.objects.filter(contact=chat.contact).first()
-    # Usamos select_related para optimizar las consultas
-    messages = Messages.objects.filter(chat=chat.id).select_related('filessms')
     
-    # Creamos una lista para almacenar los mensajes con sus archivos
+    messages = Messages.objects.prefetch_related('files').filter(chat=chat.id)
+
     messages_with_files = []
     for message in messages:
+        files = message.files.all()
         message_dict = {
             'id': message.id,
             'sender_type': message.sender_type,
@@ -347,16 +347,9 @@ def chat(request, chatId):
             'message_content': message.message_content,
             'created_at': message.created_at,
             'is_read': message.is_read,
-            'file': None
+            'files': [f.file.url for f in files] if files else []
         }
-
-        # Intentamos obtener el archivo asociado
-        try:
-            message_dict['file'] = message.filessms
-        except FilesSMS.DoesNotExist:
-            pass
-            
-        messages_with_files.append(message_dict)
+        messages_with_files.append(message_dict)        
     messages.update(is_read=True)
 
     chats = getPageChats(request, 1)
@@ -723,7 +716,7 @@ def get_last_message_for_chats(chats):
 
             chat.last_message_content = content
             chat.last_message_time = last_message.created_at
-            chat.has_attachment = hasattr(last_message, 'files')
+            chat.has_attachment = last_message.files.exists()
             chat.is_message_unread = not last_message.is_read
         else:
             chat.last_message_content = "There are no messages."

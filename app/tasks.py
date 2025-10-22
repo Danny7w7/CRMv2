@@ -247,27 +247,28 @@ def saveImageFromUrlTask(messageId, payload, contactId, companyId):
         contact = Contacts.objects.get(id=contactId)
         company = Companies.objects.get(id=companyId)
 
-        media = payload.get('media', [])
-        if not media:
+        allMedia = payload.get('media', [])
+        if not allMedia:
             return
 
-        url = media[0].get('url')
-        filename = url.split('/')[-1]
+        for media in allMedia:
+            url = media.get('url')
+            filename = url.split('/')[-1]
 
-        response = requests.get(url)
-        response.raise_for_status()
+            response = requests.get(url)
+            response.raise_for_status()
 
-        file = FilesSMS()
-        file.message = message
-        file.file.save(filename, ContentFile(response.content), save=True)
+            file = FilesSMS()
+            file.message = message
+            file.file.save(filename, ContentFile(response.content), save=True)
 
-        fileUrl = file.file.url
+            fileUrl = file.file.url
 
-        # Enviar por WebSocket una vez se tiene la imagen
-        SendMessageWebsocketChannel('MMS', payload, contact, companyId, fileUrl)
+            # Enviar por WebSocket una vez se tiene la imagen
+            SendMessageWebsocketChannel('MMS', payload, contact, companyId, fileUrl)
 
-        if companyId not in [1, 2]:
-            discountRemainingBalance(company, '0.027')
+            if companyId not in [1, 2]:
+                discountRemainingBalance(company, '0.027')
 
     except Exception as e:
         logger.error(f'Error saving MMS image or sending WebSocket: {e}')
