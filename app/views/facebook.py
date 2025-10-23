@@ -1,6 +1,8 @@
 
 import json
 import requests
+import hmac
+import hashlib
 from django.conf import settings
 from django.contrib import messages
 from django.db.models import Count, Q
@@ -72,7 +74,7 @@ def facebookCallback(request):
         r = requests.get(token_url, params=params, timeout=10)
         data = r.json()
         
-        print(f"🔍 Respuesta token: {json.dumps(data, indent=2)}")
+        print("🔍 Token recibido correctamente (detalles ocultos por seguridad)")
         
         if 'error' in data:
             error_info = data['error']
@@ -141,7 +143,7 @@ def facebookCallback(request):
         )
         pages_data = pages_resp.json()
         
-        print(f"🔍 Respuesta páginas: {json.dumps(pages_data, indent=2)}")
+        print(f"🔍 Páginas obtenidas correctamente ({len(pages_data.get('data', []))} páginas)")
         
         if 'error' in pages_data:
             error_info = pages_data['error']
@@ -317,69 +319,66 @@ def getLeadDetails(leadgen_id, page_access_token):
 
 @csrf_exempt
 def facebookWebhook(request):
-    """Webhook único para recibir leads de Facebook."""
+    """Webhook único para recibir leads de Facebook con verificación HMAC."""
     
-    # ✅ GET: Verificación inicial de Facebook
+    # ✅ GET: Verificación inicial (sin cambios)
     if request.method == 'GET':
         mode = request.GET.get('hub.mode')
         token = request.GET.get('hub.verify_token')
         challenge = request.GET.get('hub.challenge')
         verify_token = getattr(settings, 'FB_VERIFY_TOKEN', None)
         
-        print(f"🔍 Verificación webhook")
-        print(f"   Mode: {mode}")
-        print(f"   Token recibido: '{token}'")
-        print(f"   Token esperado: '{verify_token}'")
-        print(f"   Challenge: {challenge}")
-        
         if mode == 'subscribe' and verify_token and token == verify_token:
-            print("✅ Verificación exitosa - Enviando challenge")
-            return HttpResponse(challenge, content_type='text/plain')
-        else:
-            print(f"❌ Verificación fallida")
-            if not verify_token:
-                print("   ERROR: FB_VERIFY_TOKEN no está configurado en settings")
-            elif token != verify_token:
-                print(f"   ERROR: Tokens no coinciden")
-            return HttpResponse('Invalid verify token', status=403)
+            return HttpResponse(challenge, content_type='text/plain', status=200)
+        return HttpResponse('Invalid verify token', status=403)
     
-    # ✅ POST: Recepción de leads
+    # ✅ POST: Recepción de leads con firma
     elif request.method == 'POST':
         try:
+            # --- 🔒 Verificación de firma HMAC ---
+            signature_header = request.headers.get('X-Hub-Signature-256', '')
+            expected_signature = 'sha256=' + hmac.new(
+                settings.FB_APP_SECRET.encode(),
+                request.body,
+                hashlib.sha256
+            ).hexdigest()
+
+            if not hmac.compare_digest(signature_header, expected_signature):
+                print("❌ Webhook rechazado: firma inválida")
+                return HttpResponse(status=403)
+            
+            # --- ✅ Procesamiento seguro ---
             body = json.loads(request.body.decode('utf-8'))
-            print("📩 Webhook recibido:", json.dumps(body, indent=2))
+            print("📩 Webhook recibido correctamente (payload resumido)")
             
             for entry in body.get('entry', []):
                 for change in entry.get('changes', []):
                     if change.get('field') == 'leadgen':
                         page_id = change['value'].get('page_id')
                         leadgen_id = change['value'].get('leadgen_id')
-                        
-                        print(f"🎯 Lead detectado - Page: {page_id}, Lead ID: {leadgen_id}")
-                        
+                        print(f"🎯 Nuevo lead detectado - Page: {page_id}, Lead ID: {leadgen_id}")
+
                         fb_account = FacebookAccount.objects.filter(page_id=page_id, is_active=True).first()
-                        
                         if fb_account:
                             lead = FacebookLead.objects.create(
                                 facebook_account=fb_account,
                                 leadgen_id=leadgen_id,
                                 raw_payload=change['value'],
-                                is_active = True
+                                is_active=True
                             )
-                            
                             try:
                                 detail = getLeadDetails(leadgen_id, fb_account.page_access_token)
                                 lead.raw_payload = detail
                                 lead.created_time = detail.get('created_time')
                                 lead.save()
-                                print(f"✅ Lead {leadgen_id} guardado con detalles")
+                                print(f"✅ Lead {leadgen_id} guardado correctamente")
                             except Exception as e:
-                                print(f"⚠️ Error obteniendo detalles del lead: {e}")
+                                print(f"⚠️ Error obteniendo detalle del lead: {e}")
                         else:
-                            print(f"⚠️ No se encontró FacebookAccount para page_id: {page_id}")
-            
-            return JsonResponse({'status': 'ok'})
-            
+                            print(f"⚠️ No se encontró cuenta asociada al page_id {page_id}")
+
+            return JsonResponse({'status': 'ok'}, status=200)
+        
         except Exception as e:
             print(f"❌ Error procesando webhook: {e}")
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
@@ -568,4 +567,74 @@ def facebookAccountDisconnect(request, account_id):
     )
     
     return redirect('facebook_dashboard')
+
+
+import base64
+
+@csrf_exempt
+def facebookDeleteData(request):
+    """
+    Endpoint requerido por Facebook para eliminación de datos del usuario.
+    https://developers.facebook.com/docs/deletion-callback
+    """
+    if request.method != 'POST':
+        return HttpResponseBadRequest('Method not allowed')
+
+    try:
+        signed_request = request.POST.get('signed_request')
+        if not signed_request:
+            return JsonResponse({'error': 'Missing signed_request'}, status=400)
+
+        # --- 🔒 Verificar firma del signed_request ---
+        def parse_signed_request(sr, secret):
+            try:
+                encoded_sig, payload = sr.split('.', 1)
+                sig = base64.urlsafe_b64decode(encoded_sig + "==")
+                data = json.loads(base64.urlsafe_b64decode(payload + "==").decode('utf-8'))
+                expected_sig = hmac.new(
+                    secret.encode(),
+                    msg=payload.encode(),
+                    digestmod=hashlib.sha256
+                ).digest()
+                if not hmac.compare_digest(sig, expected_sig):
+                    return None
+                return data
+            except Exception:
+                return None
+
+        data = parse_signed_request(signed_request, settings.FB_APP_SECRET)
+        if not data:
+            return JsonResponse({'error': 'Invalid signature'}, status=403)
+
+        user_id = data.get('user_id') or data.get('uid')
+        if not user_id:
+            return JsonResponse({'error': 'Missing user_id'}, status=400)
+
+        # --- 🗑️ Eliminar datos relacionados ---
+        FacebookLead.objects.filter(raw_payload__icontains=user_id).delete()
+        FacebookAccount.objects.filter(page_id=user_id).delete()
+
+        # --- 📦 Respuesta con URL de confirmación ---
+        confirmation_code = f"delete_{user_id}"
+        return JsonResponse({
+            "url": f"{settings.SITE_URL}/facebook/confirm_delete/{confirmation_code}/",
+            "confirmation_code": confirmation_code
+        })
+
+    except Exception as e:
+        print(f"❌ Error en eliminación de datos: {e}")
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+def facebookPrivacyPolicy(request):
+    """Página pública de política de privacidad exigida por Meta."""
+    return render(request, 'facebook/privacy.html')
+
+def facebookConfirmDelete(request, confirmation_code):
+    return HttpResponse(f"Tus datos fueron eliminados correctamente. Código: {confirmation_code}")
+
+
+
+
+
 

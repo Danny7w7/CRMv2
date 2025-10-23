@@ -90,7 +90,7 @@
 
 <!-- Header -->
 <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
-    
+
 	<div class="breadcrumb-title pe-3">
 		<span class="fb-icon-badge">f</span>
 		Facebook
@@ -101,9 +101,13 @@
 			<a href="/facebook/leads/" class="btn btn-secondary">
 				<i class='bx bx-list-ul'></i> Ver Leads
 			</a>
-			<a href="/facebook/connect/" class="btn btn-primary">
+			<!-- <a href="/facebook/connect/" class="btn btn-primary">
 				<i class='bx bx-plus'></i> Conectar Página
-			</a>
+			</a> -->
+            <!-- Botón que abre el modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#privacyModal">
+  <i class='bx bx-plus'></i> Conectar Página
+</button>
 		</div>
 	</div>
 </div>
@@ -252,6 +256,31 @@
 		{% endif %}
 	</div>
 </div>
+
+<!-- Modal con política -->
+<div class="modal fade" id="privacyModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content p-4">
+      <h4 class="mb-3">Política de Privacidad</h4>
+      <p>
+        Al continuar, aceptas nuestra <a href="/politica-privacidad/" target="_blank">Política de Privacidad</a>,
+        que explica cómo usamos los datos recibidos desde Facebook para gestionar tus leads de manera segura.
+      </p>
+      <p>
+        La conexión con Facebook se realiza únicamente para permitir que nuestro CRM reciba los leads generados
+        en tus formularios de Facebook Lead Ads. No publicaremos ni compartiremos nada sin tu permiso.
+      </p>
+
+      <div class="mt-4 text-end">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <a href="/facebook/connect/" class="btn btn-primary">
+          Acepto y Conectar Página
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 {% endblock %}
 
