@@ -357,7 +357,7 @@ def facebookWebhook(request):
                         
                         print(f"🎯 Lead detectado - Page: {page_id}, Lead ID: {leadgen_id}")
                         
-                        fb_account = FacebookAccount.objects.filter(page_id=page_id, is_active=True, company = request.user.company).first()
+                        fb_account = FacebookAccount.objects.filter(page_id=page_id, is_active=True).first()
                         
                         if fb_account:
                             lead = FacebookLead.objects.create(
