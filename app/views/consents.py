@@ -115,6 +115,12 @@ def consent(request, obamacare_id):
         objectClient = save_data_from_request(Clients, request.POST, ['agent'],obamacare.client)
         objectObamacare = save_data_from_request(ObamaCare, request.POST, ['signature'], obamacare)
         
+        if not contact:
+            contact = ContactClient.objects.create(
+                client=obamacare.client,
+                agent=obamacare.agent
+            )
+
         # Usamos la nueva función para guardar los checkboxes en ContactClient
         objectContact = save_contact_client_checkboxes(request.POST, contact)
 

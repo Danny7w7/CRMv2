@@ -98,7 +98,7 @@ def formCreateClient(request):
             client.company = companyInstance
             client.save()
 
-            if client.type_sales in ['ACA', 'ACA/SUPLEMENTARIO']:
+            if client.type_sales != 'SUPLEMENTARIO':
                 contactClient = ContactClient.objects.create(client=client,agent=request.user)
 
             contact = Contacts.objects.filter(phone_number=client.phone_number).first()
