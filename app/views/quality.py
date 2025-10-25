@@ -28,7 +28,7 @@ def formCreateControl(request):
     company_filter = {'company': company_id} if not request.user.is_staff else {}
 
     userRole = [ 'A' , 'C', 'SUPP', 'S']
-    users = Users.objects.filter(role__in = userRole, **company_filter ).order_by('first_name')
+    users = Users.objects.filter(role__in = userRole,is_active = True ,**company_filter ).order_by('first_name')
 
     if request.method == 'POST':
 

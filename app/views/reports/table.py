@@ -670,9 +670,9 @@ def customerPerformance(request):
     documents = DocumentObamaSupp.objects.select_related('agent_create').filter(created_at__range=(start_date, end_date), **company_filter2)
     appointments = AppointmentClient.objects.select_related('agent_create').filter(created_at__range=(start_date, end_date), **company_filter2)
     payments = Payments.objects.select_related('agent').filter(created_at__range=(start_date, end_date), **company_filter)
-    paymentDate = PaymentDate.objects.filter(created_at__range=(start_date, end_date), **company_filter)
-    totalClientWithUsernameAndCarrier = UserCarrier.objects.filter(dateUserCarrier__range=(start_date, end_date), **company_filter)
-    lettersAndCards = LettersCard.objects.filter(Q(dateLetters__range=(start_date, end_date)) | Q(dateCard__range=(start_date, end_date)), **company_filter)
+    paymentDate = PaymentDate.objects.filter(created_at__range=(start_date, end_date), **company_filter2)
+    totalClientWithUsernameAndCarrier = UserCarrier.objects.filter(dateUserCarrier__range=(start_date, end_date), **company_filter2)
+    lettersAndCards = LettersCard.objects.filter(Q(dateLetters__range=(start_date, end_date)) | Q(dateCard__range=(start_date, end_date)), **company_filter2)
 
     # Obtener agentes Customer, excluyendo a Maria Tinoco y Carmen Rodriguez
     agents = Users.objects.prefetch_related('usaAgents').filter(role='C', is_active=1, **company_filter).exclude(username__in=('MariaCaTi', 'CarmenR'))
