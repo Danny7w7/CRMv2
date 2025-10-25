@@ -114,7 +114,15 @@ class USAgent(models.Model):
     def getFirstName(self):
         return self.name.strip().split()[0] if self.name.strip() else ""
     
+class AgentCompanies(models.Model):
 
+    agentUSA = models.ForeignKey(USAgent, on_delete=models.CASCADE)
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=True)   
+    created_at = models.DateTimeField(auto_now_add=True) 
+
+    class Meta:
+        db_table = 'agent_companies'
 
 class Numbers_whatsapp(models.Model):
     phone_number = models.BigIntegerField()  
