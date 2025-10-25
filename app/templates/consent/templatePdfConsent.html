@@ -58,7 +58,8 @@
 
         .headerTwo {
             text-align: center;
-            margin-bottom: 0px; /* Reducido de 40px a 20px */
+            margin-top: 380px;
+            margin-bottom: 12px; /* Reducido de 40px a 20px */
             padding: 5px; /* Reducido de 24px a 20px */
             background: linear-gradient(to right, #2563eb, #1d4ed8);
             border-radius: 12px;
@@ -201,6 +202,23 @@
             margin-top: 16px;
         }
 
+        .dependent-card {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+
+        .dependent-card p {
+            margin: 4px 0;
+            font-size: 15px;
+        }
+
+        .dependent-card strong {
+            color: #333;
+        }
+
         @media (max-width: 768px) {
             body {
                 padding: 10px;
@@ -275,35 +293,26 @@
         </div>
 
         {% if dependents %}
-
         <div class="headerTwo">
-            <h1> {% trans "INFORMACIÓN DE LOS DEPENDIENTES" %} </h1>
-            <p> {% trans "PARA ENROLAMIENTO EN EL MERCADO DE SALUD" %} </p>
+            <h1>{% trans "INFORMACIÓN DE LOS DEPENDIENTES" %}</h1>
+            <p>{% trans "PARA ENROLAMIENTO EN EL MERCADO DE SALUD" %}</p>
         </div>
 
-        <div class="section section-table">
-            <div class="table-container">
-                <table class="table">
-                    <tr>
-                        <th>{% trans "Nombre" %}</th>
-                        <td>{% trans "Sexo" %}</td>
-                        <td>{% trans "Estatus de inmigración" %}</td>
-                        <td>{% trans "Fecha de Cumpleaños" %}</td>
-                        <td>{% trans "Parentesco" %}</td>
-                        <td>{% trans "Aplica" %}</td>
-                    </tr>
-                    {% for dependent in dependents %}
-                    <tr>
-                        <th>{{dependent.name}}</th>
-                        <td>{{dependent.sex}}</td>
-                        <td>{{dependent.migration_status}}</td>
-                        <td>{{dependent.date_birth}}</td>
-                        <td>{{dependent.kinship}}</td>
-                        <td>{{dependent.apply}}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
+        <div class="section">
+            {% for dependent in dependents %}
+                <div class="dependent-card">
+                    <h3>{% trans "Dependiente" %} {{ forloop.counter }}</h3>
+                    <p><strong>{% trans "Nombre:" %}</strong> {{ dependent.name }}</p>
+                    <p><strong>{% trans "Sexo:" %}</strong> {{ dependent.sex }}</p>
+                    <p><strong>{% trans "Estatus de inmigración:" %}</strong> {{ dependent.migration_status }}</p>
+                    <p><strong>{% trans "Fecha de cumpleaños:" %}</strong> {{ dependent.date_birth }}</p>
+                    <p><strong>{% trans "Parentesco:" %}</strong> {{ dependent.kinship }}</p>
+                    <p><strong>{% trans "Aplica:" %}</strong> {{ dependent.apply }}</p>
+                </div>
+                {% if not forloop.last %}
+                    <hr>
+                {% endif %}
+            {% endfor %}
         </div>
         {% endif %}
 
