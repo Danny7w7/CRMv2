@@ -57,10 +57,11 @@ def formCreateClient(request):
 
     if company_id == 1:
         companies = Companies.objects.filter(is_active = True)
-        agentUsa = USAgent.objects.all().prefetch_related("company")
+        agentUsa = USAgent.objects.all()
     else:
         companies = None
-        agentUsa = USAgent.objects.filter(company = request.user.company).prefetch_related("company")
+        agentUsa = AgentCompanies.objects.select_related('agentUSA').filter(company = request.user.company, is_active = True)
+
 
     context = {
         'user' : user,
@@ -141,9 +142,9 @@ def formCreateAssure(request):
 
     user = Users.objects.select_related('company').filter(company = company_id).first()
     if request.user.is_superuser:
-        agentUsa = USAgent.objects.all().prefetch_related("company")
+        agentUsa = USAgent.objects.all()
     else:
-        agentUsa = USAgent.objects.filter(company = request.user.company).prefetch_related("company")
+        agentUsa = AgentCompanies.objects.select_related('agentUSA').filter(company = request.user.company, is_active = True)
 
 
     paises = []  # Inicializa la lista por si hay error
@@ -239,9 +240,9 @@ def formCreateClientLife(request):
     user = Users.objects.select_related('company').filter(company = company_id).first()
 
     if request.user.is_superuser:
-        agentUsa = USAgent.objects.all().prefetch_related("company")
+        agentUsa = USAgent.objects.all()
     else:
-        agentUsa = USAgent.objects.filter(company = request.user.company).prefetch_related("company")
+        agentUsa = AgentCompanies.objects.select_related('agentUSA').filter(company = request.user.company, is_active = True)
 
     if company_id == 1:
         companies = Companies.objects.filter(is_active = True)
@@ -321,9 +322,9 @@ def formCreateClientMedicare(request):
     user = Users.objects.select_related('company').filter(company = company_id).first()
 
     if request.user.is_superuser:
-        agentUsa = USAgent.objects.all().prefetch_related("company")
+        agentUsa = USAgent.objects.all()
     else:
-        agentUsa = USAgent.objects.filter(company = request.user.company).prefetch_related("company")
+        agentUsa = AgentCompanies.objects.select_related('agentUSA').filter(company = request.user.company, is_active = True)
 
     if company_id == 1:
         company = Companies.objects.filter(is_active = True)
@@ -405,9 +406,9 @@ def formCreatePlan(request ,client_id):
     company = Companies.objects.filter(id = company_id).first()
 
     if company_id == 1:
-        agentUsa = USAgent.objects.all().prefetch_related("company")
+        agentUsa = USAgent.objects.all()
     else:
-        agentUsa = USAgent.objects.filter(company = request.user.company).prefetch_related("company")
+        agentUsa = AgentCompanies.objects.select_related('agentUSA').filter(company = request.user.company, is_active = True)
 
     type_sale = request.GET.get('type_sale')
     aca_plan = ObamaCare.objects.filter(client=client).first()
@@ -431,9 +432,9 @@ def formCreatePlan(request ,client_id):
 def formCreatePlanAssure(request ,client_id):   
 
     if request.user.is_superuser:
-        agentUsa = USAgent.objects.all().prefetch_related("company")
+        agentUsa = USAgent.objects.all()
     else:
-        agentUsa = USAgent.objects.filter(company = request.user.company).prefetch_related("company")
+        agentUsa = AgentCompanies.objects.select_related('agentUSA').filter(company = request.user.company, is_active = True)
 
     if request.method == 'POST':    
         client = get_object_or_404(ClientsAssure, id=client_id)
@@ -522,9 +523,9 @@ def formAddObama(request, client_id):
     client = Clients.objects.get(id=client_id)
 
     if request.user.is_superuser:
-        agentUsa = USAgent.objects.all().prefetch_related("company")
+        agentUsa = USAgent.objects.all()
     else:
-        agentUsa = USAgent.objects.filter(company = request.user.company).prefetch_related("company")
+        agentUsa = AgentCompanies.objects.select_related('agentUSA').filter(company = request.user.company, is_active = True)
 
     if request.method == 'POST':
         company_id = request.company_id  # Obtener company_id desde request
@@ -556,9 +557,9 @@ def formAddSupp(request,client_id):
     client = Clients.objects.get(id=client_id)   
 
     if request.user.is_superuser:
-        agentUsa = USAgent.objects.all().prefetch_related("company")
+        agentUsa = USAgent.objects.all()
     else:
-        agentUsa = USAgent.objects.filter(company = request.user.company).prefetch_related("company") 
+        agentUsa = AgentCompanies.objects.select_related('agentUSA').filter(company = request.user.company, is_active = True)
 
     if request.method == 'POST':
         company_id = request.company_id  # Obtener company_id desde request

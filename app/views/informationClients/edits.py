@@ -14,6 +14,7 @@ from django.db.models import F, Value
 from django.http import JsonResponse
 from collections import defaultdict
 from django.db.models.functions import Concat
+from django.db.models import Q
 
 # Django core libraries
 from django.contrib.auth.decorators import login_required
@@ -35,9 +36,9 @@ def formEditClient(request, client_id):
     client = get_object_or_404(Clients, id=client_id)     
 
     if request.user.is_superuser:
-        agentUsa = USAgent.objects.all().prefetch_related("company")
+        agentUsa = USAgent.objects.all()
     else:
-        agentUsa = USAgent.objects.filter(company = request.user.company).prefetch_related("company")   
+        agentUsa = AgentCompanies.objects.select_related('agentUSA').filter(company = request.user.company, is_active = True) 
 
     if request.method == 'POST':
 
@@ -101,10 +102,17 @@ def editClientMedicare(request, medicare_id):
     medicare = get_object_or_404(Medicare.objects.select_related('agent'), id=medicare_id)
 
     if request.user.is_superuser:
-        agentUsa = USAgent.objects.all().prefetch_related("company")
-    else:
-        agentUsa = USAgent.objects.filter(company = request.user.company).prefetch_related("company")
-    
+        agentUsa = USAgent.objects.all()
+    else:     
+        
+        query = Q(agentcompanies__company_id=medicare.company, agentcompanies__is_active=True)
+
+        # Si hay un agente guardado, incluirlo también aunque esté inactivo
+        if medicare.agent_usa:
+            query |= Q(name=medicare.agent_usa)
+        
+        agentUsa = USAgent.objects.filter(query).distinct().order_by('name')    
+
     social_number = medicare.social_security  # Campo real del modelo
     # Asegurarse de que social_number no sea None antes de formatear
     if social_number:
@@ -241,9 +249,15 @@ def editObama(request ,obamacare_id, way):
     paymentDateObama = PaymentDate.objects.filter(obamacare = obamacare).first()
 
     if company_id == 1:
-        agentUsa = USAgent.objects.all().prefetch_related("company")
+        agentUsa = USAgent.objects.all()
     else:
-        agentUsa = USAgent.objects.filter(company = request.user.company).prefetch_related("company")
+        query = Q(agentcompanies__company_id=company_id, agentcompanies__is_active=True)
+
+        # Si hay un agente guardado, incluirlo también aunque esté inactivo
+        if obamacare.agent_usa:
+            query |= Q(name=obamacare.agent_usa)
+        
+        agentUsa = USAgent.objects.filter(query).distinct().order_by('name')
         
     if letterCard and letterCard.letters and letterCard.card: 
         newLetterCard = True
@@ -824,9 +838,15 @@ def editSupp(request, supp_id):
 
     
     if company_id == 1:
-        agentUsa = USAgent.objects.all().prefetch_related("company")
+        agentUsa = USAgent.objects.all()
     else:
-        agentUsa = USAgent.objects.filter(company = request.user.company).prefetch_related("company")
+        query = Q(agentcompanies__company_id=company_id, agentcompanies__is_active=True)
+
+        # Si hay un agente guardado, incluirlo también aunque esté inactivo
+        if supp.agent_usa:
+            query |= Q(name=supp.agent_usa)
+        
+        agentUsa = USAgent.objects.filter(query).distinct().order_by('name')
 
 
     if request.method == 'POST':
@@ -1058,9 +1078,15 @@ def editAssure(request, assure_id):
     users = Users.objects.filter(role='SUPP', company = company_id, is_active = True)
 
     if request.user.is_superuser:
-        agentUsa = USAgent.objects.all().prefetch_related("company")
+        agentUsa = USAgent.objects.all()
     else:
-        agentUsa = USAgent.objects.filter(company = request.user.company).prefetch_related("company")
+        query = Q(agentcompanies__company_id=company_id, agentcompanies__is_active=True)
+
+        # Si hay un agente guardado, incluirlo también aunque esté inactivo
+        if assure.agent_usa:
+            query |= Q(name=assure.agent_usa)
+        
+        agentUsa = USAgent.objects.filter(query).distinct().order_by('name')
 
     # Obtener todos los dependientes asociados a este Supp
     dependents = DependentsAssure.objects.filter(client = assure_id)
@@ -1244,9 +1270,15 @@ def editLife(request, client_id):
     consent = Consents.objects.filter(lifeInsurance = client_id )
 
     if request.user.is_superuser:
-        agentUsa = USAgent.objects.all().prefetch_related("company")
+        agentUsa = USAgent.objects.all()
     else:
-        agentUsa = USAgent.objects.filter(company = request.user.company).prefetch_related("company")
+        query = Q(agentcompanies__company_id=company_id, agentcompanies__is_active=True)
+
+        # Si hay un agente guardado, incluirlo también aunque esté inactivo
+        if client.agent_usa:
+            query |= Q(name=client.agent_usa)
+        
+        agentUsa = USAgent.objects.filter(query).distinct().order_by('name')
 
     action = request.POST.get('action')
 

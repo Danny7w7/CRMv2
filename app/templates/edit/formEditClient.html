@@ -51,7 +51,7 @@
 							<select class="form-select" id="agent_usa" name="agent_usa">
 								<option value="no_valid" disabled {% if client.agent_usa == None %}selected{% endif %}>Please Select</option>
 								{% for agentUsa in agentUsa %}
-									<option {% if client.agent_usa == agentUsa.name %}selected{% endif %} value="{{agentUsa.name}}">{{agentUsa.name}}</option>
+									<option {% if client.agent_usa == agentUsa.agentUSA.name %}selected{% endif %} value="{{agentUsa.agentUSA.name}}">{{agentUsa.agentUSA.name}}</option>
 								{% endfor %}							
 							</select>
 						</div>

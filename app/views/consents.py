@@ -27,6 +27,7 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.translation import activate
 from django.views.decorators.http import require_POST
 from urllib.parse import urlencode
+from django.db.models import Q
 
 # Third-party libraries
 from weasyprint import HTML
@@ -81,9 +82,15 @@ def consent(request, obamacare_id):
     temporalyURL = None
 
     if request.user.is_superuser:
-        agentUsa = USAgent.objects.all().prefetch_related("company")
+        agentUsa = USAgent.objects.all()
     else:
-        agentUsa = USAgent.objects.filter(company = obamacare.company).prefetch_related("company")
+        query = Q(agentcompanies__company_id=obamacare.company, agentcompanies__is_active=True)
+
+        # Si hay un agente guardado, incluirlo también aunque esté inactivo
+        if obamacare.agent_usa:
+            query |= Q(name=obamacare.agent_usa)
+        
+        agentUsa = USAgent.objects.filter(query).distinct().order_by('name')
 
     typeToken = 'obamacare'
    

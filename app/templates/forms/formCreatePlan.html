@@ -100,7 +100,7 @@
 									<select class="form-select" id="agent_usa" aria-label="Default select example" name="agent_usa">
 										<option disabled selected value="">Please Select</option>
 										{% for agentUsa in agentUsa %}
-											<option {% if aca_plan_data.agent_usa == agentUsa.name %}selected{% endif %}  value="{{agentUsa.name}}">{{agentUsa.name}}</option>
+											<option {% if aca_plan_data.agent_usa == agentUsa.agentUSA.name %}selected{% endif %}  value="{{agentUsa.agentUSA.name}}">{{agentUsa.agentUSA.name}}</option>
 										{% endfor %}
 									</select>
 								</div>
@@ -218,7 +218,7 @@
 																<select class="form-select" id="agent_usa" aria-label="Default select example" name="agent_usa">
 																	<option disabled selected value="">Please Select</option>
 																	{% for agentUsa in agentUsa %}
-																		<option {% if supp_plan.agent_usa == agentUsa.name %}selected{% endif %}  value="{{agentUsa.name}}">{{agentUsa.name}}</option>
+																		<option {% if supp_plan.agent_usa == agentUsa.agentUSA.name %}selected{% endif %}  value="{{agentUsa.agentUSA.name}}">{{agentUsa.agentUSA.name}} buenas</option>
 																	{% endfor %}
 																</select>
 															</div>
@@ -326,7 +326,7 @@
 																<select class="form-select" id="agent_usa" aria-label="Default select example" name="agent_usa">
 																	<option disabled selected value="">Please Select</option>
 																	{% for agentUsa in agentUsa %}
-																		<option value="{{agentUsa.name}}">{{agentUsa.name}}</option>
+																		<option value="{{agentUsa.agentUSA.name}}">{{agentUsa.agentUSA.name}}</option>
 																	{% endfor %}
 																</select>
 															</div>

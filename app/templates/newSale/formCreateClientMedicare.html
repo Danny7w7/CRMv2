@@ -69,7 +69,7 @@
 							<select class="form-select" id="agent_usa" aria-label="Default select example" name="agent_usa">
 								<option value="no_valid" disabled selected>Please Select</option>
 								{% for agentUsa in agentUsa %}
-									<option  value="{{agentUsa.name}}">{{agentUsa.name}}</option>
+									<option value="{{agentUsa.agentUSA.name}}">{{agentUsa.agentUSA.name}}</option>
 								{% endfor %}
 							</select>
 						</div>

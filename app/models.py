@@ -107,7 +107,6 @@ class Numbers(models.Model):
 
 class USAgent(models.Model):
     name = models.CharField(max_length=50)
-    company = models.ManyToManyField(Companies)
 
     class Meta:
         db_table = 'us_agents'
@@ -115,6 +114,8 @@ class USAgent(models.Model):
     def getFirstName(self):
         return self.name.strip().split()[0] if self.name.strip() else ""
     
+
+
 class Numbers_whatsapp(models.Model):
     phone_number = models.BigIntegerField()  
     company = models.ForeignKey(Companies, on_delete=models.CASCADE) 
@@ -145,8 +146,8 @@ class Users(AbstractUser):
     assigned_phone = models.ForeignKey(Numbers, on_delete=models.SET_NULL, null=True, blank=True)
     assigned_phone_whatsapp = models.ForeignKey(Numbers_whatsapp, on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey(Companies, on_delete=models.CASCADE)
-    usaAgents = models.ManyToManyField(USAgent)
-    agent_seguro = models.ManyToManyField(USAgent, related_name='agent_seguro_users', blank=True)
+    usaAgents = models.ManyToManyField(USAgent) # customer
+    agent_seguro = models.ManyToManyField(USAgent, related_name='agent_seguro_users', blank=True) #Casos para lo de zhoira
     
     class Meta:
         db_table = 'users'
