@@ -1,7 +1,7 @@
 {% extends "dashboard/index.html" %}
 {% load static %}
 {% block head %}
-    <title>Dashboard Facebook - CRM</title>
+    <title>Dashboard Facebook</title>
 	<!--plugins-->
 	<link href="{% static "assets/plugins/simplebar/css/simplebar.css" %}" rel="stylesheet" />
 	<link href="{% static "assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" %}" rel="stylesheet" />
@@ -99,22 +99,22 @@
 	<div class="ms-auto">
 		<div class="btn-group">
 			<a href="/facebook/leads/" class="btn btn-secondary">
-				<i class='bx bx-list-ul'></i> Ver Leads
+				<i class='bx bx-list-ul'></i> View Leads
 			</a>
 			<!-- <a href="/facebook/connect/" class="btn btn-primary">
-				<i class='bx bx-plus'></i> Conectar Página
+				<i class='bx bx-plus'></i> Connect Page
 			</a> -->
             <!-- Botón que abre el modal -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#privacyModal">
-  <i class='bx bx-plus'></i> Conectar Página
-</button>
+			<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#privacyModal">
+			<i class='bx bx-plus'></i> Connect Page
+			</button>
 		</div>
 	</div>
 </div>
 
 <br>
 
-<h6 class="mb-0 text-uppercase">Estadísticas de Facebook</h6>
+<h6 class="mb-0 text-uppercase">Facebook Statistics</h6>
 <hr/>
 
 <!-- Estadísticas -->
@@ -141,7 +141,7 @@
 			<div class="card-body">
 				<div class="d-flex align-items-center">
 					<div>
-						<p class="mb-0 text-secondary">Leads Hoy</p>
+						<p class="mb-0 text-secondary">Leads Today</p>
 						<h4 class="my-1 text-success">{{ leads_today|default:0 }}</h4>
 					</div>
 					<div class="widgets-icons bg-light-success text-success ms-auto">
@@ -157,7 +157,7 @@
 			<div class="card-body">
 				<div class="d-flex align-items-center">
 					<div>
-						<p class="mb-0 text-secondary">Pendientes</p>
+						<p class="mb-0 text-secondary">Pending Leads</p>
 						<h4 class="my-1 text-warning">{{ leads_pending|default:0 }}</h4>
 					</div>
 					<div class="widgets-icons bg-light-warning text-warning ms-auto">
@@ -173,7 +173,7 @@
 			<div class="card-body">
 				<div class="d-flex align-items-center">
 					<div>
-						<p class="mb-0 text-secondary">Páginas Conectadas</p>
+						<p class="mb-0 text-secondary">Connected Pages</p>
 						<h4 class="my-1 text-info">{{ total_accounts|default:0 }}</h4>
 					</div>
 					<div class="widgets-icons bg-light-info text-info ms-auto">
@@ -187,7 +187,7 @@
 </div>
 
 <!-- Lista de páginas conectadas -->
-<h6 class="mb-0 text-uppercase">Páginas Conectadas</h6>
+<h6 class="mb-0 text-uppercase">Connected Pages</h6>
 <hr/>
 
 <div class="card">
@@ -197,12 +197,12 @@
 				<table class="table table-hover mb-0">
 					<thead>
 						<tr>
-							<th>Página</th>
-							<th>Propietario</th>
+							<th>Page</th>
+							<th>Owner</th>
 							<th class="text-center">Total Leads</th>
-							<th class="text-center">Nuevos</th>
-							<th class="text-center">Estado</th>
-							<th class="text-center">Acciones</th>
+							<th class="text-center">New Leads</th>
+							<th class="text-center">Status</th>
+							<th class="text-center">Actions</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -227,13 +227,13 @@
 							</td>
 							<td class="text-center">
 								<span class="badge bg-success status-badge">
-									<i class='bx bx-check'></i> Activa
+									<i class='bx bx-check'></i> Active
 								</span>
 							</td>
 							<td class="text-center">
 								<div class="d-flex justify-content-center gap-2">
 									<a href="/facebook/account/{{ account.id }}/" class="btn btn-sm btn-primary">
-										<i class='bx bx-show'></i> Ver
+										<i class='bx bx-show'></i> View
 									</a>
 								</div>
 							</td>
@@ -247,10 +247,10 @@
 				<div class="empty-state-icon">
 					<i class='bx bxl-facebook-circle'></i>
 				</div>
-				<h4 class="text-secondary">No hay páginas conectadas</h4>
-				<p class="text-muted">Conecta tu primera página de Facebook para empezar a recibir leads</p>
+				<h4 class="text-secondary">No connected pages</h4>
+				<p class="text-muted">Connect your first Facebook page to start receiving leads</p>
 				<a href="/facebook/connect/" class="btn btn-primary mt-3">
-					<i class='bx bx-plus'></i> Conectar ahora
+					<i class='bx bx-plus'></i> Connect Now
 				</a>
 			</div>
 		{% endif %}
@@ -261,20 +261,22 @@
 <div class="modal fade" id="privacyModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content p-4">
-      <h4 class="mb-3">Política de Privacidad</h4>
-      <p>
-        Al continuar, aceptas nuestra <a href="/politica-privacidad/" target="_blank">Política de Privacidad</a>,
-        que explica cómo usamos los datos recibidos desde Facebook para gestionar tus leads de manera segura.
-      </p>
-      <p>
-        La conexión con Facebook se realiza únicamente para permitir que nuestro CRM reciba los leads generados
-        en tus formularios de Facebook Lead Ads. No publicaremos ni compartiremos nada sin tu permiso.
-      </p>
+      <h4 class="mb-3">Privacy Policy and Terms & Conditions</h4>
+
+      	<p>
+			By continuing, you agree to our <a href="https://crm.lapeira.com/privacy-policy/" target="_blank">Privacy Policy</a> 
+			and <a href="https://crm.lapeira.com/terms-and-conditions/" target="_blank">Terms & Conditions</a>, 
+			which explain how we use and protect the data received from Facebook to manage your leads securely.
+		</p>
+
+		<p>
+			The connection with Facebook is only for the purpose of allowing our CRM to receive the leads generated in your Facebook Lead Ads forms. We will not publish or share any information without your permission.
+		</p>
 
       <div class="mt-4 text-end">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
         <a href="/facebook/connect/" class="btn btn-primary">
-          Acepto y Conectar Página
+          Accept and Connect Page
         </a>
       </div>
     </div>

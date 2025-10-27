@@ -1,7 +1,7 @@
 {% extends "dashboard/index.html" %}
 {% load static %}
 {% block head %}
-    <title>Leads de Facebook - CRM</title>
+    <title>Leads de Facebook</title>
 	<!--plugins-->
 	<link href="{% static "assets/plugins/simplebar/css/simplebar.css" %}" rel="stylesheet" />
 	<link href="{% static "assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" %}" rel="stylesheet" />
@@ -61,7 +61,7 @@
 
 <br>
 
-<h6 class="mb-0 text-uppercase">Filtros de búsqueda</h6>
+<h6 class="mb-0 text-uppercase">Search filters</h6>
 <hr/>
 
 <!-- Filtros -->
@@ -71,10 +71,10 @@
 			{% csrf_token %}
 			<div class="row g-3">
 				<div class="col-md-3">
-					<label class="form-label">Cuenta de Facebook</label>
+					<label class="form-label">Facebook Page</label>
 					<select name="account" class="form-select" required>
 						<option selected disabled >Select please</option>
-						<option value="">Todos</option>
+						<option value="">All pages</option>
 						{% for account in accounts %}
 						<option value="{{ account.id }}" {% if selected_account == account.id|stringformat:"s" %}selected{% endif %}>
 							{{ account.page_name }}
@@ -84,10 +84,10 @@
 				</div>
 				
 				<div class="col-md-3">
-					<label class="form-label">Estado</label>
+					<label class="form-label">Status</label>
 					<select name="status" class="form-select" required>
 						<option selected disabled >Select please</option>
-						<option value="">Todos</option>
+						<option value="">All</option>
 						<option value="pending" {% if selected_status == 'pending' %}selected{% endif %}>Pendientes</option>
 						<option value="processed" {% if selected_status == 'processed' %}selected{% endif %}>Procesados</option>
 					</select>
@@ -96,7 +96,7 @@
 				
 				<div class="col-md-2 d-flex align-items-end">
 					<button type="submit" class="btn btn-primary w-100">
-						<i class='bx bx-search-alt'></i> Filtrar
+						<i class='bx bx-search-alt'></i> Apply filters
 					</button>
 				</div>
 			</div>
@@ -104,7 +104,7 @@
 	</div>
 </div>
 
-<h6 class="mb-0 text-uppercase">Lista de Leads</h6>
+<h6 class="mb-0 text-uppercase">Leads List</h6>
 <hr/>
 
 <!-- Tabla de Leads -->
@@ -116,11 +116,11 @@
 				<thead>
 					<tr>
 						<th>ID</th>
-						<th>Página</th>
-						<th>Fecha</th>
-						<th>Vista previa</th>
-						<th>Estado</th>
-						<th>Acciones</th>
+						<th>Facebook Page</th>
+						<th>Date</th>
+						<th>Preview</th>
+						<th>Status</th>
+						<th>Actions</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -147,25 +147,25 @@
 										<strong>{{ field.name }}:</strong> {{ field.values.0 }}{% if not forloop.last %}<br>{% endif %}
 									{% endfor %}
 								{% else %}
-									<span class="text-muted">Sin datos</span>
+									<span class="text-muted">No data available</span>
 								{% endif %}
 							</div>
 						</td>
 						<td>
 							{% if lead.processed %}
 							<span class="badge bg-success">
-								<i class='bx bx-check'></i> Procesado
+								<i class='bx bx-check'></i> Processed
 							</span>
 							{% else %}
 							<span class="badge bg-warning text-dark">
-								<i class='bx bx-time'></i> Pendiente
+								<i class='bx bx-time'></i> Pending
 							</span>
 							{% endif %}
 						</td>
 						<td>
 							<div class="d-flex gap-2">
 								<a href="/facebook/leads/{{ lead.id }}/" class="btn btn-primary btn-sm">
-									<i class='bx bx-show'></i> Ver
+									<i class='bx bx-show'></i> View
 								</a>
 							</div>
 						</td>
@@ -180,10 +180,10 @@
 			<div class="empty-state-icon">
 				<i class='bx bx-envelope-open'></i>
 			</div>
-			<h4 class="text-secondary">No hay leads aún</h4>
-			<p class="text-muted">Los leads aparecerán aquí automáticamente cuando lleguen desde Facebook</p>
+			<h4 class="text-secondary">No leads available yet</h4>
+			<p class="text-muted">Leads will be displayed here automatically when they arrive from Facebook</p>
 			<a href="/facebook/connect/" class="btn btn-primary mt-3">
-				<i class='bx bx-plus'></i> Conectar página
+				<i class='bx bx-plus'></i> Connect page
 			</a>
 		</div>
 		{% endif %}

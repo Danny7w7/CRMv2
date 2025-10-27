@@ -3,6 +3,7 @@ import json
 import requests
 import hmac
 import hashlib
+import base64
 from django.conf import settings
 from django.contrib import messages
 from django.db.models import Count, Q
@@ -26,7 +27,6 @@ def facebookConnect(request):
         f"&redirect_uri={redirect_uri}&scope={scope}"
     )
     return redirect(fb_url)
-
 
 def facebookCallback(request):
     """Callback de OAuth con debugging detallado"""
@@ -316,7 +316,6 @@ def getLeadDetails(leadgen_id, page_access_token):
     r = requests.get(url, params=params)
     return r.json()
 
-
 @csrf_exempt
 def facebookWebhook(request):
     """Webhook único para recibir leads de Facebook con verificación HMAC."""
@@ -385,7 +384,6 @@ def facebookWebhook(request):
     
     return HttpResponseBadRequest('Método no permitido')
 
-
 def facebookDashboard(request):
     """Dashboard principal con resumen de cuentas y leads"""
     accounts = FacebookAccount.objects.filter(is_active=True, company = request.user.company).annotate(
@@ -411,7 +409,6 @@ def facebookDashboard(request):
     }
     
     return render(request, 'facebook/facebookDashboard.html', context)
-
 
 def facebookLeadsList(request):
     """Lista de todos los leads capturados"""
@@ -444,7 +441,6 @@ def facebookLeadsList(request):
     
     return render(request, 'facebook/leadsList.html', context)
 
-
 def facebookLeadDetail(request, lead_id):
     """Ver el detalle completo de un lead"""
     lead = get_object_or_404(FacebookLead, id=lead_id)
@@ -466,7 +462,6 @@ def facebookLeadDetail(request, lead_id):
     
     return render(request, 'facebook/leadDetail.html', context)
 
-
 def facebookLeadMarkProcessed(request, lead_id):
     """Marcar un lead como procesado"""
     if request.method == 'POST':
@@ -476,7 +471,6 @@ def facebookLeadMarkProcessed(request, lead_id):
         messages.success(request, f'✅ Lead marcado como procesado')
     
     return redirect('facebookLeadsList')
-
 
 def facebookAccountDetail(request, account_id):
     """Ver detalles de una cuenta de Facebook conectada"""
@@ -505,11 +499,7 @@ def facebookAccountDetail(request, account_id):
     
     return render(request, 'facebook/accountDetail.html', context)
 
-
-
-
 # === MARCAR LEAD COMO PROCESADO ===
-
 def facebookLeadProcess(request, lead_id):
     """Marca un lead como procesado"""
     lead = get_object_or_404(FacebookLead, id=lead_id)
@@ -521,8 +511,6 @@ def facebookLeadProcess(request, lead_id):
     messages.success(request, f'Lead #{lead.id} marcado como procesado')
     return redirect('facebookLeadDetail', lead_id=lead.id)
 
-
-
 def facebookLeadUnprocess(request, lead_id):
     """Marca un lead como pendiente"""
     lead = get_object_or_404(FacebookLead, id=lead_id)
@@ -533,9 +521,7 @@ def facebookLeadUnprocess(request, lead_id):
     messages.success(request, f'Lead #{lead.id} marcado como pendiente')
     return redirect('facebookLeadDetail', lead_id=lead.id)
 
-
 # === ELIMINAR LEAD ===
-
 def facebookLeadDelete(request, lead_id):
     """Elimina un lead"""
     lead = get_object_or_404(FacebookLead, id=lead_id)
@@ -549,7 +535,6 @@ def facebookLeadDelete(request, lead_id):
     
     messages.success(request, f'Lead de {page_name} eliminado correctamente')
     return redirect('leadsList')
-
 
 def facebookAccountDisconnect(request, account_id):
     """Desconecta una cuenta de Facebook"""
@@ -567,9 +552,6 @@ def facebookAccountDisconnect(request, account_id):
     )
     
     return redirect('facebook_dashboard')
-
-
-import base64
 
 @csrf_exempt
 def facebookDeleteData(request):
@@ -625,10 +607,13 @@ def facebookDeleteData(request):
         print(f"❌ Error en eliminación de datos: {e}")
         return JsonResponse({'error': str(e)}, status=500)
 
-
 def facebookPrivacyPolicy(request):
     """Página pública de política de privacidad exigida por Meta."""
     return render(request, 'facebook/privacy.html')
+
+def facebookTerms(request):
+    """Página pública de términos y condiciones exigida por Meta."""
+    return render(request, 'facebook/terms.html')
 
 def facebookConfirmDelete(request, confirmation_code):
     return HttpResponse(f"Tus datos fueron eliminados correctamente. Código: {confirmation_code}")

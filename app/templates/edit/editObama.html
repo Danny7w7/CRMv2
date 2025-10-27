@@ -1733,7 +1733,7 @@
 									
 									<div class="modal-header bg-success text-white">
 										<h5 class="modal-title" id="renovationModalLabel">
-											<i class="bi bi-arrow-repeat me-2"></i>Renovación de Cliente
+											<i class="bi bi-arrow-repeat me-2"></i>Client Renewal
 										</h5>
 										<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
 									</div>
@@ -1747,7 +1747,7 @@
 											<input type="hidden" name="originalClientId" value="{{obamacare.client.id}}">
 											<input type="hidden" name="passObamacareId" value="{{obamacare.id}}">
 											
-											<h4 class="text-success border-bottom pb-2">Cliente</h4>
+											<h4 class="text-success border-bottom pb-2">Client</h4>
 											
 											<div class="col-12 col-lg-4">
 												<label for="renovation_first_name" class="form-label">First Name</label>
@@ -1839,10 +1839,10 @@
 											</div>
 
 											<hr>
-											<h4 class="text-success border-bottom pb-2">Plan de Renovación</h4>
+											<h4 class="text-success border-bottom pb-2">Renovation Plan</h4>
 											
 											<div class="col-12 col-lg-6">
-												<label for="renovation_agent_usa_obamacare" class="form-label font-weight-bold">Agente USA Plan</label>
+												<label for="renovation_agent_usa_obamacare" class="form-label font-weight-bold">USA Agent Plan</label>
 												<select class="form-select" id="renovation_agent_usa_obamacare" name="agent_usa_obamacare" required>
 													<option value="">Please Select</option>
 													{% for agentUsa in agentUsa %}
@@ -1927,7 +1927,7 @@
 											
 											<div class="col-12">
 												<label for="renovation_observation" class="form-label">Observation</label>
-												<textarea class="form-control" id="renovation_observation" name="observation" rows="3" style="resize: none" placeholder="Observaciones para la renovación..."></textarea>
+												<textarea class="form-control" id="renovation_observation" name="observation" rows="3" style="resize: none" placeholder="Comments for renewal..."></textarea>
 											</div>
 											
 										</form>

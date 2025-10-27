@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Seleccionar página</title>
+    <title>Select page</title>
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -54,29 +54,29 @@
     <!-- facebook/select_page.html -->
     {% if missing_scopes %}
     <div class="alert alert-warning">
-        <strong>⚠️ Advertencia:</strong> Faltan los siguientes permisos:
+        <strong>⚠️ Warning:</strong> The following permissions are missing:
         <ul>
             {% for scope in missing_scopes %}
             <li><code>{{ scope }}</code></li>
             {% endfor %}
         </ul>
-        <p>La app no funcionará correctamente sin estos permisos.</p>
+        <p>The app will not function properly without these permissions.</p>
     </div>
     {% endif %}
 
     {% if granted_scopes %}
     <div class="alert alert-info">
-        <strong>✅ Permisos otorgados:</strong>
+        <strong>✅ Permits granted:</strong>
         {{ granted_scopes|join:", " }}
     </div>
     {% endif %}
     <form method="POST" action="/facebook/save_page/">
       {% csrf_token %}
 
-      <h3>Selecciona la página que quieres conectar</h3>
+      <h3>Select the page you want to connect to</h3>
 
-      <label>Nombre para tu cliente (ej: Empresa A)</label>
-      <input type="text" name="owner_name" placeholder="Nombre de la empresa">
+      <label>Name for your client (e.g., Company A)</label>
+      <input type="text" name="owner_name" placeholder="Company name">
 
       <ul>
         {% for p in pages %}
@@ -90,7 +90,7 @@
             <label for="page_{{ forloop.counter }}">{{ p.name }} ({{ p.id }})</label>
           </li>
         {% empty %}
-          <li>No hay páginas disponibles</li>
+          <li>No pages available</li>
         {% endfor %}
       </ul>
 
@@ -98,7 +98,7 @@
       <input type="hidden" name="page_access_token" id="page_token_input">
       <input type="hidden" name="page_name" id="page_name_input">
 
-      <button type="submit">Conectar página</button>
+      <button type="submit">Connect page</button>
     </form>
 
     <script>
@@ -107,7 +107,7 @@
         const checked = document.querySelector('input[name="page_id"]:checked');
         if (!checked) {
           e.preventDefault();
-          alert('Selecciona una página antes de continuar.');
+          alert('Select a page before continuing.');
           return;
         }
 

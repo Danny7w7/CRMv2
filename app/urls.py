@@ -367,6 +367,7 @@ urlpatterns = [
     path('webhook/facebook/leads/', facebook.facebookWebhook, name='facebookWebhook'),
     path('facebook/delete_data/', facebook.facebookDeleteData, name='facebookDeleteData'),
     path('politica-privacidad/', facebook.facebookPrivacyPolicy, name='facebookPrivacyPolicy'),
+    path('terms-and-conditions/', facebook.facebookTerms, name='facebookTerms'),
     path('facebook/confirm_delete/<str:confirmation_code>/', facebook.facebookConfirmDelete, name='facebookConfirmDelete'),
 
 

@@ -1,7 +1,7 @@
 {% extends "dashboard/index.html" %}
 {% load static %}
 {% block head %}
-    <title>Lead #{{ lead.id }} - Detalle - CRM</title>
+    <title>Lead #{{ lead.id }} - Details</title>
 	<!--plugins-->
 	<link href="{% static "assets/plugins/simplebar/css/simplebar.css" %}" rel="stylesheet" />
 	<link href="{% static "assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" %}" rel="stylesheet" />
@@ -118,7 +118,7 @@
 <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
 	<div class="breadcrumb-title pe-3">
 		<i class='bx bx-envelope me-2'></i>
-		Detalle del Lead
+		Lead Details
 	</div>
 	<div class="ps-3">
 		<nav aria-label="breadcrumb">
@@ -133,11 +133,11 @@
 	<div class="ms-auto">
 		<div class="btn-group">
 			<a href="{% url 'facebookLeadsList' %}" class="btn btn-secondary">
-				<i class='bx bx-arrow-back'></i> Volver
+				<i class='bx bx-arrow-back'></i> Back
 			</a>
 			{% if not lead.processed %}
 			<button class="btn btn-primary" onclick="markAsProcessed()">
-				<i class='bx bx-check'></i> Marcar procesado
+				<i class='bx bx-check'></i> Mark as Processed
 			</button>
 			{% endif %}
 		</div>
@@ -155,7 +155,7 @@
 							f
 						</div>
 						<div>
-							<h4 class="mb-1">Lead de {{ lead.facebook_account.page_name }}</h4>
+							<h4 class="mb-1">Lead {{ lead.facebook_account.page_name }}</h4>
 							<p class="mb-0 text-secondary">
 								<i class='bx bx-calendar me-1'></i> {{ lead.created_time|date:"d/m/Y H:i:s" }}
 							</p>
@@ -168,11 +168,11 @@
 					<div>
 						{% if lead.processed %}
 						<span class="badge bg-success" style="font-size: 14px; padding: 10px 20px;">
-							<i class='bx bx-check-circle'></i> Procesado
+							<i class='bx bx-check-circle'></i> Processed
 						</span>
 						{% else %}
 						<span class="badge bg-warning text-dark" style="font-size: 14px; padding: 10px 20px;">
-							<i class='bx bx-time'></i> Pendiente
+							<i class='bx bx-time'></i> Pending
 						</span>
 						{% endif %}
 					</div>
@@ -188,7 +188,7 @@
 		<div class="card">
 			<div class="card-body">
 				<h5 class="card-title mb-4">
-					<i class='bx bx-user me-2'></i>Información del Lead
+					<i class='bx bx-user me-2'></i>Lead Information
 				</h5>
 				
 				{% if lead.raw_payload.field_data %}
@@ -208,7 +208,7 @@
 				{% else %}
 					<div class="alert alert-warning">
 						<i class='bx bx-info-circle me-2'></i>
-						No hay datos de campos disponibles para este lead.
+						There is no field data available for this lead.
 					</div>
 				{% endif %}
 			</div>
@@ -219,10 +219,10 @@
 			<div class="card-body">
 				<div class="d-flex justify-content-between align-items-center mb-3">
 					<h5 class="card-title mb-0">
-						<i class='bx bx-code-alt me-2'></i>Datos Técnicos (JSON)
+						<i class='bx bx-code-alt me-2'></i>Technical Data (JSON)
 					</h5>
 					<button class="btn btn-sm btn-outline-primary" onclick="copyJSON()">
-						<i class='bx bx-copy'></i> Copiar JSON
+						<i class='bx bx-copy'></i> Copy JSON
 					</button>
 				</div>
 				<div class="json-viewer" id="jsonViewer">
@@ -238,16 +238,16 @@
 		<div class="card">
 			<div class="card-body">
 				<h5 class="card-title mb-3">
-					<i class='bx bxl-facebook-circle me-2'></i>Cuenta de Facebook
+					<i class='bx bxl-facebook-circle me-2'></i>Facebook Account
 				</h5>
 				<table class="table table-sm table-borderless">
 					<tbody>
 						<tr>
-							<td class="text-muted">Página:</td>
+							<td class="text-muted">Page:</td>
 							<td class="text-end fw-bold">{{ lead.facebook_account.page_name }}</td>
 						</tr>
 						<tr>
-							<td class="text-muted">Propietario:</td>
+							<td class="text-muted">Owner:</td>
 							<td class="text-end">{{ lead.facebook_account.owner_name }}</td>
 						</tr>
 						<tr>
@@ -259,7 +259,7 @@
 					</tbody>
 				</table>
 				<a href="{% url 'facebookAccountDetail' lead.facebook_account.id %}" class="btn btn-primary btn-sm w-100">
-					<i class='bx bx-link-external'></i> Ver cuenta
+					<i class='bx bx-link-external'></i> View account
 				</a>
 			</div>
 		</div>
@@ -274,7 +274,7 @@
 				<div class="timeline-item">
 					<div class="d-flex justify-content-between align-items-start">
 						<div>
-							<strong>Lead recibido</strong><br>
+							<strong>Lead received</strong><br>
 							<small class="text-muted">{{ lead.created_time|date:"d/m/Y H:i:s" }}</small>
 						</div>
 						<i class='bx bx-envelope text-primary' style="font-size: 20px;"></i>
@@ -285,7 +285,7 @@
 				<div class="timeline-item" style="border-left-color: #28a745;">
 					<div class="d-flex justify-content-between align-items-start">
 						<div>
-							<strong>Procesado</strong><br>
+							<strong>Processed</strong><br>
 							<small class="text-muted">{{ lead.updated_at|date:"d/m/Y H:i:s" }}</small>
 						</div>
 						<i class='bx bx-check-circle text-success' style="font-size: 20px;"></i>
@@ -299,25 +299,21 @@
 		<div class="card">
 			<div class="card-body">
 				<h5 class="card-title mb-3">
-					<i class='bx bx-cog me-2'></i>Acciones
+					<i class='bx bx-cog me-2'></i>Actions
 				</h5>
 				<div class="d-grid gap-2">
 					{% if not lead.processed %}
-					<button class="btn btn-success" onclick="markAsProcessed()">
-						<i class='bx bx-check'></i> Marcar como procesado
-					</button>
+						<button class="btn btn-success" onclick="markAsProcessed()">
+							<i class='bx bx-check'></i> Process
+						</button>
 					{% else %}
-					<button class="btn btn-warning" onclick="markAsUnprocessed()">
-						<i class='bx bx-undo'></i> Marcar como pendiente
-					</button>
+						<button class="btn btn-warning" onclick="markAsUnprocessed()">
+							<i class='bx bx-undo'></i> Unprocess
+						</button>
 					{% endif %}
 					
-					<button class="btn btn-primary" onclick="createClient()">
-						<i class='bx bx-user-plus'></i> Crear cliente
-					</button>
-					
 					<button class="btn btn-danger" onclick="deleteLead()">
-						<i class='bx bx-trash'></i> Eliminar lead
+						<i class='bx bx-trash'></i> Delete lead
 					</button>
 				</div>
 			</div>
@@ -342,10 +338,10 @@
 		// Copiar al portapapeles
 		function copyToClipboard(text) {
 			navigator.clipboard.writeText(text).then(function() {
-				showNotification('success', '¡Copiado al portapapeles!');
+				showNotification('success', '¡Copied to clipboard!');
 			}).catch(function(err) {
-				console.error('Error al copiar: ', err);
-				showNotification('error', 'Error al copiar');
+				console.error('Error copying to clipboard: ', err);
+				showNotification('error', 'Error copying to clipboard');
 			});
 		}
 
@@ -357,14 +353,14 @@
 
 		// Marcar como procesado
 		function markAsProcessed() {
-			if (confirm('¿Marcar este lead como procesado?')) {
+			if (confirm('¿Mark this lead as processed?')) {
 				window.location.href = "{% url 'facebookLeadProcess' lead.id %}";
 			}
 		}
 
 		// Marcar como no procesado
 		function markAsUnprocessed() {
-			if (confirm('¿Marcar este lead como pendiente?')) {
+			if (confirm('Mark this lead as pending?')) {
 				window.location.href = "{% url 'facebookLeadUnprocess' lead.id %}";
 			}
 		}
@@ -372,7 +368,7 @@
 
 		// Eliminar lead
 		function deleteLead() {
-			if (confirm('¿Estás seguro de eliminar este lead?\n\nEsta acción no se puede deshacer.')) {
+			if (confirm('Are you sure you want to delete this lead??\n\nThis action cannot be undone.')) {
 				window.location.href = "{% url 'facebookLeadDelete' lead.id %}";
 			}
 		}
