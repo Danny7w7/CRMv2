@@ -1,5 +1,5 @@
 # Standard Python libraries
-from calendar import month_abbr
+from calendar import month_abbr, monthrange
 import datetime
 from datetime import timedelta, date
 
@@ -1354,18 +1354,33 @@ def paymentsReports(request):
 
     agentsUsa = request.POST.getlist('agentsUsa') if request.method == 'POST' else []
     agentsCol = request.POST.getlist('agentsCol') if request.method == 'POST' else []
-    
-    start_date = request.POST.get('start_date') if request.method == 'POST' else None
-    end_date = request.POST.get('end_date') if request.method == 'POST' else None
 
-    if start_date and end_date:
-        # Convertir fechas a objetos datetime con zona horaria
-        start_date = timezone.make_aware(
-            datetime.datetime.strptime(start_date, '%Y-%m-%d').replace(hour=0, minute=0, second=0, microsecond=0)
-        )
-        end_date = timezone.make_aware(
-            datetime.datetime.strptime(end_date, '%Y-%m-%d').replace(hour=23, minute=59, second=59, microsecond=999999)
-        )
+    start_date = None
+    end_date = None
+    selectMonth = request.POST.get('month') if request.method == 'POST' else None
+
+    if selectMonth:
+        selectedMonth = int(selectMonth)
+        selectedYear = 2025
+
+        # Handle January case safely
+        if selectedMonth == 1:
+            prevMonth = 12
+            prevYear = selectedYear - 1
+        else:
+            prevMonth = selectedMonth - 1
+            prevYear = selectedYear
+
+        # Get last day of previous month
+        last_day_prev_month = monthrange(prevYear, prevMonth)[1]
+
+        # Example: end_date = last day of previous month
+        end_date = timezone.make_aware(datetime.datetime(
+            prevYear, prevMonth, last_day_prev_month, 23, 59, 59, 999999
+        ))
+
+        # Example: start_date fixed
+        start_date = timezone.make_aware(datetime.datetime(2024, 11, 1, 0, 0, 0, 0))
 
     filters = {
         'is_active': True,

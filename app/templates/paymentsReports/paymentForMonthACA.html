@@ -55,16 +55,24 @@
                 <small class="text-muted">Hold Ctrl (Cmd on Mac) to select multiple agents</small>
             </div>
             <div class="col-md-6">
-				<label for="start_date">Start date:</label>
-				<input type="date" name="start_date" id="start_date" 
-					   class="form-control" value="{{ start_date|date:'Y-m-d'|default:'' }}">
+				<label for="month">Month:</label>
+				<select name="month" id="month" class="form-select">
+					<option value="">Select a month</option>
+					<option value="1">January</option>
+					<option value="2">February</option>
+					<option value="3">March</option>
+					<option value="4">April</option>
+					<option value="5">May</option>
+					<option value="6">June</option>
+					<option value="7">July</option>
+					<option value="8">August</option>
+					<option value="9">September</option>
+					<option value="10">October</option>
+					<option value="11">November</option>
+					<option value="12">December</option>
+				</select>
             </div>
-            <div class="col-md-6">
-                <label for="end_date">End date: </label>
-                <input type="date" name="end_date" id="end_date" 
-                       class="form-control" value="{{ end_date|date:'Y-m-d'|default:''}}">
-            </div>
-			<div class="col-md-4">
+			<div class="col-md-6">
 				<button type="submit" class="btn btn-lg btn-outline-primary w-100 shadow-sm">
 					<i class="bi bi-funnel"></i> Submit
 				</button>
