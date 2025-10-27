@@ -123,3 +123,44 @@ function toogleActionRequired(checkbox) {
         isRequestPending = false; // Habilita de nuevo las peticiones
     });
 }
+
+// Validación para el formulario de video testimonio
+
+let testimonialVideoForm = document.getElementById('testimonialVideoForm');
+if (testimonialVideoForm){
+
+    testimonialVideoForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const testimonyVideoSelect = document.getElementById('testimonyVideo');
+
+        const formData = new FormData();
+        formData.append('testimony', testimonyVideoSelect.value);
+        formData.append('client_id', client_id);
+
+        fetch('/fetchTestimonyVideo/', {
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            Swal.fire({
+                title: 'Success!',
+                text: 'The testimony status was updated successfully.',
+                icon: 'success',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#3085d6'
+            });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                title: 'Error!',
+                text: 'An unexpected error occurred. Please try again later.',
+                icon: 'error',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#d33'
+            });
+        });
+    });
+}

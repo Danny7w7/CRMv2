@@ -1122,6 +1122,16 @@ class FacebookLead(models.Model):
         db_table = "facebook_lead"
 
 
+class CustomerTestimonialVideo(models.Model):
+    client = models.ForeignKey(Clients, on_delete=models.CASCADE)
+    agent_create = models.ForeignKey(Users, on_delete=models.CASCADE)
+    status = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'customer_testimonial_video'
+
+
 from .modelsSMS import *
 from .modelsWhatsapp import *
 from .modelsDialer import *

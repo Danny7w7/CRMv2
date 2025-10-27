@@ -110,6 +110,8 @@ urlpatterns = [
     path('sendEmailComplaint/', consents.sendEmailComplaint, name='sendEmailComplaint'),
     path('fetchChangePlanDate/<int:change_id>/', modals.fetchChangePlanDate, name='fetchChangePlanDate'),
     path('fetchChangePlanAgent/<int:change_id>/', modals.fetchChangePlanAgent, name='fetchChangePlanAgent'),
+    path('fetchTestimonyVideo/', modals.fetchTestimonyVideo, name='fetchTestimonyVideo'),
+
 
     path('clientAccionRequired/', table.clientAccionRequired, name='clientAccionRequired'),
 

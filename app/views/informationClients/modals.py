@@ -751,3 +751,28 @@ def fetchChangePlanAgent(request, change_id):
 
     except Exception as e:
         return JsonResponse({"error": f"Unexpected error: {str(e)}"}, status=500)
+
+@require_POST
+@csrf_exempt
+def fetchTestimonyVideo(request):
+    try:
+        client_id = request.POST.get('client_id')
+        testimony_status = request.POST.get('testimony')
+
+        if not client_id or not testimony_status:
+            return JsonResponse({"error": "Missing parameters."}, status=400)
+
+        client = Clients.objects.filter(id=client_id).first()
+        if not client:
+            return JsonResponse({"error": "Client record not found."}, status=404)
+
+        CustomerTestimonialVideo.objects.create(
+            client=client,
+            agent_create=request.user,
+            status=True if testimony_status == '1' else False
+        )
+
+        return JsonResponse({"message": "Testimony video status updated successfully."}, status=200)
+
+    except Exception as e:
+        return JsonResponse({"error": f"Unexpected error: {str(e)}"}, status=500)

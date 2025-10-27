@@ -247,6 +247,7 @@ def editObama(request ,obamacare_id, way):
     userCarrier = UserCarrier.objects.filter(obamacare = obamacare_id).first()
     accionRequired = CustomerRedFlag.objects.filter(obamacare = obamacare)    
     paymentDateObama = PaymentDate.objects.filter(obamacare = obamacare).first()
+    customerTestimonial = CustomerTestimonialVideo.objects.filter(client=obamacare.client).last()
 
     if company_id == 1:
         agentUsa = USAgent.objects.all()
@@ -593,6 +594,7 @@ def editObama(request ,obamacare_id, way):
         'fechaLimite' : fechaLimite,
         'renovation' : renovation,
         'agentUsa' : agentUsa,
+        'customerTestimonial':customerTestimonial,
         #SMS Blue
         'contact':contact,
         'chat':chat,

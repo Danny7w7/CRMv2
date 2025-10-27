@@ -726,7 +726,9 @@
 								Email Complaint
 							</button>
 							{% endif %}
-							
+							<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalCustomerTestimonialVideo">
+								Customer Testimonial Video
+							</button>
 							<button type="button" class="btn btn-secondary me-2" data-bs-toggle="modal" data-bs-target="#modalVerTexto">
 								See Observations
 							</button>
@@ -844,7 +846,38 @@
 								</div>
 							</div>
 						</div>
-						
+
+						<!-- Modal para video del testimonio -->
+						<div class="modal fade" id="modalCustomerTestimonialVideo" tabindex="-1" role="dialog" aria-labelledby="modalTitleId" aria-hidden="true">
+							<div class="modal-dialog" role="document">
+								<div class="modal-content">
+									<form id="testimonialVideoForm" method="POST" enctype="multipart/form-data">
+										<div class="modal-header">
+											<h5 class="modal-title" id="modalTitleId">
+												Customer Testimonial Video
+											</h5>
+											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+										</div>
+										<div class="modal-body row">
+											<div class="mb-3">
+												<label for="testimonyVideo" class="form-label">Obtain video testimony from the client</label>
+												<select class="form-select" name="testimonyVideo" id="testimonyVideo">
+													<option value="0"{% if not customerTestimonial.status %} selected {% endif %}>Not Done</option>
+													<option value="1"{% if customerTestimonial.status %} selected {% endif %}>Done</option>
+												</select>
+											</div>
+										</div>
+										<div class="modal-footer">
+											<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+												Close
+											</button>
+											{% csrf_token %}
+											<button type="submit" class="btn btn-primary">Send</button>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>						
 				
 						<!-- Modal para ingresar texto -->
 						<div class="modal fade" id="modalIngresarTexto" tabindex="-1" aria-labelledby="modalIngresarTextoLabel" aria-hidden="true">
@@ -2210,6 +2243,7 @@
 	<!-- Scripts SMS's -->
 	<script>
 		var obamacare_id = '{{obamacare.id}}'
+		var client_id = '{{obamacare.client.id}}'
 		var company_id = '{{request.user.company.id}}'
 		var username = '{{request.user.username}}'
 		var contact_id = '{{contact.id}}'
@@ -2231,7 +2265,7 @@
 	<script src="{% static 'assets/js/validations/emailComplaint.js' %}"></script>
 	
 	<script src="{% static 'assets/js/modals/modalRenovations.js' %}"></script>
-	<script src="{% static "assets/js/modals/saveMonitoringObama.js" %}"></script>
+	<script src="{% static 'assets/js/modals/saveMonitoringObama.js' %}"></script>
 	
 	<script>
 		document.addEventListener('DOMContentLoaded', function() {
