@@ -80,6 +80,7 @@
 				<tr>
 					<th rowspan="2">Client</th>
 					<th rowspan="2">Agent USA</th>
+					<th rowspan="2">Status</th>
 					{% for month in months %}
 					<th class="text-center" colspan="3">{{ month }}</th>
 					{% endfor %}
@@ -97,6 +98,7 @@
 					<tr>
 						<td>{{ key.0 }}</td>  <!-- client -->
 						<td>{{ key.1 }}</td>  <!-- agent -->
+						<td>{{ key.2 }}</td>  <!-- status -->
 						{% for month in months %}
 							{% with status=monthData|dict_get:month %}
 							<td class="text-center">

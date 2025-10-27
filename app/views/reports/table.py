@@ -1406,7 +1406,7 @@ def paymentsReports(request):
         obamacareId = record.id
 
         # Crea una clave única combinando cliente y agente
-        key = (clientName, agentUsa)
+        key = (clientName, agentUsa, record.status)
         
         if key not in reportData:
             reportData[key] = {}
