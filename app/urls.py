@@ -111,6 +111,7 @@ urlpatterns = [
     path('fetchChangePlanDate/<int:change_id>/', modals.fetchChangePlanDate, name='fetchChangePlanDate'),
     path('fetchChangePlanAgent/<int:change_id>/', modals.fetchChangePlanAgent, name='fetchChangePlanAgent'),
     path('fetchTestimonyVideo/', modals.fetchTestimonyVideo, name='fetchTestimonyVideo'),
+    path('fetchReference/', modals.fetchReference, name='fetchReference'),
 
 
     path('clientAccionRequired/', table.clientAccionRequired, name='clientAccionRequired'),
@@ -369,8 +370,5 @@ urlpatterns = [
     path('politica-privacidad/', facebook.facebookPrivacyPolicy, name='facebookPrivacyPolicy'),
     path('terms-and-conditions/', facebook.facebookTerms, name='facebookTerms'),
     path('facebook/confirm_delete/<str:confirmation_code>/', facebook.facebookConfirmDelete, name='facebookConfirmDelete'),
-
-
-
 
 ]

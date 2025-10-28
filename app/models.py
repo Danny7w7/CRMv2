@@ -351,6 +351,25 @@ class ObamaCare(models.Model):
     class Meta:
         db_table = 'obamacare'
 
+class CustomerTestimonialVideo(models.Model):
+    client = models.ForeignKey(Clients, on_delete=models.CASCADE)
+    agent_create = models.ForeignKey(Users, on_delete=models.CASCADE)
+    status = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'customer_testimonial_video'
+
+class CustomerReference(models.Model):
+    client = models.ForeignKey(Clients, on_delete=models.CASCADE)
+    reference = models.BigIntegerField()  
+    agent_create = models.ForeignKey(Users, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'customer_reference'
+
 class Dependents(models.Model):  
     client = models.ForeignKey(Clients, on_delete=models.CASCADE)
     obamacare = models.ManyToManyField( 'ObamaCare', related_name='dependents_many')
@@ -1120,17 +1139,6 @@ class FacebookLead(models.Model):
     
     class Meta:
         db_table = "facebook_lead"
-
-
-class CustomerTestimonialVideo(models.Model):
-    client = models.ForeignKey(Clients, on_delete=models.CASCADE)
-    agent_create = models.ForeignKey(Users, on_delete=models.CASCADE)
-    status = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        db_table = 'customer_testimonial_video'
-
 
 from .modelsSMS import *
 from .modelsWhatsapp import *

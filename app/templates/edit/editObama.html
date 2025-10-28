@@ -729,6 +729,9 @@
 							<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalCustomerTestimonialVideo">
 								Customer Testimonial Video
 							</button>
+							<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalReferido">
+								Referred customers
+							</button>
 							<button type="button" class="btn btn-secondary me-2" data-bs-toggle="modal" data-bs-target="#modalVerTexto">
 								See Observations
 							</button>
@@ -877,7 +880,36 @@
 									</form>
 								</div>
 							</div>
-						</div>						
+						</div>	
+						
+						<!-- Modal para Referido -->
+						<div class="modal fade" id="modalReferido" tabindex="-1" role="dialog" aria-labelledby="modalTitleId" aria-hidden="true">
+							<div class="modal-dialog" role="document">
+								<div class="modal-content">
+									<form id="referenceForm" method="POST" enctype="multipart/form-data">
+										<div class="modal-header">
+											<h5 class="modal-title" id="modalTitleId">
+												Referrals provided by the customer
+											</h5>
+											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+										</div>
+										<div class="modal-body row">
+											<div class="mb-3">
+												<label for="reference" class="form-label">Reference number provided by the customer</label>
+												<input type="number" min="0" id="reference" class="form-control" name="reference" required>
+											</div>
+										</div>
+										<div class="modal-footer">
+											<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+												Close
+											</button>
+											{% csrf_token %}
+											<button type="submit" class="btn btn-primary">Send</button>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
 				
 						<!-- Modal para ingresar texto -->
 						<div class="modal fade" id="modalIngresarTexto" tabindex="-1" aria-labelledby="modalIngresarTextoLabel" aria-hidden="true">
@@ -2296,70 +2328,69 @@
 
 	{% if temporalyURL %}
 		<script>
-async function copyCurrentURL() {
-    let currentURL = '{{ temporalyURL|safe }}';
+			async function copyCurrentURL() {
+				let currentURL = '{{ temporalyURL|safe }}';
 
-    const url = new URL(currentURL);
-    const params = new URLSearchParams(url.search);
-    const language = params.get('lenguaje');
+				const url = new URL(currentURL);
+				const params = new URLSearchParams(url.search);
+				const language = params.get('lenguaje');
 
-    // Si no tiene el parámetro de lenguaje, preguntar
-    if (!language) {
-        const result = await Swal.fire({
-            title: 'Select your language',
-            text: 'Please choose a language before copying the link:',
-            icon: 'question',
-            showDenyButton: true,
-            showCancelButton: true,
-            confirmButtonText: 'English',
-            denyButtonText: 'Español',
-            cancelButtonText: 'Cancel',
-            reverseButtons: true
-        });
+				// Si no tiene el parámetro de lenguaje, preguntar
+				if (!language) {
+					const result = await Swal.fire({
+						title: 'Select your language',
+						text: 'Please choose a language before copying the link:',
+						icon: 'question',
+						showDenyButton: true,
+						showCancelButton: true,
+						confirmButtonText: 'English',
+						denyButtonText: 'Español',
+						cancelButtonText: 'Cancel',
+						reverseButtons: true
+					});
 
-        if (result.isConfirmed) {
-            params.set('lenguaje', 'en');
-        } else if (result.isDenied) {
-            params.set('lenguaje', 'es');
-        } else {
-            console.log('Usuario canceló');
-            return; // Sale sin copiar
-        }
+					if (result.isConfirmed) {
+						params.set('lenguaje', 'en');
+					} else if (result.isDenied) {
+						params.set('lenguaje', 'es');
+					} else {
+						console.log('Usuario canceló');
+						return; // Sale sin copiar
+					}
 
-        url.search = params.toString();
-        currentURL = url.toString();
-    }
+					url.search = params.toString();
+					currentURL = url.toString();
+				}
 
-    try {
-        await navigator.clipboard.writeText(currentURL);
+				try {
+					await navigator.clipboard.writeText(currentURL);
 
-        const successMessage = document.querySelector('.success-message');
-        const button = document.querySelector('.copy-button');
-        const originalContent = button.innerHTML;
+					const successMessage = document.querySelector('.success-message');
+					const button = document.querySelector('.copy-button');
+					const originalContent = button.innerHTML;
 
-        const lang = new URLSearchParams(url.search).get('lenguaje') || 'es';
-        const copiedText = lang === 'en' ? 'Copied!' : '¡Copiado!';
+					const lang = new URLSearchParams(url.search).get('lenguaje') || 'es';
+					const copiedText = lang === 'en' ? 'Copied!' : '¡Copiado!';
 
-        if (successMessage) successMessage.style.display = 'block';
-        button.innerHTML = `<i class="fas fa-check"></i> ${copiedText}`;
+					if (successMessage) successMessage.style.display = 'block';
+					button.innerHTML = `<i class="fas fa-check"></i> ${copiedText}`;
 
-        setTimeout(() => {
-            if (successMessage) successMessage.style.display = 'none';
-            button.innerHTML = originalContent;
-        }, 2000);
+					setTimeout(() => {
+						if (successMessage) successMessage.style.display = 'none';
+						button.innerHTML = originalContent;
+					}, 2000);
 
-    } catch (err) {
-        console.error('Error al copiar:', err);
-        Swal.fire({
-            icon: 'error',
-            title: language === 'en' ? 'Error copying' : 'Error al copiar',
-            text: language === 'en'
-                ? 'Could not copy the link. Please try again.'
-                : 'No se pudo copiar el link. Por favor, inténtalo de nuevo.'
-        });
-    }
-}
-
+				} catch (err) {
+					console.error('Error al copiar:', err);
+					Swal.fire({
+						icon: 'error',
+						title: language === 'en' ? 'Error copying' : 'Error al copiar',
+						text: language === 'en'
+							? 'Could not copy the link. Please try again.'
+							: 'No se pudo copiar el link. Por favor, inténtalo de nuevo.'
+					});
+				}
+			}
 
 		</script>
 	{% endif %}

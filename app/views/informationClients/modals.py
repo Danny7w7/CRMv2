@@ -776,3 +776,30 @@ def fetchTestimonyVideo(request):
 
     except Exception as e:
         return JsonResponse({"error": f"Unexpected error: {str(e)}"}, status=500)
+
+@require_POST
+@csrf_exempt
+def fetchReference(request):
+    try:
+        client_id = request.POST.get('client_id')
+        reference = request.POST.get('reference')
+
+        if not client_id or not reference:
+            return JsonResponse({"error": "Missing parameters."}, status=400)
+
+        client = Clients.objects.filter(id=client_id).first()
+        if not client:
+            return JsonResponse({"error": "Client record not found."}, status=404)
+
+        CustomerReference.objects.create(
+            client=client,
+            reference = reference,
+            agent_create=request.user
+        )
+
+        return JsonResponse({"message": "Testimony video status updated successfully."}, status=200)
+
+    except Exception as e:
+        return JsonResponse({"error": f"Unexpected error: {str(e)}"}, status=500)
+
+

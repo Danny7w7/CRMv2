@@ -164,3 +164,42 @@ if (testimonialVideoForm){
         });
     });
 }
+
+let referenceForm = document.getElementById('referenceForm');
+if (referenceForm){
+
+    referenceForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const referenceInput = document.getElementById('reference');
+
+        const formData = new FormData();
+        formData.append('reference', referenceInput.value);
+        formData.append('client_id', client_id);
+
+        fetch('/fetchReference/', {
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            Swal.fire({
+                title: 'Success!',
+                text: 'The status of referrals has been successfully updated.',
+                icon: 'success',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#3085d6'
+            });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                title: 'Error!',
+                text: 'An unexpected error occurred. Please try again later.',
+                icon: 'error',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#d33'
+            });
+        });
+    });
+}
