@@ -320,7 +320,8 @@ def generateConsentPdf(request, obamacare, dependents, supps, language):
         'var':var,
         'id': id,
         'representativeAuthorized': representativeAuthorized,
-        'relationshipWithApplicant': relationshipWithApplicant
+        'relationshipWithApplicant': relationshipWithApplicant,
+        'daysAuthorization':daysAuthorization
     }
 
     activate(language)

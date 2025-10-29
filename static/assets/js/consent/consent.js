@@ -457,6 +457,21 @@ const cleanup = listenToInputChanges(inputIdsToListen, (data) => {
     }
 });
 
+document.addEventListener('DOMContentLoaded', function () {
+    const selectElement = document.getElementById('authorizationValidFor');
+
+    // Ejecutar la función al cargar la página
+    const selectedText = selectElement.options[selectElement.selectedIndex].text;
+    changeSpan('textDuration', selectedText);
+
+    // Ejecutar la función cuando cambie el select
+    selectElement.addEventListener('change', function () {
+        const selectedText = this.options[this.selectedIndex].text;
+        changeSpan('textDuration', selectedText);
+    });
+});
+
+
 function changeinputsValue(id, text) {
     const input = document.getElementById(id)
     input.value = text 

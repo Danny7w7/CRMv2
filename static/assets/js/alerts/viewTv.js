@@ -1,4 +1,4 @@
-const userSocket = new WebSocket('ws://' + window.location.host + '/ws/user-update/');
+const userSocket = new WebSocket('ws://' + window.location.host + '/ws/alerts/');
 	
 userSocket.onmessage = function(e) {
     const data = JSON.parse(e.data);

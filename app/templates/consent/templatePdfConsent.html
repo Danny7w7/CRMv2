@@ -58,7 +58,6 @@
 
         .headerTwo {
             text-align: center;
-            margin-top: 380px;
             margin-bottom: 12px; /* Reducido de 40px a 20px */
             padding: 5px; /* Reducido de 24px a 20px */
             background: linear-gradient(to right, #2563eb, #1d4ed8);
@@ -154,25 +153,8 @@
             margin-bottom: 24px;
             border-left: 4px solid var(--primary-color);
         }
+        /* Reset para listas ordenadas */
 
-        ul {
-            list-style: none;
-            padding-left: 0;
-        }
-
-        ul li {
-            margin-bottom: 12px;
-            padding-left: 24px;
-            position: relative;
-        }
-
-        ul li:before {
-            content: "•";
-            color: var(--primary-color);
-            font-weight: bold;
-            position: absolute;
-            left: 0;
-        }
 
         .bold {
             font-weight: 600;
@@ -234,6 +216,13 @@
         }
 
     </style>
+    {% if dependents %}
+    <style>
+        .headerTwo {
+            margin-top: 380px;
+        }
+    </style>
+    {% endif %}
 </head>
 <body>
     <div class="container">
@@ -316,21 +305,33 @@
         </div>
         {% endif %}
 
+        {% if var %}
+        <div class="section">
+            <h2>{% trans "Consentimiento de Comunicación Electrónica" %} </h2>
+            <p>{% trans "Acepto a ser contactado por mi broker, mi carrier, y/o el mercado de salud vía: " %}{{var}}.</p>
+            
+            <p>{% trans "Al suministrar mi número de teléfono, autorizo a " %}<span class="bold">{{company}}</span> {% blocktrans %}a enviarme mensajes de texto automatizados con información relacionada con opciones de seguro médico, beneficios, productos de seguros, actualizaciones de pólizas, primas, solicitudes y demás asuntos necesarios para ayudarme o recordarme cualquier acción requerida para mantener mi póliza al día. <br>
+            Entiendo y acepto los Términos de Uso y la Política de Privacidad de la compañía.<br>
+            Reconozco que mi autorización no es una condición para la compra. <br>
+            Puedo responder HELP para recibir ayuda o STOP para cancelar en cualquier momento. Pueden aplicarse tarifas de mensajes y datos. Hasta 5 mensajes por mes{% endblocktrans %}</p>
+        </div>
+        {% endif %}
+
         <div class="section">
             <h2>{% trans "Mis Derechos como Paciente" %} </h2>
             <p>
-                {% trans "Yo," %} <span class="bold">{{obamacare.client.first_name}} {{obamacare.client.last_name}}</span>{% trans ", autorizo a" %} <span class="bold">{{obamacare.agent_usa}}</span>{% trans "de" %} <span class="bold">{{company}}</span> {% trans "para servir como mi agente y broker de seguros de salud, es decir mi Agente de Registro, para mi y las personas en mi núcleo familiar, cuando aplica, para el propósito de enrolamiento en un Plan Médico Calificado ofrecido en el Mercado de Salud Federal." %}
+                {% trans "Yo," %} <span class="bold">{{obamacare.client.first_name}} {{obamacare.client.last_name}}</span>{% trans ", autorizo a" %} <span class="bold">{{obamacare.agent_usa}} </span>{% trans "de" %} <span class="bold">{{company}}</span> {% trans "para servir como mi agente y broker de seguros de salud, es decir mi Agente de Registro, para mi y las personas en mi núcleo familiar, cuando aplica, para el propósito de enrolamiento en un Plan Médico Calificado ofrecido en el Mercado de Salud Federal." %}
             </p>
             <p>
-                {% trans "Al firmar esta forma, autorizo a" %} {{company}}{% trans ", y su staff, a trabajar para mi y las personas en mi núcleo familiar, cuando aplica, en las siguientes funciones de apoyo de seguro y cualquier otra tarea administrativa necesaria para mantener mi solicitud y cobertura en buen estado, como sigue:" %}
+                {% trans "Al firmar esta forma, autorizo a" %}<span class="bold"> {{obamacare.agent_usa}}</span>{% trans ", y su staff, a trabajar para mi y las personas en mi núcleo familiar, cuando aplica, en las siguientes funciones de apoyo de seguro y cualquier otra tarea administrativa necesaria para mantener mi solicitud y cobertura en buen estado, como sigue:" %}
             </p>
-            <ul>
+            <ol>
                 <li>{% blocktrans %} Realizar búsquedas de aplicaciones nuevas o actuales en el mercado de salud.{% endblocktrans %}</li>
-                <li>{% blocktrans %} Completar una aplicación para búsqueda de eligibilidad y enrolamiento en el Mercado de Salud Federal, o en programas de gobierno tales como Medicaid y CHIP.{% endblocktrans %}</li>
-                <li>{% blocktrans %} Proveer mantenimiento de mi cuenta en el Mercado de Salud Federal, asistencia en enrolamiento e información sobre los beneficios.{% endblocktrans %}</li>
+                <li>{% blocktrans %} Completar una aplicación para búsqueda de eligibilidad y enrolamiento en el Mercado de Salud Federal, o en programas de gobierno tales como Medicaid y CHIP, en los sitios de Enrolamiento Directo del Mercado de Salud, o enrolamiento en programas del mercado de salud que ayudan a aplicar a crédito fiscales o enrolamiento de productos de seguros en planes a nivel estatal.{% endblocktrans %}</li>
+                <li>{% blocktrans %} Proveer mantenimiento de mi cuenta en el Mercado de Salud Federal, asistencia en enrolamiento, información sobre los beneficios de los planes, nuevos productos, beneficios de nuevos productos, y asesoría en los pagos de transacciones si es necesario.{% endblocktrans %}</li>
                 <li>{% blocktrans %} Apoyar si es necesario en responder inquietudes del Mercado de Salud Federal.{% endblocktrans %}</li>
-                <li>{% blocktrans %} Contactarme por teléfono o por cualquier medio escrito para ayudarme o recordarme cualquier acción necesaria para mantener mi póliza en regla.{% endblocktrans %}</li>
-            </ul>
+                <li>{% trans "Consentimiento de comunicación (Cumplimiento TCPA): Yo, " %}<span class="bold">{{obamacare.client.first_name}} {{obamacare.client.last_name}}</span>{% trans ", doy mi consentimiento para recibir comunicaciones de " %}<span class="bold">{{company}}</span> {% trans "con respecto a opciones de seguro de salud, beneficios, productos de seguros, actualizaciones de pólizas, primas, solicitudes y asuntos relacionados a través de llamadas telefónicas, correos electrónicos, mensajes SMS y otras formas de comunicación para ayudarme o recordarme cualquier acción necesaria para mantener mi póliza en buen estado. Entiendo que dichas comunicaciones pueden involucrar el uso de sistemas automatizados o mensajes de voz pregrabados de " %}<span class="bold">{{company}}</span>{% blocktrans %} en el número proporcionado. Al proporcionar mi información de contacto con mi firma electrónica, cuando hago clic en el botón "enviar", acepto los Términos de Uso de {% endblocktrans %}<span class="bold">{{company}}.</span> {% trans "Este consentimiento incluye aceptar resolver cualquier reclamo de la Ley de Protección al Consumidor de Teléfonos mediante arbitraje. Esto aplica incluso si su número está en una lista de no llamar. Aceptar estas llamadas o textos no es un requisito para comprar bienes o servicios de nosotros. Al recibir un mensaje de texto, puede responder " %}<span class="bold">SI</span> {% trans "para recibir actualizaciones e información sobre su póliza de " %}<span class="bold">{{company}}</span>{% blocktrans %} También puede responder <span class="bold">AYUDA</span> para obtener ayuda. Pueden aplicarse tarifas de mensajes y datos. Hasta 5 mensajes/mes. Responda <span class="bold">ALTO</span> para cancelar en cualquier momento. Para obtener más información sobre nuestras Políticas de Privacidad, haga clic aquí: <a href="https://lapeirainsurance.com/privacy-policy/">https://lapeirainsurance.com/privacy-policy/</a>. Para obtener más información sobre nuestros Términos de Uso, haga clic aquí: <a href="https://lapeirainsurance.com/terms-of-use/">https://lapeirainsurance.com/terms-of-use/</a>.{% endblocktrans %}</li>
+            </ol>
             <p>
                 {% blocktrans %} Entiendo que mi Agente de Registro no utilizará o compartirá mi información de identificación personal (PII) para ningún propósito excepto los aquí listados en esta autorización. Entiendo que esta autorización será válida hasta que sea revocada por mi en cualquier momento. Para revocar esta autorización, debo hacerlo por escrito y enviarlo a la persona correspondiente a través del correo electrónico: client@lapeira.com.{% endblocktrans %}
             </p>
@@ -338,30 +339,42 @@
                 {% blocktrans %} Entiendo que la información que yo le suministre a mi Agente de Registro se va a utilizar ÚNICAMENTE para asistirme en verificar mi elegibilidad y mi aplicacion o enrolamiento en el mercado de salud federal (Marketplace). Esta aprobación incluye la búsqueda de una aplicacion activa utilizando la páginas web aprobadas para el enrolamiento clásico directo (DE) o el Enhanced Direct Enrollment (EDE). Así mismo, entiendo que no tengo que compatir otra informacion adicional excepto la que es requerida para mi enrolamiento o verificacion de eligibilidad en el mercado de salud federal (Marketplace).{% endblocktrans %}
             </p>
 
-        {% if var %}
         <div class="section">
-            <p>{% trans "Acepto ser contactado via: " %}{{var}}.</p>
+            <h2>Reconocimiento de Información Correcta y No Falsificación</h2>
+            <p>{% trans "Yo," %} <span class="bold">{{obamacare.client.first_name}} {{obamacare.client.last_name}}</span>{% trans ", confirmo que la información para mi aplicación es correcta y válida según los requisitos del Mercado de Salud Federal." %}</p>
+            <ol>
+                <li>{% trans "Los beneficios específicos incluidos en el plan de salud, incluyendo cualquier cobertura de seguro o beneficios asociados." %}</li>
+                <li>{% trans "Si el plan de salud en el que me estoy inscribiendo es considerado un plan de salud mayor o integral, o si es equivalente a dicha cobertura de seguro." %}</li>
+                <li>{% trans "Los costos verdaderos y precisos asociados con el plan de salud, incluyendo primas, deducibles y otras obligaciones financieras." %}</li>
+            </ol>
+            <p>{% blocktrans %} Además, confirmo que no se me ha ofrecido ni prometido ningún tipo de ofertas gratuitas, recompensas en efectivo, reembolsos u otros incentivos relacionados con mi inscripción en el plan de salud. Reconozco que no se me ha hecho ninguna afirmación o promesa sobre este tipo de incentivos durante el proceso de inscripción.{% endblocktrans %}</p>
+            <ul>
+                <li>{% trans "Nombre del Aplicante:" %} <span class="bold">{{obamacare.client.first_name}} {{obamacare.client.last_name}}</span></li>
+                <li>{% trans "Nombre Agente en Registro [AOR]:" %} <span class="bold">{{obamacare.agent_usa}}</span></li>
+                <li>{% trans "Nombre Agencia en Registro:" %} <span class="bold">{{company}}</span></li>
+                <li>{% trans "Teléfono Agencia:" %} <span class="bold">1.855.963.6900</span></li>
+            </ul>
+
+            <p><strong>{% trans "Necesita cobertura adicional?:" %}</strong> {% if supps %}{% trans "SI" %}{% else %}{% trans "NO" %}{% endif %}</p>
+            {% if supps %}
+            <p><strong>{% trans "Coberturas adicionales solicitadas:" %}</strong>
+                {% for supp in supps %}
+                {{supp.policy_type}},
+                {% endfor %}
+            </p>
+            {% endif %}
         </div>
-        {% endif %}
 
         <div class="section">
             <div class="highlight">
-                <p>{% trans "Yo," %} <span class="bold">{{obamacare.client.first_name}} {{obamacare.client.last_name}}</span>{% trans ", confirmo que la información para mi aplicación es correcta y válida según los requisitos del Mercado de Salud Federal." %}</p>
-                <ul>
-                    <li>{% trans "Nombre del Aplicante:" %} <span class="bold">{{obamacare.client.first_name}} {{obamacare.client.last_name}}</span></li>
-                    <li>{% trans "Nombre Agente en Registro [AOR]:" %} <span class="bold">{{obamacare.agent_usa}}</span></li>
-                    <li>{% trans "Nombre Agencia en Registro:" %} <span class="bold">{{company}}</span></li>
-                    <li>{% trans "Teléfono Agencia:" %} <span class="bold">1.855.963.6900</span></li>
-                </ul>
-
-                <p><strong>{% trans "Necesita cobertura adicional?:" %}</strong> {% if supps %}{% trans "SI" %}{% else %}{% trans "NO" %}{% endif %}</p>
-                {% if supps %}
-                <p><strong>{% trans "Coberturas adicionales solicitadas:" %}</strong>
-                    {% for supp in supps %}
-                    {{supp.policy_type}},
-                    {% endfor %}
+                <h2>{% trans "Certificación de Revisión y Reconocimiento de la Información" %}</h2>
+                <p>{% trans "Yo" %}, <span class="bold">{{obamacare.client.first_name}} {{obamacare.client.last_name}}</span>{% trans ", he revisado y confirmado que la información para mi aplicación en el mercado de salud es CORRECTA Y VERIDICA y estará disponible como es requerido por el Centro de Servicios de Medicare & Medicaid (CMS) para efectos de elegibilidad y enrolamiento." %}</p>
+                <p>{% trans "Así mismo, acepto a " %}<span class="bold">{{obamacare.agent_usa}}</span>{% trans " como mi agente en registro por los próximos " %}<span class="bold">{{daysAuthorization}} {% trans "días" %}</span>{% trans " a partir del día " %}<span class="bold">{% now "m/d/Y" %}</span>{% trans " y entiendo que " %}<span class="bold">{{obamacare.agent_usa}}</span>{% trans " mantendrá copia de la documentación suministrada por mi como es requerido por el Centro de Servicios de Medicare & Medicaid para efectos de elegibilidad y enrolamiento. Para constancia de ello queda firmado este consent." %}</p>
+                <p>{% trans "Nombre del Aplicante: " %}<span class="bold">{{obamacare.client.first_name}} {{obamacare.client.last_name}}</span><br>
+                    {% trans "Nombre del Agente en Registro: " %}<span class="bold">{{obamacare.agent_usa}}</span><br>
+                    {% trans "Nombre de la Agencia en Registro: " %}<span class="bold">{{company}}</span><br>
+                    {% trans "Teléfono de la Agencia: " %}<span class="bold">+1 (855) 963 6900</span>
                 </p>
-                {% endif %}
             </div>
         </div>
 
