@@ -109,7 +109,7 @@ class USAgent(models.Model):
     name = models.CharField(max_length=50)
 
     class Meta:
-        db_table = 'us_agents'
+        db_table = 'usa_agents'
 
     def getFirstName(self):
         return self.name.strip().split()[0] if self.name.strip() else ""
@@ -642,6 +642,7 @@ class BasePerson(models.Model):
     zipCode = models.IntegerField(null=True)
     agent_id = models.IntegerField(null=True)
     is_sold = models.BooleanField(default=False)
+    other = models.TextField(null=True)
 
     class Meta:
         abstract = True  # No se crea tabla para esta clase

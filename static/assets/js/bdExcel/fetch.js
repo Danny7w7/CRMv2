@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Manejar el envío de formularios de observación
     const forms = document.querySelectorAll('.form-observation');
     
     forms.forEach(function(form) {
@@ -10,7 +9,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const recordId = formData.get('record_id');
             const observation = formData.get('observation');
             
-            // Validación básica
             if (!observation || observation === 'no_valid') {
                 Swal.fire({
                     title: 'Error',
@@ -21,7 +19,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            // Usar la URL desde la variable global
             fetch(window.djangoUrls.saveCommentAjax, {
                 method: 'POST',
                 headers: {
@@ -38,8 +35,33 @@ document.addEventListener('DOMContentLoaded', function() {
                         text: data.message,
                         icon: 'success',
                         confirmButtonText: 'OK'
-                    }).then(() => {
                     });
+
+                    // 🟢 Actualizar icono de "Sold"
+                    const row = form.closest('tr');
+                    const soldCell = row.querySelector('td:first-child');
+                    if (soldCell) {
+                        if (data.is_sold) {
+                            soldCell.innerHTML = `<div class="font-35 text-success"><i class='bx bxs-check-circle'></i></div>`;
+                        } else {
+                            soldCell.innerHTML = `<div class="font-35 text-danger"><i class='bx bxs-message-square-x'></i></div>`;
+                        }
+                    }
+
+                    // 📝 Agregar comentario al modal correspondiente
+                    const modalBody = document.querySelector(`#modalVerTexto_${data.record_id} .modal-body`);
+                    if (modalBody && data.comment) {
+                        const newComment = document.createElement('ul');
+                        newComment.classList.add('list-group');
+                        newComment.innerHTML = `
+                            <li class="list-group-item">
+                                <strong>${data.comment.user}:</strong> ${data.comment.content} 
+                                <strong>Date:</strong> ${data.comment.created_at}
+                            </li>
+                        `;
+                        modalBody.appendChild(newComment);
+                    }
+
                 } else {
                     Swal.fire({
                         title: 'Error',

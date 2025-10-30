@@ -2,6 +2,7 @@
 import datetime
 import csv
 import os
+import json
 
 import pandas as pd
 
@@ -23,12 +24,14 @@ from .decoratorsCompany import *
 @login_required(login_url='/login') 
 @company_ownership_required_sinURL    
 def uploadExcel(request):
-
     company_id = request.company_id  # Obtener company_id desde request
-    company = Companies.objects.filter(id = company_id).first()
+    company = Companies.objects.filter(id=company_id).first()
 
     headers = []  # Cabeceras del archivo Excel
-    model_fields = [field.name for field in BdExcel._meta.fields if field.name not in ['id', 'agent_id', 'excel_metadata']]
+    model_fields = [
+        field.name for field in BdExcel._meta.fields
+        if field.name not in ['id', 'agent_id', 'excel_metadata']
+    ]
 
     if request.method == 'POST':
         form = ExcelUploadForm(request.POST, request.FILES)
@@ -36,34 +39,34 @@ def uploadExcel(request):
         description = request.POST.get('description')
 
         if form.is_valid() and file_name:
-            excel_file = request.FILES['file']            
+            excel_file = request.FILES['file']
 
             try:
-                # Leer el archivo Excel para extraer las cabeceras
+                # Leer archivo Excel
                 df = pd.read_excel(excel_file, engine='openpyxl')
-                headers = list(df.columns)  # Extraer las cabeceras del archivo
+                headers = list(df.columns)
 
-                # Convertir valores a tipos compatibles con JSON
+                # Convertir valores no serializables (como datetime) a texto
                 df = df.applymap(
-                    lambda x: x.isoformat() if isinstance(x, pd.Timestamp) else x
+                    lambda x: (
+                        x.isoformat() if isinstance(x, (datetime.datetime, pd.Timestamp))
+                        else str(x) if isinstance(x, datetime.date)
+                        else x
+                    )
                 )
 
-                # Crear un registro en ExcelFileMetadata
-                try:
-                    excel_metadata = ExcelFileMetadata.objects.create(
-                        file_name=file_name,
-                        description=description,
-                        uploaded_at=datetime.datetime.now(),
-                        company = company
-                    )
-                except Exception as e:
-                    print("❌ Error al crear el registro en ExcelFileMetadata:", str(e))
+                # Crear registro en ExcelFileMetadata
+                excel_metadata = ExcelFileMetadata.objects.create(
+                    file_name=file_name,
+                    description=description,
+                    uploaded_at=datetime.datetime.now(),
+                    company=company
+                )
 
-
-                # Guardar el DataFrame en la sesión para usarlo después
-                request.session['uploaded_data'] = df.to_dict(orient='list')  # Convertir a diccionario serializable
+                # Guardar el DataFrame en sesión
+                request.session['uploaded_data'] = df.to_dict(orient='list')
                 request.session['uploaded_headers'] = headers
-                request.session['metadata_id'] = excel_metadata.id  # Guardar ID del archivo para usarlo luego
+                request.session['metadata_id'] = excel_metadata.id
 
             except Exception as e:
                 return render(request, 'addExcelsDB/uploadExcel.html', {
@@ -71,16 +74,17 @@ def uploadExcel(request):
                     'error': f"Error al procesar el archivo: {str(e)}"
                 })
 
-            # Renderizar la página de mapeo
+            # Pasar al mapeo
             return render(request, 'addExcelsDB/mapHeaders.html', {
                 'headers': headers,
                 'model_fields': model_fields
-                
             })
+
     else:
         form = ExcelUploadForm()
 
     return render(request, 'addExcelsDB/uploadExcel.html', {'form': form})
+
 
 def processAndSave(request):
     if request.method == 'POST':
@@ -124,7 +128,6 @@ def processAndSave(request):
 
 def saveData(request):
     if request.method == 'POST':
-        # Obtener el mapeo entre los campos del modelo y las cabeceras del archivo
         mapping = {}
         for key, value in request.POST.items():
             if key.startswith('mapping_'):
@@ -133,25 +136,25 @@ def saveData(request):
                 if header:
                     mapping[model_field] = header
 
-        # Recuperar datos desde la sesión
         uploaded_data = request.session.get('uploaded_data')
         metadata_id = request.session.get('metadata_id')
+
         if not uploaded_data or not metadata_id:
             return render(request, 'addExcelsDB/uploadExcel.html', {
                 'error': 'No se encontraron datos para procesar.'
             })
 
-        # Recuperar metadata del archivo
         excel_metadata = ExcelFileMetadata.objects.get(id=metadata_id)
-
-        # Reconstruir DataFrame
         df = pd.DataFrame(uploaded_data)
 
-        # Estructuras auxiliares
-        errors = []      # Errores de filas
-        saved_count = 0  # Contador de guardados
+        errors = []
+        saved_count = 0
 
-        # Validar cada fila
+        valid_model_fields = [
+            f.name for f in BdExcel._meta.fields
+            if f.name not in ['id', 'excel_metadata', 'other']
+        ]
+
         for index, row in df.iterrows():
             row_errors = {}
             data = {}
@@ -161,54 +164,55 @@ def saveData(request):
                 if header in df.columns:
                     value = row[header]
 
-                    # Validaciones
-                    if model_field == 'first_name' and not isinstance(value, str):
-                        row_errors[model_field] = 'Debe ser una cadena de texto.'
-                    elif model_field == 'last_name' and value is not None and not isinstance(value, str):
-                        row_errors[model_field] = 'Debe ser una cadena de texto o nulo.'
+                    # Limpieza de NaN o NaT
+                    if pd.isna(value) or value in ['NaT', 'nan']:
+                        value = None
+
+                    # Validaciones básicas
+                    if model_field == 'first_name' and value and not isinstance(value, str):
+                        row_errors[model_field] = 'Debe ser texto.'
                     elif model_field == 'phone':
                         try:
                             value = int(value)
                         except (ValueError, TypeError):
-                            row_errors[model_field] = 'Debe ser un número entero.'
-                            phone_valid = False  # 🚨 si el phone es inválido, no guardamos la fila
+                            row_errors[model_field] = 'Debe ser número.'
+                            phone_valid = False
                     elif model_field == 'zipCode':
                         try:
                             value = int(value)
                         except (ValueError, TypeError):
-                            row_errors[model_field] = 'Debe ser un número entero.'
-                    elif model_field == 'agent_id' and value is not None:
-                        try:
-                            value = int(value)
-                        except (ValueError, TypeError):
-                            row_errors[model_field] = 'Debe ser un número entero o nulo.'
+                            row_errors[model_field] = 'Debe ser número entero.'
 
                     data[model_field] = value
 
-            # --- Guardado condicional ---
-            if phone_valid:  
+            # Guardar columnas no mapeadas
+            other_data = {
+                col: row[col]
+                for col in df.columns
+                if col not in mapping.values()
+            }
+            data['other'] = json.dumps(other_data, ensure_ascii=False)
+
+            if phone_valid:
                 BdExcel.objects.create(excel_metadata=excel_metadata, **data)
                 saved_count += 1
             else:
                 row_errors['phone'] = "Fila descartada: phone inválido, no se guardó."
 
-            # Guardamos errores (sean fatales o no)
             if row_errors:
                 errors.append({'row': index + 1, 'errors': row_errors})
 
-        # Limpiar sesión
         request.session.pop('uploaded_data', None)
         request.session.pop('uploaded_headers', None)
         request.session.pop('metadata_id', None)
 
-        # 🚀 SIEMPRE vamos a success.html
         return render(request, 'addExcelsDB/success.html', {
             'message': f"Se guardaron {saved_count} registros correctamente.",
-            'errors': errors  # Lista con filas y errores para mostrar en la vista
+            'errors': errors
         })
 
-    else:
-        return redirect('addExcelsDB/uploadExcel')
+    return redirect('addExcelsDB/uploadExcel')
+
 
 @login_required(login_url='/login') 
 @company_ownership_required_sinURL  
@@ -300,43 +304,53 @@ def manageAgentAssignments(request):
 @login_required(login_url='/login')
 @company_ownership_required_sinURL  
 def commentDB(request):
-
     company_id = request.company_id  # Obtener company_id desde request    
-    # Definir el filtro de compañía (será un diccionario vacío si es superusuario)
+
+    # Definir los filtros
     company_filter = {'excel_metadata__company': company_id} if not request.user.is_superuser else {}
     company_filter2 = {'company': company_id} if not request.user.is_superuser else {}
 
     roleAuditar = ['S', 'Admin']
     filterBd = None
 
-    # Obtén las opciones para el select desde el modelo DropDownList
+    # Obtener opciones del select
     optionBd = DropDownList.objects.values_list('status_bd', flat=True).exclude(status_bd__isnull=True)
     comenntAgent = CommentBD.objects.all()
 
-    # Filtra los registros dependiendo del rol del usuario
+    # Filtrar registros según rol
     if request.user.role in roleAuditar:
         bd = BdExcel.objects.filter(**company_filter)
         bdName = ExcelFileMetadata.objects.filter(**company_filter2)
     else:
-        bd = BdExcel.objects.filter(agent_id=request.user.id, is_sold = False, **company_filter)
+        bd = BdExcel.objects.filter(agent_id=request.user.id, is_sold=False, **company_filter)
         bdName = ExcelFileMetadata.objects.filter(**company_filter2)
 
+    # Filtrar por archivo Excel si se seleccionó uno
     if request.method == 'POST':        
+        filterBd = request.POST.get('bd')
+        bd = bd.filter(excel_metadata=filterBd)
 
-        filterBd =  request.POST.get('bd')
-        bd = bd.filter(excel_metadata = filterBd)    
+    # 🔍 Convertir "other" de JSON string → dict legible
+    for item in bd:
+        try:
+            if item.other:
+                item.pretty_other = json.loads(item.other)
+            else:
+                item.pretty_other = None
+        except Exception as e:
+            item.pretty_other = None
 
-
-    # Si es una solicitud GET, simplemente renderizamos la vista con los datos
+    # Contexto para la plantilla
     context = {
         'optionBd': optionBd,
         'bd': bd,
-        'comenntAgent':comenntAgent,
-        'bdName' : bdName,
-        'filter' : filterBd
+        'comenntAgent': comenntAgent,
+        'bdName': bdName,
+        'filter': filterBd
     }
 
     return render(request, 'addExcelsDB/bd.html', context)
+
 
 @login_required(login_url='/login')
 @csrf_exempt
@@ -350,7 +364,7 @@ def saveCommentAjax(request):
     try:
         bd_excel_record = BdExcel.objects.get(id=record_id)
 
-        CommentBD.objects.create(
+        comment = CommentBD.objects.create(
             bd_excel=bd_excel_record,
             agent_create=request.user,
             content=observation,
@@ -361,7 +375,18 @@ def saveCommentAjax(request):
             bd_excel_record.is_sold = True
             bd_excel_record.save()
 
-        return JsonResponse({'success': True, 'message': 'Observation saved successfully.'})
+        return JsonResponse({
+            'success': True,
+            'message': 'Observation saved successfully.',
+            'is_sold': bd_excel_record.is_sold,  # <- usado en JS para refrescar icono
+            'record_id': bd_excel_record.id,     # <- para identificar la fila
+            'comment': {
+                'user': request.user.username,
+                'content': comment.content,
+                'created_at': timezone.localtime(comment.created_at).strftime('%Y-%m-%d %H:%M:%S')
+            }
+        })
+
     except BdExcel.DoesNotExist:
         return JsonResponse({'success': False, 'message': 'Record not found.'}, status=404)
     except Exception as e:

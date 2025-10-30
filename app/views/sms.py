@@ -929,9 +929,12 @@ def smstemplate(request):
     template = ContentTemplate.objects.filter(id = sms).first()
 
     if validation == 6:
-        
         validationSms = True
-        sendTemplate(request, client.phone_number, agentFirstName)
+        sendTemplate(request, client.phone_number, agentFirstName, lang='es')
+
+    if validation == 11:
+        validationSms = True
+        sendTemplate(request, client.phone_number, agentFirstName, lang='en')
 
     elif validation in (7,8,9,10):
 
@@ -976,17 +979,26 @@ def smstemplate(request):
     return redirect('editObama', obamacare_id=obama.id, way=way)
 
 #Funcion para enviar template de bienvenida por sms
-def sendTemplate(request, to_number, nameTemplate):
-    imagen_url = None
+def sendTemplate(request, to_number, nameTemplate, lang='es'):
+    """
+    Envía una imagen personalizada al cliente por SMS (Telnyx).
+    Soporta idioma español ('es') e inglés ('en').
+    """
 
+    imagen_url = None
     if request.method == 'POST' and request.FILES.get('filepond'):
         imagen_usuario_file = request.FILES['filepond']
 
         # Leer la imagen del usuario directamente desde memoria
         imagen_usuario = Image.open(imagen_usuario_file).convert("RGBA")
 
-        # Cargar imagen base
-        imagen_base_path = os.path.join(settings.BASE_DIR, 'static', 'assets', 'images', 'template-images', f'{nameTemplate}.jpg')
+        # Cargar imagen base según el idioma
+        suffix = "1" if lang == 'en' else ""
+        imagen_base_path = os.path.join(
+            settings.BASE_DIR, 
+            'static', 'assets', 'images', 'template-images', 
+            f'{nameTemplate}{suffix}.jpg'
+        )
         base = Image.open(imagen_base_path).convert("RGBA")
 
         # Redimensionar y pegar la imagen del usuario
@@ -1021,8 +1033,12 @@ def sendTemplate(request, to_number, nameTemplate):
 
         # Enviar SMS con Telnyx
         telnyx.api_key = settings.TELNYX_API_KEY
-        nameComapny = getCompanyPerAgent(nameTemplate)
-        messageContent = f'¡Bienvenido a {nameComapny}! Aquí está tu información personalizada.'
+        nameCompany = getCompanyPerAgent(nameTemplate)
+
+        if lang == 'en':
+            messageContent = f'Welcome to {nameCompany}! Here is your personalized information.'
+        else:
+            messageContent = f'¡Bienvenido a {nameCompany}! Aquí está tu información personalizada.'
 
         telnyx.Message.create(
             from_='+17869848427',
