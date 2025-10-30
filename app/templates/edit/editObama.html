@@ -1093,9 +1093,9 @@
 											<input type="hidden" name="way" value="{{way}}">
 											<div class="mb-3">
 												<select class="form-select"  name="sms" id="sms" required>
-													<option value="" selected disabled ></OPtion>
+													<option value="" selected disabled >Please Select</OPtion>
 													{% for item in smsTemplateAll %}
-														<option value="{{item.id}}">{{item.identification}}</option>
+														<option value="{{item.template.id}}">{{item.template.identification}}</option>
 													{% endfor %}
 												</select>
 											</div>
