@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (smsSelect) {
         smsSelect.addEventListener('change', function () {
-            welcomeFields.style.display = this.value === '6' ? 'block' : 'none';
+            welcomeFields.style.display = this.value === '6' || this.value === '11' ? 'block' : 'none';
         });
     }
 
