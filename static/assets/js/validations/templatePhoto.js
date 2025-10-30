@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('smsForm');
     if (form) {
         form.addEventListener('submit', function (e) {
-            if (smsSelect.value === '6' && pond.getFiles().length === 0) {
+            if (smsSelect.value === '6' || smsSelect.value === '11' && pond.getFiles().length === 0) {
                 e.preventDefault();
                 alert('Debes seleccionar una imagen para el mensaje de bienvenida.');
             }
