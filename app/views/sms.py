@@ -932,7 +932,7 @@ def smstemplate(request):
         validationSms = True
         sendTemplate(request, client.phone_number, agentFirstName, lang='es')
 
-    if validation == 11:
+    elif validation == 11:
         validationSms = True
         sendTemplate(request, client.phone_number, agentFirstName, lang='en')
 
