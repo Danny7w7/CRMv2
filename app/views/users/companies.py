@@ -1,6 +1,6 @@
 # Standard Python libraries
 from django.http import HttpResponse
-from django.db.models import F
+from django.db.models import F, Prefetch, Count
 
 # Django core libraries
 from django.contrib.auth.decorators import login_required
@@ -270,8 +270,15 @@ def addNumbersUsers(request):
     # Base query con filtro de compañía
     company_filter = {} if request.user.is_superuser else {'company': company_id}
         
-    users = Users.objects.filter(is_active=True, **company_filter)
-    numbers = Numbers.objects.filter(is_active = True, **company_filter)
+    users = Users.objects.filter(is_active=True, **company_filter)    
+    numbers = (
+        Numbers.objects.filter(is_active=True, **company_filter)
+        .annotate(total_users=Count('assigned_users'))
+        .prefetch_related(
+            Prefetch('assigned_users', queryset=Users.objects.only('username', 'first_name', 'last_name'))
+        )
+    )
+        
     hasErrors = False
 
     if request.method == "POST":
@@ -305,10 +312,9 @@ def addNumbersUsers(request):
         # Redirigir para evitar reenvío del formulario
         return redirect('addNumbersUsers')
     
-
     context = {
         'users':users,
-        'numbers':numbers
+        'numbers':numbers,
     }
 
     return render(request, 'companies/addNumbersUsers.html', context)

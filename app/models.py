@@ -151,7 +151,7 @@ class Users(AbstractUser):
         null=True,
         unique=False
     )
-    assigned_phone = models.ForeignKey(Numbers, on_delete=models.SET_NULL, null=True, blank=True)
+    assigned_phone = models.ForeignKey(Numbers, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_users')
     assigned_phone_whatsapp = models.ForeignKey(Numbers_whatsapp, on_delete=models.SET_NULL, null=True, blank=True)
     company = models.ForeignKey(Companies, on_delete=models.CASCADE)
     usaAgents = models.ManyToManyField(USAgent) # customer
@@ -639,7 +639,7 @@ class BasePerson(models.Model):
     address = models.CharField(max_length=255, null=True)
     city = models.CharField(max_length=200, null=True)
     state = models.CharField(max_length=200, null=True)
-    zipCode = models.IntegerField(null=True)
+    zipCode = models.CharField(max_length=255, null=True)
     agent_id = models.IntegerField(null=True)
     is_sold = models.BooleanField(default=False)
     other = models.TextField(null=True)
