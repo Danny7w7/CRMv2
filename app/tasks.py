@@ -529,12 +529,12 @@ def get_obamacare_and_supp():
             ),
             origen=Value("Obamacare"),
         )
-        .values("origen", "agent_usa", "agente", "cliente", "client__phone_number", "created_at", "status","tipe_sale" )
+        .values("origen", "agent_usa", "agente", "cliente", "created_at", "status","tipe_sale" )
     )
     obamacare_df = pd.DataFrame(list(obamacare_qs))
     if not obamacare_df.empty:
         obamacare_df = obamacare_df[
-            ["origen", "agent_usa", "agente", "cliente", "client__phone_number", "created_at", "status","tipe_sale"]
+            ["origen", "agent_usa", "agente", "cliente", "created_at", "status","tipe_sale"]
         ]
 
     # Consulta Supp
@@ -550,11 +550,11 @@ def get_obamacare_and_supp():
             F("agent__last_name"),
         ),
         origen=Value("Supp")
-    ).values( "origen", "agent_usa", "agente", "cliente", "client__phone_number", "created_at", "status", "policy_type", "carrier")
+    ).values( "origen", "agent_usa", "agente", "cliente", "created_at", "status", "policy_type", "carrier")
     supp_df = pd.DataFrame(list(supp_qs))
     if not supp_df.empty:
         supp_df = supp_df[
-            ["origen", "agent_usa", "agente", "cliente", "client__phone_number", "created_at", "status", "policy_type", "carrier"]
+            ["origen", "agent_usa", "agente", "cliente", "created_at", "status", "policy_type", "carrier"]
         ]
 
     # Consulta Calls
