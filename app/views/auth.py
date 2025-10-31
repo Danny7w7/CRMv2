@@ -52,8 +52,7 @@ def logout_(request):
     
 @login_required(login_url='/login')
 def motivationalPhrase(request):
-    randomInt = random.randint(1,174)
-    motivation = Motivation.objects.filter(id=randomInt).first()
+    motivation = Motivation.objects.order_by('?').first()
     user = Users.objects.select_related('company').filter(id = request.user.id).first()
     context = {
         'motivation':motivation,
