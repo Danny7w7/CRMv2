@@ -263,21 +263,32 @@ def toggleNumberCompany(request, number_id):
 
 @login_required(login_url='/login')
 @company_ownership_required_sinURL
-@staffUserRequired
 def addNumbersUsers(request):
 
     company_id = request.company_id  # Obtener company_id desde request
     # Base query con filtro de compañía
     company_filter = {} if request.user.is_superuser else {'company': company_id}
         
-    users = Users.objects.filter(is_active=True, **company_filter)    
-    numbers = (
-        Numbers.objects.filter(is_active=True, **company_filter)
-        .annotate(total_users=Count('assigned_users'))
-        .prefetch_related(
-            Prefetch('assigned_users', queryset=Users.objects.only('username', 'first_name', 'last_name'))
+    users = Users.objects.filter(is_active=True, **company_filter) 
+
+    if request.user.role.is_superuser:
+
+        numbers = (
+            Numbers.objects.annotate(total_users=Count('assigned_users'))
+            .prefetch_related(
+                Prefetch('assigned_users', queryset=Users.objects.only('username', 'first_name', 'last_name'))
+            )
         )
-    )
+
+    else:
+
+        numbers = (
+            Numbers.objects.filter(is_active=True, **company_filter)
+            .annotate(total_users=Count('assigned_users'))
+            .prefetch_related(
+                Prefetch('assigned_users', queryset=Users.objects.only('username', 'first_name', 'last_name'))
+            )
+        )
         
     hasErrors = False
 
@@ -318,3 +329,4 @@ def addNumbersUsers(request):
     }
 
     return render(request, 'companies/addNumbersUsers.html', context)
+
