@@ -54,6 +54,8 @@ urlpatterns = [
     path('validatePhone/', fetchInformations.validatePhone, name='validatePhone'),
     path('validateKey/', fetchInformations.validateKey, name='validateKey'),
 
+    path('notes/', forms.notes, name='notes'),
+    path('saveNote/', forms.saveNote, name='saveNote'),
 
     path('formCreateClientLife/', forms.formCreateClientLife, name='formCreateClientLife'), # Formulario para crear Clientes Life Life Insurance .. 
 

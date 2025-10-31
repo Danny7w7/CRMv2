@@ -45,7 +45,7 @@ EXCLUDED_VIEWS = ['index', 'weeklyLiveViewTV', 'monthLiveViewTV', 'toggleDarkMod
                   'logout','viewConsent','consetMedicare','formCreateUser', 'addNumbersUsers','incomeLetter',
                   'ConsentLifeInsurance','complaint', 'sms','whatsappReply','url_temporal', 'obtainLeadsByGoHighLevel',
                   'consentL','sendConsentForm','enviar_email','uploadTempUrl','cignaSuplemental','tableStatusSale',
-                  'webhooks','check',
+                  'webhooks','check','notes','saveNote',
                   'facebookConnect','facebookCallback','facebookWebhook','facebookSavePage','facebookPrivacyPolicy','facebookConfirmDelete','facebookTerms','facebookDeleteData']  # Puedes agregar más si lo necesitas
 
 class ModuleAccessMiddleware:

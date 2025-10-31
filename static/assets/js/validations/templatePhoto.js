@@ -15,8 +15,8 @@ document.addEventListener('DOMContentLoaded', function () {
         storeAsFile: true,
         acceptedFileTypes: ['image/*'],
         allowImagePreview: true,
-        labelIdle: 'Arrastra tu imagen o <span class="filepond--label-action">búscala</span>',
-        labelFileTypeNotAllowed: 'Solo se permiten imágenes',
+        labelIdle: 'Drag your image or <span class="filepond--label-action">look for it</span>',
+        labelFileTypeNotAllowed: 'Only images are allowed.',
         fileValidateTypeDetectType: (source, type) => new Promise((resolve) => resolve(type))
     });
 
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
         form.addEventListener('submit', function (e) {
             if ((smsSelect.value === '6' || smsSelect.value === '11') && pond.getFiles().length === 0) {
                 e.preventDefault();
-                alert('Debes seleccionar una imagen para el mensaje de bienvenida.');
+                alert('You must select an image for the welcome message.');
             }
         });
     }

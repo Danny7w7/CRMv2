@@ -687,3 +687,37 @@ def formCreateFinalExpenses(request):
 
     return render(request, 'forms/formFinalExpenses.html')
 
+@login_required(login_url='/login') 
+@company_ownership_required_sinURL
+def notes(request):
+
+    agent = request.user
+    company = request.user.company
+
+    notes = Notes.objects.filter(agent=agent, company=company)
+    notes_dict = {n.note_type: n.content for n in notes}
+
+    return render(request, 'forms/notes.html', {"notes": notes_dict })
+
+@csrf_exempt
+def saveNote(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+
+        note_type = data.get("note_type")
+        content = data.get("content")
+        agent = request.user
+        company = request.user.company
+
+        note, created = Notes.objects.get_or_create(
+            agent=agent,
+            company=company,
+            note_type=note_type
+        )
+
+        note.content = content
+        note.save()
+
+        return JsonResponse({"success": True})
+
+    return JsonResponse({"success": False})

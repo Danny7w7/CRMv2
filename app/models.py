@@ -1141,6 +1141,18 @@ class FacebookLead(models.Model):
     class Meta:
         db_table = "facebook_lead"
 
+class Notes(models.Model):
+    agent = models.ForeignKey(Users, on_delete=models.CASCADE)
+    note_type = models.CharField(max_length=50)  # "home", "profile", "contact"
+    content = models.TextField()
+    company = models.ForeignKey(Companies, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "notes"
+
+
 from .modelsSMS import *
 from .modelsWhatsapp import *
 from .modelsDialer import *
