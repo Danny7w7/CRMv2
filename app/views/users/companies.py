@@ -271,7 +271,7 @@ def addNumbersUsers(request):
         
     users = Users.objects.filter(is_active=True, **company_filter) 
 
-    if request.user.role.is_superuser:
+    if request.user.is_superuser:
 
         numbers = (
             Numbers.objects.annotate(total_users=Count('assigned_users'))
