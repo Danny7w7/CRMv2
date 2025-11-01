@@ -25,31 +25,33 @@
 <h6 class="mb-0 text-uppercase">BD assigned</h6>
 
 <hr/>
-
-<div class="card">
-    <div class="card-header">
-        <form method="POST" class="row">
-            {% csrf_token %}
-            <div class="col-md-3">
-                <label for="Name BD">Name BD:</label>
-                <select class="form-select" name="bd" id="bd" required>
-                    <option value="" disabled selected>Select Please</option>
-                        {% for bd_item in bdName %}
-                            <option value="{{ bd_item.id }}" {% if filter and filter == bd_item.id|stringformat:"s" %}selected{% endif %}>
-                                {{ bd_item.file_name }}
-                            </option>
-                        {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-4 align-self-end mt-2">
-                <button type="submit" class="btn btn-primary">Filter</button>
-                <a href="{% url 'bd' %}" class="btn btn-secondary">Reset</a>
-            </div>
-        </form>
+{% if request.user.role != 'A' %}
+    <div class="card">
+        <div class="card-header">
+            <form method="POST" class="row">
+                {% csrf_token %}
+                <div class="col-md-3">
+                    <label for="Name BD">Name BD:</label>
+                    <select class="form-select" name="bd" id="bd" required>
+                        <option value="" disabled selected>Select Please</option>
+                            {% for bd_item in bdName %}
+                                <option value="{{ bd_item.id }}" {% if filter and filter == bd_item.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ bd_item.file_name }}
+                                </option>
+                            {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 align-self-end mt-2">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                    <a href="{% url 'bd' %}" class="btn btn-secondary">Reset</a>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
-<hr/>
+    <hr/>
+
+{% endif %}
 
 <div class="card">
     <div class="card-body">
