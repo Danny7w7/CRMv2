@@ -121,6 +121,9 @@
 							{% if request.user|has_module:"OBAMACARE" or request.user|has_module:"SUPP" or request.user|has_module:"ASSURE" or request.user|has_module:"LIFE INSURANCE" or  request.user|has_module:"MEDICARE" %}
 								<li> <a href="{% url 'formCreateAlert' %}"><i class='bx bx-radio-circle'></i>Create Alert</a> </li>
 								<li> <a href="{% url 'notes' %}"><i class='bx bx-radio-circle'></i>Notes</a> </li>
+								{% if request.user.role == 'Admin' or request.user.role == 'S'  %}
+									<li> <a href="{% url 'tableNotes' %}"><i class='bx bx-radio-circle'></i>View notes</a> </li>
+								{% endif %}
 							{% endif %}
 						</ul>
 					</li>

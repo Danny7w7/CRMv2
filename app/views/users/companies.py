@@ -294,35 +294,46 @@ def addNumbersUsers(request):
 
     if request.method == "POST":
 
-        users = request.POST.getlist('users[]')
-        numbers = request.POST.getlist('number[]')
-        validNumbers = 0
+        formType = request.POST.get('formType')
+        if formType == 'formA':
 
-        for user, number in zip(users, numbers):
-            
-            try:
-                numberDB = Numbers.objects.get(id=number)           
+            users = request.POST.getlist('users[]')
+            numbers = request.POST.getlist('number[]')
+            validNumbers = 0
 
-                if numberDB:
-                    Users.objects.filter(id = user).update(
-                    assigned_phone=numberDB)
-                    validNumbers += 1
-                else:
-                    messages.error(request, f"The # + <strong>{number}</strong> cannot be assigned.")
-                    hasErrors = True               
+            for user, number in zip(users, numbers):
+                
+                try:
+                    numberDB = Numbers.objects.get(id=number)           
 
-            except Users.DoesNotExist:
-                messages.error(request, f"The username '{user}' does not exist.")
-                hasErrors = True
+                    if numberDB:
+                        Users.objects.filter(id = user).update(
+                        assigned_phone=numberDB)
+                        validNumbers += 1
+                    else:
+                        messages.error(request, f"The # + <strong>{number}</strong> cannot be assigned.")
+                        hasErrors = True               
 
-        if not hasErrors:
-            messages.success(request, f"The numbers were added correctly.")
-        elif validNumbers > 0:
-            messages.warning(request, f"Added {validNumbers} #, but there were mistakes with some of them.")
+                except Users.DoesNotExist:
+                    messages.error(request, f"The username '{user}' does not exist.")
+                    hasErrors = True
 
-        # Redirigir para evitar reenvío del formulario
-        return redirect('addNumbersUsers')
-    
+            if not hasErrors:
+                messages.success(request, f"The numbers were added correctly.")
+            elif validNumbers > 0:
+                messages.warning(request, f"Added {validNumbers} #, but there were mistakes with some of them.")
+
+            # Redirigir para evitar reenvío del formulario
+            return redirect('addNumbersUsers')
+        
+        elif formType == 'formB':
+
+            numbers = request.POST.get('numberDelete')
+            Numbers.objects.filter(id = numbers).update(is_active=False)
+            messages.success(request, f"Number successfully deleted")  
+
+            return redirect('addNumbersUsers') 
+
     context = {
         'users':users,
         'numbers':numbers,

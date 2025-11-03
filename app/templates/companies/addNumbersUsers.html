@@ -40,52 +40,85 @@
 
 {% endblock %}
 {% block page_content %}
-<h6 class="mb-0 text-uppercase">ADD Numbers Users</h6>
-<hr/>
-<div class="row">
-    <div class="col-xl-10 mx-auto">
-        <div class="card">
-            <div class="card-header px-4 py-3">
-                <h5 class="mb-0">Add New Numbers Users</h5>
-            </div>
-            <div class="card-body p-4">
-                <form id="formCreateCompanies" class="row g-3 needs-validation" method="POST">
-                    <div id="numbers-container">
-                        <div class="numbers-item row g-3">
-                            <div class="col-md-6">
-                                <label for="users" class="form-label">Users</label>
-                                <select class="form-control" name="users[]" required>
-                                    <option value="" disabled selected>Select Please</option>
-                                    {% for  item in users %}
+
+<div class="row row-cols-1 row-cols-md-1 row-cols-lg-2 row-cols-xl-2">
+	<div class="col">
+		<h6 class="mb-0 text-uppercase">Add New Numbers Users</h6>
+		<hr/>
+		<div class="card">
+			<div class="card-body">
+				<form class="row g-3 needs-validation" method="POST">
+					<div id="numbers-container">
+						<div class="numbers-item row g-3">
+							<div class="col-md-6">
+								<label for="users" class="form-label">Users</label>
+								<select class="form-control" name="users[]" required>
+									<option value="" disabled selected>Select Please</option>
+									{% for  item in users %}
 										<option value="{{item.id}}" >{{item.first_name}} {{item.last_name}}</option>                      
 									{% endfor %}		
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="number" class="form-label">Numbers</label>
+								</select>
+							</div>
+							<div class="col-md-6">
+								<label for="number" class="form-label">Numbers</label>
 								<select class="form-control" name="number[]" required>
-                                    <option value="" disabled selected>Select Please</option>
-                                    {% for  item in numbers %}
+									<option value="" disabled selected>Select Please</option>
+									{% for  item in numbers %}
 										<option value="{{item.id}}" >{{item.phone_number}}</option>                      
 									{% endfor %}		
-                                </select>
-                            </div>
-                            <div class="col-md-12 text-end">
-                                <button type="button" class="btn btn-danger remove-numbers">Remove</button>
-                            </div>
-                        </div>
-                    </div>                   
-                    <div class="col-md-12">
-                        <div class="d-md-flex d-grid align-items-center gap-3">
-                            <button type="button" id="addNumbers" class="btn btn-success px-4">ADD</button>
-                            <button type="submit" class="btn btn-primary px-4">Submit</button>
-                        </div>
-                    </div>
-                    {% csrf_token %}
-                </form>
-            </div>
-        </div>
-        <hr>
+								</select>
+							</div>
+							<div class="col-md-12 text-end">
+								<button type="button" class="btn btn-danger remove-numbers">Remove selection</button>
+							</div>
+						</div>
+					</div>                   
+					<div class="col-md-12">
+						<div class="d-md-flex d-grid align-items-center gap-3">
+							<button type="button" id="addNumbers" class="btn btn-success px-4">ADD</button>
+							<button type="submit" class="btn btn-primary px-4"  name="formType" value="formA">Submit</button>
+						</div>
+					</div>
+					{% csrf_token %}
+				</form>
+			</div>
+		</div>
+	</div>
+	<div class="col">
+		<h6 class="mb-0 text-uppercase">Deletion of numbers</h6>
+		<hr/>
+		<div class="card">
+			<div class="card-body">
+				<form class="row g-3 needs-validation" method="POST">
+					<div id="numbers-container">
+						<div class="numbers-item row g-3">					
+							<div class="col-md-6">
+								<label for="number" class="form-label">Numbers</label>
+								<select class="form-control" name="numberDelete" required>
+									<option value="" disabled selected>Select Please</option>
+									{% for  item in numbers %}
+										<option value="{{item.id}}" >{{item.phone_number}}</option>                      
+									{% endfor %}		
+								</select>
+							</div>
+						</div>
+					</div>                   
+					<div class="col-md-12">
+						<div class="d-md-flex d-grid align-items-center gap-3">
+							<button type="submit" class="btn btn-primary px-4"  name="formType" value="formB">Submit</button>
+						</div>
+					</div>
+					{% csrf_token %}
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<hr/>
+
+<div class="row">
+    <div class="col-xl-11 mx-auto">
         <h3>Numbers</h3>
 		<div class="card">
 			<div class="card-body">

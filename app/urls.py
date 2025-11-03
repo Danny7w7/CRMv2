@@ -56,6 +56,7 @@ urlpatterns = [
 
     path('notes/', forms.notes, name='notes'),
     path('saveNote/', forms.saveNote, name='saveNote'),
+    path('tableNotes/', table.tableNotes, name='tableNotes'),
 
     path('formCreateClientLife/', forms.formCreateClientLife, name='formCreateClientLife'), # Formulario para crear Clientes Life Life Insurance .. 
 
@@ -283,7 +284,6 @@ urlpatterns = [
     path('manageAgentAssignments/', dbExcel.manageAgentAssignments, name='manageAgentAssignments'),
     path('bd/', dbExcel.commentDB, name='bd'),
     path('reportBd/', dbExcel.reportBd, name='reportBd'),
-    path('saveCommentAjax', dbExcel.saveCommentAjax, name='saveCommentAjax'),
 
 
     #<---------------------------Consent---------------------------> 

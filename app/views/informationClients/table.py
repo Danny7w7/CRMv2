@@ -391,5 +391,16 @@ def clientFinallExpenses(request):
 
     return render(request, 'informationClient/clientFinallExpenses.html', {'finalE':finalE})
 
+@login_required(login_url='/login')   
+@company_ownership_required_sinURL 
+def tableNotes(request):
 
+    company_id = request.company_id
+
+    if request.user.is_superuser:
+        note = Notes.objects.select_related('agent','company').all()
+    else:
+        note = Notes.objects.select_related('agent').filter(company = company_id)
+
+    return render(request, 'informationClient/tableNotes.html', {'note':note})
 

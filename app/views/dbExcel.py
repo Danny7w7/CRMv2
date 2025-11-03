@@ -11,7 +11,7 @@ from django.http import HttpResponse, JsonResponse
 
 # Django core libraries
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count, TextField, Value
+from django.db.models import Count, TextField, Value, Q
 from django.db.models.functions import Coalesce
 from django.shortcuts import redirect, render 
 from django.views.decorators.csrf import csrf_exempt
@@ -84,7 +84,6 @@ def uploadExcel(request):
         form = ExcelUploadForm()
 
     return render(request, 'addExcelsDB/uploadExcel.html', {'form': form})
-
 
 def processAndSave(request):
     if request.method == 'POST':
@@ -213,7 +212,6 @@ def saveData(request):
 
     return redirect('addExcelsDB/uploadExcel')
 
-
 @login_required(login_url='/login') 
 @company_ownership_required_sinURL  
 def manageAgentAssignments(request):
@@ -302,95 +300,212 @@ def manageAgentAssignments(request):
     })
 
 @login_required(login_url='/login')
-@company_ownership_required_sinURL  
+@company_ownership_required_sinURL 
 def commentDB(request):
-    company_id = request.company_id  # Obtener company_id desde request    
+    company_id = request.company_id
 
-    # Definir los filtros
-    company_filter = {'excel_metadata__company': company_id} if not request.user.is_superuser else {}
+    # ✅ 1) Obtener timeline (Comentarios + Observaciones)
+    if request.GET.get('get_comments'):
+        record_id = request.GET.get('record_id')
+
+        comments = CommentBD.objects.filter(
+            bd_excel_id=record_id
+        ).select_related('agent_create').values(
+            'content', 'created_at',
+            'agent_create__first_name', 'agent_create__last_name'
+        )
+
+        observations = ObservationBD.objects.filter(
+            bd_excel_id=record_id
+        ).select_related('agent_create').values(
+            'content', 'created_at',
+            'agent_create__first_name', 'agent_create__last_name'
+        )
+
+        timeline = []
+
+        for c in comments:
+            timeline.append({
+                'text': c['content'],
+                'agent_name': f"{c['agent_create__first_name']} {c['agent_create__last_name']}".strip() or "Sistema",
+                'date': c['created_at'].strftime('%Y-%m-%d %H:%M:%S'),
+                'type': 'Tipificación'
+            })
+
+        for o in observations:
+            timeline.append({
+                'text': o['content'],
+                'agent_name': f"{o['agent_create__first_name']} {o['agent_create__last_name']}".strip() or "Sistema",
+                'date': o['created_at'].strftime('%Y-%m-%d %H:%M:%S'),
+                'type': 'Observación'
+            })
+
+        timeline = sorted(timeline, key=lambda x: x['date'], reverse=True)
+
+        return JsonResponse({'comments': timeline})
+
+
+    # ✅ 2) Petición AJAX de DataTables
+    if request.GET.get('draw'):
+        return commentDBAjax(request, company_id)
+
+
+    # ✅ 3) Guardar tipificación u observación (POST AJAX)
+    if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+
+        record_id = request.POST.get('record_id')
+        excel_metadata_id = request.POST.get('record_id_coment')
+        text = request.POST.get('observation')
+        mode = request.POST.get('type')  # "comment" o "observation"
+
+        if not record_id or not text or text == 'no_valid':
+            return JsonResponse({'success': False, 'error': 'Datos incompletos'}, status=400)
+
+        try:
+            bd_excel = BdExcel.objects.get(id=record_id)
+
+            if mode == 'observation':
+                ObservationBD.objects.create(
+                    bd_excel=bd_excel,
+                    agent_create=request.user,
+                    excel_metadata_id=excel_metadata_id,
+                    content=text
+                )
+            else:
+                CommentBD.objects.create(
+                    bd_excel=bd_excel,
+                    agent_create=request.user,
+                    excel_metadata_id=excel_metadata_id,
+                    content=text
+                )
+
+            return JsonResponse({'success': True})
+
+        except BdExcel.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Registro no encontrado'}, status=404)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+
+    # ✅ 4) Render normal de página
     company_filter2 = {'company': company_id} if not request.user.is_superuser else {}
 
-    roleAuditar = ['S', 'Admin']
-    filterBd = None
-
-    # Obtener opciones del select
-    optionBd = DropDownList.objects.values_list('status_bd', flat=True).exclude(status_bd__isnull=True)
-    comenntAgent = CommentBD.objects.all()
-
-    # Filtrar registros según rol
-    if request.user.role in roleAuditar:
-        bd = BdExcel.objects.filter(**company_filter)
-        bdName = ExcelFileMetadata.objects.filter(**company_filter2)
-    else:
-        bd = BdExcel.objects.filter(agent_id=request.user.id, is_sold=False, **company_filter)
-        bdName = ExcelFileMetadata.objects.filter(**company_filter2)
-
-    # Filtrar por archivo Excel si se seleccionó uno
-    if request.method == 'POST':        
-        filterBd = request.POST.get('bd')
-        bd = bd.filter(excel_metadata=filterBd)
-
-    # 🔍 Convertir "other" de JSON string → dict legible
-    for item in bd:
-        try:
-            if item.other:
-                item.pretty_other = json.loads(item.other)
-            else:
-                item.pretty_other = None
-        except Exception as e:
-            item.pretty_other = None
-
-    # Contexto para la plantilla
     context = {
-        'optionBd': optionBd,
-        'bd': bd,
-        'comenntAgent': comenntAgent,
-        'bdName': bdName,
-        'filter': filterBd
+        'optionBd': DropDownList.objects.values_list('status_bd', flat=True).exclude(status_bd__isnull=True),
+        'comenntAgent': CommentBD.objects.all(),
+        'bdName': ExcelFileMetadata.objects.filter(**company_filter2),
+        'filter': request.POST.get('bd') if request.method == 'POST' else None
     }
 
     return render(request, 'addExcelsDB/bd.html', context)
 
-
 @login_required(login_url='/login')
 @csrf_exempt
-def saveCommentAjax(request):
-    record_id = request.POST.get('record_id')
-    observation = request.POST.get('observation')
-
-    if not record_id or not observation:
-        return JsonResponse({'success': False, 'message': 'Please select a valid option.'}, status=400)
-
-    try:
-        bd_excel_record = BdExcel.objects.get(id=record_id)
-
-        comment = CommentBD.objects.create(
-            bd_excel=bd_excel_record,
-            agent_create=request.user,
-            content=observation,
-            excel_metadata=bd_excel_record.excel_metadata
+def commentDBAjax(request, company_id):
+    """Maneja las peticiones AJAX de DataTables"""
+    
+    # Parámetros de DataTables
+    draw = int(request.GET.get('draw', 1))
+    start = int(request.GET.get('start', 0))
+    length = int(request.GET.get('length', 50))
+    search_value = request.GET.get('search[value]', '')
+    
+    # Filtros
+    company_filter = {'excel_metadata__company': company_id} if not request.user.is_superuser else {}
+    roleAuditar = ['S', 'Admin']
+    
+    # Filtrar registros según rol
+    if request.user.role in roleAuditar:
+        bd = BdExcel.objects.select_related('excel_metadata').filter(**company_filter)
+    else:
+        bd = BdExcel.objects.select_related('excel_metadata').filter(
+            agent_id=request.user.id, 
+            is_sold=False, 
+            **company_filter
         )
-
-        if observation == 'SOLD':
-            bd_excel_record.is_sold = True
-            bd_excel_record.save()
-
-        return JsonResponse({
-            'success': True,
-            'message': 'Observation saved successfully.',
-            'is_sold': bd_excel_record.is_sold,  # <- usado en JS para refrescar icono
-            'record_id': bd_excel_record.id,     # <- para identificar la fila
-            'comment': {
-                'user': request.user.username,
-                'content': comment.content,
-                'created_at': timezone.localtime(comment.created_at).strftime('%Y-%m-%d %H:%M:%S')
-            }
-        })
-
-    except BdExcel.DoesNotExist:
-        return JsonResponse({'success': False, 'message': 'Record not found.'}, status=404)
-    except Exception as e:
-        return JsonResponse({'success': False, 'message': str(e)}, status=500)
+    
+    # Filtrar por archivo Excel si existe
+    filterBd = request.GET.get('bd_filter')
+    if filterBd:
+        bd = bd.filter(excel_metadata=filterBd)
+    
+    # Búsqueda global
+    if search_value:
+        bd = bd.filter(
+            Q(first_name__icontains=search_value) |
+            Q(last_name__icontains=search_value) |
+            Q(phone__icontains=search_value) |
+            Q(city__icontains=search_value) |
+            Q(state__icontains=search_value) |
+            Q(zipCode__icontains=search_value)
+        )
+    
+    # Total de registros
+    records_total = bd.count()
+    
+    # Aplicar paginación
+    bd_page = bd[start:start + length]
+    
+    # 🔧 FUNCIÓN AUXILIAR para limpiar valores NaN/None/Infinity
+    def clean_value(value):
+        """Convierte valores inválidos en None o strings"""
+        if value is None:
+            return None
+        if isinstance(value, float):
+            if value != value:  # Detecta NaN
+                return None
+            if value == float('inf') or value == float('-inf'):
+                return None
+        return value
+    
+    def clean_dict(data):
+        """Limpia un diccionario recursivamente"""
+        if not isinstance(data, dict):
+            return data
+        cleaned = {}
+        for key, value in data.items():
+            if isinstance(value, dict):
+                cleaned[key] = clean_dict(value)
+            elif isinstance(value, list):
+                cleaned[key] = [clean_value(v) for v in value]
+            else:
+                cleaned[key] = clean_value(value)
+        return cleaned
+    
+    # Preparar datos
+    data = []
+    for item in bd_page:
+        # Parsear other
+        pretty_other = None
+        try:
+            if item.other:
+                parsed = json.loads(item.other)
+                # Limpiar valores NaN/None/Infinity del diccionario
+                pretty_other = clean_dict(parsed)
+        except Exception as e:
+            print(f"Error parseando 'other' del registro {item.id}: {e}")
+            pretty_other = None
+        
+        row = {
+            'id': item.id,
+            'is_sold': item.is_sold,
+            'first_name': item.first_name or '',
+            'last_name': item.last_name or '',
+            'phone': item.phone or '',
+            'address': item.address or '',
+            'city': item.city or '',
+            'state': item.state or '',
+            'pretty_other': pretty_other,
+            'excel_metadata': item.excel_metadata.id if item.excel_metadata else None
+        }
+        data.append(row)
+    
+    return JsonResponse({
+        'draw': draw,
+        'recordsTotal': records_total,
+        'recordsFiltered': records_total,
+        'data': data
+    })
 
 @login_required(login_url='/login')
 @company_ownership_required_sinURL  

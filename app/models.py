@@ -639,7 +639,6 @@ class BasePerson(models.Model):
     address = models.CharField(max_length=255, null=True)
     city = models.CharField(max_length=200, null=True)
     state = models.CharField(max_length=200, null=True)
-    zipCode = models.CharField(max_length=255, null=True)
     agent_id = models.IntegerField(null=True)
     is_sold = models.BooleanField(default=False)
     other = models.TextField(null=True)
@@ -707,6 +706,16 @@ class CommentBD(models.Model):
 
     class Meta:
         db_table = 'comment_bd'
+
+class ObservationBD(models.Model):
+    bd_excel = models.ForeignKey(BdExcel, on_delete=models.CASCADE)
+    agent_create = models.ForeignKey(Users, on_delete=models.CASCADE )
+    excel_metadata = models.ForeignKey(ExcelFileMetadata,on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'observation_bd'
 
 class DocumentsClient(models.Model):
     file = models.FileField(
@@ -1143,7 +1152,7 @@ class FacebookLead(models.Model):
 
 class Notes(models.Model):
     agent = models.ForeignKey(Users, on_delete=models.CASCADE)
-    note_type = models.CharField(max_length=50)  # "home", "profile", "contact"
+    note_type = models.CharField(max_length=50)  
     content = models.TextField()
     company = models.ForeignKey(Companies, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)

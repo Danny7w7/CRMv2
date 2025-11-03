@@ -32,7 +32,7 @@ MODULE_PATHS = {
     'CUSTOMER REPORTS': [ 'customerPerformance', 'typification','customerTypification','toggleTypification','get_observation_detail','customerStep'],
     'GRAPHICAL REPORTS': [ 'averageCustomer', 'salesPerformance','chart6Week'],
     'QUALITY': [ 'formCreateControl', 'control','createQuality','formCreateQuestionControl','toggleQuestionControl','formOE','tableOE','tableOEDetail','formAsignationQuestionControl'],
-    'BD': [ 'uploadExcel', 'manageAgentAssignments','reportBd','bd','processAndSave','saveData','saveCommentAjax'],
+    'BD': [ 'uploadExcel', 'manageAgentAssignments','reportBd','bd','processAndSave','saveData','commentDB'],
     'COMPARATIVE': [ 'uploadReports','processExcel','headerProcessor', 'paymentsReports', 'paymentsReportsSupp'],
     'TEAM MANAGEMENT': [ 'customerAssignments'],
     'QUOTATION': [ 'marketplace','obtenerCountyfips','obtenerLatLon'],
@@ -45,7 +45,7 @@ EXCLUDED_VIEWS = ['index', 'weeklyLiveViewTV', 'monthLiveViewTV', 'toggleDarkMod
                   'logout','viewConsent','consetMedicare','formCreateUser', 'addNumbersUsers','incomeLetter',
                   'ConsentLifeInsurance','complaint', 'sms','whatsappReply','url_temporal', 'obtainLeadsByGoHighLevel',
                   'consentL','sendConsentForm','enviar_email','uploadTempUrl','cignaSuplemental','tableStatusSale',
-                  'webhooks','check','notes','saveNote',
+                  'webhooks','check','notes','saveNote','tableNotes',
                   'facebookConnect','facebookCallback','facebookWebhook','facebookSavePage','facebookPrivacyPolicy','facebookConfirmDelete','facebookTerms','facebookDeleteData']  # Puedes agregar más si lo necesitas
 
 class ModuleAccessMiddleware:
