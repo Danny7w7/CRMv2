@@ -180,6 +180,7 @@
     data-is-admin="{% if request.user.role == 'Admin' or request.user.role == 'S' %}true{% else %}false{% endif %}"
     data-bd-filter="{{ filter|default:'' }}"
     data-api-url="{% url 'bd' %}">
+    {% csrf_token %}
 </div>
 
 <!-- Pasar las opciones del dropdown como variable global -->

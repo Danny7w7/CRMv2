@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Obtener configuración del dataset del elemento contenedor
     const container = document.getElementById('bdTableContainer');
     if (!container) {
-        console.error('Container not found #bdTableContainer');
+        console.error('No se encontró el contenedor #bdTableContainer');
         return;
     }
     
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <tr>
                     <td colspan="${isAdmin ? 11 : 10}" class="text-center">
                         <div class="spinner-border" role="status">
-                            <span class="visually-hidden">Loading...</span>
+                            <span class="visually-hidden">Cargando...</span>
                         </div>
                     </td>
                 </tr>
@@ -81,11 +81,11 @@ document.addEventListener('DOMContentLoaded', function() {
             renderInfo();
             
         } catch (error) {
-            console.error('Error loading data:', error);
+            console.error('Error al cargar datos:', error);
             tableBody.innerHTML = `
                 <tr>
                     <td colspan="${isAdmin ? 11 : 10}" class="text-center text-danger">
-                        Error loading data. Please try again.
+                        Error al cargar los datos. Por favor, intente de nuevo.
                     </td>
                 </tr>
             `;
@@ -93,8 +93,8 @@ document.addEventListener('DOMContentLoaded', function() {
             // SweetAlert para error de carga
             Swal.fire({
                 icon: 'error',
-                title: 'Error loading data.',
-                text: 'The records could not be loaded. Please try again.',
+                title: 'Error al cargar datos',
+                text: 'No se pudieron cargar los registros. Por favor, intente de nuevo.',
                 confirmButtonColor: '#d33'
             });
         }
@@ -106,12 +106,17 @@ document.addEventListener('DOMContentLoaded', function() {
             tableBody.innerHTML = `
                 <tr>
                     <td colspan="${isAdmin ? 11 : 10}" class="text-center">
-                        No results found
+                        No se encontraron resultados
                     </td>
                 </tr>
             `;
             return;
         }
+        
+        // Obtener CSRF token UNA VEZ fuera del loop
+        const csrfTokenElement = document.querySelector('[name=csrfmiddlewaretoken]');
+        const csrfToken = csrfTokenElement ? csrfTokenElement.value : '';
+        const optionsBd = window.BD_OPTIONS || []; // Las opciones deben pasarse desde el template
         
         tableBody.innerHTML = data.map(item => {
             let row = '<tr>';
@@ -148,10 +153,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </td>
             `;
                     
-            // Typification - Aquí necesitamos el token CSRF y las opciones
-            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-            const optionsBd = window.BD_OPTIONS || []; // Las opciones deben pasarse desde el template
-            
+            // Typification
             row += `
                 <td style="vertical-align: middle;">
                     <form method="POST" class="form-observation" data-id="${item.id}">
@@ -170,12 +172,12 @@ document.addEventListener('DOMContentLoaded', function() {
             // View Typification
             row += `
                 <td style="vertical-align: middle;">
-                    <button type="button" class="btn btn-outline-secondary btn-sm btn-view-comment" 
+                    <button type="button" class="btn btn-outline-secondary btn-view-comment" 
                             data-id="${item.id}">
                         <i class='bx bx-comment-detail me-0'></i>
                     </button>
 
-                    <button type="button" class="btn btn-outline-secondary btn-sm btn-add-observation"
+                    <button type="button" class="btn btn-warning btn-sm btn-add-observation"
                             data-id="${item.id}" data-excel="${item.excel_metadata}" data-text="${item.observation || ''}">
                         <i class='bx bx-edit-alt'></i>
                     </button>
@@ -195,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function renderInfo() {
         const start = (currentPage - 1) * recordsPerPage + 1;
         const end = Math.min(currentPage * recordsPerPage, totalRecords);
-        tableInfo.textContent = `Displaying ${start} to ${end} from ${totalRecords} records`;
+        tableInfo.textContent = `Mostrando ${start} a ${end} de ${totalRecords} registros`;
     }
     
     // Renderizar paginación
@@ -212,14 +214,14 @@ document.addEventListener('DOMContentLoaded', function() {
         // Botón Primera
         html += `
             <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-                <a class="page-link" href="#" data-page="1">First</a>
+                <a class="page-link" href="#" data-page="1">Primera</a>
             </li>
         `;
         
         // Botón Anterior
         html += `
             <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-                <a class="page-link" href="#" data-page="${currentPage - 1}">Previous</a>
+                <a class="page-link" href="#" data-page="${currentPage - 1}">Anterior</a>
             </li>
         `;
         
@@ -238,14 +240,14 @@ document.addEventListener('DOMContentLoaded', function() {
         // Botón Siguiente
         html += `
             <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-                <a class="page-link" href="#" data-page="${currentPage + 1}">Next</a>
+                <a class="page-link" href="#" data-page="${currentPage + 1}">Siguiente</a>
             </li>
         `;
         
         // Botón Última
         html += `
             <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-                <a class="page-link" href="#" data-page="${totalPages}">Last</a>
+                <a class="page-link" href="#" data-page="${totalPages}">Última</a>
             </li>
         `;
         
@@ -311,12 +313,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Verificar si data es string "null" o realmente null/undefined
         if (!data || data === 'null' || data === null || (typeof data === 'object' && Object.keys(data).length === 0)) {
-            modalBody.innerHTML = '<p class="text-muted">No additional data.</p>';
+            modalBody.innerHTML = '<p class="text-muted">Sin datos adicionales.</p>';
         } else {
             let html = '<table class="table table-sm table-bordered"><tbody>';
             for (const [key, value] of Object.entries(data)) {
                 // Convertir null a texto legible
-                const displayValue = value === null || value === undefined ? '<em class="text-muted">No data</em>' : value;
+                const displayValue = value === null || value === undefined ? '<em class="text-muted">Sin datos</em>' : value;
                 html += `<tr><th>${key}</th><td>${displayValue}</td></tr>`;
             }
             html += '</tbody></table>';
@@ -336,7 +338,7 @@ document.addEventListener('DOMContentLoaded', function() {
         modalBody.innerHTML = `
             <div class="text-center">
                 <div class="spinner-border" role="status">
-                    <span class="visually-hidden">Loading...</span>
+                    <span class="visually-hidden">Cargando...</span>
                 </div>
             </div>
         `;
@@ -348,7 +350,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const response = await fetch(`${apiUrl}?get_comments=1&record_id=${recordId}`);
             
             if (!response.ok) {
-                throw new Error('Error loading comments');
+                throw new Error('Error al cargar comentarios');
             }
             
             const data = await response.json();
@@ -359,7 +361,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     html += `
                         <div class="list-group-item">
                             <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">${comment.agent_name || 'User'}</h6>
+                                <h6 class="mb-1">${comment.agent_name || 'Usuario'}</h6>
                                 <small>${comment.date || ''}</small>
                             </div>
                             <p class="mb-1">${comment.text || ''}</p>
@@ -370,18 +372,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 html += '</div>';
                 modalBody.innerHTML = html;
             } else {
-                modalBody.innerHTML = '<p class="text-muted">There are no comments for this record..</p>';
+                modalBody.innerHTML = '<p class="text-muted">No hay comentarios para este registro.</p>';
             }
             
         } catch (error) {
             console.error('Error:', error);
-            modalBody.innerHTML = '<p class="text-danger">Error loading comments.</p>';
+            modalBody.innerHTML = '<p class="text-danger">Error al cargar los comentarios.</p>';
             
             // SweetAlert para error de comentarios
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: 'Comments could not be loaded.',
+                text: 'No se pudieron cargar los comentarios',
                 confirmButtonColor: '#d33'
             });
         }
@@ -394,7 +396,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const originalText = button.textContent;
         
         button.disabled = true;
-        button.textContent = 'Saving...';
+        button.textContent = 'Guardando...';
         
         try {
             const response = await fetch(apiUrl, {
@@ -411,8 +413,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // SweetAlert de éxito
                 Swal.fire({
                     icon: 'success',
-                    title: 'Saved!',
-                    text: 'Classification successfully saved.',
+                    title: '¡Guardado!',
+                    text: 'Tipificación guardada exitosamente',
                     timer: 2000,
                     showConfirmButton: false,
                     toast: true,
@@ -425,7 +427,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: data.error || 'Unknown error while saving.',
+                    text: data.error || 'Error desconocido al guardar',
                     confirmButtonColor: '#d33'
                 });
             }
@@ -435,8 +437,8 @@ document.addEventListener('DOMContentLoaded', function() {
             // SweetAlert de error de red
             Swal.fire({
                 icon: 'error',
-                title: 'Connection error',
-                text: 'The classification could not be saved. Please check your connection.',
+                title: 'Error de conexión',
+                text: 'No se pudo guardar la tipificación. Verifique su conexión.',
                 confirmButtonColor: '#d33'
             });
         } finally {
@@ -456,8 +458,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!text.trim()) {
             Swal.fire({
                 icon: 'warning',
-                title: 'Empty field',
-                text: 'Please enter a comment before saving.',
+                title: 'Campo vacío',
+                text: 'Por favor escriba una observación antes de guardar',
                 confirmButtonColor: '#ffc107'
             });
             return;
@@ -465,8 +467,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Mostrar loading mientras guarda
         Swal.fire({
-            title: 'Saving...',
-            text: 'Please wait.',
+            title: 'Guardando...',
+            text: 'Por favor espere',
             allowOutsideClick: false,
             allowEscapeKey: false,
             showConfirmButton: false,
@@ -503,8 +505,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // SweetAlert de éxito
                 Swal.fire({
                     icon: 'success',
-                    title: 'Excellent!',
-                    text: 'Observation saved successfully.',
+                    title: '¡Excelente!',
+                    text: 'Observación guardada correctamente',
                     timer: 2000,
                     showConfirmButton: false
                 });
@@ -515,8 +517,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // SweetAlert de error
                 Swal.fire({
                     icon: 'error',
-                    title: 'Error saving',
-                    text: data.error || 'An unknown error occurred',
+                    title: 'Error al guardar',
+                    text: data.error || 'Ocurrió un error desconocido',
                     confirmButtonColor: '#d33'
                 });
             }
@@ -526,8 +528,8 @@ document.addEventListener('DOMContentLoaded', function() {
             // SweetAlert de error de conexión
             Swal.fire({
                 icon: 'error',
-                title: 'Connection error',
-                text: 'Could not connect to the server',
+                title: 'Error de conexión',
+                text: 'No se pudo conectar con el servidor',
                 confirmButtonColor: '#d33'
             });
         }
