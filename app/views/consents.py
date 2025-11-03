@@ -755,7 +755,7 @@ def getCompanyPerAgent(agent):
         company = "TRUINSURANCE GROUP LLC"
     elif any(substring in agent_upper for substring in ["DANIEL", "ZOHIRA", "DANIESKA", "VLADIMIR", "FRANK"]):
         company = "LAPEIRA & ASSOCIATES LLC"
-    elif any(substring in agent_upper for substring in ["BORJA", "RODRIGO", "EVELYN"]):
+    elif any(substring in agent_upper for substring in ["BORJA", "RODRIGO", "EVELYN","YURLEY"]):
         company = "SECUREPLUS INSURANCE LLC"
     else:
         company = ""  # Valor predeterminado si no hay coincidencia
